@@ -25,6 +25,26 @@ app.use('*', async (c, next) => {
   return next()
 })
 
+// Test-only (Playwright): empties every table between tests. It answers only when ENVIRONMENT === 'dev', which
+// is set in .dev.vars or by the e2e web server and never in wrangler.jsonc, so a deployed Worker returns 404.
+app.post('/dev/reset', async (c) => {
+  if (c.env.ENVIRONMENT !== 'dev') return err('not_found', 'No such API route', 404)
+  const db = c.env.DB
+  await db.batch([
+    db.prepare('DELETE FROM task_progress'),
+    db.prepare('DELETE FROM week_log'),
+    db.prepare('DELETE FROM problem_log'),
+    db.prepare('DELETE FROM design_status'),
+    db.prepare('DELETE FROM decision_card'),
+    db.prepare('DELETE FROM note'),
+    db.prepare('DELETE FROM flashcard_state'),
+    db.prepare('DELETE FROM focus_session'),
+    db.prepare('DELETE FROM settings'),
+    db.prepare('DELETE FROM applied_op'),
+  ])
+  return json({ reset: true })
+})
+
 app.get('/state', async (c) => json(await readState(c.env.DB)))
 
 app.get('/export', async (c) => {

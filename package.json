@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "npm run build && wrangler deploy",
+    "lhci": "npm run build && node scripts/lhci.mjs",
+    "test:all": "vitest run && playwright test"
   },
   "dependencies": {
     "@preact/signals": "^2.11.3",

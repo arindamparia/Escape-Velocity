@@ -280,6 +280,16 @@ describe('auth: the Worker enforces Access itself', () => {
     const token = await mint()
     expect((await get({ ...PROD, ACCESS_AUD: '<the Application Audience (AUD) tag from the Access app>' }, { 'Cf-Access-Jwt-Assertion': token })).status).toBe(401)
   })
+
+  it('POST /api/dev/reset never wipes anything outside dev, even for the signed-in owner', async () => {
+    await post([op('task.set', { taskId: aTask, done: true })])
+    const reset = (headers: Record<string, string> = {}) => app.fetch(new Request('http://x/api/dev/reset', { method: 'POST', headers }), PROD)
+    expect((await reset()).status).toBe(401)
+    const res = await reset({ 'Cf-Access-Jwt-Assertion': await mint() })
+    expect(res.status).toBe(404)
+    expect(((await res.json()) as { error: { code: string } }).error.code).toBe('not_found')
+    expect((await state()).taskProgress).toHaveLength(1)
+  })
 })
 
 describe('GET /api/export and errors', () => {
@@ -293,6 +303,15 @@ describe('GET /api/export and errors', () => {
     expect(body.taskProgress).toHaveLength(1)
     expect(body.settings[0]).toMatchObject({ key: 'why_note', value: 'because' })
     expect(body.appliedOps).toBe(2)
+  })
+
+  it('POST /api/dev/reset empties every table in dev, so e2e tests start clean', async () => {
+    await post([op('task.set', { taskId: aTask, done: true }), op('setting.set', { key: 'onboarded', value: '1' }), op('note.upsert', { id: uuid(), kind: 'free', body: 'x' })])
+    const res = await app.fetch(new Request('http://x/api/dev/reset', { method: 'POST' }), DEV)
+    expect(res.status).toBe(200)
+    const s = await state()
+    for (const rows of Object.values(s)) expect(rows).toEqual([])
+    expect((await (await app.fetch(new Request('http://x/api/export'), DEV)).json() as { appliedOps: number }).appliedOps).toBe(0)
   })
 
   it('unknown API routes are JSON 404s', async () => {
