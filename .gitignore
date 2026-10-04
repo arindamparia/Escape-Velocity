@@ -1,0 +1,10 @@
+node_modules
+dist
+.wrangler
+.dev.vars
+src/generated
+test-results
+playwright-report
+.lighthouseci
+.claude
+.DS_Store

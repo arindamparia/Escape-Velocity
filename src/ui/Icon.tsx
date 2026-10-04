@@ -1,0 +1,10 @@
+export type IconName =
+  | 'check' | 'circle' | 'play' | 'pause' | 'star' | 'search' | 'moon' | 'gear' | 'link' | 'warn' | 'orbit' | 'close' | 'chevron' | 'book' | 'dot'
+
+export function Icon({ name, label }: { name: IconName; label?: string }) {
+  return (
+    <svg class="i" aria-hidden={label ? undefined : 'true'} role={label ? 'img' : undefined} aria-label={label} focusable="false">
+      <use href={`#i-${name}`} />
+    </svg>
+  )
+}

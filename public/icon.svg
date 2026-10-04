@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Escape Velocity">
+  <rect width="512" height="512" rx="112" fill="#0B1020"/>
+  <ellipse cx="256" cy="300" rx="190" ry="96" fill="none" stroke="#26304F" stroke-width="14" transform="rotate(-18 256 300)"/>
+  <path d="M82 345C140 215 280 140 392 150" fill="none" stroke="#9AA3BA" stroke-width="16" stroke-linecap="round"/>
+  <path d="M392 78l24 62 66 5-51 43 17 65-56-37-56 37 17-65-51-43 66-5z" fill="#F5B942" transform="translate(-4 -6)"/>
+</svg>

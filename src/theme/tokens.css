@@ -1,0 +1,90 @@
+/* Themes: Dark (night sky), Light (day sky), Paper (e-paper). System follows prefers-color-scheme (see themes.ts). */
+@font-face {
+  font-family: 'JBM';
+  src: url('./jbm.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+}
+
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0b1020;
+  --surface: #121933;
+  --text: #e6e9f2;
+  --text-muted: #9aa3ba;
+  --accent: #f5b942;
+  --accent-ink: #0b1020;
+  --line: #26304f;
+  --warn: #ff9d8a;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 8px 24px rgb(0 0 0 / 0.25);
+  --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --lh: 1.55;
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --surface: #ffffff;
+  --text: #141826;
+  --text-muted: #525a70;
+  --accent: #8a5a12;
+  --accent-ink: #ffffff;
+  --line: #dde1ea;
+  --warn: #a12a16;
+  --shadow: 0 1px 2px rgb(20 24 38 / 0.08), 0 8px 24px rgb(20 24 38 / 0.06);
+}
+
+[data-theme='paper'] {
+  color-scheme: light;
+  --bg: #f2efe6;
+  --surface: #f2efe6;
+  --text: #1a1a1a;
+  --text-muted: #3d3d3d;
+  --accent: #1a1a1a;
+  --accent-ink: #f2efe6;
+  --line: #1a1a1a;
+  --warn: #1a1a1a;
+  --shadow: none;
+  --font-body: 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+  --lh: 1.65;
+}
+
+/* Paper: no motion, no shadows, no gradients, no blur. */
+[data-theme='paper'] *,
+[data-theme='paper'] *::before,
+[data-theme='paper'] *::after {
+  animation: none !important;
+  transition: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  backdrop-filter: none !important;
+  background-image: none !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Print is the Paper look, whatever the screen theme. */
+@media print {
+  :root {
+    color-scheme: light;
+    --bg: #fff;
+    --surface: #fff;
+    --text: #1a1a1a;
+    --text-muted: #3d3d3d;
+    --accent: #1a1a1a;
+    --accent-ink: #fff;
+    --line: #1a1a1a;
+    --font-body: 'Iowan Old Style', Georgia, serif;
+    --shadow: none;
+  }
+}
