@@ -1,5 +1,5 @@
 import type { WeekChunk } from '../../shared/plan-types'
-import { plan } from '../lib/plan'
+import { plan, taskLabel } from '../lib/plan'
 import { engine, toggleTask } from '../lib/app'
 import { Html } from './Html'
 import { Icon } from './Icon'
@@ -20,7 +20,7 @@ export function EquationCard({ week, chunk, taskId }: { week: number; chunk: Wee
         <button type="button" class={`btn btn--small${done ? ' btn--primary' : ''}`} aria-pressed={done} onClick={() => toggleTask(task.id)}>
           <Icon name={done ? 'check' : 'circle'} /> {done ? 'Derived it' : 'I derived it'}
         </button>
-        <span class="mono muted small">{task.id} · +{task.points}</span>
+        <span class="muted small">{taskLabel(task.id)} · +{task.points}</span>
       </div>
     </section>
   )

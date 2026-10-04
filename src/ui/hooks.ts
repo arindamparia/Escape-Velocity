@@ -1,32 +1,29 @@
 import { useEffect, useMemo, useState } from 'preact/hooks'
 import type { WeekChunk } from '../../shared/plan-types'
-import { loadPage, loadWeek } from '../lib/plan'
+import { loadPage, loadWeek, pageLoaded, weekLoaded } from '../lib/plan'
 import type { DesignFull, PageChunks } from '../../shared/plan-types'
-
-const weeks = new Map<number, WeekChunk>()
-const pages = new Map<string, unknown>()
 
 /** A week's content. Returns null only the first time, while it loads; repeat reads are synchronous. */
 export function useWeekChunk(n: number): WeekChunk | null {
   const [, bump] = useState(0)
   useEffect(() => {
-    if (weeks.has(n)) return
+    if (weekLoaded.has(n)) return
     let alive = true
-    loadWeek(n).then((c) => { weeks.set(n, c); if (alive) bump((x) => x + 1) }).catch(() => {})
+    loadWeek(n).then(() => { if (alive) bump((x) => x + 1) }).catch(() => {})
     return () => { alive = false }
   }, [n])
-  return weeks.get(n) ?? null
+  return weekLoaded.get(n) ?? null
 }
 
 export function usePage<K extends keyof PageChunks>(name: K): PageChunks[K] | null {
   const [, bump] = useState(0)
   useEffect(() => {
-    if (pages.has(name)) return
+    if (pageLoaded.has(name)) return
     let alive = true
-    loadPage(name).then((c) => { pages.set(name, c); if (alive) bump((x) => x + 1) }).catch(() => {})
+    loadPage(name).then(() => { if (alive) bump((x) => x + 1) }).catch(() => {})
     return () => { alive = false }
   }, [name])
-  return (pages.get(name) as PageChunks[K] | undefined) ?? null
+  return (pageLoaded.get(name) as PageChunks[K] | undefined) ?? null
 }
 
 /** Re-render once a second (or at the given interval) while mounted. */
@@ -51,12 +48,12 @@ export function useAllWeeks(): Map<number, WeekChunk> {
   useEffect(() => {
     let alive = true
     for (let n = 1; n <= 13; n++) {
-      if (weeks.has(n)) continue
-      loadWeek(n).then((c) => { weeks.set(n, c); if (alive) bump((x) => x + 1) }).catch(() => {})
+      if (weekLoaded.has(n)) continue
+      loadWeek(n).then(() => { if (alive) bump((x) => x + 1) }).catch(() => {})
     }
     return () => { alive = false }
   }, [])
-  return weeks
+  return weekLoaded
 }
 
 /** The full design library (names, derive-it questions, links), from the library chunk. */

@@ -144,14 +144,14 @@ export function createSync(engine: Engine, deps: SyncDeps = {}) {
   }
 
   /** Sync on open, on `online`, on visibility change, after each local save, and every 60 s while visible. */
-  function start(): () => void {
+  function start(runNow = true): () => void {
     const onVisible = () => { if (document.visibilityState === 'visible') void run() }
     const onOnline = () => void run()
     document.addEventListener('visibilitychange', onVisible)
     window.addEventListener('online', onOnline)
     const offSaved = engine.onSaved(() => void run())
     const interval = setInterval(() => { if (document.visibilityState === 'visible') void run() }, 60_000)
-    void run()
+    if (runNow) void run()
     return () => {
       document.removeEventListener('visibilitychange', onVisible)
       window.removeEventListener('online', onOnline)

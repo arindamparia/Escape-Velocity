@@ -1,4 +1,5 @@
 import { engine, toggleTask } from '../lib/app'
+import { taskLabel } from '../lib/plan'
 import { Html } from '../ui/Html'
 import { Icon } from '../ui/Icon'
 import { usePage } from '../ui/hooks'
@@ -15,7 +16,7 @@ export function FormulaTool() {
       <ol class="stack" style="list-style:none;padding:0;margin:0;gap:0.6rem">
         {page.formulas.map((f) => (
           <li key={f.taskId} class="card">
-            <div class="row row--between" style="margin-bottom:0.4rem"><span class="eyebrow" style="margin:0">Week {f.week} · {f.taskId}</span>
+            <div class="row row--between" style="margin-bottom:0.4rem"><span class="eyebrow" style="margin:0">{taskLabel(f.taskId)}</span>
               <button type="button" class={`btn btn--small noprint${done.has(f.taskId) ? ' btn--primary' : ''}`} aria-pressed={done.has(f.taskId)} onClick={() => toggleTask(f.taskId)}><Icon name={done.has(f.taskId) ? 'check' : 'circle'} /> {done.has(f.taskId) ? 'Derived' : 'Derived it'}</button></div>
             <Html html={f.html} />
           </li>

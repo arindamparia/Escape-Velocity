@@ -52,6 +52,8 @@ export function createEngine(deps: EngineDeps = {}) {
   const state = signal<AppState>(EMPTY_STATE)
   const outbox = signal<Op[]>([])
   const hydrated = signal(false)
+  /** true when IndexedDB already held a copy of the state: this device is not opening the app for the first time */
+  let restored = false
   /** ops currently being sent: never coalesced */
   const inflight = new Set<string>()
 
@@ -80,6 +82,7 @@ export function createEngine(deps: EngineDeps = {}) {
     try {
       const snap = await get<Snapshot>('snapshot', store())
       if (snap?.v === 1) {
+        restored = true
         batch(() => {
           state.value = snap.state
           outbox.value = snap.outbox
@@ -135,6 +138,7 @@ export function createEngine(deps: EngineDeps = {}) {
   return {
     state, outbox, hydrated, doneSet, settings, inflight,
     hydrate, dispatch, persist, replaceFromServer, removeFromOutbox, recheckOutbox,
+    get restored() { return restored },
     /** called after each local change has been saved */
     onSaved: (fn: () => void) => { listeners.add(fn); return () => listeners.delete(fn) },
   }

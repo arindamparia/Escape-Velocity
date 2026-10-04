@@ -4,7 +4,7 @@ import { engine } from '../lib/app'
 import { today } from '../lib/clock'
 import { weekHasLightDay } from '../lib/dates'
 import { navigate } from '../lib/nav'
-import { plan } from '../lib/plan'
+import { plan, taskLabel } from '../lib/plan'
 import { weekMaxPoints, weekPoints, weekTarget } from '../lib/points'
 import { dayInfo } from '../lib/today'
 import { Html } from '../ui/Html'
@@ -71,7 +71,7 @@ function WeekDetail({ n }: { n: number }) {
           {light ? <span class="chip"><Icon name="moon" /> {lightLabels.join(' · ')}: no target</span> : null}
           <span class="chip">Saturday design: {w.saturdayDesign}</span>
         </div>
-        <div class="bar" style="margin-top:0.7rem" role="progressbar" aria-valuemin={0} aria-valuemax={target ?? max} aria-valuenow={pts}><i style={{ width: `${Math.min(100, (pts / (target ?? max)) * 100)}%` }} /></div>
+        <div class="bar" style="margin-top:0.7rem" role="progressbar" aria-label={`Week ${n} points`} aria-valuemin={0} aria-valuemax={target ?? max} aria-valuenow={pts}><i style={{ width: `${Math.min(100, (pts / (target ?? max)) * 100)}%` }} /></div>
       </header>
       <section class="card">
         <p class="eyebrow">DSA focus</p>
@@ -120,7 +120,7 @@ function CapstoneTab() {
       </div>
       <div>
         <p class="eyebrow">Milestones</p>
-        {current ? <p class="small"><strong>Current:</strong> week {current.week}: {weeks.get(current.week!)?.tasks[current.id]?.text ?? current.id}</p> : <p class="small"><strong>All milestones shipped.</strong></p>}
+        {current ? <p class="small"><strong>Current:</strong> week {current.week}: {weeks.get(current.week!)?.tasks[current.id]?.text ?? taskLabel(current.id)}</p> : <p class="small"><strong>All milestones shipped.</strong></p>}
         <ul class="tasks">
           {tasks.map((t) => (
             <li key={t.id} class="task" data-done={done.has(t.id)} style="grid-template-columns:auto 1fr auto">

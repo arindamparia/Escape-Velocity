@@ -2,7 +2,7 @@ import { useMemo } from 'preact/hooks'
 import { useLocation } from 'preact-iso'
 import { engine } from '../lib/app'
 import { today } from '../lib/clock'
-import { plan } from '../lib/plan'
+import { plan, refLabel } from '../lib/plan'
 import { MAX_CARDS_PER_DAY, dueCards, redrawsDue } from '../lib/srs'
 import { CheatsheetTool } from '../tools/CheatsheetTool'
 import { EnvelopeTool } from '../tools/EnvelopeTool'
@@ -45,7 +45,7 @@ function Related() {
       <section class="card">
         <p class="eyebrow">Recent notes</p>
         {recent.length ? recent.map((n) => (
-          <div key={n.id} style="margin-bottom:0.6rem"><span class="chip">{n.kind}</span> <span class="mono small muted">{n.refId ?? ''}</span><div class="small" style="max-height:3.2em;overflow:hidden"><TextBlock text={n.body} /></div></div>
+          <div key={n.id} style="margin-bottom:0.6rem"><span class="chip">{n.kind}</span> <span class="small muted">{n.refId ? refLabel(n.refId) : ''}</span><div class="small" style="max-height:3.2em;overflow:hidden"><TextBlock text={n.body} /></div></div>
         )) : <p class="small muted" style="margin:0">Nothing yet.</p>}
         <a class="small" href="/study/notes">All notes</a>
       </section>

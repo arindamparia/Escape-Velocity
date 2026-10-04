@@ -3,7 +3,8 @@
   font-family: 'JBM';
   src: url('./jbm.woff2') format('woff2');
   font-weight: 500;
-  font-display: swap;
+  /* optional: used if it is there within about 100 ms (the preload makes that near certain), never swapped in late, so nothing shifts */
+  font-display: optional;
 }
 
 :root,

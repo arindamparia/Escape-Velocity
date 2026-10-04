@@ -39,7 +39,7 @@ function RuleOfTheDay({ seed }: { seed: number }) {
 function WhyStrip() {
   const why = whyNote.value
   return (
-    <section class="card" aria-label="Your why">
+    <section class="why" aria-label="Your why">
       <p class="eyebrow">Your why</p>
       {why.trim() ? (
         <p style="white-space:pre-wrap;margin-bottom:0.5rem;max-width:72ch">{why}</p>
@@ -136,8 +136,12 @@ export default function Today() {
   useEffect(() => {
     const idle = (cb: () => void) => ('requestIdleCallback' in window ? window.requestIdleCallback(cb) : setTimeout(cb, 120))
     idle(() => setShowSky(true))
-    performance.mark('ev:today-painted')
   }, [])
+  // "Meaningful content painted" (plan 6): the mark waits for the week's real task text, then for the frame that shows it
+  useEffect(() => {
+    if (!chunk || performance.getEntriesByName('ev:today-painted').length) return
+    requestAnimationFrame(() => requestAnimationFrame(() => performance.mark('ev:today-painted')))
+  }, [!!chunk])
 
   const todays = tasksOn(info.week, info.dayName)
   const weekly = weeklyTasks(info.week)
@@ -216,10 +220,10 @@ export default function Today() {
     const primary = actions.find((a) => a.primary) ?? actions[0]
     const entry = chunk?.tasks[next.id]
     const design = next.designs?.[0] ? chunk?.designs[next.designs[0]] : undefined
-    const blockLabel = info.block === 'morning' ? 'Morning' : info.block === 'night' ? 'Night' : 'Next up'
+    const blockLabel = info.block === 'morning' ? 'Morning · next up' : info.block === 'night' ? 'Night · next up' : 'Next up'
     hero = (
       <section class="card hero" aria-label="Next up">
-        <p class="eyebrow">{blockLabel} · next up · {TYPE_LABEL[next.type]}{next.company ? ` · asked at ${next.company}` : ''}</p>
+        <p class="eyebrow">{blockLabel} · {TYPE_LABEL[next.type]}{next.company ? ` · asked at ${next.company}` : ''}</p>
         {entry ? <Html html={entry.html} class="hero__text" /> : <Skeleton h="4rem" />}
         {next.type === 'dsa' && chunk ? (
           <p class="small muted">This week’s focus: <strong>{chunk.dsaFocus}</strong>{suggestion ? <> · try one reported problem: <strong>{suggestion}</strong></> : null}</p>
@@ -255,6 +259,8 @@ export default function Today() {
   }
 
   const dayList = todays.filter((t) => t.type !== 'rest' || !light)
+  // the next-up card already offers this task's buttons, so its row below is only the tick and the text
+  const heroOffersTask = !!next && info.phase === 'during' && !light && !welcomeBack
   return (
     <div class="page page--rail-hide">
       <div class="slot-main stack">
@@ -270,7 +276,7 @@ export default function Today() {
           ) : null}
         </header>
 
-        <WhyStrip />
+        {info.phase === 'before' && !whyNote.value.trim() ? null : <WhyStrip />}
         {timerOn ? <TimerCard /> : null}
         {hero}
 
@@ -286,7 +292,7 @@ export default function Today() {
               <button type="button" class="btn btn--link" onClick={() => navigate(`/weeks/${info.week}`)}>See this week’s plan</button>
             ) : dayList.length ? (
               <ul class="tasks">
-                {dayList.map((t) => <TaskRow key={t.id} task={t} chunk={chunk} focused={focusId.value === t.id} />)}
+                {dayList.map((t) => <TaskRow key={t.id} task={t} chunk={chunk} focused={focusId.value === t.id} actions={!(heroOffersTask && t.id === next?.id)} />)}
               </ul>
             ) : (
               <div class="empty">Nothing is scheduled for {info.dayName}. {weekly.length ? 'This week’s open tasks are below.' : ''}</div>

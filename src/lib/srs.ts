@@ -1,6 +1,6 @@
 // Flashcard (Leitner) and redraw scheduling. Pure functions; shared by the client and the Worker.
 import type { DesignStatus, DesignStatusRow, FlashcardStateRow, Grade } from '../../shared/state'
-import { addDays, dayNum, kolkataToday } from './dates'
+import { addDays, dayNum } from './dates'
 
 /** Days until a card is due again, by box 1 to 5. */
 export const LEITNER_DAYS = [1, 3, 7, 14, 30] as const
@@ -17,13 +17,19 @@ export function nextCardState(prev: CardState | undefined, grade: Grade, reviewe
   return { box, dueOn: addDays(reviewedOn, LEITNER_DAYS[box - 1]), reviews: (prev?.reviews ?? 0) + 1, lastGrade: grade }
 }
 
-/** Reviews done today, from each card's last update (a review is the only thing that touches a card row). */
+/**
+ * The Kolkata day a card was last reviewed. A review sets dueOn = reviewedOn + the box's interval, so the day is
+ * recovered exactly from the schedule. Using the server's `updatedAt` instead would put a review made offline in the
+ * evening and synced the next morning on the wrong day, and the daily cap would miscount.
+ */
+export function lastReviewedOn(s: Pick<FlashcardStateRow, 'box' | 'dueOn'>): string {
+  return addDays(s.dueOn, -LEITNER_DAYS[s.box - 1])
+}
+
+/** Reviews done today (a review is the only thing that touches a card row). */
 export function reviewedOnDay(states: Iterable<FlashcardStateRow>, today: string): number {
   let n = 0
-  for (const s of states) {
-    const t = Date.parse(s.updatedAt)
-    if (!Number.isNaN(t) && kolkataToday(t) === today) n++
-  }
+  for (const s of states) if (lastReviewedOn(s) === today) n++
   return n
 }
 
@@ -39,7 +45,7 @@ export function dueCards(eligible: string[], states: Map<string, FlashcardStateR
   eligible.forEach((id, order) => {
     const s = states.get(id)
     if (!s) due.push({ id, dueOn: '0000-00-00', order })
-    else if (s.dueOn <= today && kolkataToday(Date.parse(s.updatedAt)) !== today) due.push({ id, dueOn: s.dueOn, order })
+    else if (s.dueOn <= today && lastReviewedOn(s) !== today) due.push({ id, dueOn: s.dueOn, order })
   })
   due.sort((a, b) => (a.dueOn === b.dueOn ? a.order - b.order : a.dueOn < b.dueOn ? -1 : 1))
   // Overdue reviews before brand-new cards.

@@ -30,8 +30,8 @@ export function MockTool() {
       <div class="stack">
         <p class="muted">A random design, 45 minutes, out loud. A follow-up constraint lands at 20 and 35 minutes. Then you score yourself from 1 to 5 on six things.</p>
         <div class="card stack">
-          <div class="row" role="radiogroup" aria-label="Which designs">
-            {(['unseen', 'attempted', 'any'] as const).map((m) => <button key={m} type="button" role="radio" aria-checked={mode === m} class="chip" aria-pressed={mode === m} onClick={() => setMode(m)}>{m === 'unseen' ? 'Unseen design' : m === 'attempted' ? 'One I’ve attempted' : 'Any'}</button>)}
+          <div class="row" role="group" aria-label="Which designs">
+            {(['unseen', 'attempted', 'any'] as const).map((m) => <button key={m} type="button" class="chip" aria-pressed={mode === m} onClick={() => setMode(m)}>{m === 'unseen' ? 'Unseen design' : m === 'attempted' ? 'One I’ve attempted' : 'Any'}</button>)}
           </div>
           <div class="row">
             <button type="button" class="btn btn--primary btn--big" disabled={!study || !list.length} onClick={() => {
@@ -77,8 +77,8 @@ export function MockTool() {
         {MOCK_CRITERIA.map((c, i) => (
           <div key={c} class="row row--between">
             <span>{c}</span>
-            <span class="row" role="radiogroup" aria-label={c} style="gap:0.3rem">
-              {[1, 2, 3, 4, 5].map((n) => <button key={n} type="button" role="radio" aria-checked={scores[i] === n} class="chip mono" aria-pressed={scores[i] === n} onClick={() => setScores((s) => s.map((v, j) => (j === i ? n : v)))}>{n}</button>)}
+            <span class="row" role="group" aria-label={c} style="gap:0.3rem">
+              {[1, 2, 3, 4, 5].map((n) => <button key={n} type="button" class="chip mono" aria-pressed={scores[i] === n} onClick={() => setScores((s) => s.map((v, j) => (j === i ? n : v)))}>{n}</button>)}
             </span>
           </div>
         ))}
