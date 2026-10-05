@@ -6,6 +6,7 @@ import { dsaProgress, mergeProblems, perDay } from '../lib/problems'
 import { algotracker } from '../lib/solved'
 import { Html } from './Html'
 import { Icon } from './Icon'
+import { StudyPanel } from './Resources'
 import { PRESETS, startTimer } from '../tools/timer'
 
 export const TYPE_LABEL: Record<TaskType, string> = {
@@ -122,6 +123,7 @@ export function TaskRow({ task, chunk, focused = false, actions = true, inWeek =
           <span class="task__pts" title="points">+{task.points}</span>
         </div>
         {entry ? <Html class="task__text" html={entry.html} inline /> : <span class="task__text muted">…</span>}
+        <StudyPanel items={chunk?.resources?.[task.id]} design={task.type === 'design' || task.type === 'design2'} />
         <DsaProgress task={task} locked={engine.autoDoneSet.value.has(task.id)} />
         {pick ? <div class="small muted">Your pick: <strong>{chunk?.designs[pick]?.name ?? pick}</strong></div> : null}
         {list.length ? (

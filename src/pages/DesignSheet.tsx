@@ -6,6 +6,7 @@ import { DecisionCards } from '../ui/DecisionCards'
 import { Html } from '../ui/Html'
 import { Icon } from '../ui/Icon'
 import { NoteEditor } from '../ui/NoteEditor'
+import { ResourceList } from '../ui/Resources'
 import { useDesigns, usePage } from '../ui/hooks'
 import { DESIGN_STATUSES } from '../../shared/constants'
 
@@ -20,6 +21,7 @@ export function DesignDetail({ id }: { id: string }) {
   if (!ready) return <div class="skeleton" />
   if (!d) return <div class="empty">That design isn’t in the library.</div>
   const reading = library?.reading.filter((r) => r.designIds.includes(id)) ?? []
+  const study = library?.resources.filter((r) => r.designId === id) ?? []
 
   const setStatus = (next: string, attemptedOn?: string, drawingUrl?: string) => {
     engine.dispatch('design.set', {
@@ -62,6 +64,9 @@ export function DesignDetail({ id }: { id: string }) {
         {row?.drawingUrl ? <a class="small" href={row.drawingUrl} target="_blank" rel="noopener noreferrer">Open my drawing</a> : null}
       </div>
 
+      {study.length ? (
+        <div><p class="eyebrow">Study this design</p><ResourceList items={study} /><p class="small muted" style="margin:0.4rem 0 0">After your own cold attempt. Free ones come first.</p></div>
+      ) : null}
       <div><p class="eyebrow">Decision cards</p><DecisionCards designId={id} /></div>
       <div><p class="eyebrow">Notes</p><NoteEditor kind="design" refId={id} rows={5} placeholder="What surprised you, what you’d change…" /></div>
       {reading.length ? (

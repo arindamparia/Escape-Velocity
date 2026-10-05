@@ -5,6 +5,7 @@ import { engine, selectedDesign, showDesign } from '../lib/app'
 import { navigate } from '../lib/nav'
 import { Html } from '../ui/Html'
 import { usePage, useTitle } from '../ui/hooks'
+import { StudyLinks } from '../ui/StudyLinks'
 import { DesignDetail } from './DesignSheet'
 
 type Tab = 'designs' | 'machine' | 'companies' | 'systems' | 'resources'
@@ -145,7 +146,7 @@ export default function Library() {
             <Html html={page.readingNoteHtml} class="prose" />
           </div>
         ) : (
-          <Html html={page.resourcesHtml} class="prose prose-wide" />
+          <StudyLinks />
         )}
         <footer class="small muted" style="margin-top:1rem">Everything here comes from the plan. <a href="/sources">Resources and sources</a>.</footer>
       </div>

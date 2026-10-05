@@ -1,0 +1,42 @@
+// Study links from the resources doc: under each task, on each design's page, and as an index on Sources.
+import { expect, openApp, test } from './support'
+
+test('a task has a Study panel: free first, premium marked, links open in a new tab', async ({ page, api }) => {
+  await api.onboard()
+  await openApp(page, '/weeks/6') // Saturday: Payment System, free ByteByteGo and Airbnb next to the premium doc
+  const row = page.locator('[data-task="w06-07"]')
+  const study = row.locator('details.study')
+  await expect(study.locator('summary')).toContainText(/\d+ links?, \d+ free/)
+  await study.locator('summary').click()
+  const items = study.locator('li')
+  expect(await items.count()).toBeGreaterThan(3)
+  const access = await items.evaluateAll((els) => els.map((e) => e.getAttribute('data-access')))
+  expect(access.indexOf('premium')).toBeGreaterThan(access.lastIndexOf('free'))
+  await expect(study.locator('li[data-access="premium"]').first()).toContainText('Premium')
+  const link = items.first().getByRole('link')
+  await expect(link).toHaveAttribute('target', '_blank')
+  await expect(link).toHaveAttribute('rel', /noopener/)
+  await expect(study).toContainText('Watch only after your own 45-minute cold attempt')
+})
+
+test('a design with only a premium breakdown still has free ways in (Instagram, Metrics Monitoring)', async ({ page, api }) => {
+  await api.onboard()
+  await openApp(page, '/library?design=metrics-monitoring')
+  const panel = page.getByRole('dialog').or(page.getByRole('complementary', { name: 'Design detail' }))
+  await expect(panel.getByText('Study this design')).toBeVisible()
+  await expect(panel.getByRole('link', { name: /Design Metrics Monitoring & Alerting System/ })).toBeVisible()
+  await expect(panel.locator('li[data-access="free"]').first()).toBeVisible()
+})
+
+test('Study links lists the channels and every week, and the Library tab shows the same', async ({ page, api }) => {
+  await api.onboard()
+  await openApp(page, '/sources')
+  await expect(page.getByRole('heading', { name: 'Study links' })).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Free channels' }).getByRole('link', { name: 'Hello Interview' })).toBeVisible()
+  const weeks = page.getByRole('region', { name: 'Links by week' }).locator('details.resweek')
+  expect(await weeks.count()).toBeGreaterThanOrEqual(13)
+  await weeks.first().locator('summary').click()
+  await expect(weeks.first().getByRole('link', { name: 'Delivery Framework', exact: true })).toBeVisible()
+  await openApp(page, '/library?tab=resources')
+  await expect(page.getByRole('region', { name: 'Links by week' })).toBeVisible()
+})

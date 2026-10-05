@@ -5,9 +5,9 @@ import { Marked } from 'marked'
 import { parse as parseYaml } from 'yaml'
 import { addDays, dayNum, formatRange, isRealDate, weekEnd, weekStart } from '../../src/lib/dates'
 import {
-  SURFACES, TASK_TYPES,
+  DAYS, SURFACES, TASK_TYPES,
   type DesignAccess, type DesignFull, type DesignRef, type LightDay, type PageChunks, type PlanConfig,
-  type PlanCore, type PlanDay, type PlanTask, type PlanWeek, type SearchEntry, type Surface,
+  type PlanCore, type PlanDay, type PlanTask, type PlanWeek, type ResourceAccess, type ResourceKind, type ResourceRow, type SearchEntry, type Surface,
   type TaskType, type WeekChunk,
 } from '../../shared/plan-types'
 
@@ -526,7 +526,7 @@ export function compilePlan(source: string): CompileOutput {
     const key = String(n).padStart(2, '0')
     const chunk: WeekChunk = {
       n, introHtml: sectionHtml(s), dsaFocus: dsaFocus.get(n) ?? '',
-      reported: n >= reportedFrom && n <= reportedTo ? reported : [], tasks: {}, math: {}, designs: {},
+      reported: n >= reportedFrom && n <= reportedTo ? reported : [], tasks: {}, math: {}, designs: {}, resources: {},
     }
     for (const t of tasks.filter((x) => x.week === n)) {
       const isMaths = t.type === 'maths'
@@ -638,7 +638,75 @@ export function compilePlan(source: string): CompileOutput {
     })
   if (reading.length < 4) errors.push('Could not read the "Real systems to read" bullets')
   const readingNoteHtml = renderBlock(bodyLines(readingSection).filter((l) => !/^- After /.test(l)).join('\n'))
-  const resourcesHtml = htmlOf('library.resources')
+  // ---- study resources: "Study resources" section, parsed into rows and handed to the task each belongs to
+  const studyIdx = sections.findIndex((x) => x.surface === 'library.resources' && /^Study resources/.test(x.heading))
+  const studyTree: RawSection[] = []
+  if (studyIdx === -1) errors.push('Part 6 has no "Study resources" section')
+  else {
+    studyTree.push(sections[studyIdx])
+    for (let i = studyIdx + 1; i < sections.length && sections[i].level > sections[studyIdx].level; i++) studyTree.push(sections[i])
+  }
+  const resourcesHtml = (sectionsBySurface.get('library.resources') ?? []).filter((x) => !studyTree.includes(x)).map((x) => sectionHtml(x)).filter(Boolean).join('\n')
+  const studyRoot = studyTree[0]
+  const resourceRows: ResourceRow[] = []
+  const resTable = tableOf(studyTree.find((x) => x.heading === 'Resources by week'), errors, 'resources by week', ['Week', 'Day', 'Topic', 'Design ID', 'Kind', 'Access', 'Title', 'Source', 'Link'])
+  const channelTable = tableOf(studyTree.find((x) => /^Free channels/.test(x.heading)), errors, 'free channels', ['Channel', 'Use for', 'Weeks', 'Start with'])
+  const designIds = new Set(designs.map((d) => d.id))
+  const ACCESS_ORDER: ResourceAccess[] = ['free', 'partial', 'premium']
+  const weekSpan = (spec: string): number[] | null => {
+    if (spec === 'Extra') return []
+    const m = /^(\d+)(?:[–-](\d+))?$/.exec(spec)
+    if (!m) return null
+    const a = Number(m[1]), b = Number(m[2] ?? m[1])
+    return a >= 1 && b <= 13 && a <= b ? Array.from({ length: b - a + 1 }, (_, i) => a + i) : null
+  }
+  const STOP = new Set(['option', 'pick', 'one', 'optional', 'deep', 'dive', 'the', 'and', 'for', 'with', 'how', 'small'])
+  const topicWords = (topic: string) => topic.toLowerCase().replace(/\(.*?\)/g, ' ').split(/[^a-z0-9]+/).filter((w) => w.length >= 3 && !STOP.has(w))
+  /** Which task on that day a topic belongs to: its design, then words from its text, then its type. */
+  const taskFor = (r: ResourceRow, week: number): PlanTask | undefined => {
+    const day = parsed.filter((t) => t.week === week && t.day === r.day && t.type !== 'rest')
+    const score = (t: PlanTask & { text?: string }) => {
+      const text = (tasks.find((x) => x.id === t.id)?.text ?? '').toLowerCase()
+      let n = 0
+      if (r.designId && t.designs?.includes(r.designId)) n += 10
+      for (const w of topicWords(r.topic)) if (text.includes(w)) n += 2
+      if (/^LLD/.test(r.topic) && t.type === 'lld') n += 6
+      if (/docker|kubernetes|helm|aws|terraform|github actions|ci\/cd|ingress/i.test(r.topic) && t.type === 'infra') n += 4
+      if (t.type === 'concept' || t.type === 'infra' || t.type === 'read') n += 1
+      return n
+    }
+    return day.map((t) => ({ t, n: score(t) })).sort((a, b) => b.n - a.n)[0]?.t
+  }
+  for (const [i, row] of (resTable?.rows ?? []).entries()) {
+    const at = `Resources row ${i + 1} (${row['Week']} ${row['Day']} ${row['Topic']})`
+    const kind = row['Kind'] as ResourceKind, access = row['Access'] as ResourceAccess
+    if (!(['doc', 'video', 'repo'] as string[]).includes(kind)) errors.push(`${at}: unknown kind "${row['Kind']}"`)
+    if (!ACCESS_ORDER.includes(access)) errors.push(`${at}: unknown access "${row['Access']}"`)
+    if (!/^https:\/\/\S+$/.test(row['Link'])) errors.push(`${at}: the link is not an https URL`)
+    const designId = row['Design ID'] === '—' || !row['Design ID'] ? undefined : row['Design ID']
+    if (designId && !designIds.has(designId)) errors.push(`${at}: design "${designId}" is not in the library`)
+    const span = weekSpan(row['Week'])
+    if (span === null) { errors.push(`${at}: week must be a number, a range like 4–11, or Extra`); continue }
+    const day = row['Day'] === '—' ? '' : row['Day']
+    if (span.length && !DAYS.includes(day as PlanDay)) errors.push(`${at}: day "${row['Day']}" is not a plan day`)
+    if (!span.length && day) errors.push(`${at}: an Extra row has no day`)
+    const out: ResourceRow = { week: row['Week'], day, topic: row['Topic'], ...(designId ? { designId } : {}), kind, access, title: row['Title'], source: row['Source'], url: row['Link'] }
+    resourceRows.push(out)
+    for (const w of span) {
+      const t = taskFor(out, w)
+      if (!t) { errors.push(`${at}: week ${w} has no task on ${day}`); continue }
+      const chunk = weekChunks[String(w).padStart(2, '0')]
+      ;(chunk.resources[t.id] ??= []).push(out)
+    }
+  }
+  const byAccess = (a: ResourceRow, b: ResourceRow) => ACCESS_ORDER.indexOf(a.access) - ACCESS_ORDER.indexOf(b.access)
+  for (const w of Object.values(weekChunks)) for (const list of Object.values(w.resources)) list.sort(byAccess) // stable: free first, the doc's order after
+  resourceRows.sort(byAccess)
+  const studyBody = studyRoot ? studyRoot.body.map((b) => b.text) : []
+  const studyIntroHtml = renderBlock(studyBody.filter((l) => /^Use them in this order/.test(l)).join('\n'))
+  const channelRule = bodyLines(studyTree.find((x) => /^Free channels/.test(x.heading)) ?? sections[0]).find((l) => /^Rule:/.test(l)) ?? ''
+  const studyRuleHtml = renderInline(channelRule)
+  const channels = (channelTable?.rows ?? []).map((r) => ({ channel: r['Channel'], use: r['Use for'], weeks: r['Weeks'], url: r['Start with'] }))
 
   const pointsSection = first('progress.points-help')
   const pointsTable = tableOf(pointsSection, errors, 'points', ['Activity', 'Points'])
@@ -704,6 +772,10 @@ export function compilePlan(source: string): CompileOutput {
       reading,
       readingNoteHtml,
       resourcesHtml,
+      studyIntroHtml,
+      studyRuleHtml,
+      resources: resourceRows,
+      channels,
     },
     progress: {
       pointsHtml: sectionHtml(pointsSection),

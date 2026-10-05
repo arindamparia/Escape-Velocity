@@ -87,6 +87,24 @@ export interface DesignRef {
   link: string
 }
 
+export type ResourceKind = 'doc' | 'video' | 'repo'
+export type ResourceAccess = 'free' | 'partial' | 'premium'
+
+/** One study link: a doc, video or repo, and whether it is free. Free comes first everywhere it is shown. */
+export interface ResourceRow {
+  /** "1", "4–11" or "Extra" */
+  week: string
+  /** Mon to Sun, or empty for Extra */
+  day: string
+  topic: string
+  designId?: string
+  kind: ResourceKind
+  access: ResourceAccess
+  title: string
+  source: string
+  url: string
+}
+
 export interface WeekChunk {
   n: number
   introHtml: string
@@ -98,6 +116,8 @@ export interface WeekChunk {
   /** Maths tasks: MathML-rendered html of the derivation */
   math: Record<string, string>
   designs: Record<string, DesignRef>
+  /** Study links for each task (docs, videos, repos), free first */
+  resources: Record<string, ResourceRow[]>
 }
 
 export interface DesignFull extends DesignRef {
@@ -148,6 +168,12 @@ export interface PageChunks {
     reading: { designIds: string[]; html: string }[]
     readingNoteHtml: string
     resourcesHtml: string
+    /** "Use them in this order…" and the rule, as html */
+    studyIntroHtml: string
+    studyRuleHtml: string
+    /** Every study link, free first: the Sources page lists them by week, a design's page picks its own by designId */
+    resources: ResourceRow[]
+    channels: { channel: string; use: string; weeks: string; url: string }[]
   }
   progress: {
     pointsHtml: string

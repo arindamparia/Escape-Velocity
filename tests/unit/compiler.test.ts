@@ -195,6 +195,31 @@ describe('compiler: every failure rule fails the build', () => {
     expect(errorsOf(src).join('\n')).toMatch(/not a tasks section/)
   })
 
+  it('a study link with an unknown access, kind or design, or on a day with no task', () => {
+    const row = '| 1 | Mon | Interview framework | — | doc | free | Delivery Framework |'
+    expect(errorsOf(mutate(row, row.replace('| doc | free |', '| doc | gratis |'))).join('\n')).toMatch(/unknown access "gratis"/)
+    expect(errorsOf(mutate(row, row.replace('| doc | free |', '| pdf | free |'))).join('\n')).toMatch(/unknown kind "pdf"/)
+    expect(errorsOf(mutate(row, row.replace('| — |', '| no-such-design |'))).join('\n')).toMatch(/design "no-such-design" is not in the library/)
+    expect(errorsOf(mutate(row, row.replace('| 1 | Mon |', '| 1 | Sun |'))).join('\n')).not.toMatch(/has no task/) // Sunday has tasks
+    expect(errorsOf(mutate(row, row.replace('| 1 | Mon |', '| 14 | Mon |'))).join('\n')).toMatch(/week must be a number/)
+  })
+
+  it('study links go to the task they belong to, free first', () => {
+    const out = compilePlan(source)
+    const w1 = out.weekChunks['01'].resources
+    expect(Object.keys(w1)).toContain('w01-05') // Numbers to Know
+    expect(w1['w01-05'].map((r) => r.access)).toEqual([...w1['w01-05'].map((r) => r.access)].sort((a, b) => ['free', 'partial', 'premium'].indexOf(a) - ['free', 'partial', 'premium'].indexOf(b)))
+    expect(w1['w01-11'].every((r) => r.designId === 'bitly')).toBe(true) // the design task, not the maths or LLD task of the same Saturday
+    expect(w1['w01-13'].every((r) => /^LLD/.test(r.topic))).toBe(true)
+    // a range row (weeks 4 to 11, Saturday) lands on that week's LLD task
+    expect(out.weekChunks['08'].resources['w08-08'].some((r) => r.topic === 'LLD in Java')).toBe(true)
+    // every premium or partial doc has a free way in: the same topic, or the design's own free rows
+    const rows = out.pages.library.resources
+    for (const r of rows.filter((x) => x.access !== 'free')) {
+      expect(rows.some((x) => x.access === 'free' && (x.topic === r.topic || (r.designId && x.designId === r.designId))), `${r.title} (${r.topic})`).toBe(true)
+    }
+  })
+
   it('reports every problem at once, not just the first', () => {
     const src = mutate('`w01-01` `dsa`', '`w01-01` `dsax`').replace('<!-- surface: weeks.dsa -->\n', '')
     expect(errorsOf(src).length).toBeGreaterThanOrEqual(2)

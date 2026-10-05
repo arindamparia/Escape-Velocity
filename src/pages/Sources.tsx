@@ -1,14 +1,19 @@
 import { Html } from '../ui/Html'
+import { StudyLinks } from '../ui/StudyLinks'
 import { usePage, useTitle } from '../ui/hooks'
 
-/** Resources and sources: where every claim in the plan comes from. */
+/** Study links and sources: every link in the plan, and where each claim comes from. */
 export default function Sources() {
-  useTitle('Sources')
+  useTitle('Study links and sources')
   const page = usePage('library')
   return (
     <div class="page"><div class="slot-main stack">
-      <h1>Resources and sources</h1>
-      {page ? <Html html={page.resourcesHtml} class="prose prose-wide" /> : <div class="skeleton" style="min-height:20rem" />}
+      <header>
+        <p class="eyebrow">Library</p>
+        <h1>Study links</h1>
+        {page ? <p class="muted" style="margin:0"><Html html={page.studyIntroHtml} inline class="" /> Each task has these under “Study”; each design has its own in the <a href="/library">library</a>.</p> : null}
+      </header>
+      <StudyLinks />
     </div></div>
   )
 }
