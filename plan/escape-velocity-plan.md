@@ -773,7 +773,7 @@ DSA focus: binary search (including on the answer), heaps, intervals.
 - [ ] `w03-05` `design` `+10` Sat · [Rate Limiter](https://www.hellointerview.com/learn/system-design/problem-breakdowns/distributed-rate-limiter), full loop
 - [ ] `w03-06` `lld` `+8` Sat · Splitwise (untimed)
 - [ ] `w03-07` `boss` `+5` Sun · Boss problem
-- [ ] `w03-08` `capstone` `+8` Sun · Write the capstone design doc with the six forces and decision cards; scaffold the Go service and Postgres with Docker Compose
+- [ ] `w03-08` `capstone` `+8` Sun · Write the capstone design doc: the checkout flow, the order and stock states, the six forces and decision cards; scaffold the Go service and Postgres with Docker Compose
 - [ ] `w03-09` `redraw` `+3` Sun · Redraw: Bitly
 - [ ] `w03-10` `review` `+0` Sun · Weekly review
 
@@ -790,7 +790,7 @@ DSA focus: graphs (BFS, DFS, topological sort, Dijkstra, union-find).
 - [ ] `w04-07` `design` `+10` Sat · [Ticketmaster](https://www.hellointerview.com/learn/system-design/problem-breakdowns/ticketmaster), full loop
 - [ ] `w04-08` `lld` `+8` Sat · Timed, 2 h; asked at Groww: a thread-safe cache with pluggable eviction (LRU, LFU, FIFO via the strategy pattern) and unit tests. Uses locks, ConcurrentHashMap and ExecutorService
 - [ ] `w04-09` `boss` `+5` Sun · Boss problem
-- [ ] `w04-10` `capstone` `+8` Sun · Order API, Postgres schema, idempotency keys, order state machine
+- [ ] `w04-10` `capstone` `+8` Sun · Order API: Postgres schema, idempotency keys, the order state machine, and checkout checks for price, product, quantity limit and delivery pincode
 - [ ] `w04-11` `redraw` `+6` Sun · Redraw: Rate Limiter, Bitly
 - [ ] `w04-12` `review` `+0` Sun · Weekly review
 
@@ -806,7 +806,7 @@ DSA focus: DP (1D and 2D, knapsack, LIS, interval DP).
 - [ ] `w05-06` `maths` `+3` Thu · 99.9% availability allows about 8.8 hours of downtime a year; 99.99% about 53 minutes. Two dependencies in series at 99.9% each give about 99.8%. Why does every extra dependency cost you?
 - [ ] `w05-07` `design` `+10` Sat · [Dropbox](https://www.hellointerview.com/learn/system-design/problem-breakdowns/dropbox), full loop
 - [ ] `w05-08` `lld` `+8` Sat · Timed 90 min; asked at PhonePe: a to-do manager with add, update, remove, and analytics on completed and overdue tasks, with unit tests
-- [ ] `w05-09` `capstone` `+4` Sun · Diwali, light: add Kafka to Compose (1 hour)
+- [ ] `w05-09` `capstone` `+4` Sun · Diwali, light: add Kafka and Redis to Compose (1 hour)
 - [ ] `w05-10` `redraw` `+3` Sun · Redraw: Ticketmaster
 - [ ] `w05-11` `review` `+0` Sun · Checkpoint: look at five weeks of scorecard rows. Is the loop working? Decide on Hello Interview Premium
 
@@ -823,7 +823,7 @@ DSA focus: trees, tries, monotonic stack and queue. From this week, alternate co
 - [ ] `w06-07` `design` `+10` Sat · [Payment System](https://www.hellointerview.com/learn/system-design/problem-breakdowns/payment-system) (Premium), or derive a payment gateway like Razorpay yourself
 - [ ] `w06-08` `lld` `+8` Sat · Timed 90 min; asked at CRED: a payment processing package from a long problem statement: payment methods, state transitions, retries, error handling, unit tests
 - [ ] `w06-09` `boss` `+5` Sun · Boss problem
-- [ ] `w06-10` `capstone` `+8` Sun · Transactional outbox, payment event consumer, retries, dead-letter queue
+- [ ] `w06-10` `capstone` `+8` Sun · Inventory service: stock reservations with a TTL, release on failure or expiry, and no overselling when many orders race
 - [ ] `w06-11` `read` `+2` Sun · Stripe's [idempotency post](https://stripe.com/blog/idempotency) again, and the [Hyperswitch](https://github.com/juspay/hyperswitch) README
 - [ ] `w06-12` `redraw` `+6` Sun · Redraw: Dropbox, Rate Limiter
 - [ ] `w06-13` `ai` `+2` Week · AI-fluency rep: a small task with an AI assistant; verify and explain every line
@@ -842,7 +842,7 @@ DSA focus: mixed timed sets, 1 hard.
 - [ ] `w07-07` `design` `+10` Sat · [Flash Sale](https://www.hellointerview.com/learn/system-design/problem-breakdowns/flash-sale) (Premium) or derive it yourself; then read [Shopify inventory reservations](https://www.hellointerview.com/learn/system-design/in-the-wild/shopify-inventory-reservations)
 - [ ] `w07-08` `lld` `+8` Sat · Timed 90 min; asked at PhonePe: a multilevel cache with LFU eviction and read, write and delete across levels
 - [ ] `w07-09` `boss` `+5` Sun · Boss problem
-- [ ] `w07-10` `capstone` `+8` Sun · Mock payment provider with webhooks, timeouts and a reconciliation job
+- [ ] `w07-10` `capstone` `+8` Sun · Transactional outbox, a payment service with retries and a dead-letter queue, and a mock payment provider that sends signed webhooks, sometimes late, twice or out of order
 - [ ] `w07-11` `redraw` `+6` Sun · Redraw: your week 6 design, Ticketmaster
 - [ ] `w07-12` `ai` `+2` Week · AI-fluency rep
 - [ ] `w07-13` `review` `+0` Sun · Weekly review
@@ -859,7 +859,7 @@ DSA focus: mixed timed sets, 1 hard.
 - [ ] `w08-06` `maths` `+3` Thu · A Bloom filter needs about 9.6 bits per item for a 1% false-positive rate, so 1 million items fit in about 1.2 MB. Derive it from the false-positive formula
 - [ ] `w08-07` `design` `+10` Sat · [WhatsApp](https://www.hellointerview.com/learn/system-design/problem-breakdowns/whatsapp), full loop
 - [ ] `w08-08` `lld` `+8` Sat · Timed 90 min; asked at Flipkart: an in-memory task scheduler
-- [ ] `w08-09` `capstone` `+8` Sun · OpenTelemetry traces, Prometheus and Grafana
+- [ ] `w08-09` `capstone` `+8` Sun · Handle the provider's webhooks (signature check, dedupe, out-of-order events) and send your own signed, retried webhooks to the store; add the reconciliation job for orders, payments and stock
 - [ ] `w08-10` `mock` `+10` Sun · Mock #1 with a peer
 - [ ] `w08-11` `redraw` `+6` Sun · Redraw: your week 7 design, Dropbox
 - [ ] `w08-12` `ai` `+2` Week · AI-fluency rep
@@ -879,7 +879,7 @@ DSA focus: mixed timed sets, 1 hard.
 - [ ] `w09-07` `design` `+10` Sat · [ChatGPT](https://www.hellointerview.com/learn/system-design/problem-breakdowns/chatgpt) (Premium), or derive an agentic checkout gateway from your UCP work
 - [ ] `w09-08` `lld` `+8` Sat · Timed 90 min: movie ticket booking with seat locking
 - [ ] `w09-09` `boss` `+5` Sun · Boss problem
-- [ ] `w09-10` `capstone` `+8` Sun · Deploy on kind, then a short cloud session; tear it down afterwards
+- [ ] `w09-10` `capstone` `+8` Sun · OpenTelemetry traces, Prometheus and Grafana; deploy on kind, then a short cloud session; tear it down afterwards
 - [ ] `w09-11` `redraw` `+6` Sun · Redraw: WhatsApp, your week 6 design
 - [ ] `w09-12` `ai` `+2` Week · AI-fluency rep
 - [ ] `w09-13` `review` `+0` Sun · Weekly review
@@ -896,7 +896,7 @@ DSA focus: interview format, 2 problems in 45 min, out loud.
 - [ ] `w10-06` `maths` `+3` Thu · In a simple queue, time in the system grows like 1/(1 − utilisation). Going from 80% to 95% busy multiplies it by 4. Why do you never run a payment service near 100%?
 - [ ] `w10-07` `design` `+10` Sat · [FB News Feed](https://www.hellointerview.com/learn/system-design/problem-breakdowns/fb-news-feed), full loop
 - [ ] `w10-08` `lld` `+8` Sat · Timed 90 min; asked at Razorpay: an in-memory relational database with tables, insert, update, delete, primary keys, indexes and column constraints
-- [ ] `w10-09` `capstone` `+8` Sun · k6 load test; write up the bottleneck you found and how you fixed it
+- [ ] `w10-09` `capstone` `+8` Sun · k6 load test, including a flash sale where many buyers chase the last items; write up the bottleneck you found, how you fixed it, and that nothing oversold
 - [ ] `w10-10` `mock` `+10` Sun · Mock #2
 - [ ] `w10-11` `career` `+4` Week · Apply to 3 to 5 practice companies; ask each recruiter for the AI policy per round
 - [ ] `w10-12` `story` `+4` Week · Prepare a 10-minute architecture walkthrough of your Tapestry cart and checkout work (diagram, traffic, failures, what you'd change)
@@ -917,7 +917,7 @@ DSA focus: interview format.
 - [ ] `w11-06` `maths` `+3` Thu · A count-min sketch with width e/ε and depth ln(1/δ) overestimates by at most εN with probability 1 − δ. Size one for ε = 0.1% and δ = 1%
 - [ ] `w11-07` `design` `+10` Sat · [Ad Click Aggregator](https://www.hellointerview.com/learn/system-design/problem-breakdowns/ad-click-aggregator), then read [Razorpay's anomaly detection on Amazon MSK](https://aws.amazon.com/blogs/big-data/how-razorpay-built-real-time-anomaly-detection-with-amazon-msk/)
 - [ ] `w11-08` `lld` `+8` Sat · Timed 90 min; asked in a Razorpay assessment that allowed an AI assistant: a Git-like version control system (init, add, commit, log, diff, checkout). Use an AI assistant, but verify and explain every line
-- [ ] `w11-09` `capstone` `+8` Sun · CI/CD pipeline
+- [ ] `w11-09` `capstone` `+8` Sun · CI/CD pipeline that also runs a failure-injection suite: crash the consumer, send a webhook twice, time out the provider
 - [ ] `w11-10` `story` `+4` Week · Write your 6 STAR stories and rehearse them out loud
 - [ ] `w11-11` `mock` `+20` Week · Two mocks this week
 - [ ] `w11-12` `redraw` `+6` Sun · Redraw: FB News Feed, WhatsApp
@@ -936,7 +936,7 @@ DSA focus: interview format.
 - [ ] `w12-06` `maths` `+3` Thu · Each extra geohash character divides a cell by 32; 6 characters is roughly a 1.2 km by 0.6 km cell. Why pick the precision from the search radius?
 - [ ] `w12-07` `design` `+10` Sat · [Uber](https://www.hellointerview.com/learn/system-design/problem-breakdowns/uber), full loop
 - [ ] `w12-08` `lld` `+8` Sat · Redo your weakest machine-coding problem, timed
-- [ ] `w12-09` `capstone` `+8` Sun · README, architecture diagram, and a blog post on your site
+- [ ] `w12-09` `capstone` `+8` Sun · README, architecture diagram, failure-injection results, and a blog post on your site
 - [ ] `w12-10` `read` `+2` Week · Build a one-page cheat sheet of every concept, from your own notes
 - [ ] `w12-11` `mock` `+20` Week · Two mocks this week
 - [ ] `w12-12` `career` `+2` Week · Build your target list of Indian fintech companies
@@ -979,18 +979,19 @@ With 750+ problems behind you, DSA is about speed and sharpness, not volume: abo
 - **AI-fluency rep** once a week from week 6.
 - **Reported problems** to solve in weeks 3 to 9: Distribute Coins in Binary Tree (979), Remove K Digits (402), Course Schedule II (210), Meeting Rooms II (253), subarrays with equal odd and even counts (prefix sums plus a hash map).
 
-## Capstone: an order and payment service
+## Capstone: checkout for an online store
 <!-- surface: weeks.capstone -->
 
-One project that covers cloud, Docker, Kubernetes, HLD and LLD, and gives you failure stories interviewers ask for.
+One project, the checkout of an online store, that covers cloud, Docker, Kubernetes, HLD and LLD, and gives you failure stories interviewers ask for.
 
-- **Language:** Go for the service; Java stays your LLD language.
-- **Parts:** order API, payment service, a mock payment provider, Kafka, Postgres, Redis, a reconciliation job.
-- **Must-haves:** idempotency keys, an order and payment state machine, transactional outbox, webhook signature checks and dedupe, retries with backoff and a dead-letter queue, reconciliation, traces and metrics, a k6 load test, CI/CD, deployment on Kubernetes.
-- **Done means:** a public GitHub repo with a design doc, an architecture diagram, load-test findings, and a blog post on your site.
+- **Scenario:** a buyer places an order. The system checks the cart, holds the stock, takes the payment, tells the store, and stays correct when a step fails, a message arrives twice, or a hundred buyers want the last item.
+- **Language:** Go for the services; Java stays your LLD language.
+- **Parts:** order API, inventory service, payment service, a mock payment provider, a webhook sender, Kafka, Postgres, Redis, a reconciliation job.
+- **Must-haves:** idempotency keys, price and product checks at checkout, quantity limits and delivery-area checks, stock reservations with a TTL, no overselling under concurrent orders, an order state machine with compensation, transactional outbox, signature checks and dedupe on the provider's webhooks, out-of-order event handling, signed outbound webhooks to the store, retries with backoff and a dead-letter queue, reconciliation across orders and payments and stock, traces and metrics, a k6 load test with a flash-sale oversell check, a failure-injection suite, CI/CD, deployment on Kubernetes.
+- **Done means:** a public GitHub repo with a design doc, an architecture diagram, load-test and failure-injection findings, and a blog post on your site.
 - **Cost guard:** build locally with Docker Compose and kind or k3d; use the cloud only for short sessions, with a billing alarm set on day one.
 
-Flow: Client → Order API (Go) → Postgres (orders + outbox table) → outbox relay → Kafka (payment events) → Payment service (consumes, retries, DLQ) → Mock PSP (charge; async webhooks back). Order API checks idempotency keys in Redis. Payment service writes status back to Postgres. A reconciliation job compares records with the mock PSP.
+Flow: Client → Order API (Go) → Inventory service (reserves stock with a TTL) → Postgres (orders + outbox table) → outbox relay → Kafka (order events) → Payment service (consumes, retries, DLQ) → Mock PSP (charge; async webhooks back). The Order API checks the cart and idempotency keys (Redis) first. The provider's webhook confirms the order and commits the stock, or releases it. The webhook sender tells the store. A reconciliation job compares orders, payments and stock with the mock PSP.
 
 ## Mocks, stories and applying
 <!-- surface: weeks.interview -->

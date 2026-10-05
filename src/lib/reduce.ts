@@ -46,7 +46,7 @@ export function applyOp(s: AppState, op: Op): AppState {
         ...s,
         problemLog: upsert(s.problemLog, (r) => r.id === p.id, (prev) => ({
           id: p.id, loggedOn: p.loggedOn, difficulty: p.difficulty, minutes: p.minutes ?? null, noAi: p.noAi,
-          title: p.title ?? null, createdAt: prev?.createdAt ?? at,
+          title: p.title ?? null, url: p.url ?? null, createdAt: prev?.createdAt ?? at,
         })),
       }
     }

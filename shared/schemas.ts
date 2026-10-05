@@ -50,6 +50,7 @@ export const OpSchema = z.discriminatedUnion('type', [
       minutes: z.optional(z.int().check(z.gt(0), z.lte(600))),
       noAi: z.boolean(),
       title: z.optional(text(200)),
+      url: z.optional(z.string().check(z.maxLength(500), z.regex(/^https?:\/\/\S+$/i))),
     }),
   ),
   op('problem.delete', z.strictObject({ id })),

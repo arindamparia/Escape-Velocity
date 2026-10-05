@@ -305,6 +305,16 @@ describe('GET /api/export and errors', () => {
     expect(body.appliedOps).toBe(2)
   })
 
+  it('says plainly when Access has never been set up, instead of looking like an expired session', async () => {
+    const unset: Env = { ...PROD, ACCESS_TEAM_DOMAIN: '<your-team>.cloudflareaccess.com', ACCESS_AUD: '<the Application Audience (AUD) tag from the Access app>' }
+    const res = await app.fetch(new Request('http://x/api/state'), unset)
+    expect(res.status).toBe(401)
+    expect(((await res.json()) as { error: { code: string; message: string } }).error).toMatchObject({ code: 'access_not_configured', message: expect.stringContaining('not set up') })
+    // once it is set up, a request without an identity is an ordinary 401
+    const set = await app.fetch(new Request('http://x/api/state'), PROD)
+    expect(((await set.json()) as { error: { code: string } }).error.code).toBe('unauthorized')
+  })
+
   it('POST /api/dev/reset empties every table in dev, so e2e tests start clean', async () => {
     await post([op('task.set', { taskId: aTask, done: true }), op('setting.set', { key: 'onboarded', value: '1' }), op('note.upsert', { id: uuid(), kind: 'free', body: 'x' })])
     const res = await app.fetch(new Request('http://x/api/dev/reset', { method: 'POST' }), DEV)

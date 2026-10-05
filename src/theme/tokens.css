@@ -9,44 +9,57 @@
 
 :root,
 [data-theme='dark'] {
+  /* Dark: a night sky with amber stars. Green is only ever "done". */
   color-scheme: dark;
-  --bg: #0b1020;
-  --surface: #121933;
-  --text: #e6e9f2;
-  --text-muted: #9aa3ba;
-  --accent: #f5b942;
-  --accent-ink: #0b1020;
-  --line: #26304f;
+  --bg: #0a0e1a;
+  --surface: #121a33;
+  --surface-2: #19234a;
+  --text: #eaf0ff;
+  --text-muted: #9fabcb;
+  --accent: #ffb224;
+  --accent-ink: #0a0e1a;
+  --line: #232d50;
+  --done: #3ddc97;
   --warn: #ff9d8a;
-  --shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 8px 24px rgb(0 0 0 / 0.25);
+  --radius: 12px;
+  --shadow: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 14px 34px -18px rgb(0 0 0 / 0.7);
+  --hero-tint: color-mix(in srgb, var(--accent) 13%, var(--surface));
   --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI', Roboto, sans-serif;
   --lh: 1.55;
 }
 
 [data-theme='light'] {
+  /* Light: warm paper white with an ember accent, so a finished task feels like progress, not paperwork. */
   color-scheme: light;
-  --bg: #f7f8fb;
+  --bg: #fbf8f3;
   --surface: #ffffff;
-  --text: #141826;
-  --text-muted: #525a70;
-  --accent: #8a5a12;
+  --surface-2: #f3ede3;
+  --text: #1a1523;
+  --text-muted: #5a5566;
+  --accent: #b5340a;
   --accent-ink: #ffffff;
-  --line: #dde1ea;
+  --line: #e7dfd2;
+  --done: #0a6f4c;
   --warn: #a12a16;
-  --shadow: 0 1px 2px rgb(20 24 38 / 0.08), 0 8px 24px rgb(20 24 38 / 0.06);
+  --shadow: 0 1px 2px rgb(26 21 35 / 0.06), 0 12px 28px -16px rgb(26 21 35 / 0.2);
+  --hero-tint: color-mix(in srgb, var(--accent) 9%, var(--surface));
 }
 
 [data-theme='paper'] {
   color-scheme: light;
   --bg: #f2efe6;
   --surface: #f2efe6;
+  --surface-2: #f2efe6;
   --text: #1a1a1a;
   --text-muted: #3d3d3d;
   --accent: #1a1a1a;
   --accent-ink: #f2efe6;
   --line: #1a1a1a;
+  --done: #1a1a1a;
   --warn: #1a1a1a;
+  --radius: 2px;
   --shadow: none;
+  --hero-tint: #f2efe6;
   --font-body: 'Iowan Old Style', Georgia, 'Times New Roman', serif;
   --lh: 1.65;
 }
@@ -85,6 +98,9 @@
     --accent: #1a1a1a;
     --accent-ink: #fff;
     --line: #1a1a1a;
+    --surface-2: #fff;
+    --done: #1a1a1a;
+    --hero-tint: #fff;
     --font-body: 'Iowan Old Style', Georgia, serif;
     --shadow: none;
   }

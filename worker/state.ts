@@ -36,6 +36,7 @@ export async function readState(db: D1Database): Promise<AppState> {
       minutes: r.minutes === null ? null : Number(r.minutes),
       noAi: r.no_ai === 1,
       title: str(r.title),
+      url: str(r.url),
       createdAt: String(r.created_at),
     })),
     designStatus: ds.results.map((r) => ({

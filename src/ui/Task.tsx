@@ -1,15 +1,23 @@
 import type { PlanTask, TaskType, WeekChunk } from '../../shared/plan-types'
 import { engine, findNote, openOverlay, saveNote, toggleTask } from '../lib/app'
 import { navigate } from '../lib/nav'
-import { taskLabel } from '../lib/plan'
+import { plan, taskLabel } from '../lib/plan'
+import { dsaProgress, mergeProblems, perDay } from '../lib/problems'
+import { algotracker } from '../lib/solved'
 import { Html } from './Html'
 import { Icon } from './Icon'
 import { PRESETS, startTimer } from '../tools/timer'
 
 export const TYPE_LABEL: Record<TaskType, string> = {
-  dsa: 'DSA', boss: 'Boss', concept: 'Concept', infra: 'Infra', design: 'Design', design2: 'Second design', lld: 'LLD',
-  maths: 'Maths', capstone: 'Capstone', redraw: 'Redraw', read: 'Read', mock: 'Mock', story: 'Story', career: 'Career',
-  mindset: 'Mindset', review: 'Review', rest: 'Rest', ai: 'AI rep', ready: 'Ready',
+  dsa: 'DSA', boss: 'Boss problem', concept: 'Concept', infra: 'Infra', design: 'System design', design2: 'Second design', lld: 'Machine coding',
+  maths: 'Maths', capstone: 'Capstone', redraw: 'Redraw', read: 'Reading', mock: 'Mock interview', story: 'Story', career: 'Career',
+  mindset: 'Mindset', review: 'Sunday review', rest: 'Rest', ai: 'AI practice', ready: 'Ready check',
+}
+
+/** Task type to the entry in the guide's glossary that explains it. */
+const TYPE_TERM: Partial<Record<TaskType, string>> = {
+  dsa: 'dsa', boss: 'boss-problem', infra: 'infra', design: 'learning-loop', design2: 'learning-loop', lld: 'machine-coding',
+  maths: 'derivation', capstone: 'capstone', redraw: 'redraw', mock: 'mock-interview', story: 'star-story', ready: 'readiness',
 }
 
 export interface TaskAction { label: string; primary?: boolean; run: () => void }
@@ -73,12 +81,16 @@ export function actionsFor(task: PlanTask, chunk: WeekChunk | null): TaskAction[
 
 export function TaskCheck({ task }: { task: PlanTask }) {
   const done = engine.doneSet.value.has(task.id)
+  const locked = engine.autoDoneSet.value.has(task.id)
   return (
     <button
       type="button"
       class="task__check"
       aria-pressed={done}
-      aria-label={`${done ? 'Untick' : 'Tick'} ${taskLabel(task.id)}`}
+      aria-disabled={locked || undefined}
+      data-locked={locked || undefined}
+      title={locked ? 'Done by your solved problems. It unlocks if one is un-solved.' : undefined}
+      aria-label={locked ? `${taskLabel(task.id)}: done by your solved problems` : `${done ? 'Untick' : 'Tick'} ${taskLabel(task.id)}`}
       onClick={() => toggleTask(task.id)}
     >
       <Icon name="check" />
@@ -86,7 +98,15 @@ export function TaskCheck({ task }: { task: PlanTask }) {
   )
 }
 
-export function TaskRow({ task, chunk, focused = false, actions = true }: { task: PlanTask; chunk: WeekChunk | null; focused?: boolean; actions?: boolean }) {
+/** "1 of 2 solved" under a DSA task, counted from AlgoTracker and the problems logged here. */
+function DsaProgress({ task, locked }: { task: PlanTask; locked: boolean }) {
+  const byDay = perDay(mergeProblems(engine.state.value.problemLog, algotracker.value.solved))
+  const p = dsaProgress(task, byDay, plan.config.startDate, plan.config.lightDays)
+  if (!p || (p.have === 0 && !locked)) return null
+  return <div class="small muted">{locked ? 'Done from your solved problems · ' : ''}<a href="/progress/problems" title="See everything you solved">{p.have} of {p.need} {p.unit === 'days' ? 'days done' : p.need === 1 ? 'problem solved' : 'problems solved'}</a></div>
+}
+
+export function TaskRow({ task, chunk, focused = false, actions = true, inWeek = false }: { task: PlanTask; chunk: WeekChunk | null; focused?: boolean; actions?: boolean; /** link the label to the task in its week (on Today; the week page is already there) */ inWeek?: boolean }) {
   const done = engine.doneSet.value.has(task.id)
   const entry = chunk?.tasks[task.id]
   const list = actions && !done ? actionsFor(task, chunk) : []
@@ -96,12 +116,13 @@ export function TaskRow({ task, chunk, focused = false, actions = true }: { task
       <TaskCheck task={task} />
       <div>
         <div class="task__meta">
-          <span class="chip">{TYPE_LABEL[task.type]}</span>
+          {TYPE_TERM[task.type] ? <a class="chip" href={`/guide#${TYPE_TERM[task.type]}`} title="What is this?">{TYPE_LABEL[task.type]}</a> : <span class="chip">{TYPE_LABEL[task.type]}</span>}
           {task.company ? <span class="chip chip--accent">asked at {task.company}</span> : null}
-          <span class="muted small">{taskLabel(task.id)}</span>
+          {inWeek && task.week ? <a class="small" href={`/weeks/${task.week}#${task.id}`} title="See this task in its week">{taskLabel(task.id)}</a> : <span class="muted small">{taskLabel(task.id)}</span>}
           <span class="task__pts" title="points">+{task.points}</span>
         </div>
         {entry ? <Html class="task__text" html={entry.html} inline /> : <span class="task__text muted">…</span>}
+        <DsaProgress task={task} locked={engine.autoDoneSet.value.has(task.id)} />
         {pick ? <div class="small muted">Your pick: <strong>{chunk?.designs[pick]?.name ?? pick}</strong></div> : null}
         {list.length ? (
           <div class="task__actions">

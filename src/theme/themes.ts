@@ -6,7 +6,7 @@ export type ThemePref = 'system' | 'dark' | 'light' | 'paper'
 export const THEME_PREFS: ThemePref[] = ['system', 'dark', 'light', 'paper']
 export const THEME_LABEL: Record<ThemePref, string> = { system: 'System', dark: 'Dark', light: 'Light', paper: 'Paper' }
 
-const BG = { dark: '#0B1020', light: '#F7F8FB', paper: '#F2EFE6' } as const
+const BG = { dark: '#0A0E1A', light: '#FBF8F3', paper: '#F2EFE6' } as const
 
 function readPref(): ThemePref {
   try {

@@ -1,22 +1,35 @@
-import { useMemo, useState } from 'preact/hooks'
+import { useEffect, useMemo, useState } from 'preact/hooks'
 import { engine, toggleTask } from '../lib/app'
 import { today } from '../lib/clock'
 import { weekHasLightDay } from '../lib/dates'
 import { plan, readinessTasks, taskLabel } from '../lib/plan'
+import { loadSolved, withSolved } from '../lib/solved'
 import { pointsByWeek, readinessProgress, totalPoints, weekTarget } from '../lib/points'
 import { lastMediumsInBox, scorecard, weekStats } from '../lib/stats'
 import { dayInfo } from '../lib/today'
-import { EvidenceStrip } from '../ui/Evidence'
 import { Html } from '../ui/Html'
 import { Icon } from '../ui/Icon'
 import { LineChart, ProblemsChart, Ring, ScoreSheet } from '../ui/charts'
 import { usePage, useTitle } from '../ui/hooks'
 import { Review } from './Review'
+import { SolvedProblems } from './SolvedProblems'
 import { WeekForm } from './WeekForm'
+
+/** Where to go to make progress on each readiness item. */
+const READINESS_LINK: Record<string, [string, string]> = {
+  'r-01': ['/study/timer', 'Practise with the timer'],
+  'r-02': ['/library', 'Open the design library'],
+  'r-03': ['/study/redraws', 'Open the redraw queue'],
+  'r-04': ['/study/mock', 'Start a mock interview'],
+  'r-05': ['/library?tab=machine', 'See machine-coding problems'],
+  'r-06': ['/study/mock', 'Start a mock interview'],
+  'r-07': ['/weeks/capstone', 'Open the capstone'],
+  'r-08': ['/study/notes?tab=stories', 'Write your STAR stories'],
+}
 
 function Readiness() {
   const page = usePage('progress')
-  const state = engine.state.value
+  const state = withSolved(engine.state.value)
   const done = engine.doneSet.value
   const { done: n, total } = readinessProgress(plan.tasks, done)
   const live = lastMediumsInBox(state.problemLog)
@@ -39,7 +52,7 @@ function Readiness() {
         return (
           <label key={t.id} class="check">
             <input type="checkbox" checked={isDone} onChange={() => toggleTask(t.id)} />
-            <span>{page ? <Html html={page.readiness[t.id] ?? taskLabel(t.id)} inline class="" /> : taskLabel(t.id)}{hints[t.id] ? <><br /><span class="small muted">{hints[t.id]}</span></> : null}</span>
+            <span>{page ? <Html html={page.readiness[t.id] ?? taskLabel(t.id)} inline class="" /> : taskLabel(t.id)}{hints[t.id] ? <><br /><span class="small muted">{hints[t.id]}</span></> : null}{READINESS_LINK[t.id] ? <><br /><a class="small" href={READINESS_LINK[t.id][0]}>{READINESS_LINK[t.id][1]}</a></> : null}</span>
           </label>
         )
       })}
@@ -48,7 +61,7 @@ function Readiness() {
 }
 
 function ScorecardTable({ current }: { current: number }) {
-  const state = engine.state.value
+  const state = withSolved(engine.state.value)
   const done = engine.doneSet.value
   const [edit, setEdit] = useState(current)
   const pts = pointsByWeek(plan.tasks, done, 13)
@@ -74,9 +87,10 @@ function ScorecardTable({ current }: { current: number }) {
 }
 
 export default function Progress({ view }: { view?: string }) {
-  useTitle(view === 'review' ? 'Sunday review' : 'Progress')
+  useTitle(view === 'review' ? 'Sunday review' : view === 'problems' ? 'Solved problems' : 'Progress')
   const progress = usePage('progress')
-  const state = engine.state.value
+  useEffect(() => { void loadSolved() }, [])
+  const state = withSolved(engine.state.value)
   const done = engine.doneSet.value
   const info = dayInfo(today.value)
   const current = info.phase === 'before' ? 0 : info.week
@@ -85,17 +99,26 @@ export default function Progress({ view }: { view?: string }) {
   const stats = past.map((w) => weekStats(state.problemLog, w, plan.config.startDate))
   const labels = past.map(String)
 
-  if (view === 'review') return <div class="page"><div class="slot-main"><Review /></div></div>
+  const nav = (
+    <nav class="tabs" role="tablist" aria-label="Progress">
+      {([['', 'Overview', '/progress'], ['problems', 'Solved problems', '/progress/problems'], ['review', 'Sunday review', '/progress/review']] as const).map(([v, label, href]) => (
+        <a key={v} role="tab" href={href} aria-selected={(view ?? '') === v}>{label}</a>
+      ))}
+    </nav>
+  )
+  if (view === 'review') return <div class="page"><div class="slot-main stack">{nav}<Review /></div></div>
+  if (view === 'problems') return <div class="page"><div class="slot-main stack">{nav}<SolvedProblems /></div></div>
 
   return (
     <div class="page">
       <div class="slot-main stack">
+        {nav}
         <header>
           <p class="eyebrow">Am I actually getting better?</p>
           <h1>Progress</h1>
-          <p class="muted">{totalPoints(plan.tasks, done)} points so far. Open the numbers, the way you’d check a proof instead of trusting a feeling.</p>
+          <p class="muted">{totalPoints(plan.tasks, done)} points so far. Check the numbers, not the feeling.</p>
         </header>
-        <ScoreSheet title="Weekly mock-score sheet" subtitle="Points per week. Your past weeks only." data={past.map((w) => ({ label: String(w), value: pts[w - 1], hatched: weekHasLightDay(w, plan.config.startDate, plan.config.lightDays) }))} slots={13} target={plan.config.weeklyPointsTarget} />
+        <ScoreSheet title="Points per week" subtitle="Your past weeks. The dashed line is the weekly target." data={past.map((w) => ({ label: String(w), value: pts[w - 1], hatched: weekHasLightDay(w, plan.config.startDate, plan.config.lightDays) }))} slots={13} target={plan.config.weeklyPointsTarget} />
         <div class="charts">
           <ProblemsChart slots={13} data={past.map((w, i) => ({ label: String(w), easy: stats[i].easy, medium: stats[i].medium, hard: stats[i].hard }))} />
           <LineChart title="Average medium time" subtitle="Minutes, mediums solved without AI. The box is 25." series={[{ name: 'Avg minutes', marker: 'circle', values: past.map((w, i) => scorecard(state, w, plan.config.startDate, pts[w - 1]).avgShown ?? stats[i].avgMediumMin) }]} slots={13} labels={labels} yMax={60} unit="" reference={{ value: 25, label: '25 min box' }} />
@@ -105,7 +128,6 @@ export default function Progress({ view }: { view?: string }) {
       </div>
       <div class="slot-aside">
         <Readiness />
-        <EvidenceStrip />
         <details class="card"><summary>How points work</summary><div style="margin-top:0.8rem">{progress ? <Html html={progress.pointsHtml} class="prose small" /> : <div class="skeleton" />}</div></details>
         {info.phase === 'after' ? <div class="card"><p style="margin:0"><Icon name="star" /> 13 constellations. Go collect offers.</p></div> : null}
         <p class="small muted">Weekly target: {weekTarget(info.week, plan.config) ?? 'none this week'}.</p>

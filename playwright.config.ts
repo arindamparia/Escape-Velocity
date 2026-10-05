@@ -7,7 +7,7 @@ const PORT = 8788
 const BUILD = process.env.E2E_SKIP_BUILD ? '' : 'npm run build && '
 const SERVER =
   `${BUILD}npx wrangler d1 migrations apply escape-velocity --local --persist-to .wrangler/e2e && ` +
-  `npx wrangler dev --port ${PORT} --local --persist-to .wrangler/e2e --var ENVIRONMENT:dev --var OWNER_EMAIL:e2e@localhost`
+  `npx wrangler dev --port ${PORT} --local --persist-to .wrangler/e2e --var ENVIRONMENT:dev --var OWNER_EMAIL:e2e@localhost --var ALGOTRACKER_DATABASE_URL: `
 
 // On a Mac Playwright finds its own browsers. A container with a preinstalled Chromium sets PW_CHROMIUM_PATH.
 const executablePath = process.env.PW_CHROMIUM_PATH
@@ -26,7 +26,6 @@ export default defineConfig({
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL: `http://localhost:${PORT}`,
-    serviceWorkers: 'allow',
     // The plan runs in Asia/Kolkata whatever the machine's zone is. Running the browser in another zone makes any
     // accidental use of local time show up as a failure.
     timezoneId: 'America/Los_Angeles',

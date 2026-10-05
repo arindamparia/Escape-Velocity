@@ -49,6 +49,8 @@ export interface PlanTask {
   company?: string
   /** concept and infra tasks that carry a "Why:" question (these become flashcards) */
   hasWhy?: boolean
+  /** dsa tasks: done by itself when each of these weekdays (0 = Mon) has at least `perDay` solved problems */
+  solve?: { days: number[]; perDay: number }
 }
 
 export interface PlanWeek {
@@ -163,6 +165,9 @@ export interface PageChunks {
     dsaTable: { weeks: string; focus: string }[]
     capstoneHtml: string
     capstoneFlow: string[]
+    /** The capstone's one-line description, and its bullet list (Language, Parts, Must-haves, Done means, Cost guard) */
+    capstoneIntroHtml: string
+    capstoneFacts: { label: string; html: string; parts: string[] }[]
     interviewHtml: string
     stories: string[]
   }

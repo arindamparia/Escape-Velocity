@@ -35,6 +35,8 @@ export const PAGES = [
   { name: 'progress', path: '/progress', heading: /./ },
   { name: 'mindset', path: '/mindset', heading: /./ },
   { name: 'settings', path: '/settings', heading: /Settings/ },
+  { name: 'guide', path: '/guide', heading: /How this works/ },
+  { name: 'solved', path: '/progress/problems', heading: /Solved problems/ },
 ] as const
 
 /* ------------------------------------------------------------------ time */
@@ -59,6 +61,14 @@ export class Api {
       const res = await this.request.post('/api/ops', { data: { ops: ops.slice(i, i + 20) } })
       expect(res.ok(), await res.text()).toBeTruthy()
     }
+  }
+
+  /** Pretend AlgoTracker's database answered with these solved problems (dev server only). Newest first, as the real query returns them. */
+  async solved(rows: { n: number; name: string; topic?: string; difficulty?: 'Easy' | 'Medium' | 'Hard'; slug?: string; at: string }[] | null) {
+    const res = await this.request.post('/api/dev/solved', {
+      data: { rows: rows && rows.map((r) => ({ lc_number: r.n, name: r.name, url: `https://leetcode.com/problems/${r.slug ?? r.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}/`, topic: r.topic ?? 'Arrays', difficulty: r.difficulty ?? 'Medium', solved_at: r.at })) },
+    })
+    expect(res.ok(), await res.text()).toBeTruthy()
   }
 
   tick = (...taskIds: string[]) => this.send(taskIds.map((taskId) => this.op('task.set', { taskId, done: true })))
@@ -143,15 +153,6 @@ export async function settle(page: Page): Promise<void> {
 
 export const taskRow = (page: Page, id: string) => page.locator(`[data-task="${id}"]`)
 export const tickButton = (page: Page, id: string) => taskRow(page, id).locator('.task__check')
-
-/** Waits until the service worker is active (the precache is complete by then) and controls the page. */
-export async function installOffline(page: Page): Promise<void> {
-  await page.evaluate(async () => { await navigator.serviceWorker.ready })
-  // the worker does not claim already-open pages (so a new version never swaps code under you): one reload hands over control
-  await page.reload()
-  await page.waitForFunction(() => !!navigator.serviceWorker.controller)
-  await settle(page)
-}
 
 export async function axeSeriousViolations(page: Page, context?: string) {
   const results = await new AxeBuilder({ page }).analyze()

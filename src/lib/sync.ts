@@ -17,7 +17,7 @@ export interface SyncDeps {
 type Outcome<T> =
   | { kind: 'ok'; data: T }
   | { kind: 'rejected'; opId?: string; message: string }
-  | { kind: 'signed-out' }
+  | { kind: 'signed-out'; notSetUp?: boolean }
   | { kind: 'retry'; offline: boolean }
 
 async function call<T>(f: typeof fetch, url: string, init?: RequestInit): Promise<Outcome<T>> {
@@ -28,7 +28,11 @@ async function call<T>(f: typeof fetch, url: string, init?: RequestInit): Promis
     return { kind: 'retry', offline: true }
   }
   // Access redirects to its login page (an opaque redirect) or answers 401/403 when the session expired.
-  if (res.type === 'opaqueredirect' || res.status === 401 || res.status === 403 || (res.status >= 300 && res.status < 400)) return { kind: 'signed-out' }
+  if (res.status === 401) {
+    const code = ((await res.clone().json().catch(() => null)) as { error?: { code?: string } } | null)?.error?.code
+    return { kind: 'signed-out', notSetUp: code === 'access_not_configured' }
+  }
+  if (res.type === 'opaqueredirect' || res.status === 403 || (res.status >= 300 && res.status < 400)) return { kind: 'signed-out' }
   const isJson = (res.headers.get('content-type') ?? '').includes('application/json')
   if (!isJson) return res.ok ? { kind: 'signed-out' } : { kind: 'retry', offline: false }
   if (res.ok) {
@@ -52,6 +56,8 @@ export function createSync(engine: Engine, deps: SyncDeps = {}) {
 
   const status = signal<SyncStatus>('idle')
   const lastSyncedAt = signal<number | null>(null)
+  /** signed out because the site's sign-in (Cloudflare Access) was never set up, not because a session expired */
+  const signInNotSetUp = signal(false)
   /** ops the server refused; dropped from the outbox so one bad op can't wedge the queue */
   const rejected = signal<{ opId: string; message: string }[]>([])
 
@@ -88,6 +94,7 @@ export function createSync(engine: Engine, deps: SyncDeps = {}) {
         engine.removeFromOutbox(bad)
       } else if (out.kind === 'signed-out') {
         status.value = 'signed-out'
+        signInNotSetUp.value = !!out.notSetUp
         return
       } else {
         failures++
@@ -100,6 +107,7 @@ export function createSync(engine: Engine, deps: SyncDeps = {}) {
     const st = await call<AppState>(f, '/api/state')
     if (st.kind === 'ok') {
       failures = 0
+      signInNotSetUp.value = false
       engine.replaceFromServer(st.data)
       lastSyncedAt.value = Date.now()
       if (engine.outbox.peek().length) {
@@ -111,6 +119,7 @@ export function createSync(engine: Engine, deps: SyncDeps = {}) {
       }
     } else if (st.kind === 'signed-out') {
       status.value = 'signed-out'
+      signInNotSetUp.value = !!st.notSetUp
     } else if (st.kind === 'retry') {
       failures++
       status.value = st.offline ? 'offline' : 'error'
@@ -143,14 +152,14 @@ export function createSync(engine: Engine, deps: SyncDeps = {}) {
     return running
   }
 
-  /** Sync on open, on `online`, on visibility change, after each local save, and every 60 s while visible. */
+  /** Sync on open, on `online`, on visibility change, after each local save, and every 15 s while visible. */
   function start(runNow = true): () => void {
     const onVisible = () => { if (document.visibilityState === 'visible') void run() }
     const onOnline = () => void run()
     document.addEventListener('visibilitychange', onVisible)
     window.addEventListener('online', onOnline)
     const offSaved = engine.onSaved(() => void run())
-    const interval = setInterval(() => { if (document.visibilityState === 'visible') void run() }, 60_000)
+    const interval = setInterval(() => { if (document.visibilityState === 'visible') void run() }, 15_000)
     if (runNow) void run()
     return () => {
       document.removeEventListener('visibilitychange', onVisible)
@@ -160,7 +169,7 @@ export function createSync(engine: Engine, deps: SyncDeps = {}) {
     }
   }
 
-  return { status, lastSyncedAt, rejected, run, start }
+  return { status, lastSyncedAt, rejected, signInNotSetUp, run, start }
 }
 
 export type Sync = ReturnType<typeof createSync>

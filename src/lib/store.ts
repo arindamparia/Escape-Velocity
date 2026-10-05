@@ -4,7 +4,10 @@ import { batch, computed, signal } from '@preact/signals'
 import { createStore as createKv, get, set, type UseStore } from 'idb-keyval'
 import type { Op, OpOf, OpType } from '../../shared/schemas'
 import { EMPTY_STATE, type AppState } from '../../shared/state'
+import { plan } from './plan'
+import { autoDone, mergeProblems } from './problems'
 import { applyOp, applyOps } from './reduce'
+import { algotracker } from './solved'
 
 interface Snapshot { v: 1; state: AppState; outbox: Op[] }
 
@@ -57,7 +60,10 @@ export function createEngine(deps: EngineDeps = {}) {
   /** ops currently being sent: never coalesced */
   const inflight = new Set<string>()
 
-  const doneSet = computed(() => new Set(state.value.taskProgress.filter((r) => r.done).map((r) => r.taskId)))
+  const ticked = computed(() => new Set(state.value.taskProgress.filter((r) => r.done).map((r) => r.taskId)))
+  /** DSA tasks the solved problems (AlgoTracker + logged here) have completed; locked until a problem is un-solved */
+  const autoDoneSet = computed(() => autoDone(plan.tasks, mergeProblems(state.value.problemLog, algotracker.value.solved), plan.config.startDate, plan.config.lightDays))
+  const doneSet = computed(() => (autoDoneSet.value.size ? new Set([...ticked.value, ...autoDoneSet.value]) : ticked.value))
   const settings = computed(() => new Map(state.value.settings.map((s) => [s.key, s.value])))
 
   let writing: Promise<void> = Promise.resolve()
@@ -136,7 +142,7 @@ export function createEngine(deps: EngineDeps = {}) {
   }
 
   return {
-    state, outbox, hydrated, doneSet, settings, inflight,
+    state, outbox, hydrated, doneSet, autoDoneSet, settings, inflight,
     hydrate, dispatch, persist, replaceFromServer, removeFromOutbox, recheckOutbox,
     get restored() { return restored },
     /** called after each local change has been saved */

@@ -1,6 +1,7 @@
 import { lazy } from 'preact-iso'
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import type { SearchEntry } from '../../shared/plan-types'
+import { canonicalProblemUrl, titleFromProblemUrl } from '../../shared/constants'
 import { closeOverlay, engine, logProblem, needsOnboarding, overlay, say, setTheme, showDesign, whyNote } from '../lib/app'
 import { today } from '../lib/clock'
 import { navigate } from '../lib/nav'
@@ -88,15 +89,19 @@ function LogProblem({ difficulty, minutes, minimum }: { difficulty?: 'medium' | 
   const [mins, setMins] = useState(minutes ? String(minutes) : '')
   const [noAi, setNoAi] = useState(true)
   const [title, setTitle] = useState('')
+  const [link, setLink] = useState('')
   const [date, setDate] = useState(today.value)
+  const guess = titleFromProblemUrl(link)
+  const linkBad = link.trim() !== '' && canonicalProblemUrl(link) === null
   return (
     <Dialog title={minimum ? 'Minimum day: one problem' : 'Log a problem'} onClose={closeOverlay}>
       <form
         class="stack"
         onSubmit={(e) => {
           e.preventDefault()
+          if (linkBad) { say('That does not look like a link (it should start with https://).'); return }
           const m = Number(mins)
-          const ok = logProblem(d, Number.isInteger(m) && m > 0 ? m : undefined, noAi, title.trim() || undefined, date)
+          const ok = logProblem(d, Number.isInteger(m) && m > 0 ? m : undefined, noAi, title.trim() || guess || undefined, date, link.trim() || undefined)
           if (ok) {
             say(minimum ? 'One problem. Still counts. Tomorrow’s you says thanks.' : `Logged: ${d}${m ? `, ${m} min` : ''}.`, 3600)
             closeOverlay()
@@ -113,7 +118,9 @@ function LogProblem({ difficulty, minutes, minimum }: { difficulty?: 'medium' | 
           <label>Minutes<input type="number" min="1" max="600" inputMode="numeric" value={mins} onInput={(e) => setMins((e.target as HTMLInputElement).value)} placeholder="22" /></label>
           <label>Date<input type="date" value={date} onInput={(e) => setDate((e.target as HTMLInputElement).value)} /></label>
         </div>
-        <label>Problem (optional)<input type="text" value={title} maxLength={200} onInput={(e) => setTitle((e.target as HTMLInputElement).value)} placeholder="Course Schedule II" /></label>
+        <label>Problem link<input type="url" value={link} maxLength={500} onInput={(e) => setLink((e.target as HTMLInputElement).value)} placeholder="https://leetcode.com/problems/course-schedule-ii/" aria-invalid={linkBad} /></label>
+        {linkBad ? <p class="small" role="alert" style="margin:0">That does not look like a link: it should start with https://</p> : null}
+        <label>Name (optional)<input type="text" value={title} maxLength={200} onInput={(e) => setTitle((e.target as HTMLInputElement).value)} placeholder={guess ?? 'Course Schedule II'} /></label>
         <label class="check">
           <input type="checkbox" checked={noAi} onChange={(e) => setNoAi((e.target as HTMLInputElement).checked)} /> <span>Solved without AI</span>
         </label>
@@ -161,6 +168,7 @@ function Onboarding() {
           <WhyField rows={5} />
         </div>
         <div><h3>Theme</h3><ThemePicker /></div>
+        <p class="small muted" style="margin:0">Not sure how it works? <a href="/guide" onClick={() => { engine.dispatch('setting.set', { key: 'onboarded', value: '1' }); closeOverlay() }}>Read the one-page guide</a> any time; it is also linked at the bottom of every page.</p>
         <div class="row"><button type="button" class="btn btn--primary btn--big" onClick={() => { engine.dispatch('setting.set', { key: 'onboarded', value: '1' }); closeOverlay() }}>Start</button></div>
       </div>
     </Dialog>
@@ -171,7 +179,7 @@ function Onboarding() {
 
 interface Item { label: string; hint?: string; run: () => void }
 
-const PAGES: [string, string][] = [['Today', '/'], ['Weeks', '/weeks'], ['Study', '/study'], ['Library', '/library'], ['Progress', '/progress'], ['Mindset', '/mindset'], ['Settings', '/settings']]
+const PAGES: [string, string][] = [['Solved problems', '/progress/problems'], ['How this works', '/guide'], ['Today', '/'], ['Weeks', '/weeks'], ['Study', '/study'], ['Library', '/library'], ['Progress', '/progress'], ['Mindset', '/mindset'], ['Settings', '/settings']]
 const TOOLS: [string, string][] = [
   ['Learning loop', '/study/loop'], ['Redraw queue', '/study/redraws'], ['Flashcards', '/study/flashcards'], ['Focus timer', '/study/timer'],
   ['Mock mode', '/study/mock'], ['Envelope calculator', '/study/envelope'], ['Formula sheet', '/study/formulas'], ['Notes', '/study/notes'],
@@ -185,11 +193,12 @@ function go(url: string): () => void {
 export function commandsFor(q: string): Item[] {
   const s = q.trim().toLowerCase()
   const out: Item[] = []
-  let m = /^log\s+(easy|medium|hard)(?:\s+(\d{1,3}))?$/.exec(s)
+  let m = /^log\s+(easy|medium|hard)(?:\s+(\d{1,3}))?(?:\s+(https?:\/\/\S+))?$/i.exec(q.trim())
   if (m) {
-    const d = m[1] as 'easy' | 'medium' | 'hard'
+    const d = m[1].toLowerCase() as 'easy' | 'medium' | 'hard'
     const mins = m[2] ? Number(m[2]) : undefined
-    out.push({ label: `Log ${d}${mins ? ` · ${mins} min` : ''}`, hint: 'problem', run: () => { closeOverlay(); if (logProblem(d, mins, true, undefined, today.value)) say(`Logged: ${d}${mins ? `, ${mins} min` : ''}.`) } })
+    const url = m[3]
+    out.push({ label: `Log ${d}${mins ? ` · ${mins} min` : ''}${url ? ' with its link' : ''}`, hint: 'problem', run: () => { closeOverlay(); if (logProblem(d, mins, true, titleFromProblemUrl(url) ?? undefined, today.value, url)) say(`Logged: ${d}${mins ? `, ${mins} min` : ''}.`) } })
   }
   m = /^timer\s+(\d{1,3})$/.exec(s)
   if (m && Number(m[1]) > 0) {
@@ -241,7 +250,7 @@ function Palette() {
     <Dialog title="Command palette" onClose={closeOverlay} bare>
       <input
         type="text" role="combobox" aria-expanded="true" aria-controls="palette-list" aria-activedescendant={items.length ? `palette-opt-${index}` : undefined} aria-label="Search or run a command" autofocus
-        placeholder="Jump to a week, design or tool · log medium 22 · timer 25 · theme paper" value={q}
+        placeholder="Jump to a week, design or tool · log medium 22 <link> · timer 25 · theme paper" value={q}
         onInput={(e) => setQ((e.target as HTMLInputElement).value)}
         onKeyDown={(e) => {
           if (e.key === 'ArrowDown') { e.preventDefault(); setIndex((i) => Math.min(items.length - 1, i + 1)) }

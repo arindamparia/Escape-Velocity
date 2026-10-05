@@ -65,7 +65,7 @@ function Designs({ groups, f }: { groups: { title: string; designs: DesignFull[]
                   <button type="button" class="library-item" aria-current={selectedDesign.value === d.id ? 'true' : undefined} style={selectedDesign.value === d.id ? 'border-color:var(--accent);border-width:2px' : undefined} onClick={() => { navigate(`/library?design=${d.id}`, { replace: true }); showDesign(d.id) }}>
                     <span><strong>{d.name}</strong><br /><span class="small muted">{d.teaches}</span></span>
                     <span class="row" style="justify-content:flex-end;align-content:start">
-                      <span class={`chip${d.access === 'premium' ? ' chip--accent' : ''}`}>{d.access === 'derive' ? 'derive' : d.access}</span>
+                      <span class={`chip${d.access === 'premium' ? ' chip--accent' : ''}`} title="Whether a breakdown of this design is free, behind Premium, or does not exist (you derive it yourself)">{d.access === 'derive' ? 'no breakdown' : `${d.access} breakdown`}</span>
                       <span class="chip">{/^\d+$/.test(d.week) ? `Wk ${d.week}` : d.week}</span>
                       {s !== 'not-started' ? <span class="chip chip--accent">{STATUS_LABEL[s]}</span> : null}
                     </span>
@@ -85,7 +85,8 @@ export default function Library() {
   const { query } = useLocation()
   const tab = (TABS.find((t) => t[0] === query.tab)?.[0] ?? 'designs') as Tab
   useTitle('Library')
-  useEffect(() => { if (query.design) selectedDesign.value = query.design }, [query.design])
+  // a link to /library?design=<id> (from the capstone, the palette, a reading list) opens that design: in the side panel on a wide screen, as a sheet otherwise
+  useEffect(() => { if (query.design) showDesign(query.design) }, [query.design])
   const company = query.company
   const [f, setF] = useState<Filters>({ group: '', access: '', st: '', q: '' })
   const set = (p: Partial<Filters>) => setF((x) => ({ ...x, ...p }))

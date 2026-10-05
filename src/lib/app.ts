@@ -65,6 +65,7 @@ export function toggleTask(taskId: string): void {
   const now = Date.now()
   if (now - (lastTick.get(taskId) ?? 0) < 450) return
   lastTick.set(taskId, now)
+  if (engine.autoDoneSet.peek().has(taskId)) { say('Done by your solved problems. It unlocks if one is un-solved.'); return }
   const task = plan.tasks.find((t) => t.id === taskId)
   const before = engine.doneSet.peek()
   const done = !before.has(taskId)
@@ -93,9 +94,9 @@ export function saveNote(kind: 'why' | 'design' | 'story' | 'free', refId: strin
   engine.dispatch('note.upsert', { id: existing?.id ?? crypto.randomUUID(), kind, ...(refId ? { refId } : {}), body })
 }
 
-export function logProblem(difficulty: 'easy' | 'medium' | 'hard', minutes: number | undefined, noAi: boolean, title: string | undefined, loggedOn: string): boolean {
+export function logProblem(difficulty: 'easy' | 'medium' | 'hard', minutes: number | undefined, noAi: boolean, title: string | undefined, loggedOn: string, url?: string): boolean {
   const r = engine.dispatch('problem.add', {
-    id: crypto.randomUUID(), loggedOn, difficulty, noAi, ...(minutes ? { minutes } : {}), ...(title ? { title } : {}),
+    id: crypto.randomUUID(), loggedOn, difficulty, noAi, ...(minutes ? { minutes } : {}), ...(title ? { title } : {}), ...(url ? { url } : {}),
   })
   if (!r.ok) say(`Could not save: ${r.error}`)
   return r.ok

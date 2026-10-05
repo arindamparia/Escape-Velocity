@@ -24,6 +24,8 @@ export interface ProblemLogRow {
   minutes: number | null
   noAi: boolean
   title: string | null
+  /** where the problem is (LeetCode, GeeksforGeeks, …) */
+  url: string | null
   createdAt: string
 }
 export interface DesignStatusRow {
@@ -74,3 +76,6 @@ export const EMPTY_STATE: AppState = {
 
 export interface ApiError { error: { code: string; message: string; opId?: string } }
 export interface OpsResult { applied: number; skipped: number }
+
+/** A problem solved in AlgoTracker, as the Worker's /api/solved returns it (newest first). */
+export interface SolvedProblem { lcNumber: number; name: string; url: string; topic: string; difficulty: 'Easy' | 'Medium' | 'Hard'; solvedAt: string }

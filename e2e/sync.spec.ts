@@ -78,6 +78,17 @@ test.describe('an expired Access session', () => {
     })
   }
 
+  test('when Cloudflare Access was never set up, the banner says so (and offers no sign-in button)', async ({ page, api }) => {
+    await api.onboard()
+    await openApp(page, '/weeks/1')
+    await page.route('**/api/**', (route) => route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ error: { code: 'access_not_configured', message: 'Cloudflare Access is not set up for this site yet' } }) }))
+    await tickButton(page, A).click()
+    await expect(page.getByRole('alert')).toContainText('Sign-in is not set up yet')
+    await expect(page.getByRole('alert')).toContainText('Cloudflare Access')
+    await expect(page.getByRole('button', { name: 'Sign in again' })).toHaveCount(0)
+    await expect(tickButton(page, A)).toHaveAttribute('aria-pressed', 'true') // nothing is lost
+  })
+
   test('a refused op (400) is dropped and reported, and does not block the ones behind it', async ({ page, api }) => {
     await api.onboard()
     await openApp(page, '/weeks/1')
@@ -94,7 +105,7 @@ test.describe('an expired Access session', () => {
     await tickButton(page, B).click()
     await expect.poll(() => api.doneIds(), { timeout: 20_000 }).toEqual([B])
     // the list of refused changes lives in memory, so go to Settings inside the app, not with a fresh page load
-    await page.getByRole('link', { name: 'Settings' }).click()
+    await page.locator('header.topbar').getByRole('link', { name: 'Settings' }).click()
     await expect(page.getByRole('alert')).toContainText('refused by the server')
   })
 })

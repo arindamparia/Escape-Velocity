@@ -1,27 +1,29 @@
-import { useMemo } from 'preact/hooks'
+import { useEffect, useMemo } from 'preact/hooks'
 import { engine } from '../lib/app'
+import { algotracker, loadSolved } from '../lib/solved'
 import { evidence } from '../lib/today'
 
 /** Evidence, not pressure: what you have done since day one. Never a backlog, never a red streak. */
 export function EvidenceStrip() {
   const state = engine.state.value
   const done = engine.doneSet.value
-  const e = useMemo(() => evidence(state, done), [state, done])
-  const items: [number, string][] = [
-    [e.mediums, 'mediums solved without AI'],
-    [e.hards, 'hards solved without AI'],
-    [e.designsOwned, 'designs owned (redrawn twice)'],
-    [e.cardsMastered, 'flashcards mastered'],
-    [e.constellations, 'constellations lit'],
+  useEffect(() => { void loadSolved() }, [])
+  const solved = algotracker.value.solved
+  const e = useMemo(() => evidence(state, done, solved), [state, done, solved])
+  const items: [number, string, string][] = [
+    [e.mediums, 'medium problems solved without AI', '/progress/problems'],
+    [e.hards, 'hard problems solved without AI', '/progress/problems'],
+    [e.designsOwned, 'designs you can redraw from memory', '/library'],
+    [e.cardsMastered, 'flashcards you know well', '/study/flashcards'],
+    [e.constellations, 'weeks completed (of 13)', '/weeks'],
   ]
   return (
     <section class="card" aria-label="Evidence">
-      <p class="eyebrow">Since day one</p>
+      <p class="eyebrow">Your progress so far</p>
       <div class="evidence">
-        {items.slice(0, 4).map(([n, label]) => (
-          <div key={label}><strong>{n}</strong><span>{label}</span></div>
+        {items.map(([n, label, href]) => (
+          <a key={label} href={href}><strong>{n}</strong><span>{label}</span></a>
         ))}
-        <div style="grid-column: 1 / -1"><strong>{items[4][0]}<span class="muted small" style="display:inline"> / 13</span></strong><span>{items[4][1]}</span></div>
       </div>
     </section>
   )

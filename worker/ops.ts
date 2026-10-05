@@ -90,12 +90,12 @@ function statementFor(db: D1Database, op: Op, now: string, cards: Map<string, { 
       const p = op.payload
       return db
         .prepare(
-          `INSERT INTO problem_log (id, logged_on, difficulty, minutes, no_ai, title, created_at)
-           VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
+          `INSERT INTO problem_log (id, logged_on, difficulty, minutes, no_ai, title, url, created_at)
+           VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
            ON CONFLICT(id) DO UPDATE SET logged_on = excluded.logged_on, difficulty = excluded.difficulty,
-             minutes = excluded.minutes, no_ai = excluded.no_ai, title = excluded.title`,
+             minutes = excluded.minutes, no_ai = excluded.no_ai, title = excluded.title, url = excluded.url`,
         )
-        .bind(p.id, p.loggedOn, p.difficulty, p.minutes ?? null, p.noAi ? 1 : 0, p.title ?? null, now)
+        .bind(p.id, p.loggedOn, p.difficulty, p.minutes ?? null, p.noAi ? 1 : 0, p.title ?? null, p.url ?? null, now)
     }
     case 'problem.delete':
       return db.prepare('DELETE FROM problem_log WHERE id = ?1').bind(op.payload.id)

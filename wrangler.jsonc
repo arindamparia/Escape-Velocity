@@ -12,15 +12,17 @@
     {
       "binding": "DB",
       "database_name": "escape-velocity",
-      "database_id": "<paste the id from `wrangler d1 create escape-velocity`>",
+      "database_id": "0e785b86-4ea6-487a-b7fa-c09dc1f93bd3",
       "migrations_dir": "migrations"
     }
   ],
+  "triggers": { "crons": [] },
   "vars": {
     "ENVIRONMENT": "production",
     "PLAN_TZ": "Asia/Kolkata",
-    "OWNER_EMAIL": "<your email>",
-    "ACCESS_TEAM_DOMAIN": "<your-team>.cloudflareaccess.com",
-    "ACCESS_AUD": "<the Application Audience (AUD) tag from the Access app>"
+    "OWNER_EMAIL": "arindamparia321@gmail.com",
+    "ACCESS_TEAM_DOMAIN": "arindam-codes.cloudflareaccess.com",
+    "ACCESS_AUD": "51fecbec76ae596526c6b8379a9957e63fe904bb5a52313899b0caa6c76ef460",
+    "ALGOTRACKER_EMAIL": "arindamparia321@gmail.com"
   }
 }

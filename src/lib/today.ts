@@ -1,9 +1,12 @@
 // What Today shows. Pure functions over the plan and the user's state, so the motivation rules are testable.
 import type { PlanDay, PlanTask } from '../../shared/plan-types'
-import type { AppState } from '../../shared/state'
+import { canonicalProblemUrl } from '../../shared/constants'
+import type { AppState, SolvedProblem } from '../../shared/state'
 import { blockOf, dayNum, DOW_NAMES, kolkataToday, lightDayOn, planDow, planPhase, weekEnd, weekNumber, weekStart, type DayBlock, type LightDayRange, type PlanPhase } from './dates'
 import { plan } from './plan'
+import { mergeProblems } from './problems'
 import { weekPoints, weekTarget } from './points'
+import { dueCards, redrawsDue } from './srs'
 
 export interface DayInfo {
   phase: PlanPhase
@@ -55,11 +58,11 @@ const toDay = (iso: string): string | null => {
 }
 
 /** Kolkata dates with any activity: a tick, a logged problem, a focus session, a review, a note. A minimum day counts. */
-export function activityDates(s: AppState): Set<string> {
+export function activityDates(s: AppState, solved: readonly SolvedProblem[] = []): Set<string> {
   const out = new Set<string>()
   const add = (d: string | null) => d && out.add(d)
   for (const r of s.taskProgress) if (r.done) add(r.doneAt ? toDay(r.doneAt) : null)
-  for (const r of s.problemLog) out.add(r.loggedOn)
+  for (const r of mergeProblems(s.problemLog, solved)) out.add(r.loggedOn)
   for (const r of s.sessions) add(toDay(r.startedAt))
   for (const r of s.flashcards) add(toDay(r.updatedAt))
   for (const r of s.notes) add(toDay(r.updatedAt))
@@ -108,10 +111,14 @@ export function constellationLit(week: number, done: ReadonlySet<string>): boole
   return weekPoints(plan.tasks, done, week) >= target
 }
 
-export function evidence(s: AppState, done: ReadonlySet<string>): Evidence {
+/** `solved` = problems solved in AlgoTracker, all of them without AI; one logged here with the same link is counted once. */
+export function evidence(s: AppState, done: ReadonlySet<string>, solved: readonly Pick<SolvedProblem, 'url' | 'difficulty'>[] = []): Evidence {
+  const known = new Set(solved.map((x) => canonicalProblemUrl(x.url)).filter(Boolean))
+  const mine = s.problemLog.filter((p) => p.noAi && !(canonicalProblemUrl(p.url) && known.has(canonicalProblemUrl(p.url))))
+  const count = (d: 'medium' | 'hard') => mine.filter((p) => p.difficulty === d).length + solved.filter((x) => x.difficulty.toLowerCase() === d).length
   return {
-    mediums: s.problemLog.filter((p) => p.difficulty === 'medium' && p.noAi).length,
-    hards: s.problemLog.filter((p) => p.difficulty === 'hard' && p.noAi).length,
+    mediums: count('medium'),
+    hards: count('hard'),
     designsOwned: s.designStatus.filter((d) => d.status === 'redrawn-2').length,
     cardsMastered: s.flashcards.filter((c) => c.box >= 4).length,
     constellations: Array.from({ length: plan.config.weeksCount }, (_, i) => i + 1).filter((w) => constellationLit(w, done)).length,
@@ -119,3 +126,10 @@ export function evidence(s: AppState, done: ReadonlySet<string>): Evidence {
 }
 
 export { weekEnd }
+
+/** What is waiting in the study tools today: flashcards (a card exists once its why-note has text) and redraws. */
+export function dueSummary(s: AppState, today: string): { cards: number; redraws: number } {
+  const states = new Map(s.flashcards.map((c) => [c.cardId, c]))
+  const eligible = plan.flashcardIds.filter((id) => (s.notes.find((n) => n.kind === 'why' && n.refId === id)?.body ?? '').trim())
+  return { cards: dueCards(eligible, states, today).length, redraws: redrawsDue(s.designStatus, today).length }
+}
