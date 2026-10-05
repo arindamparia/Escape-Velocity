@@ -12,13 +12,11 @@ export type SolvedState =
 
 export const algotracker = signal<SolvedState>({ status: 'loading', solved: [] })
 let inflight: Promise<void> | null = null
-let lastRead = 0
 
-/** Read AlgoTracker now (`force`), or share the read already made on this page. `quiet` keeps what is shown while it reads. */
-export function loadSolved(force = false, quiet = false): Promise<void> {
+/** Read AlgoTracker now (`force`), or share the read already made on this page. */
+export function loadSolved(force = false): Promise<void> {
   if (inflight && !force) return inflight
-  lastRead = Date.now()
-  if (force && !quiet) algotracker.value = { status: 'loading', solved: algotracker.peek().solved }
+  if (force) algotracker.value = { status: 'loading', solved: algotracker.peek().solved }
   inflight = fetch('/api/solved', { redirect: 'manual' })
     .then(async (r): Promise<SolvedState> => {
       if (r.status === 401) return { status: 'signin', solved: [] }
@@ -31,12 +29,9 @@ export function loadSolved(force = false, quiet = false): Promise<void> {
   return inflight
 }
 
-/** Read once when the app opens, and again when the tab comes back after a while (you solved something in AlgoTracker). */
-export function keepSolvedFresh(): () => void {
+/** Read once when the app opens. After that only a Refresh button reads again: nothing polls AlgoTracker. */
+export function readSolvedOnOpen(): void {
   void loadSolved()
-  const onShow = () => { if (document.visibilityState === 'visible' && Date.now() - lastRead > 20_000) void loadSolved(true, true) }
-  document.addEventListener('visibilitychange', onShow)
-  return () => document.removeEventListener('visibilitychange', onShow)
 }
 
 /** The state with AlgoTracker's solved problems added to the ones logged here, so every number counts both. */

@@ -19,7 +19,12 @@ export function EvidenceStrip() {
   ]
   return (
     <section class="card" aria-label="Evidence">
-      <p class="eyebrow">Your progress so far</p>
+      <div class="row row--between">
+        <p class="eyebrow" style="margin:0">Your progress so far</p>
+        <button type="button" class="btn btn--small btn--ghost" disabled={algotracker.value.status === 'loading'} onClick={() => void loadSolved(true)} title="Read AlgoTracker again">
+          {algotracker.value.status === 'loading' ? 'Reading…' : 'Refresh'}
+        </button>
+      </div>
       <div class="evidence">
         {items.map(([n, label, href]) => (
           <a key={label} href={href}><strong>{n}</strong><span>{label}</span></a>
