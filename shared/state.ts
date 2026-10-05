@@ -24,6 +24,11 @@ export interface ProblemLogRow {
   minutes: number | null
   noAi: boolean
   title: string | null
+  /** where the problem is (LeetCode, GeeksforGeeks, …) */
+  url: string | null
+  /** 'manual' = logged here; 'algotracker' = solved in AlgoTracker and imported (it changes there, not here) */
+  source: 'manual' | 'algotracker'
+  externalId: string | null
   createdAt: string
 }
 export interface DesignStatusRow {

@@ -9,9 +9,11 @@ import { termFor } from './glossary'
 // What each part of the capstone lets you say in an interview. The questions are the ones the plan's company reports
 // list (payment gateway, payouts, reconciliation, UPI flows, failure stories); the links go to those designs.
 const PROVES: { q: string; a: string; design?: [string, string] }[] = [
-  { q: '“Design a payment system.”', a: 'You built one: a state machine for the order, idempotency keys, webhooks.', design: ['payment-gateway-like-razorpay', 'Payment gateway design'] },
+  { q: '“Design the checkout of an online store.”', a: 'You built one: cart checks, a state machine for the order, idempotency keys, payments, webhooks.', design: ['payment-gateway-like-razorpay', 'Payment gateway design'] },
+  { q: '“How do you stop overselling the last item?”', a: 'Stock reservations with a TTL, and a flash-sale load test that shows nothing oversold.', design: ['flash-sale', 'Flash sale design'] },
   { q: '“What if the consumer crashes halfway?”', a: 'The outbox and retries mean nothing is lost, and the dead-letter queue catches poison messages.' },
-  { q: '“How do you know the money is right?”', a: 'The reconciliation job, plus the mismatches you planted to prove it works.', design: ['reconciliation-and-merchant-settlement', 'Reconciliation design'] },
+  { q: '“What if a payment webhook arrives twice, or late?”', a: 'Signature checks, dedupe and out-of-order handling, and a failure-injection test that proves it.' },
+  { q: '“How do you know the money and the stock are right?”', a: 'The reconciliation job, plus the mismatches you planted to prove it works.', design: ['reconciliation-and-merchant-settlement', 'Reconciliation design'] },
   { q: '“Where is the bottleneck?”', a: 'Your k6 load test: the number, the cause, and the fix.' },
   { q: '“Tell me about a production incident.”', a: 'The failures you caused on purpose, and what each taught you.' },
 ]
@@ -19,14 +21,14 @@ const PROVES: { q: string; a: string; design?: [string, string] }[] = [
 // Format from hiring guides: action + technique + a measured result. Fill the [brackets] from your own runs, and never
 // write a number you can't explain.
 const BULLETS = [
-  'Built an order and payment service in Go (Postgres, Redis, Kafka) with idempotency keys and a transactional outbox; across [N] injected failures (crashes, duplicate webhooks, provider timeouts) it charged twice [0] times.',
-  'Load-tested with k6 at [X] requests/s: found [the bottleneck] and cut p99 latency from [A] ms to [B] ms by [the fix].',
-  'Added a reconciliation job against a mock payment provider that caught [N] of [N] seeded mismatches, with traces and metrics (OpenTelemetry, Prometheus) to see why.',
+  'Built the checkout of an online store in Go (Postgres, Redis, Kafka): idempotent orders, price and stock checks, and a transactional outbox; across [N] injected failures (crashes, duplicate or late webhooks, provider timeouts) it charged twice [0] times.',
+  'Reserved stock with a TTL so [N] concurrent buyers chasing [M] items bought exactly [M] and nothing oversold; load-tested with k6 at [X] requests/s and cut p99 latency from [A] ms to [B] ms by [the fix].',
+  'Verified payment-provider webhooks (signatures, dedupe, out-of-order) and sent signed, retried webhooks to the store; a reconciliation job caught [N] of [N] seeded mismatches across orders, payments and stock.',
 ]
 
 // A suggested order to protect, if a Sunday slips. Not from the plan: it is guidance for this page.
-const KEEP_FIRST = ['Order API with idempotency keys and the state machine', 'Outbox, Kafka consumer, retries and the dead-letter queue', 'Mock provider with signed, de-duplicated webhooks', 'Reconciliation job', 'Load test and its write-up', 'Public repo: README, diagram, design doc, blog post']
-const THEN = ['Traces and metrics', 'Kubernetes on kind', 'CI/CD']
+const KEEP_FIRST = ['Checkout checks, idempotency keys and the order state machine', 'Stock reservations with a TTL, and no overselling', 'Outbox, payment service, retries and the dead-letter queue', 'Provider webhooks: signatures, dedupe, out-of-order', 'Reconciliation, and the load test with its oversell check', 'Public repo: README, diagram, design doc, blog post']
+const THEN = ['Signed webhooks to the store', 'Traces and metrics', 'Kubernetes on kind', 'CI/CD']
 
 export function CapstoneOverview() {
   const page = usePage('weeks')
@@ -42,9 +44,10 @@ export function CapstoneOverview() {
     <div class="stack" style="gap:1.6rem">
       <section class="stack" aria-label="What it is">
         <p class="lede-big"><Html html={page.capstoneIntroHtml} inline class="" /></p>
+        {fact('Scenario') ? <p class="muted cap1" style="margin:0;max-width:60ch"><Html html={fact('Scenario')!.html} inline class="" /></p> : null}
         <div class="row">
           <a class="chip" href="/guide#capstone">Explain it simply</a>
-          {fact('Language') ? <span class="chip">Go for the service · Java for LLD</span> : null}
+          {fact('Language') ? <span class="chip">Go for the services · Java for LLD</span> : null}
           <span class="chip">10 Sundays · about 2 h each</span>
         </div>
       </section>
@@ -104,7 +107,7 @@ export function CapstoneOverview() {
 
       <section class="stack" aria-label="If time runs short">
         <h2 style="margin:0">If a Sunday slips</h2>
-        <p class="muted" style="margin:0">A suggestion, not part of the plan: protect these in order, and let the last three go before the first six.</p>
+        <p class="muted" style="margin:0">A suggestion, not part of the plan: protect these in order, and let the ones below go before any of the six.</p>
         <ol class="keep">{KEEP_FIRST.map((k) => <li key={k}>{k}</li>)}</ol>
         <p class="eyebrow" style="margin:0.4rem 0 0">Then, if there is time</p>
         <ul class="chips">{THEN.map((k) => <li key={k}><span class="chip">{k}</span></li>)}</ul>

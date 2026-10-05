@@ -9,4 +9,8 @@ export interface Env {
   ACCESS_TEAM_DOMAIN: string
   /** The Access application's Audience (AUD) tag */
   ACCESS_AUD: string
+  /** AlgoTracker's Neon connection string (a secret; a read-only role is best). Without it the link is simply off. */
+  ALGOTRACKER_DATABASE_URL?: string
+  /** whose AlgoTracker progress to read; defaults to OWNER_EMAIL */
+  ALGOTRACKER_EMAIL?: string
 }

@@ -6,7 +6,7 @@ import { resetAccessKeyCache } from '../../worker/access'
 import type { Env } from '../../worker/env'
 import { app } from '../../worker/index'
 
-const TABLES = ['task_progress', 'week_log', 'problem_log', 'design_status', 'decision_card', 'note', 'flashcard_state', 'focus_session', 'settings', 'applied_op']
+const TABLES = ['task_progress', 'week_log', 'problem_log', 'design_status', 'decision_card', 'note', 'flashcard_state', 'focus_session', 'settings', 'applied_op', 'sync_state']
 
 const DEV: Env = {
   DB: env.DB, ASSETS: env.ASSETS, ENVIRONMENT: 'dev', PLAN_TZ: 'Asia/Kolkata', OWNER_EMAIL: 'me@example.com',
@@ -303,6 +303,14 @@ describe('GET /api/export and errors', () => {
     expect(body.taskProgress).toHaveLength(1)
     expect(body.settings[0]).toMatchObject({ key: 'why_note', value: 'because' })
     expect(body.appliedOps).toBe(2)
+  })
+
+  it('POST /api/dev/algotracker pretends AlgoTracker answered, in dev only', async () => {
+    const row = { lc_number: 1, name: 'Two Sum', url: 'https://leetcode.com/problems/two-sum/', topic: 'Arrays', difficulty: 'Easy', solved_at: '2026-10-06T05:00:00.000Z' }
+    const call = (e: Env) => app.fetch(new Request('http://x/api/dev/algotracker', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ rows: [row] }) }), e)
+    expect((await call(PROD)).status).toBe(401)
+    expect(await (await call(DEV)).json()).toEqual({ added: 1, removed: 0, linked: 0 })
+    expect((await state()).problemLog).toMatchObject([{ title: 'Two Sum', source: 'algotracker', difficulty: 'easy', loggedOn: '2026-10-06' }])
   })
 
   it('POST /api/dev/reset empties every table in dev, so e2e tests start clean', async () => {

@@ -34,6 +34,14 @@ export const GLOSSARY: TermGroup[] = [
     ],
   },
   {
+    title: 'Your problems',
+    blurb: 'Where solved problems come from.',
+    terms: [
+      { id: 'problems', term: 'Solved problems', what: 'Every problem you have solved, each with its link, on the Problems page. Log one here with its link, or solve it in AlgoTracker.' },
+      { id: 'algotracker', term: 'AlgoTracker link', what: 'Your DSA tracker (algotracker.xyz). When it is linked, problems you solve there appear here within minutes, and un-solving one there removes it here. A problem in both places counts once. Setup is in the README.' },
+    ],
+  },
+  {
     title: 'How you study a design',
     blurb: 'The method behind the Study tools.',
     terms: [
@@ -48,7 +56,12 @@ export const GLOSSARY: TermGroup[] = [
     title: 'The capstone project',
     blurb: 'Words you will meet while building it.',
     terms: [
-      { id: 'capstone', term: 'Capstone', what: 'One real project you build a little each Sunday for ten weeks: an order and payment service like the ones fintech companies run. It ends as a public GitHub repo, and gives you something concrete to talk about in interviews.' },
+      { id: 'capstone', term: 'Capstone', what: 'One real project you build a little each Sunday for ten weeks: the checkout of an online store, with cart checks, stock, payments and webhooks, like the ones commerce and fintech companies run. It ends as a public GitHub repo, and gives you something concrete to talk about in interviews.' },
+      { id: 'reservation', term: 'Stock reservation', what: 'When a buyer checks out, the item is held for them for a few minutes (a TTL). Paid: the hold becomes a sale. Failed or expired: the stock is released for someone else.' },
+      { id: 'oversell', term: 'Overselling', what: 'Selling more than you have, because many buyers raced for the last item at the same moment. Reservations and a flash-sale load test prevent and prove it.' },
+      { id: 'compensation', term: 'Compensation', what: 'Undoing an earlier step when a later one fails, like releasing the stock when the payment fails. An order state machine with compensation keeps everything consistent.' },
+      { id: 'outbound-webhook', term: 'Outbound webhook', what: 'A call your service makes to the store when an order changes (paid, failed). It is signed so the store can trust it, and retried until it is acknowledged.' },
+      { id: 'failure-injection', term: 'Failure injection', what: 'Breaking things on purpose (crash the consumer, send a webhook twice, time out the provider) and checking the system still ends up correct. It gives you real failure stories.' },
       { id: 'psp', term: 'Payment provider (PSP)', what: 'A company that actually charges cards, like Razorpay or Adyen. The capstone uses a pretend one, so you can make it fail on purpose.' },
       { id: 'idempotency', term: 'Idempotency key', what: 'A unique id sent with a request, so retrying it never does the job twice. It is how a payment is never charged twice.' },
       { id: 'state-machine', term: 'State machine', what: 'A fixed list of states an order can be in (created, paid, failed…) and the only moves allowed between them.' },
@@ -66,7 +79,8 @@ export const GLOSSARY: TermGroup[] = [
 
 /** Capstone parts and must-haves that have an explanation above, matched by the words in the plan's bullet. */
 const CAPSTONE_LINKS: [RegExp, string][] = [
-  [/idempotency/i, 'idempotency'], [/state machine/i, 'state-machine'], [/outbox/i, 'outbox'], [/webhook/i, 'webhook'],
+  [/idempotency/i, 'idempotency'], [/stock reservation/i, 'reservation'], [/overselling/i, 'oversell'], [/compensation/i, 'compensation'],
+  [/outbound|webhook sender/i, 'outbound-webhook'], [/failure-injection/i, 'failure-injection'], [/state machine/i, 'state-machine'], [/outbox/i, 'outbox'], [/webhook/i, 'webhook'],
   [/dead-letter/i, 'dlq'], [/reconciliation/i, 'reconciliation'], [/kafka/i, 'kafka'], [/k6|load test/i, 'load-test'],
   [/kubernetes/i, 'kubernetes'], [/payment provider/i, 'psp'], [/traces|metrics/i, 'observability'],
 ]

@@ -111,8 +111,9 @@ export function constellationLit(week: number, done: ReadonlySet<string>): boole
 
 export function evidence(s: AppState, done: ReadonlySet<string>): Evidence {
   return {
-    mediums: s.problemLog.filter((p) => p.difficulty === 'medium' && p.noAi).length,
-    hards: s.problemLog.filter((p) => p.difficulty === 'hard' && p.noAi).length,
+    // since the plan began: problems solved before day one (AlgoTracker goes back to March) are history, not plan progress
+    mediums: s.problemLog.filter((p) => p.difficulty === 'medium' && p.noAi && p.loggedOn >= plan.config.startDate).length,
+    hards: s.problemLog.filter((p) => p.difficulty === 'hard' && p.noAi && p.loggedOn >= plan.config.startDate).length,
     designsOwned: s.designStatus.filter((d) => d.status === 'redrawn-2').length,
     cardsMastered: s.flashcards.filter((c) => c.box >= 4).length,
     constellations: Array.from({ length: plan.config.weeksCount }, (_, i) => i + 1).filter((w) => constellationLit(w, done)).length,

@@ -93,9 +93,9 @@ export function saveNote(kind: 'why' | 'design' | 'story' | 'free', refId: strin
   engine.dispatch('note.upsert', { id: existing?.id ?? crypto.randomUUID(), kind, ...(refId ? { refId } : {}), body })
 }
 
-export function logProblem(difficulty: 'easy' | 'medium' | 'hard', minutes: number | undefined, noAi: boolean, title: string | undefined, loggedOn: string): boolean {
+export function logProblem(difficulty: 'easy' | 'medium' | 'hard', minutes: number | undefined, noAi: boolean, title: string | undefined, loggedOn: string, url?: string): boolean {
   const r = engine.dispatch('problem.add', {
-    id: crypto.randomUUID(), loggedOn, difficulty, noAi, ...(minutes ? { minutes } : {}), ...(title ? { title } : {}),
+    id: crypto.randomUUID(), loggedOn, difficulty, noAi, ...(minutes ? { minutes } : {}), ...(title ? { title } : {}), ...(url ? { url } : {}),
   })
   if (!r.ok) say(`Could not save: ${r.error}`)
   return r.ok

@@ -13,6 +13,7 @@
     "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.2.0",
     "@preact/signals": "^2.11.3",
     "hono": "^4.13.13",
     "idb-keyval": "^6.3.0",

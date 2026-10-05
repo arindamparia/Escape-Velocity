@@ -2,6 +2,7 @@
 // (wrangler.jsonc: assets.run_worker_first = ["/api/*"]).
 import { Hono } from 'hono'
 import { OpsRequestSchema, type Op } from '../shared/schemas'
+import { algotrackerStatus, parseSolved, reconcile, syncAlgotracker } from './algotracker'
 import { verifyAccess } from './access'
 import type { Env } from './env'
 import { applyOps, checkAgainstPlan, OpError } from './ops'
@@ -41,11 +42,26 @@ app.post('/dev/reset', async (c) => {
     db.prepare('DELETE FROM focus_session'),
     db.prepare('DELETE FROM settings'),
     db.prepare('DELETE FROM applied_op'),
+    db.prepare('DELETE FROM sync_state'),
   ])
   return json({ reset: true })
 })
 
-app.get('/state', async (c) => json(await readState(c.env.DB)))
+// Every sync of the app also asks AlgoTracker whether anything changed there (throttled; a failure never blocks the state).
+// Test-only: pretend AlgoTracker answered with this list (rows as its database returns them), through the real reconcile.
+app.post('/dev/algotracker', async (c) => {
+  if (c.env.ENVIRONMENT !== 'dev') return err('not_found', 'No such API route', 404)
+  const rows = parseSolved(((await c.req.json().catch(() => null)) as { rows?: unknown } | null)?.rows)
+  return json(await reconcile(c.env.DB, rows))
+})
+
+app.get('/state', async (c) => {
+  await syncAlgotracker(c.env).catch(() => {})
+  return json(await readState(c.env.DB))
+})
+
+app.get('/algotracker', async (c) => json(await algotrackerStatus(c.env)))
+app.post('/algotracker/sync', async (c) => json(await syncAlgotracker(c.env, { force: true })))
 
 app.get('/export', async (c) => {
   const body = await readExport(c.env.DB)
@@ -102,4 +118,6 @@ app.onError((e) => {
 
 export default {
   fetch: app.fetch,
+  // cron (wrangler.jsonc triggers): read AlgoTracker even when the app is closed, so the log is already up to date
+  scheduled: (_event, env, ctx) => { ctx.waitUntil(syncAlgotracker(env, { force: true })) },
 } satisfies ExportedHandler<Env>

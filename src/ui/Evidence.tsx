@@ -8,8 +8,8 @@ export function EvidenceStrip() {
   const done = engine.doneSet.value
   const e = useMemo(() => evidence(state, done), [state, done])
   const items: [number, string, string][] = [
-    [e.mediums, 'medium problems solved without AI', '/progress'],
-    [e.hards, 'hard problems solved without AI', '/progress'],
+    [e.mediums, 'medium problems solved without AI', '/problems'],
+    [e.hards, 'hard problems solved without AI', '/problems'],
     [e.designsOwned, 'designs you can redraw from memory', '/library'],
     [e.cardsMastered, 'flashcards you know well', '/study/flashcards'],
     [e.constellations, 'weeks completed (of 13)', '/weeks'],

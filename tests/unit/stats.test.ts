@@ -5,7 +5,7 @@ import { lastMediumsInBox, problemsInWeek, scorecard, weekStats } from '../../sr
 const START = '2026-10-05'
 let n = 0
 const p = (loggedOn: string, difficulty: 'easy' | 'medium' | 'hard', minutes: number | null, noAi = true): ProblemLogRow => ({
-  id: `p${++n}`, loggedOn, difficulty, minutes, noAi, title: null, createdAt: `2026-10-05T00:00:${String(n).padStart(2, '0')}Z`,
+  id: `p${++n}`, loggedOn, difficulty, minutes, noAi, title: null, url: null, source: 'manual' as const, externalId: null, createdAt: `2026-10-05T00:00:${String(n).padStart(2, '0')}Z`,
 })
 
 describe('weekly stats', () => {

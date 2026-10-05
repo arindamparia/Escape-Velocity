@@ -21,6 +21,7 @@ const Mindset = lazyPage(() => import('./pages/Mindset'))
 const Sources = lazyPage(() => import('./pages/Sources'))
 const Settings = lazyPage(() => import('./pages/Settings'))
 const Guide = lazyPage(() => import('./pages/Guide'))
+const Problems = lazyPage(() => import('./pages/Problems'))
 
 const NAV: { href: string; label: string; match: (p: string) => boolean }[] = [
   { href: '/', label: 'Today', match: (p) => p === '/' },
@@ -159,13 +160,14 @@ function Shell() {
               <Route path="/sources" component={Sources} />
               <Route path="/settings" component={Settings} />
               <Route path="/guide" component={Guide} />
+              <Route path="/problems" component={Problems} />
               <Route default component={NotFound} />
             </Router>
           </ErrorBoundary>
         </Boundary>
       </main>
       <footer class="sitefoot noprint">
-        <a href="/guide">How this works</a><a href="/library?tab=resources">Resources and sources</a><a href="/settings">Settings</a>
+        <a href="/problems">Solved problems</a><a href="/guide">How this works</a><a href="/library?tab=resources">Resources and sources</a><a href="/settings">Settings</a>
         <button type="button" class="btn btn--link" onClick={() => openOverlay({ kind: 'shortcuts' })}>Keyboard shortcuts</button>
       </footer>
       <TabBar />

@@ -2,6 +2,7 @@
 // (tests/worker/parity.test.ts checks it). Ops carry desired state, so applying one twice is harmless.
 import type { Op } from '../../shared/schemas'
 import type { AppState } from '../../shared/state'
+import { canonicalProblemUrl } from '../../shared/constants'
 import { nextCardState } from './srs'
 
 function upsert<T>(rows: T[], match: (r: T) => boolean, make: (prev: T | undefined) => T): T[] {
@@ -42,16 +43,20 @@ export function applyOp(s: AppState, op: Op): AppState {
     }
     case 'problem.add': {
       const p = op.payload
+      // the same problem already imported from AlgoTracker is counted once
+      const key = canonicalProblemUrl(p.url)
+      if (key && s.problemLog.some((r) => r.source === 'algotracker' && r.id !== p.id && canonicalProblemUrl(r.url) === key)) return s
       return {
         ...s,
         problemLog: upsert(s.problemLog, (r) => r.id === p.id, (prev) => ({
           id: p.id, loggedOn: p.loggedOn, difficulty: p.difficulty, minutes: p.minutes ?? null, noAi: p.noAi,
-          title: p.title ?? null, createdAt: prev?.createdAt ?? at,
+          title: p.title ?? null, url: p.url ?? null, source: prev?.source ?? 'manual', externalId: prev?.externalId ?? null, createdAt: prev?.createdAt ?? at,
         })),
       }
     }
     case 'problem.delete':
-      return { ...s, problemLog: s.problemLog.filter((r) => r.id !== op.payload.id) }
+      // a problem imported from AlgoTracker is removed there (un-solving it), not here
+      return { ...s, problemLog: s.problemLog.filter((r) => r.id !== op.payload.id || r.source === 'algotracker') }
     case 'design.set': {
       const p = op.payload
       return {

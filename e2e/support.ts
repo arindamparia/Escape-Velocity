@@ -36,6 +36,7 @@ export const PAGES = [
   { name: 'mindset', path: '/mindset', heading: /./ },
   { name: 'settings', path: '/settings', heading: /Settings/ },
   { name: 'guide', path: '/guide', heading: /How this works/ },
+  { name: 'problems', path: '/problems', heading: /Problems/ },
 ] as const
 
 /* ------------------------------------------------------------------ time */
@@ -60,6 +61,15 @@ export class Api {
       const res = await this.request.post('/api/ops', { data: { ops: ops.slice(i, i + 20) } })
       expect(res.ok(), await res.text()).toBeTruthy()
     }
+  }
+
+  /** Pretend AlgoTracker answered with these solved problems (the Worker's real reconcile runs on them). */
+  async algotracker(rows: { n: number; name: string; difficulty?: 'Easy' | 'Medium' | 'Hard'; slug?: string; solvedAt?: string }[]) {
+    const res = await this.request.post('/api/dev/algotracker', {
+      data: { rows: rows.map((r) => ({ lc_number: r.n, name: r.name, url: `https://leetcode.com/problems/${r.slug ?? r.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}/`, topic: 'Arrays', difficulty: r.difficulty ?? 'Medium', solved_at: r.solvedAt ?? '2026-10-06T05:00:00.000Z' })) },
+    })
+    expect(res.ok(), await res.text()).toBeTruthy()
+    return res.json() as Promise<{ added: number; removed: number; linked: number }>
   }
 
   tick = (...taskIds: string[]) => this.send(taskIds.map((taskId) => this.op('task.set', { taskId, done: true })))
