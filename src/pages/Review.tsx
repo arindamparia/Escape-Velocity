@@ -5,6 +5,7 @@ import { weekHasLightDay } from '../lib/dates'
 import { plan } from '../lib/plan'
 import { weekMaxPoints, weekPoints, weekTarget } from '../lib/points'
 import { redrawsDue } from '../lib/srs'
+import { withSolved } from '../lib/solved'
 import { scorecard } from '../lib/stats'
 import { dayInfo } from '../lib/today'
 import { useDesigns, usePage } from '../ui/hooks'
@@ -17,7 +18,7 @@ const STEPS = ['Log the week', 'Do the redraws', 'Glance at points', 'Write one 
 export function Review() {
   const progress = usePage('progress')
   const { byId } = useDesigns()
-  const state = engine.state.value
+  const state = withSolved(engine.state.value)
   const done = engine.doneSet.value
   const week = dayInfo(today.value).week
   const [step, setStep] = useState(0)

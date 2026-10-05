@@ -65,6 +65,7 @@ export function toggleTask(taskId: string): void {
   const now = Date.now()
   if (now - (lastTick.get(taskId) ?? 0) < 450) return
   lastTick.set(taskId, now)
+  if (engine.autoDoneSet.peek().has(taskId)) { say('Done by your solved problems. It unlocks if one is un-solved.'); return }
   const task = plan.tasks.find((t) => t.id === taskId)
   const before = engine.doneSet.peek()
   const done = !before.has(taskId)

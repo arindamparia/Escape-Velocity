@@ -6,6 +6,7 @@ import { today } from '../lib/clock'
 import { daysUntil, formatShort } from '../lib/dates'
 import { focusId, focusList } from '../lib/focus'
 import { plan } from '../lib/plan'
+import { algotracker } from '../lib/solved'
 import { weekPoints, weekTarget } from '../lib/points'
 import { activityDates, dayInfo, dueSummary, missedDays, pickNextUp, streakWeeks, tasksOn, weeklyTasks } from '../lib/today'
 import { navigate } from '../lib/nav'
@@ -74,7 +75,7 @@ export default function Today() {
   const chunk = useWeekChunk(info.week)
   const done = engine.doneSet.value
   const state = engine.state.value
-  const activity = useMemo(() => activityDates(state), [state])
+  const activity = useMemo(() => activityDates(state, algotracker.value.solved), [state, algotracker.value.solved])
   const missed = useMemo(() => missedDays(activity, date, plan.config.startDate, plan.config.lightDays), [activity, date])
   const streak = useMemo(() => streakWeeks(activity, date, plan.config.startDate), [activity, date])
   const hasActivityToday = activity.has(date)

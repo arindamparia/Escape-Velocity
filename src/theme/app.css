@@ -294,6 +294,8 @@ kbd {
 .task[data-done='true'] { background: color-mix(in srgb, var(--done) 7%, var(--surface)); border-color: color-mix(in srgb, var(--done) 35%, var(--line)); }
 [data-theme='paper'] .task[data-done='true'] { background: var(--surface); border-color: var(--line); }
 .task[data-done='true'] .task__check { background: var(--done); border-color: var(--done); color: var(--bg); transform: scale(1.04); }
+.task__check[data-locked] { cursor: not-allowed; }
+.task__check[data-locked]:hover { border-color: var(--done); }
 .task[data-done='true'] .task__text { color: var(--text-muted); text-decoration: line-through; text-decoration-thickness: 1px; }
 .task__meta { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; margin-bottom: 0.3rem; }
 .task__text { overflow-wrap: anywhere; }

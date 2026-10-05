@@ -308,6 +308,21 @@ function listItems(lines: string[]): string[] {
   return lines.map((l) => /^\d+\. (.+)$/.exec(l)?.[1]).filter((x): x is string => !!x)
 }
 
+const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
+
+/**
+ * When a DSA task is done by the problems solved: a one-day task ("Morning: 2 timed mediums", "1 to 2 mediums") needs
+ * its lowest number on that day; a weekly one ("Mon to Thu", "Thu and Fri", otherwise Mon to Fri) needs one a day.
+ */
+export function dsaSolve(day: string, text: string): { days: number[]; perDay: number } {
+  const dow = WEEKDAYS.indexOf(day)
+  if (dow >= 0) return { days: [dow], perDay: Number(/Morning:\s*(\d+)/.exec(text)?.[1] ?? 1) }
+  const range = /\b(Mon|Tue|Wed|Thu|Fri)\s+(?:to|and)\s+(Mon|Tue|Wed|Thu|Fri)\b/.exec(text)
+  const [from, to] = range ? [WEEKDAYS.indexOf(range[1]), WEEKDAYS.indexOf(range[2])] : [0, 4]
+  const and = range ? /\band\b/.test(range[0]) : false
+  return { days: and ? [from, to] : Array.from({ length: to - from + 1 }, (_, i) => from + i), perDay: 1 }
+}
+
 export function compilePlan(source: string): CompileOutput {
   const errors: string[] = []
   const { fm, rest, offset } = parseFrontMatter(source.replace(/\r\n/g, '\n'), errors)
@@ -445,6 +460,7 @@ export function compilePlan(source: string): CompileOutput {
       const row = machineCoding.find((r) => Number(r.week) === t.week)
       if (row) out.company = row.company
     }
+    if (t.type === 'dsa') out.solve = dsaSolve(t.day, t.text)
     if (t.type === 'concept' || t.type === 'infra') {
       const wm = /Why:\s*(.+)$/.exec(t.text)
       if (wm) {

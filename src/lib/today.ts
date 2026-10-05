@@ -4,6 +4,7 @@ import { canonicalProblemUrl } from '../../shared/constants'
 import type { AppState, SolvedProblem } from '../../shared/state'
 import { blockOf, dayNum, DOW_NAMES, kolkataToday, lightDayOn, planDow, planPhase, weekEnd, weekNumber, weekStart, type DayBlock, type LightDayRange, type PlanPhase } from './dates'
 import { plan } from './plan'
+import { mergeProblems } from './problems'
 import { weekPoints, weekTarget } from './points'
 import { dueCards, redrawsDue } from './srs'
 
@@ -57,11 +58,11 @@ const toDay = (iso: string): string | null => {
 }
 
 /** Kolkata dates with any activity: a tick, a logged problem, a focus session, a review, a note. A minimum day counts. */
-export function activityDates(s: AppState): Set<string> {
+export function activityDates(s: AppState, solved: readonly SolvedProblem[] = []): Set<string> {
   const out = new Set<string>()
   const add = (d: string | null) => d && out.add(d)
   for (const r of s.taskProgress) if (r.done) add(r.doneAt ? toDay(r.doneAt) : null)
-  for (const r of s.problemLog) out.add(r.loggedOn)
+  for (const r of mergeProblems(s.problemLog, solved)) out.add(r.loggedOn)
   for (const r of s.sessions) add(toDay(r.startedAt))
   for (const r of s.flashcards) add(toDay(r.updatedAt))
   for (const r of s.notes) add(toDay(r.updatedAt))

@@ -3,6 +3,7 @@ import { useEffect } from 'preact/hooks'
 import { closeOverlay, engine, needsOnboarding, openOverlay, overlay, say, setTheme, sync, toast, toggleTask } from './lib/app'
 import { focusId, focusList } from './lib/focus'
 import { navigate } from './lib/nav'
+import { keepSolvedFresh } from './lib/solved'
 import Today from './pages/Today'
 import { THEME_PREFS } from './theme/themes'
 import { actionsFor } from './ui/Task'
@@ -143,6 +144,7 @@ function useShortcuts() {
 
 function Shell() {
   useShortcuts()
+  useEffect(() => keepSolvedFresh(), [])
   const { path } = useLocation()
   useEffect(() => { window.scrollTo(0, 0) }, [path.split('/')[1]])
   return (

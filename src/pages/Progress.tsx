@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'preact/hooks'
+import { useEffect, useMemo, useState } from 'preact/hooks'
 import { engine, toggleTask } from '../lib/app'
 import { today } from '../lib/clock'
 import { weekHasLightDay } from '../lib/dates'
 import { plan, readinessTasks, taskLabel } from '../lib/plan'
+import { loadSolved, withSolved } from '../lib/solved'
 import { pointsByWeek, readinessProgress, totalPoints, weekTarget } from '../lib/points'
 import { lastMediumsInBox, scorecard, weekStats } from '../lib/stats'
 import { dayInfo } from '../lib/today'
@@ -28,7 +29,7 @@ const READINESS_LINK: Record<string, [string, string]> = {
 
 function Readiness() {
   const page = usePage('progress')
-  const state = engine.state.value
+  const state = withSolved(engine.state.value)
   const done = engine.doneSet.value
   const { done: n, total } = readinessProgress(plan.tasks, done)
   const live = lastMediumsInBox(state.problemLog)
@@ -60,7 +61,7 @@ function Readiness() {
 }
 
 function ScorecardTable({ current }: { current: number }) {
-  const state = engine.state.value
+  const state = withSolved(engine.state.value)
   const done = engine.doneSet.value
   const [edit, setEdit] = useState(current)
   const pts = pointsByWeek(plan.tasks, done, 13)
@@ -88,7 +89,8 @@ function ScorecardTable({ current }: { current: number }) {
 export default function Progress({ view }: { view?: string }) {
   useTitle(view === 'review' ? 'Sunday review' : view === 'problems' ? 'Solved problems' : 'Progress')
   const progress = usePage('progress')
-  const state = engine.state.value
+  useEffect(() => { void loadSolved() }, [])
+  const state = withSolved(engine.state.value)
   const done = engine.doneSet.value
   const info = dayInfo(today.value)
   const current = info.phase === 'before' ? 0 : info.week

@@ -2,10 +2,11 @@ import { engine, say } from '../lib/app'
 import { plan } from '../lib/plan'
 import { weekPoints } from '../lib/points'
 import { scorecard } from '../lib/stats'
+import { withSolved } from '../lib/solved'
 
 /** One row of the scorecard. Each field saves on blur as a desired-state `week.set`. */
 export function WeekForm({ week }: { week: number }) {
-  const state = engine.state.value
+  const state = withSolved(engine.state.value)
   const pts = weekPoints(plan.tasks, engine.doneSet.value, week)
   const r = scorecard(state, week, plan.config.startDate, pts)
   const save = (patch: Parameters<typeof engine.dispatch<'week.set'>>[1]) => {

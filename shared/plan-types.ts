@@ -49,6 +49,8 @@ export interface PlanTask {
   company?: string
   /** concept and infra tasks that carry a "Why:" question (these become flashcards) */
   hasWhy?: boolean
+  /** dsa tasks: done by itself when each of these weekdays (0 = Mon) has at least `perDay` solved problems */
+  solve?: { days: number[]; perDay: number }
 }
 
 export interface PlanWeek {
