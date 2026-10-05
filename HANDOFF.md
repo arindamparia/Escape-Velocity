@@ -28,7 +28,7 @@ Everything from the first session (compiler, Worker + D1, local-first client, ev
 ## Not done yet (in priority order)
 
 1. Run `E2E_WEBKIT=1 npm run test:e2e` once for Safari.
-2. **Turn on Cloudflare Access** (the one deploy step left, it needs the dashboard): create the Access application for the Worker, allow only arindamparia321@gmail.com, copy its team domain and Audience tag into `ACCESS_TEAM_DOMAIN` and `ACCESS_AUD` in `wrangler.jsonc`, `npm run build && npx wrangler deploy`. Then check that a private window is asked to sign in and that a tick on one device shows on the other.
+2. **Cloudflare Access is on** (team `arindam-codes`, policy "Only me"; the team domain and AUD are in `wrangler.jsonc`). Still to check: a private window is asked to sign in and a tick on one device shows on the other.
 2b. **Make AlgoTracker's database access read-only** (README, "Solved problems from AlgoTracker"): the connection string now in the Worker secret is the owner login, so create the `ev_reader` role and replace the secret with its string.
 3. **Look at the BenQ in its ePaper mode** with Paper selected. The greyscale tests pass, but only a real panel shows how it feels.
 4. Polish noticed but not done: the Library list could use the 72-character line length; the Weeks timeline on a phone is a single tall list (fine, not designed further); on very narrow phones "Log a problem" wraps to two lines in the Today card.

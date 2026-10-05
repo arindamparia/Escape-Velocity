@@ -20,8 +20,8 @@
     "ENVIRONMENT": "production",
     "PLAN_TZ": "Asia/Kolkata",
     "OWNER_EMAIL": "arindamparia321@gmail.com",
-    "ACCESS_TEAM_DOMAIN": "<your-team>.cloudflareaccess.com",
-    "ACCESS_AUD": "<the Application Audience (AUD) tag from the Access app>",
+    "ACCESS_TEAM_DOMAIN": "arindam-codes.cloudflareaccess.com",
+    "ACCESS_AUD": "51fecbec76ae596526c6b8379a9957e63fe904bb5a52313899b0caa6c76ef460",
     "ALGOTRACKER_EMAIL": "arindamparia321@gmail.com"
   }
 }
