@@ -4,13 +4,15 @@
 *::after { box-sizing: border-box; }
 
 html {
-  /* 16px at 1512 wide, up to 17px at 2560 wide */
+  /* 16px at 1512 wide, 17px by 1800; 18px from 2200 (a 27" 2560x1440 screen is about 109 ppi, so 16px looks small at desk distance) */
   font-size: clamp(16px, 14.557px + 0.0954vw, 17px);
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   /* the scrollbar's width is always reserved, so a page that grows past the screen after it loads does not push everything sideways */
   scrollbar-gutter: stable;
 }
+
+@media (min-width: 2200px) { html { font-size: 18px; } }
 
 body {
   margin: 0;
@@ -50,7 +52,8 @@ button { cursor: pointer; }
 .topbar {
   position: sticky; top: 0; z-index: 20;
   display: flex; align-items: center; gap: 0.75rem;
-  padding: 0.6rem var(--gutter, 1rem);
+  /* the bar's contents line up with the page below, not with the far edges of a wide screen */
+  padding: 0.6rem max(var(--gutter, 1rem), calc((100% - var(--page-max, 1680px)) / 2 + var(--gutter, 1rem)));
   background: color-mix(in srgb, var(--bg) 92%, transparent);
   border-bottom: 1px solid var(--line);
 }
@@ -79,7 +82,7 @@ a.iconbtn { text-decoration: none; }
 @media (max-width: 899px) { .btn-label { display: none; } }
 main { min-height: calc(100vh - 3.6rem); }
 .sitefoot {
-  max-width: 1680px; margin: 0 auto; padding: 1rem var(--gutter) 5.5rem;
+  max-width: var(--page-max); margin: 0 auto; padding: 1rem var(--gutter) 5.5rem;
   display: flex; gap: 0.4rem 1.4rem; flex-wrap: wrap; font-size: 0.88rem; border-top: 1px solid var(--line);
 }
 .sitefoot a, .sitefoot .btn--link { font-size: inherit; color: var(--text-muted); font-weight: 500; }
@@ -156,11 +159,13 @@ a.chip:hover { color: var(--accent); }
 
 .tabbar { display: none; }
 
-:root { --gutter: 1rem; }
+:root { --gutter: 1rem; --page-max: 1680px; }
 @media (min-width: 900px) { :root { --gutter: 1.75rem; } }
+/* a 2560-wide screen: use the room, with wider side columns, instead of a 1680px island with empty margins */
+@media (min-width: 2300px) { :root { --page-max: 2200px; --gutter: 2.25rem; } }
 
 .page {
-  max-width: 1680px; margin: 0 auto;
+  max-width: var(--page-max); margin: 0 auto;
   padding: 1.5rem var(--gutter) 2rem;
   display: grid; gap: 1.5rem; grid-template-columns: minmax(0, 1fr);
   align-items: start;
@@ -189,6 +194,11 @@ a.chip:hover { color: var(--accent); }
   .page--rail-hide .slot-rail { display: block; }
   .slot-rail { position: sticky; top: 4.5rem; }
   .page--rail-top .slot-rail { position: static; }
+}
+@media (min-width: 2300px) {
+  .page, .page--rail-top, .page--rail-left, .page--rail-hide { grid-template-columns: 300px minmax(0, 1fr) 540px; gap: 2rem; }
+  dialog { max-width: min(860px, calc(100vw - 2rem)); }
+  .sheet { max-width: min(680px, 100vw); }
 }
 @media (max-width: 899px) {
   .nav { display: none; }
@@ -225,7 +235,7 @@ a.chip:hover { color: var(--accent); }
   display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
   min-height: 2.5rem; padding: 0.4rem 1.05rem; border-radius: 999px; border: 1px solid var(--line);
   background: var(--surface); color: var(--text); font-weight: 650; text-decoration: none;
-  transition: transform 0.12s ease, border-color 0.12s ease, filter 0.12s ease;
+  transition: transform 0.08s ease, border-color 0.08s ease, filter 0.08s ease;
 }
 .btn:hover { border-color: var(--accent); }
 .btn:active { transform: translateY(1px); }
@@ -287,7 +297,7 @@ kbd {
 .task__check {
   width: 2rem; height: 2rem; display: grid; place-items: center; border-radius: 50%; border: 2px solid var(--text-muted);
   background: transparent; color: transparent; padding: 0; margin-top: 0.05rem;
-  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  transition: background 0.08s ease, border-color 0.08s ease, transform 0.12s ease;
 }
 .task__check .i { width: 1.15rem; height: 1.15rem; }
 .task__check:hover { border-color: var(--done); }

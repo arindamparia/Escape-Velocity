@@ -3,8 +3,7 @@ import type { PlanTask, TaskType, WeekChunk } from '../../shared/plan-types'
 import { engine, findNote, openOverlay, saveNote, toggleTask } from '../lib/app'
 import { navigate } from '../lib/nav'
 import { plan, taskLabel } from '../lib/plan'
-import { dsaProgress, mergeProblems, perDay } from '../lib/problems'
-import { algotracker } from '../lib/solved'
+import { dsaProgress } from '../lib/problems'
 import { Html } from './Html'
 import { Icon } from './Icon'
 import { StudyPanel } from './Resources'
@@ -109,8 +108,7 @@ export function TaskCheck({ task }: { task: PlanTask }) {
 
 /** "1 of 2 solved" under a DSA task, counted from AlgoTracker and the problems logged here. */
 function DsaProgress({ task, locked }: { task: PlanTask; locked: boolean }) {
-  const byDay = perDay(mergeProblems(engine.state.value.problemLog, algotracker.value.solved))
-  const p = dsaProgress(task, byDay, plan.config.startDate, plan.config.lightDays)
+  const p = dsaProgress(task, engine.problemsByDay.value, plan.config.startDate, plan.config.lightDays)
   if (!p || (p.have === 0 && !locked)) return null
   return <div class="small muted">{locked ? 'Done from your solved problems · ' : ''}<a href="/progress/problems" title="See everything you solved">{p.have} of {p.need} {p.unit === 'days' ? 'days done' : p.need === 1 ? 'problem solved' : 'problems solved'}</a></div>
 }

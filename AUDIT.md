@@ -82,3 +82,21 @@ Simplifications made on request: task IDs are never shown (`Week 4 · Task 7`); 
 - **The timer chime** cannot be heard by a test: the setting and its code path are checked, not the sound.
 - **Headroom**: JS for Today is 34.5 KB of 35. The next feature on Today must pay for itself.
 - A decision from session one stands: the formula sheet has 12 derivations, not 13, because week 13 has no maths task.
+
+## Plan workload audit (5 Oct 2026, before week 1)
+
+Method: the plan's own time slots ("The routine": about 15.5 h a week) against each week's tasks, points and the video minutes of the study links.
+
+**Verdict: the right plan for an SDE-2 payments jump, dense rather than excessive.** It covers what the loops test (HLD, machine coding, DSA without AI, AI-enabled rounds, mocks from week 8, a capstone in your own domain). The built-in release valves (minimum day, light festival weeks, "move on, don't stack") are what make 15 h a week survivable next to a full-time job. It is tight in five places:
+
+| # | Where | The numbers | What to do |
+| --- | --- | --- | --- |
+| 1 | Thursdays, weeks 6 to 12 | A second design (20 min cold, read, one card) plus the maths derivation is about 75 min in a 45 min night slot | Budget Thursday as 75 min. If it slips, drop the maths (3 pts), never the design (4 pts) |
+| 2 | Points target in weeks 1 and 4 | Target 50, but the week's maximum is 56 (week 1) and 58 (week 4): you must finish 86 to 89% of everything to light the constellation | Treat 45 as a win in those two weeks. Weeks 6 to 12 have 62 to 84 available, so 50 is comfortable there |
+| 3 | Capstone Sundays 7 and 8 | Week 7: outbox, payment service with retries and a dead-letter queue, and a mock provider with signed, late, duplicate, out-of-order webhooks. Week 8: webhooks both ways plus the reconciliation job. Each is three components in a 2 h slot | Use the capstone page's "keep first" list. If behind, ship the outbox and signed webhooks, and move the dead-letter queue and reconciliation to week 10 |
+| 4 | Sundays 8, 10, 11, 12 | Boss (1 h) + capstone (2 h) + redraws (30) + review (30) + a mock (1 to 1.5 h) is 5 to 5.5 h | Do the mock on Saturday evening, or skip the boss problem in a mock week |
+| 5 | Stories come after applications start | Practice applications go out in week 10, the six STAR stories are written in week 11 | Draft one story (10 minutes) each Sunday from week 7 so week 11 is polishing |
+
+Night videos: six night tasks have a first video over 30 min (Docker 67, Temporal talk 69, AWS IAM 46, EC2 52, S3 38, Networking 68). The panels list a short primer first where one exists (Temporal 7 min, Docker 13 min). For the rest, split it over two nights or watch at 1.25x. The plan's slot is 45 min including the why-note.
+
+Fine as it is: 37 designs are a library, not a syllabus (11 Saturday designs plus 7 Thursday ones are scheduled); the AI practice tasks exist in weeks 6 to 10; DSA is one hour every weekday plus a boss problem.

@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'preact/hooks'
 import { useLocation } from 'preact-iso'
 import type { DesignFull } from '../../shared/plan-types'
 import { engine, overlay, selectedDesign, showDesign } from '../lib/app'
+import { today } from '../lib/clock'
+import { dayInfo } from '../lib/today'
 import { navigate } from '../lib/nav'
 import { Html } from '../ui/Html'
 import { usePage, useTitle } from '../ui/hooks'
@@ -89,6 +91,13 @@ export default function Library() {
   // a link to /library?design=<id> (from the capstone, the palette, a reading list) opens that design: in the side panel on a wide screen, as a sheet otherwise
   // (it never replaces a dialog the person has opened since the link was followed, such as the palette)
   useEffect(() => { if (query.design && !overlay.peek()) showDesign(query.design) }, [query.design])
+  // on a wide screen the side panel would sit empty: open this week's design there (or the first), so the space is used
+  useEffect(() => {
+    if (!page || query.design || selectedDesign.peek() || tab !== 'designs' || !matchMedia('(min-width: 1800px)').matches) return
+    const all = page.groups.flatMap((g) => g.designs)
+    const week = String(dayInfo(today.value).week)
+    selectedDesign.value = (all.find((d) => d.week === week) ?? all[0])?.id ?? null
+  }, [page, query.design, tab])
   const company = query.company
   const [f, setF] = useState<Filters>({ group: '', access: '', st: '', q: '' })
   const set = (p: Partial<Filters>) => setF((x) => ({ ...x, ...p }))

@@ -33,11 +33,11 @@ for (const name of Object.keys(SCREENS) as ScreenName[]) {
           expect(layout.theme).toBe(theme)
           expect(layout.tracks, 'columns').toBe(screen.columns)
           expect(layout.overflow, 'sideways scroll').toBeLessThanOrEqual(0)
-          expect(layout.pageWidth, 'content width').toBeLessThanOrEqual(1680)
+          expect(layout.pageWidth, 'content width').toBeLessThanOrEqual(name === 'benq' ? 2200 : 1680) // the 2560 screen gets a wider page
           if (name === 'phone') { expect(layout.tabbar).not.toBe('none'); expect(layout.nav).toBe('none') } else { expect(layout.tabbar).toBe('none'); expect(layout.nav).not.toBe('none') }
           expect(layout.font).toBeGreaterThanOrEqual(16)
-          expect(layout.font).toBeLessThanOrEqual(17.01)
-          if (name === 'benq') expect(layout.font).toBeCloseTo(17, 0)
+          expect(layout.font).toBeLessThanOrEqual(name === 'benq' ? 18.01 : 17.01)
+          if (name === 'benq') expect(layout.font).toBeCloseTo(18, 0)
 
           await expect(page).toHaveScreenshot(`${p.name}-${name}-${theme}.png`)
         })

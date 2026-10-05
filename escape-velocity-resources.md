@@ -44,6 +44,7 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 2 | Tue | Database indexing | — | doc | free | Use The Index, Luke | Markus Winand | https://use-the-index-luke.com/ | — |
 | 2 | Tue | Database indexing | — | video | free | DB Indexing in System Design Interviews | Hello Interview | https://www.youtube.com/watch?v=BHCSL_ZifI0 | 14 |
 | 2 | Tue | Database indexing | — | video | free | How databases store your data: B-trees vs LSM trees | ByteMonk | https://www.youtube.com/watch?v=Q9xD4J3tezw | 11 |
+| 2 | Wed | Docker basics | — | video | free | Docker explained step by step (a 13-minute first look) | ByteMonk | https://www.youtube.com/watch?v=KOwxqhFUgts | 13 |
 | 2 | Wed | Docker basics | — | doc | free | Docker: Get started | Docker docs | https://docs.docker.com/get-started/ | — |
 | 2 | Wed | Docker basics | — | video | free | Docker Tutorial for Beginners: concepts, install, commands, debugging (first hour) | TechWorld with Nana | https://www.youtube.com/watch?v=3c-iBn73dDE | 67 |
 | 2 | Thu | PostgreSQL | — | doc | partial | PostgreSQL deep dive | Hello Interview | https://www.hellointerview.com/learn/system-design/deep-dives/postgres | — |
@@ -130,8 +131,8 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 6 | Mon | CAP and PACELC | — | doc | free | CAP Theorem | Hello Interview | https://www.hellointerview.com/learn/system-design/core-concepts/cap-theorem | — |
 | 6 | Mon | CAP and PACELC | — | video | free | CAP Theorem in System Design Interviews | Hello Interview | https://www.youtube.com/watch?v=VdrEq0cODu4 | 14 |
 | 6 | Tue | Temporal | — | doc | free | Temporal deep dive | Hello Interview | https://www.hellointerview.com/learn/system-design/deep-dives/temporal | — |
-| 6 | Tue | Temporal | — | video | free | Maxim Fateev on Durable Execution with Temporal (SE Radio 596) | IEEE Computer Society | https://www.youtube.com/watch?v=fMh2ZYJST0E | 69 |
 | 6 | Tue | Temporal | — | video | free | Temporal in 7 minutes | Temporal | https://www.youtube.com/watch?v=2HjnQlnA5eY | 7 |
+| 6 | Tue | Temporal | — | video | free | Maxim Fateev on Durable Execution with Temporal (SE Radio 596) | IEEE Computer Society | https://www.youtube.com/watch?v=fMh2ZYJST0E | 69 |
 | 6 | Wed | AWS compute | — | video | free | AWS Cloud Practitioner course: EC2 | freeCodeCamp | https://www.youtube.com/watch?v=NhDYbskXRgc&t=27136s | 52 |
 | 6 | Wed | AWS compute | — | video | free | AWS Cloud Practitioner course: Containers (ECS, ECR) | freeCodeCamp | https://www.youtube.com/watch?v=NhDYbskXRgc&t=34811s | 11 |
 | 6 | Thu | UPI flow (option) | upi-payment-flow | doc | free | Unified Payments Interface (UPI) | ByteByteGo | https://bytebytego.com/guides/unified-payments-interface-upi-in-india/ | — |

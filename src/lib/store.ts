@@ -5,7 +5,7 @@ import { createStore as createKv, get, set, type UseStore } from 'idb-keyval'
 import type { Op, OpOf, OpType } from '../../shared/schemas'
 import { EMPTY_STATE, type AppState } from '../../shared/state'
 import { plan } from './plan'
-import { autoDone, mergeProblems } from './problems'
+import { autoDone, mergeProblems, perDay } from './problems'
 import { applyOp, applyOps } from './reduce'
 import { algotracker } from './solved'
 
@@ -62,7 +62,10 @@ export function createEngine(deps: EngineDeps = {}) {
 
   const ticked = computed(() => new Set(state.value.taskProgress.filter((r) => r.done).map((r) => r.taskId)))
   /** DSA tasks the solved problems (AlgoTracker + logged here) have completed; locked until a problem is un-solved */
-  const autoDoneSet = computed(() => autoDone(plan.tasks, mergeProblems(state.value.problemLog, algotracker.value.solved), plan.config.startDate, plan.config.lightDays))
+  /** everything solved (logged here + AlgoTracker), merged once per change and shared, not once per task row per render */
+  const allProblems = computed(() => mergeProblems(state.value.problemLog, algotracker.value.solved))
+  const problemsByDay = computed(() => perDay(allProblems.value))
+  const autoDoneSet = computed(() => autoDone(plan.tasks, allProblems.value, plan.config.startDate, plan.config.lightDays))
   const doneSet = computed(() => (autoDoneSet.value.size ? new Set([...ticked.value, ...autoDoneSet.value]) : ticked.value))
   const settings = computed(() => new Map(state.value.settings.map((s) => [s.key, s.value])))
 
@@ -142,7 +145,7 @@ export function createEngine(deps: EngineDeps = {}) {
   }
 
   return {
-    state, outbox, hydrated, doneSet, autoDoneSet, settings, inflight,
+    state, outbox, hydrated, doneSet, autoDoneSet, allProblems, problemsByDay, settings, inflight,
     hydrate, dispatch, persist, replaceFromServer, removeFromOutbox, recheckOutbox,
     get restored() { return restored },
     /** called after each local change has been saved */

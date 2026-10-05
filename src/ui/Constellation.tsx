@@ -130,13 +130,17 @@ export function Constellation({ week, compact = false }: { week: number; compact
       }
     }
 
+    // a twinkle needs 30 frames a second, not the 144 a gaming monitor offers: skip frames, keep time
+    const FRAME_MS = 33
     const frame = (now: number) => {
       raf = 0
       if (document.hidden) return // paused when the tab is hidden
       const dt = now - last
-      last = now
-      t += Math.min(dt, 100)
-      draw()
+      if (dt >= FRAME_MS - 1) {
+        last = now
+        t += Math.min(dt, 100)
+        draw()
+      }
       raf = requestAnimationFrame(frame)
     }
 
@@ -147,7 +151,7 @@ export function Constellation({ week, compact = false }: { week: number; compact
     }
     const onVisible = () => { if (!document.hidden) start() }
     const mo = new MutationObserver(() => { colors = readColors(); start() })
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'data-tone'] })
     const ro = new ResizeObserver(() => start())
     ro.observe(canvas)
     document.addEventListener('visibilitychange', onVisible)
