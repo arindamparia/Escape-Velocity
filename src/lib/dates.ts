@@ -35,9 +35,18 @@ const timeFmt = new Intl.DateTimeFormat('en-GB', {
   timeZone: PLAN_TZ, hourCycle: 'h23', hour: '2-digit', minute: '2-digit', second: '2-digit',
 })
 
-/** Today in Kolkata as YYYY-MM-DD. */
+/**
+ * The day does not end at midnight: it ends at 04:00 Kolkata. Work done at 1 am still belongs to the day it was
+ * meant for, so a late night can finish today's tasks. Every date in the app (ticks, logged and solved problems,
+ * streaks, sessions, flashcard days, week boundaries) comes from kolkataToday(), so this one number moves them all.
+ */
+export const DAY_STARTS_HOUR = 4
+const SHIFT_MS = DAY_STARTS_HOUR * 3_600_000
+const ms = (now: Date | number) => (typeof now === 'number' ? now : now.getTime())
+
+/** The plan day in Kolkata as YYYY-MM-DD: 04:00 to 03:59 the next morning. */
 export function kolkataToday(now: Date | number = Date.now()): string {
-  return dateFmt.format(now)
+  return dateFmt.format(ms(now) - SHIFT_MS)
 }
 
 function kolkataHms(now: Date | number): { h: number; m: number; s: number } {
@@ -46,25 +55,30 @@ function kolkataHms(now: Date | number): { h: number; m: number; s: number } {
   return { h: get('hour') % 24, m: get('minute'), s: get('second') }
 }
 
+/** The clock hour in Kolkata, 0 to 23. */
 export function kolkataHour(now: Date | number = Date.now()): number {
   return kolkataHms(now).h
 }
 
-/** Milliseconds until the next Kolkata midnight, so an open tab can roll over. */
-export function msUntilKolkataMidnight(now: Date | number = Date.now()): number {
-  const { h, m, s } = kolkataHms(now)
-  const ms = (typeof now === 'number' ? now : now.getTime()) % 1000
-  const elapsed = ((h * 60 + m) * 60 + s) * 1000 + (ms < 0 ? ms + 1000 : ms)
-  return DAY_MS - elapsed
+/** Between midnight and the start of the next plan day: still last night's day. */
+export function isLateNight(now: Date | number = Date.now()): boolean {
+  return kolkataHour(now) < DAY_STARTS_HOUR
+}
+
+/** Milliseconds until the plan day ends (the next 04:00 Kolkata), so an open tab can roll over. */
+export function msUntilDayEnd(now: Date | number = Date.now()): number {
+  const { h, m, s } = kolkataHms(ms(now) - SHIFT_MS) // the same clock, moved so the plan day starts at 00:00
+  const frac = ((ms(now) - SHIFT_MS) % 1000 + 1000) % 1000
+  return DAY_MS - (((h * 60 + m) * 60 + s) * 1000 + frac)
 }
 
 export type DayBlock = 'morning' | 'night' | 'both'
 
-/** Morning block = before 12:00 Kolkata; night block = after 18:00; between them, show both. */
+/** Morning block = 04:00 to 12:00 Kolkata; night block = 18:00 to 04:00 (a late night is still the night); between them, both. */
 export function blockOf(now: Date | number = Date.now()): DayBlock {
   const h = kolkataHour(now)
+  if (h < DAY_STARTS_HOUR || h >= 18) return 'night'
   if (h < 12) return 'morning'
-  if (h >= 18) return 'night'
   return 'both'
 }
 

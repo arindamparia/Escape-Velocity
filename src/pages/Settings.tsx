@@ -1,8 +1,42 @@
 import { useEffect, useState } from 'preact/hooks'
 import type { AiStatus } from '../../shared/ask'
 import { chimeOn, engine, openOverlay, say, sync } from '../lib/app'
+import { FOCUS_SOURCES, focusSettings, previewFocusSound, setFocusSettings, soundNotice, soundState } from '../tools/focusSound'
+import { parseStreamLink } from '../tools/sound/stream'
 import { ThemePicker } from '../ui/ThemePicker'
 import { useTitle } from '../ui/hooks'
+
+/** What plays while a timer runs. Kept on this device; a sound that cannot play says why and falls back to brown noise. */
+function FocusSound() {
+  const f = focusSettings.value
+  const playing = soundState.value !== 'idle'
+  const bad = f.source === 'custom' && f.custom.trim() !== '' && !parseStreamLink(f.custom)
+  return (
+    <section class="card stack" id="focus-sound"><h2>Focus sound</h2>
+      <div class="row" role="group" aria-label="Focus sound">
+        {FOCUS_SOURCES.map((o) => <button key={o.id} type="button" class="chip" aria-pressed={f.source === o.id} onClick={() => setFocusSettings({ source: o.id })} title={o.hint}>{o.label}</button>)}
+      </div>
+      <p class="small muted" style="margin:0">{FOCUS_SOURCES.find((o) => o.id === f.source)?.hint}</p>
+      {f.source === 'custom' ? (
+        <label>Link to a video or playlist
+          <input type="url" value={f.custom} placeholder="Paste a link" maxLength={300} onChange={(e) => setFocusSettings({ custom: (e.target as HTMLInputElement).value })} aria-invalid={bad} />
+        </label>
+      ) : null}
+      {bad ? <p class="small" role="alert" style="margin:0">That is not a video or playlist link.</p> : null}
+      {f.source !== 'off' ? (
+        <>
+          <label class="row" style="align-items:center;gap:0.8rem">Volume
+            <input type="range" min={0} max={100} step={1} value={f.volume} aria-label="Focus sound volume" style="flex:1;max-width:18rem" onInput={(e) => setFocusSettings({ volume: Number((e.target as HTMLInputElement).value) })} />
+            <span class="mono small" style="min-width:3ch">{f.volume}</span>
+          </label>
+          <div class="row"><button type="button" class="btn" disabled={bad} onClick={previewFocusSound}>{playing ? 'Stop' : 'Hear it (20 seconds)'}</button></div>
+        </>
+      ) : null}
+      {soundNotice.value ? <p class="small" role="status" style="margin:0">{soundNotice.value}</p> : null}
+      <p class="small muted" style="margin:0">Plays while a timer runs and fades out when it stops. The speaker button in the top bar mutes it. Saved on this device.</p>
+    </section>
+  )
+}
 
 /** Is the AI search switched on, how much of today's allowance is used, and does Pinecone hold this build's content? */
 function AiSearch() {
@@ -49,6 +83,7 @@ export default function Settings() {
           <ThemePicker />
           <p class="small muted" style="margin:0">Match the monitor mode you’re in: Dark and Light for the BenQ’s coding modes, Paper for its Paper Color or ePaper modes. Paper has no motion, shadows or gradients, and it’s also the print style.</p>
         </section>
+        <FocusSound />
         <section class="card stack" id="sound"><h2>Sound</h2>
           <label class="check">
             <input type="checkbox" checked={chimeOn.value} onChange={(e) => engine.dispatch('setting.set', { key: 'chime', value: (e.target as HTMLInputElement).checked ? '1' : '0' })} /> <span>Soft chime when a timer ends</span>

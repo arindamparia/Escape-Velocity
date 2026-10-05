@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
-  addDays, blockOf, dayNum, daysUntil, formatRange, isRealDate, kolkataToday, lightDayOn, msUntilKolkataMidnight,
+  addDays, blockOf, dayNum, daysUntil, formatRange, isRealDate, isLateNight, kolkataToday, lightDayOn, msUntilDayEnd,
   planDow, planPhase, weekEnd, weekHasLightDay, weekNumber, weekStart, ymdFromDayNum,
 } from '../../src/lib/dates'
 
@@ -86,38 +86,63 @@ describe('light days', () => {
   })
 })
 
-describe('Kolkata time (UTC+5:30, no DST)', () => {
-  it('rolls over at 18:30 UTC, not 18:29', () => {
-    expect(kolkataToday(new Date('2026-10-04T18:29:59Z'))).toBe('2026-10-04')
-    expect(kolkataToday(new Date('2026-10-04T18:30:00Z'))).toBe('2026-10-05')
+describe('Kolkata time (UTC+5:30, no DST): the plan day runs 04:00 to 03:59', () => {
+  // 04:00 Kolkata = 22:30 UTC the evening before
+  it('rolls over at 04:00 Kolkata (22:30 UTC), not at midnight', () => {
+    expect(kolkataToday(new Date('2026-10-04T22:29:59Z'))).toBe('2026-10-04') // 03:59:59 on 5 Oct is still the 4th
+    expect(kolkataToday(new Date('2026-10-04T22:30:00Z'))).toBe('2026-10-05')
   })
-  it('new year in Kolkata', () => {
-    expect(kolkataToday(new Date('2026-12-31T18:29:59Z'))).toBe('2026-12-31')
-    expect(kolkataToday(new Date('2026-12-31T18:30:00Z'))).toBe('2027-01-01')
+  it('midnight does not end the day: 01:30 is still last night', () => {
+    expect(kolkataToday(kolkata('2026-10-06', 0, 0, 0))).toBe('2026-10-05')
+    expect(kolkataToday(kolkata('2026-10-06', 1, 30))).toBe('2026-10-05')
+    expect(kolkataToday(kolkata('2026-10-06', 3, 59, 59))).toBe('2026-10-05')
+    expect(kolkataToday(kolkata('2026-10-06', 4, 0, 0))).toBe('2026-10-06')
+    expect(kolkataToday(kolkata('2026-10-05', 23, 59))).toBe('2026-10-05')
   })
-  it('follows fake timers', () => {
+  it('new year in Kolkata comes at 4 am', () => {
+    expect(kolkataToday(new Date('2026-12-31T22:29:59Z'))).toBe('2026-12-31') // 03:59:59 on 1 Jan
+    expect(kolkataToday(new Date('2026-12-31T22:30:00Z'))).toBe('2027-01-01')
+  })
+  it('works from a number as well as a Date, and follows fake timers', () => {
+    expect(kolkataToday(new Date('2026-10-04T22:30:00Z').getTime())).toBe('2026-10-05')
     vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-10-04T18:30:00Z'))
+    vi.setSystemTime(new Date('2026-10-04T22:30:00Z'))
     expect(kolkataToday()).toBe('2026-10-05')
-    vi.setSystemTime(new Date('2026-10-05T18:29:00Z'))
+    vi.setSystemTime(new Date('2026-10-05T22:29:00Z'))
     expect(kolkataToday()).toBe('2026-10-05')
     vi.advanceTimersByTime(61_000)
     expect(kolkataToday()).toBe('2026-10-06')
   })
-  it('counts the time left until the next Kolkata midnight', () => {
-    expect(msUntilKolkataMidnight(new Date('2026-10-05T18:29:00Z'))).toBe(60_000)
-    expect(msUntilKolkataMidnight(kolkata('2026-10-05', 0, 0, 0))).toBe(86_400_000)
-    expect(msUntilKolkataMidnight(kolkata('2026-10-05', 23, 59, 59))).toBe(1000)
+  it('counts the time left until the day ends at 04:00', () => {
+    expect(msUntilDayEnd(new Date('2026-10-05T22:29:00Z'))).toBe(60_000)
+    expect(msUntilDayEnd(kolkata('2026-10-05', 4, 0, 0))).toBe(86_400_000)
+    expect(msUntilDayEnd(kolkata('2026-10-05', 3, 59, 59))).toBe(1000)
+    expect(msUntilDayEnd(kolkata('2026-10-05', 23, 0, 0))).toBe(5 * 3_600_000) // 23:00 to 04:00
+    expect(msUntilDayEnd(kolkata('2026-10-06', 1, 0, 0))).toBe(3 * 3_600_000)
+  })
+  it('knows when it is the small hours of the previous day', () => {
+    expect(isLateNight(kolkata('2026-10-06', 0, 0))).toBe(true)
+    expect(isLateNight(kolkata('2026-10-06', 3, 59))).toBe(true)
+    expect(isLateNight(kolkata('2026-10-06', 4, 0))).toBe(false)
+    expect(isLateNight(kolkata('2026-10-06', 23, 59))).toBe(false)
+  })
+  it('the week still turns over on Monday, at 4 am: Sunday night work stays in the week', () => {
+    // Monday 12 Oct 01:00 is still Sunday 11 Oct, the last day of week 1
+    expect(weekNumber(kolkataToday(kolkata('2026-10-12', 1, 0)), START)).toBe(1)
+    expect(weekNumber(kolkataToday(kolkata('2026-10-12', 4, 0)), START)).toBe(2)
+    expect(planDow(kolkataToday(kolkata('2026-10-12', 2, 0)), START)).toBe(6) // Sunday
   })
 })
 
 describe('morning and night blocks', () => {
-  it('morning before 12:00, night from 18:00, both in between', () => {
-    expect(blockOf(kolkata('2026-10-05', 0, 0))).toBe('morning')
+  it('morning from 04:00 to 12:00, both until 18:00, night from 18:00 through the small hours', () => {
+    expect(blockOf(kolkata('2026-10-05', 4, 0))).toBe('morning')
     expect(blockOf(kolkata('2026-10-05', 11, 59))).toBe('morning')
     expect(blockOf(kolkata('2026-10-05', 12, 0))).toBe('both')
     expect(blockOf(kolkata('2026-10-05', 17, 59))).toBe('both')
     expect(blockOf(kolkata('2026-10-05', 18, 0))).toBe('night')
     expect(blockOf(kolkata('2026-10-05', 23, 59))).toBe('night')
+    expect(blockOf(kolkata('2026-10-06', 0, 0))).toBe('night') // after midnight it is still the night of the day before
+    expect(blockOf(kolkata('2026-10-06', 3, 59))).toBe('night')
   })
 })

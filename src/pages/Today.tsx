@@ -3,7 +3,7 @@ import { useEffect, useMemo } from 'preact/hooks'
 import type { PlanDay, PlanTask } from '../../shared/plan-types'
 import { engine, openOverlay, toggleTask, whyNote } from '../lib/app'
 import { today } from '../lib/clock'
-import { daysUntil, formatShort } from '../lib/dates'
+import { DAY_STARTS_HOUR, daysUntil, formatShort, isLateNight } from '../lib/dates'
 import { focusId, focusList } from '../lib/focus'
 import { plan } from '../lib/plan'
 import { algotracker } from '../lib/solved'
@@ -210,6 +210,7 @@ export default function Today() {
         <header>
           <p class="eyebrow">{longDate(date)}{info.phase === 'during' ? ` · week ${info.week} of 13` : ''}</p>
           <h1>{info.phase === 'during' ? week.title : 'Escape Velocity'}</h1>
+          {isLateNight(Date.now()) ? <p class="small muted" data-testid="late-night">It is past midnight, and this is still {longDate(date)}. The day ends at {DAY_STARTS_HOUR}:00 am, so tonight’s work counts for it.</p> : null}
           {info.phase === 'during' ? (
             <p class="muted">
               {info.dow === 0 ? <strong>New week, new constellation. </strong> : null}

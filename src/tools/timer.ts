@@ -1,5 +1,6 @@
 // Focus timer. It stores the start timestamp, never a ticking counter, so reloads, sleep and background tabs
 // cannot drift it: the display is always derived from the current time.
+import { startFocusSound, stopFocusSound } from './focusSound'
 import { signal } from '@preact/signals'
 import { engine, say } from '../lib/app'
 
@@ -53,6 +54,7 @@ export const LOOP_STEP_MIN = [45, 30, 15, 15, 5] as const
 export function startTimer(kind: string, plannedMin: number, opts: { refId?: string; label?: string; openEnded?: boolean } = {}): void {
   save({ startedAt: Date.now(), plannedMin, kind, ...opts })
   document.title = 'Timer running · Escape Velocity'
+  startFocusSound() // from the click that started the timer, so the browser allows sound
 }
 
 export function elapsedMs(t: TimerState, now = Date.now()): number {
@@ -114,6 +116,7 @@ export function checkTimer(now = Date.now()): void {
     record(t, endedAt)
     save({ ...t, finishedAt: endedAt })
     document.title = 'Time is up · Escape Velocity'
+    stopFocusSound()
     chime()
     say('Time is up.')
   }
@@ -128,10 +131,12 @@ export function stopTimer(): number {
   if (!t.finishedAt && elapsed >= 60_000) record(t, now)
   save(null)
   document.title = 'Escape Velocity'
+  stopFocusSound()
   return Math.max(1, Math.round(elapsed / 60_000))
 }
 
 export function dismissTimer(): void {
   save(null)
   document.title = 'Escape Velocity'
+  stopFocusSound()
 }

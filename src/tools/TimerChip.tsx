@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'preact/hooks'
 import { openOverlay } from '../lib/app'
 import { useNow } from '../ui/hooks'
 import { Icon } from '../ui/Icon'
+import { focusConfigured, resumeFocusSound, soundState, toggleFocusSound } from './focusSound'
 import { checkTimer, dismissTimer, elapsedMs, fmt, isDue, KIND_LABEL, remainingMs, startTimer, stopTimer, TIMER_CHOICES, timer } from './timer'
 
 function StartMenu() {
@@ -40,6 +41,8 @@ export function TimerChip() {
     const ms = remainingMs(t, now)
     if (!t.finishedAt && !t.openEnded && ms > 0) document.title = `${fmt(ms)} · ${KIND_LABEL[t.kind] ?? 'Timer'}`
   }, [t, now])
+  // after a reload with a timer still running: try to bring the sound back (the speaker button below is the click if it needs one)
+  useEffect(() => { const r = timer.peek(); if (r && !r.finishedAt) resumeFocusSound() }, [])
   if (!t) return <StartMenu />
 
   const finished = !!t.finishedAt
@@ -55,12 +58,17 @@ export function TimerChip() {
     else stopTimer()
   }
   return (
-    <div class="timerchip" data-state={finished ? 'done' : over ? 'over' : 'run'} role="group" aria-label="Timer in the top bar">
+    <div class="timerchip" data-state={finished ? 'done' : over ? 'over' : 'run'} data-sound={focusConfigured() ? soundState.value : 'off'} role="group" aria-label="Timer in the top bar">
       <a class="timerchip__main" href="/study/timer" title={`${KIND_LABEL[t.kind] ?? 'Focus'} · ${t.plannedMin} min${t.openEnded ? ', then open-ended' : ''}: open the timer page`}>
         <Icon name="clock" />
         <span class="timerchip__time mono" role="timer">{over ? '+' : ''}{fmt(shown)}</span>
         <span class="timerchip__kind small">{finished ? 'Time’s up' : over ? 'Past the box' : KIND_LABEL[t.kind] ?? 'Focus'}</span>
       </a>
+      {focusConfigured() && !finished ? (
+        <button type="button" class="timerchip__sound" onClick={toggleFocusSound} aria-label={soundState.value === 'playing' ? 'Mute the focus sound' : soundState.value === 'muted' ? 'Turn the focus sound back on' : 'Start the focus sound'} title={soundState.value === 'playing' ? 'Focus sound on: click to mute' : soundState.value === 'muted' ? 'Focus sound muted: click to turn on' : 'Click to start the focus sound'}>
+          <Icon name={soundState.value === 'muted' || soundState.value === 'blocked' || soundState.value === 'idle' ? 'mute' : 'volume'} />
+        </button>
+      ) : null}
       <button type="button" class="timerchip__act" onClick={act}>{logIt ? 'Log it' : finished ? 'Close' : t.openEnded ? 'Finish' : 'Stop'}</button>
       <i class="timerchip__bar" aria-hidden="true" style={{ width: `${pct}%` }} />
     </div>

@@ -84,10 +84,12 @@ describe('missed days and the welcome-back restart', () => {
     const act = activityDates(stateWith({ problemLog: [problem('2026-10-08')] }))
     expect(missedDays(act, '2026-10-09', START, LIGHT)).toBe(0)
   })
-  it('counts ticks by their Kolkata date', () => {
-    const act = activityDates(stateWith({ taskProgress: [{ taskId: 'w01-01', done: true, doneAt: '2026-10-05T19:00:00.000Z', updatedAt: '' }] }))
-    expect(act.has('2026-10-06')).toBe(true) // 00:30 in Kolkata
-    expect(act.has('2026-10-05')).toBe(false)
+  it('counts ticks by their plan day: after midnight is still the day before, from 04:00 it is the next', () => {
+    const late = activityDates(stateWith({ taskProgress: [{ taskId: 'w01-01', done: true, doneAt: '2026-10-05T19:00:00.000Z', updatedAt: '' }] }))
+    expect(late.has('2026-10-05')).toBe(true) // 00:30 on the 6th in Kolkata: the 5th's late night
+    expect(late.has('2026-10-06')).toBe(false)
+    const morning = activityDates(stateWith({ taskProgress: [{ taskId: 'w01-01', done: true, doneAt: '2026-10-05T22:30:00.000Z', updatedAt: '' }] }))
+    expect(morning.has('2026-10-06')).toBe(true) // 04:00 on the 6th
   })
 })
 

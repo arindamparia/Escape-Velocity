@@ -7,6 +7,7 @@
 import { z } from 'zod'
 import ragData from '../src/generated/rag.json'
 import { ASK_LIMITS, type AiStatus, type AskResponse } from '../shared/ask'
+import { kolkataToday } from '../src/lib/dates'
 import type { Env } from './env'
 import { namespaceCounts, namespaceFor, rebuild, searchPlan, type PineconeConfig } from './pinecone'
 
@@ -33,16 +34,17 @@ export class AskError extends Error {
 
 const limitOf = (env: Env) => Math.max(1, Number(env.AI_DAILY_LIMIT) || 100)
 const modelOf = (env: Env) => env.OPENAI_MODEL?.trim() || DEFAULT_MODEL
-const dayOf = (env: Env) => new Date().toLocaleDateString('en-CA', { timeZone: env.PLAN_TZ || 'Asia/Kolkata' })
+/** The plan day (04:00 to 03:59 Kolkata), the same one the app uses, so the daily allowance resets when your day does. */
+const dayOf = () => kolkataToday()
 
 async function usedToday(env: Env): Promise<number> {
-  const row = await env.DB.prepare('SELECT calls FROM ai_usage WHERE day = ?').bind(dayOf(env)).first<{ calls: number }>()
+  const row = await env.DB.prepare('SELECT calls FROM ai_usage WHERE day = ?').bind(dayOf()).first<{ calls: number }>()
   return row?.calls ?? 0
 }
 
 /** Count this question, and refuse it if today's allowance is spent. Counted before the call, so a failure still costs one. */
 async function spend(env: Env): Promise<number> {
-  const row = await env.DB.prepare('INSERT INTO ai_usage (day, calls) VALUES (?, 1) ON CONFLICT(day) DO UPDATE SET calls = calls + 1 RETURNING calls').bind(dayOf(env)).first<{ calls: number }>()
+  const row = await env.DB.prepare('INSERT INTO ai_usage (day, calls) VALUES (?, 1) ON CONFLICT(day) DO UPDATE SET calls = calls + 1 RETURNING calls').bind(dayOf()).first<{ calls: number }>()
   const n = row?.calls ?? 1
   if (n > limitOf(env)) throw new AskError('rate_limited', `Today's limit of ${limitOf(env)} questions is used up. It resets at midnight, or raise AI_DAILY_LIMIT.`, 429)
   return n

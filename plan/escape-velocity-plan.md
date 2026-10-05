@@ -405,14 +405,13 @@ CREATE TABLE applied_op (
 
 ## 14. Dates (the most common source of bugs)
 
-- The plan runs in **Asia/Kolkata** time. "Today" is always a `YYYY-MM-DD` string in that zone:
-  `new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(now)`.
+- The plan runs in **Asia/Kolkata** time. "Today" is always a `YYYY-MM-DD` string in that zone, and **the day ends at 04:00, not at midnight**, so a late night can still finish that day's tasks: `new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(now − 4 hours)`. A tick, a logged or solved problem, a session or a review made at 01:30 belongs to the day before. The week turns over on Monday at 04:00, so Sunday-night work stays in its week.
 - Never do `new Date('2026-10-05')`: that string is parsed as UTC midnight and can shift a day. Convert `YYYY-MM-DD` to a day number with `Date.UTC(y, m - 1, d) / 86_400_000` and do all maths on day numbers.
 - `week = floor((today − start_date) / 7) + 1`. Before `start_date`, show a countdown. After `end_date`, show "Plan complete" and the readiness ring.
 - Day of week inside the plan comes from `(today − start_date) mod 7` (0 = Mon), not from `Date.getDay()`.
-- Morning block = before 12:00 Kolkata time; night block = after 18:00; between them, Today shows both.
+- Morning block = 04:00 to 12:00 Kolkata time; night block = 18:00 to 04:00 (the small hours are still the night); between them, Today shows both. After midnight, Today says it is still the day before and that the day ends at 4 am.
 - The Worker stamps `updated_at` itself. Client dates (`loggedOn`, `reviewedOn`) are Kolkata `YYYY-MM-DD` strings and are validated as real dates.
-- Recompute "today" when the tab becomes visible and at the next Kolkata midnight, so a tab left open overnight rolls over.
+- Recompute "today" when the tab becomes visible and when the day ends (the next 04:00 Kolkata), so a tab left open overnight rolls over.
 
 ## 15. Screens
 
@@ -496,7 +495,7 @@ These pairs were checked: text contrast is at least 14:1 in every theme, muted t
 | Layer | Tool | Must cover |
 | --- | --- | --- |
 | Compiler | Vitest | This file compiles to exactly the expected task and design counts; each failure rule in section 18.1 has a fixture that fails; every concept or infra task with "Why:" yields a flashcard; every design task maps to a design ID |
-| Dates | Vitest, fake timers | Day before start; start day; Sunday to Monday; Kolkata midnight (18:29 vs 18:30 UTC); 31 Dec to 1 Jan; last day; after end; light days; morning and night blocks |
+| Dates | Vitest, fake timers | Day before start; start day; Sunday to Monday; the 04:00 Kolkata rollover (22:29 vs 22:30 UTC) and midnight not ending the day; 31 Dec to 1 Jan; last day; after end; light days; morning and night blocks |
 | Points and scheduling | Vitest | Week totals; light-week target hidden; readiness worth 0; redraws due at +7 and +21; Leitner boxes and the 10-card daily cap |
 | Sync | Vitest | Outbox order; replay after failure; a duplicated op applied once; offline-created item edited before sync |
 | Worker + D1 | `@cloudflare/vitest-pool-workers` | `POST /api/ops` happy path for every op type; unknown ID rejects the whole batch; invalid body gives 400; repeated `opId` skipped; more than 20 ops rejected; no Access identity gives 401 outside dev |

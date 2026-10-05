@@ -1,7 +1,7 @@
-// "Today" for the whole app. Recomputed when the tab becomes visible and at the next Kolkata midnight,
+// "Today" for the whole app. Recomputed when the tab becomes visible and when the plan day ends (04:00 Kolkata),
 // so a tab left open overnight rolls over without a reload.
 import { signal } from '@preact/signals'
-import { kolkataToday, msUntilKolkataMidnight } from './dates'
+import { kolkataToday, msUntilDayEnd } from './dates'
 
 export const today = signal(kolkataToday())
 export const nowMs = signal(Date.now())
@@ -15,8 +15,8 @@ export function startClock(): () => void {
   }
   const arm = () => {
     clearTimeout(timer)
-    // +1 s so we land just after midnight, never just before it
-    timer = setTimeout(() => { refresh(); arm() }, msUntilKolkataMidnight() + 1000)
+    // +1 s so we land just after the boundary, never just before it
+    timer = setTimeout(() => { refresh(); arm() }, msUntilDayEnd() + 1000)
   }
   const onVisible = () => { if (document.visibilityState === 'visible') { refresh(); arm() } }
   document.addEventListener('visibilitychange', onVisible)

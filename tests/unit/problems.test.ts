@@ -42,10 +42,13 @@ describe('solved problems complete DSA tasks, whatever their difficulty', () => 
     expect(autoDone(plan.tasks, mergeProblems([], solved), startDate, lightDays).has('w01-01')).toBe(true)
     expect(autoDone(plan.tasks, mergeProblems([], solved.slice(1)), startDate, lightDays).has('w01-01')).toBe(false)
   })
-  it('uses the Kolkata day: 20:00 UTC on Monday is already Tuesday', () => {
-    const p = mergeProblems([], [at('2026-10-05T20:00:00Z', 1)])
-    expect(p[0].loggedOn).toBe('2026-10-06')
-    expect(autoDone(plan.tasks, p, startDate, lightDays).has('w01-04')).toBe(true)
+  it('uses the plan day (04:00 to 03:59 Kolkata): a problem solved at 01:30 still counts for the day before', () => {
+    const late = mergeProblems([], [at('2026-10-05T20:00:00Z', 1)]) // 01:30 on Tuesday
+    expect(late[0].loggedOn).toBe('2026-10-05') // still Monday's day
+    expect(autoDone(plan.tasks, late, startDate, lightDays).has('w01-04')).toBe(false) // Tuesday's task is not done by it
+    const morning = mergeProblems([], [at('2026-10-05T22:30:00Z', 1)]) // 04:00 on Tuesday
+    expect(morning[0].loggedOn).toBe('2026-10-06')
+    expect(autoDone(plan.tasks, morning, startDate, lightDays).has('w01-04')).toBe(true)
   })
   it('a weekly task needs every day in its range', () => {
     const days = ['2026-10-12', '2026-10-13', '2026-10-14'].map((d, i) => at(`${d}T05:00:00Z`, i + 1))

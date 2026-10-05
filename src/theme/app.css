@@ -585,6 +585,10 @@ label.check > span { flex: 1; min-width: 0; }
 .timerchip__kind { color: var(--text-muted); }
 .timerchip__act { height: 1.8rem; padding: 0 0.7rem; border: 1px solid var(--line); border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-weight: 600; font-size: 0.85rem; }
 [data-theme='paper'] .timerchip__act { border-radius: 2px; border-width: 2px; }
+.timerchip__sound { display: inline-flex; align-items: center; justify-content: center; width: 1.9rem; height: 1.9rem; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--text-muted); padding: 0; }
+.timerchip__sound:hover { color: var(--text); }
+[data-theme='paper'] .timerchip__sound { border-radius: 2px; }
+.timerchip[data-sound='blocked'] .timerchip__sound { border-width: 2px; border-color: var(--accent); color: var(--text); } /* the browser is waiting for a click: heavier frame, not only colour */
 .timerchip__bar { position: absolute; left: 0; bottom: 0; height: 3px; background: var(--accent); transition: width 1s linear; }
 /* finished or past the box: a heavier frame, not only a colour change */
 .timerchip[data-state='done'], .timerchip[data-state='over'] { border-width: 2px; border-color: var(--accent); }

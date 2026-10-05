@@ -66,7 +66,7 @@ test.describe('Solved problems, inside Progress', () => {
   test('groups by type, newest group first, newest problem first inside each, with the date and a link that opens it', async ({ page, api }) => {
     await api.onboard()
     await api.solved([
-      { n: 41, name: 'First Missing Positive', topic: 'Arrays', difficulty: 'Hard', at: '2026-05-17T20:54:24.741Z' }, // 18 May in Kolkata
+      { n: 41, name: 'First Missing Positive', topic: 'Arrays', difficulty: 'Hard', at: '2026-05-17T22:54:24.741Z' }, // 04:24 on 18 May in Kolkata: past the 4 am rollover, so it is the 18th
       { n: 1, name: 'Two Sum', topic: 'Arrays', difficulty: 'Easy', at: '2026-05-17T20:18:45.523Z' },
       { n: 200, name: 'Number of Islands', topic: 'Graphs', difficulty: 'Medium', at: '2026-03-29T07:01:16.928Z' },
       { n: 207, name: 'Course Schedule', topic: 'Graphs', difficulty: 'Medium', at: '2026-03-21T07:00:00.000Z' },

@@ -7,19 +7,41 @@ const hero = (page: import('@playwright/test').Page) => page.locator('.hero')
 const ymdPlus = (ymd: string, n: number) => new Date(Date.parse(`${ymd}T00:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10)
 
 test.describe('the Kolkata day', () => {
-  test('at 00:00 Kolkata time, Today rolls to the new day without a reload', async ({ page, api }) => {
+  test('at 04:00 Kolkata time, Today rolls to the new day without a reload (not at midnight)', async ({ page, api }) => {
     await api.onboard()
-    await openApp(page, '/', { at: kolkata('2026-10-07T23:59:30'), ticking: true })
+    await openApp(page, '/', { at: kolkata('2026-10-08T03:59:30'), ticking: true })
     await expect(eyebrow(page)).toHaveText('Wednesday 7 Oct · week 1 of 13')
     await page.clock.runFor(31_000)
     await expect(eyebrow(page)).toHaveText('Thursday 8 Oct · week 1 of 13')
     await expect(page.getByRole('heading', { name: /^Today’s tasks/ })).toBeVisible()
+    await expect(page.getByTestId('late-night')).toHaveCount(0)
   })
 
-  test('Sunday night to Monday morning starts the next week, and says so', async ({ page, api }) => {
+  test('midnight does not end the day: at 01:30 it is still Wednesday, it says so, and it is still the night block', async ({ page, api }) => {
+    await api.onboard()
+    await api.activeOn('2026-10-06')
+    await openApp(page, '/', { at: kolkata('2026-10-08T01:30:00'), ticking: true })
+    await expect(eyebrow(page)).toHaveText('Wednesday 7 Oct · week 1 of 13')
+    await expect(page.getByTestId('late-night')).toContainText('still Wednesday 7 Oct')
+    await expect(page.getByTestId('late-night')).toContainText('4:00 am')
+    await expect(page.locator('.hero .eyebrow')).toHaveText('Night · next up · Infra') // late night is the night block
+    await page.clock.runFor(60_000)
+    await expect(eyebrow(page)).toHaveText('Wednesday 7 Oct · week 1 of 13') // a minute later, still
+  })
+
+  test('a task ticked at 01:00 counts for the day before, and a problem logged then is dated that day', async ({ page, api }) => {
+    await api.onboard()
+    await api.activeOn('2026-10-06')
+    await openApp(page, '/', { at: kolkata('2026-10-08T01:00:00') })
+    await page.getByRole('button', { name: 'Bad day? Minimum day' }).click()
+    await page.getByRole('dialog').getByRole('button', { name: 'Log it' }).click()
+    await expect.poll(async () => (await api.state()).problemLog.map((p) => p.loggedOn)).toEqual(['2026-10-06', '2026-10-07']) // not the 8th
+  })
+
+  test('Sunday night to Monday 4 am starts the next week, and says so', async ({ page, api }) => {
     await api.onboard()
     await api.activeOn('2026-10-10')
-    await openApp(page, '/', { at: kolkata('2026-10-11T23:59:30'), ticking: true })
+    await openApp(page, '/', { at: kolkata('2026-10-12T03:59:30'), ticking: true })
     await expect(eyebrow(page)).toHaveText('Sunday 11 Oct · week 1 of 13')
     await expect(hero(page)).toContainText('Redraw time. Let’s see what stuck.')
     await page.clock.runFor(31_000)
@@ -27,11 +49,11 @@ test.describe('the Kolkata day', () => {
     await expect(page.locator('main header')).toContainText('New week, new constellation.')
   })
 
-  test('18:29 UTC is still Wednesday in Kolkata; 18:30 UTC is Thursday', async ({ page, api }) => {
+  test('22:29 UTC is still Wednesday in Kolkata (03:59); 22:30 UTC is Thursday (04:00)', async ({ page, api }) => {
     await api.onboard()
-    await openApp(page, '/', { at: new Date('2026-10-07T18:29:59Z') })
+    await openApp(page, '/', { at: new Date('2026-10-07T22:29:59Z') })
     await expect(eyebrow(page)).toHaveText('Wednesday 7 Oct · week 1 of 13')
-    await page.clock.setFixedTime(new Date('2026-10-07T18:30:00Z'))
+    await page.clock.setFixedTime(new Date('2026-10-07T22:30:00Z'))
     await page.reload()
     await expect(eyebrow(page)).toHaveText('Thursday 8 Oct · week 1 of 13')
   })
