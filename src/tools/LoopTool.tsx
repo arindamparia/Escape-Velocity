@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'preact/hooks'
+import { signal } from '@preact/signals'
+import { useEffect, useMemo, useState } from 'preact/hooks'
 import { engine, say } from '../lib/app'
 import { today } from '../lib/clock'
 import { addDays } from '../lib/dates'
@@ -13,6 +14,21 @@ import { NoteEditor } from '../ui/NoteEditor'
 import { startTimer, timer } from './timer'
 
 const EXCALIDRAW = 'https://excalidraw.com'
+
+/** Shown after "Finish the loop". It lives here, not in the runner: finishing clears the run, which unmounts the runner. */
+const finishedLoop = signal<{ designId: string; first: string; second: string } | null>(null)
+
+function LoopComplete({ done }: { done: { designId: string; first: string; second: string } }) {
+  const { byId } = useDesigns()
+  return (
+    <div class="card hero stack">
+      <p class="eyebrow">Loop complete</p>
+      <h2>{byId.get(done.designId)?.name ?? done.designId} is on the board.</h2>
+      <p>Redraws from memory are due on <strong>{done.first}</strong> (+7 days) and <strong>{done.second}</strong> (+21 days). Sundays, 15 minutes each. No notes; check afterwards.</p>
+      <div class="row"><a class="btn btn--primary" href="/study/redraws">Redraw queue</a><a class="btn" href="/">Back to Today</a><button type="button" class="btn btn--ghost" onClick={() => { finishedLoop.value = null }}>Start another loop</button></div>
+    </div>
+  )
+}
 
 function LoopStart({ presetDesign, presetTask, presetShort }: { presetDesign?: string; presetTask?: string; presetShort?: boolean }) {
   const study = usePage('study')
@@ -48,7 +64,7 @@ function LoopStart({ presetDesign, presetTask, presetShort }: { presetDesign?: s
         </label>
         {chosen ? <p class="small"><strong>Derive it first:</strong> {chosen.derive}</p> : null}
         <div class="row">
-          <button type="button" class="btn btn--primary btn--big" disabled={!design} onClick={() => { startLoop(design, { taskId: presetTask, short }); navigate('/study/loop') }}>Start the loop</button>
+          <button type="button" class="btn btn--primary btn--big" disabled={!design} onClick={() => { finishedLoop.value = null; startLoop(design, { taskId: presetTask, short }); navigate('/study/loop') }}>Start the loop</button>
         </div>
       </div>
       {study ? <details><summary>How the loop works</summary><div style="margin-top:0.8rem"><Html html={study.loopGuideHtml} class="prose small" /></div></details> : null}
@@ -150,7 +166,6 @@ function Runner({ run }: { run: LoopRun }) {
   const steps = useMemo(() => (study ? stepPlan(run.short, study.steps) : []), [study, run.short])
   const cards = state.decisionCards.filter((c) => c.designId === run.designId).length
   const cardsNeeded = run.short ? 1 : 3
-  const [finished, setFinished] = useState<{ first: string; second: string } | null>(null)
   const step = Math.min(run.step, steps.length || 1)
 
   // the breakdown stays locked until step 1's timer has run its full time
@@ -167,21 +182,11 @@ function Runner({ run }: { run: LoopRun }) {
     const status = existing && existing.status !== 'not-started' ? existing.status : 'attempted'
     engine.dispatch('design.set', { designId: run.designId, status, attemptedOn })
     if (run.taskId) engine.dispatch('task.set', { taskId: run.taskId, done: true })
-    setFinished({ first: addDays(attemptedOn, REDRAW_OFFSETS[0]), second: addDays(attemptedOn, REDRAW_OFFSETS[1]) })
+    finishedLoop.value = { designId: run.designId, first: addDays(attemptedOn, REDRAW_OFFSETS[0]), second: addDays(attemptedOn, REDRAW_OFFSETS[1]) }
     clearLoop()
     say(`${d?.name ?? 'Design'} attempted. Redraws scheduled.`, 3600)
   }
 
-  if (finished) {
-    return (
-      <div class="card hero stack">
-        <p class="eyebrow">Loop complete</p>
-        <h2>{d?.name} is on the board.</h2>
-        <p>Redraws from memory are due on <strong>{finished.first}</strong> (+7 days) and <strong>{finished.second}</strong> (+21 days). Sundays, 15 minutes each. No notes; check afterwards.</p>
-        <div class="row"><a class="btn btn--primary" href="/study/redraws">Redraw queue</a><a class="btn" href="/">Back to Today</a></div>
-      </div>
-    )
-  }
   if (!study || !steps.length) return <div class="skeleton" />
 
   const last = step === steps.length
@@ -246,6 +251,10 @@ function Runner({ run }: { run: LoopRun }) {
 
 export function LoopTool({ query }: { query: Record<string, string> }) {
   const run = loopRun.value
+  const done = finishedLoop.value
+  // leaving the page ends the completion screen, so coming back later offers a fresh loop
+  useEffect(() => () => { finishedLoop.value = null }, [])
+  if (done && !run) return <LoopComplete done={done} />
   const presetDesign = query.design
   // arriving from Today with a design: offer to start it (or continue if it is the same one)
   if (run && (!presetDesign || presetDesign === run.designId)) return <Runner run={run} />

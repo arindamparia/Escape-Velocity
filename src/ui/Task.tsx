@@ -1,6 +1,7 @@
-import type { PlanDay, PlanTask, TaskType, WeekChunk } from '../../shared/plan-types'
+import type { PlanTask, TaskType, WeekChunk } from '../../shared/plan-types'
 import { engine, findNote, openOverlay, saveNote, toggleTask } from '../lib/app'
 import { navigate } from '../lib/nav'
+import { taskLabel } from '../lib/plan'
 import { Html } from './Html'
 import { Icon } from './Icon'
 import { PRESETS, startTimer } from '../tools/timer'
@@ -10,8 +11,6 @@ export const TYPE_LABEL: Record<TaskType, string> = {
   maths: 'Maths', capstone: 'Capstone', redraw: 'Redraw', read: 'Read', mock: 'Mock', story: 'Story', career: 'Career',
   mindset: 'Mindset', review: 'Review', rest: 'Rest', ai: 'AI rep', ready: 'Ready',
 }
-
-export const DAY_LABEL: Record<PlanDay, string> = { Mon: 'Mon', Tue: 'Tue', Wed: 'Wed', Thu: 'Thu', Fri: 'Fri', Sat: 'Sat', Sun: 'Sun', Week: 'This week' }
 
 export interface TaskAction { label: string; primary?: boolean; run: () => void }
 
@@ -37,7 +36,7 @@ export function actionsFor(task: PlanTask, chunk: WeekChunk | null): TaskAction[
     case 'infra':
       return task.hasWhy
         ? [{ label: 'Open note', primary: true, run: () => openOverlay({ kind: 'why', taskId: id }) }]
-        : [{ label: `Start ${PRESETS.concept}-min timer`, primary: true, run: () => startTimer('concept', PRESETS.concept, { refId: id }) }]
+        : [{ label: `Start ${PRESETS[task.type]}-min timer`, primary: true, run: () => startTimer(task.type, PRESETS[task.type], { refId: id }) }]
     case 'design': {
       const d = task.designs?.[0]
       return [{ label: 'Start learning loop', primary: true, run: () => navigate(`/study/loop?design=${d}&task=${id}`) }]
@@ -79,7 +78,7 @@ export function TaskCheck({ task }: { task: PlanTask }) {
       type="button"
       class="task__check"
       aria-pressed={done}
-      aria-label={`${done ? 'Untick' : 'Tick'} ${task.id}`}
+      aria-label={`${done ? 'Untick' : 'Tick'} ${taskLabel(task.id)}`}
       onClick={() => toggleTask(task.id)}
     >
       <Icon name="check" />
@@ -98,9 +97,9 @@ export function TaskRow({ task, chunk, focused = false, actions = true }: { task
       <div>
         <div class="task__meta">
           <span class="chip">{TYPE_LABEL[task.type]}</span>
-          <span class="chip">{DAY_LABEL[task.day]}</span>
           {task.company ? <span class="chip chip--accent">asked at {task.company}</span> : null}
-          <span class="mono muted small">{task.id}</span>
+          <span class="muted small">{taskLabel(task.id)}</span>
+          <span class="task__pts" title="points">+{task.points}</span>
         </div>
         {entry ? <Html class="task__text" html={entry.html} inline /> : <span class="task__text muted">…</span>}
         {pick ? <div class="small muted">Your pick: <strong>{chunk?.designs[pick]?.name ?? pick}</strong></div> : null}
@@ -114,7 +113,6 @@ export function TaskRow({ task, chunk, focused = false, actions = true }: { task
           </div>
         ) : null}
       </div>
-      <span class="task__pts" title="points">+{task.points}</span>
     </li>
   )
 }

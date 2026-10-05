@@ -2,7 +2,7 @@ import { useMemo, useState } from 'preact/hooks'
 import { engine, toggleTask } from '../lib/app'
 import { today } from '../lib/clock'
 import { weekHasLightDay } from '../lib/dates'
-import { plan, readinessTasks } from '../lib/plan'
+import { plan, readinessTasks, taskLabel } from '../lib/plan'
 import { pointsByWeek, readinessProgress, totalPoints, weekTarget } from '../lib/points'
 import { lastMediumsInBox, scorecard, weekStats } from '../lib/stats'
 import { dayInfo } from '../lib/today'
@@ -39,7 +39,7 @@ function Readiness() {
         return (
           <label key={t.id} class="check">
             <input type="checkbox" checked={isDone} onChange={() => toggleTask(t.id)} />
-            <span>{page ? <Html html={page.readiness[t.id] ?? t.id} inline class="" /> : t.id}{hints[t.id] ? <><br /><span class="small muted">{hints[t.id]}</span></> : null}</span>
+            <span>{page ? <Html html={page.readiness[t.id] ?? taskLabel(t.id)} inline class="" /> : taskLabel(t.id)}{hints[t.id] ? <><br /><span class="small muted">{hints[t.id]}</span></> : null}</span>
           </label>
         )
       })}
@@ -96,9 +96,11 @@ export default function Progress({ view }: { view?: string }) {
           <p class="muted">{totalPoints(plan.tasks, done)} points so far. Open the numbers, the way you’d check a proof instead of trusting a feeling.</p>
         </header>
         <ScoreSheet title="Weekly mock-score sheet" subtitle="Points per week. Your past weeks only." data={past.map((w) => ({ label: String(w), value: pts[w - 1], hatched: weekHasLightDay(w, plan.config.startDate, plan.config.lightDays) }))} slots={13} target={plan.config.weeklyPointsTarget} />
-        <ProblemsChart slots={13} data={past.map((w, i) => ({ label: String(w), easy: stats[i].easy, medium: stats[i].medium, hard: stats[i].hard }))} />
-        <LineChart title="Average medium time" subtitle="Minutes, mediums solved without AI. The box is 25." series={[{ name: 'Avg minutes', marker: 'circle', values: past.map((w, i) => scorecard(state, w, plan.config.startDate, pts[w - 1]).avgShown ?? stats[i].avgMediumMin) }]} slots={13} labels={labels} yMax={60} unit="" reference={{ value: 25, label: '25 min box' }} />
-        <LineChart title="Design self-score" subtitle="0 to 10, from your Sunday review" series={[{ name: 'Score', marker: 'square', values: past.map((w) => state.weekLog.find((l) => l.week === w)?.designScore ?? null) }]} slots={13} labels={labels} yMax={10} />
+        <div class="charts">
+          <ProblemsChart slots={13} data={past.map((w, i) => ({ label: String(w), easy: stats[i].easy, medium: stats[i].medium, hard: stats[i].hard }))} />
+          <LineChart title="Average medium time" subtitle="Minutes, mediums solved without AI. The box is 25." series={[{ name: 'Avg minutes', marker: 'circle', values: past.map((w, i) => scorecard(state, w, plan.config.startDate, pts[w - 1]).avgShown ?? stats[i].avgMediumMin) }]} slots={13} labels={labels} yMax={60} unit="" reference={{ value: 25, label: '25 min box' }} />
+          <LineChart title="Design self-score" subtitle="0 to 10, from your Sunday review" series={[{ name: 'Score', marker: 'square', values: past.map((w) => state.weekLog.find((l) => l.week === w)?.designScore ?? null) }]} slots={13} labels={labels} yMax={10} />
+        </div>
         <ScorecardTable current={Math.max(current, 1)} />
       </div>
       <div class="slot-aside">

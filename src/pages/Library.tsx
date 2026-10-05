@@ -26,8 +26,10 @@ function Chips<T extends string>({ label, options, value, onChange }: { label: s
 interface Filters { group: string; access: string; st: string; q: string }
 
 function FilterPanel({ groups, f, set }: { groups: { title: string; designs: DesignFull[] }[]; f: Filters; set: (p: Partial<Filters>) => void }) {
+  // open beside the list on a wide screen; closed on a phone, where it would fill the first screen and push the list away
+  const [open] = useState(() => matchMedia('(min-width: 900px)').matches || Object.values(f).some(Boolean))
   return (
-    <details class="card" open>
+    <details class="card" open={open}>
       <summary>Filters</summary>
       <div class="filters" style="margin-top:0.8rem">
         <label>Search<input type="search" value={f.q} placeholder="idempotency, geo, fan-out…" onInput={(e) => set({ q: (e.target as HTMLInputElement).value })} /></label>

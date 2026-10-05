@@ -7,19 +7,20 @@ import Today from './pages/Today'
 import { THEME_PREFS } from './theme/themes'
 import { actionsFor } from './ui/Task'
 import { Boundary } from './ui/Boundary'
+import { lazyPage } from './ui/lazyPage'
 import { Icon } from './ui/Icon'
 import { needRefresh, applyUpdate } from './lib/pwa'
 import { TimerCard } from './tools/TimerCard'
 import { timer } from './tools/timer'
 
 const Overlays = lazy(() => import('./ui/Overlays'))
-const Weeks = lazy(() => import('./pages/Weeks'))
-const Study = lazy(() => import('./pages/Study'))
-const Library = lazy(() => import('./pages/Library'))
-const Progress = lazy(() => import('./pages/Progress'))
-const Mindset = lazy(() => import('./pages/Mindset'))
-const Sources = lazy(() => import('./pages/Sources'))
-const Settings = lazy(() => import('./pages/Settings'))
+const Weeks = lazyPage(() => import('./pages/Weeks'))
+const Study = lazyPage(() => import('./pages/Study'))
+const Library = lazyPage(() => import('./pages/Library'))
+const Progress = lazyPage(() => import('./pages/Progress'))
+const Mindset = lazyPage(() => import('./pages/Mindset'))
+const Sources = lazyPage(() => import('./pages/Sources'))
+const Settings = lazyPage(() => import('./pages/Settings'))
 
 const NAV: { href: string; label: string; match: (p: string) => boolean }[] = [
   { href: '/', label: 'Today', match: (p) => p === '/' },
@@ -36,7 +37,7 @@ function SyncDot() {
   return (
     <span class="iconbtn" style="border-color:transparent" title={label} role="status" aria-label={label}>
       <span class="dot" data-s={pending && s === 'idle' ? 'saving' : s} aria-hidden="true" />
-      {s !== 'idle' || pending ? <span class="small">{s === 'signed-out' ? 'Signed out' : s === 'offline' ? 'Offline' : s === 'error' ? 'Retrying' : 'Saving…'}</span> : null}
+      {s !== 'idle' || pending ? <span class="small">{s === 'signed-out' ? 'Signed out' : s === 'offline' ? 'Offline' : s === 'error' ? 'Retrying' : 'Saving…'}</span> : <span class="small sync-label">Saved</span>}
     </span>
   )
 }
@@ -54,7 +55,7 @@ function TopBar() {
       <button type="button" class="iconbtn" aria-label="Command palette (⌘K)" title="Command palette (⌘K)" onClick={() => openOverlay({ kind: 'palette' })}>
         <Icon name="search" /><kbd class="noprint">⌘K</kbd>
       </button>
-      <a class="iconbtn" href="/settings" aria-label="Settings" aria-current={path === '/settings' ? 'page' : undefined}><Icon name="gear" /></a>
+      <a class="iconbtn" href="/settings" aria-label="Settings" aria-current={path === '/settings' ? 'page' : undefined}><Icon name="sliders" /></a>
     </header>
   )
 }
@@ -177,7 +178,7 @@ function Shell() {
 
 function NotFound() {
   return (
-    <div class="page"><div class="slot-main"><div class="empty">That page doesn’t exist. <a href="/">Back to Today</a></div></div></div>
+    <div class="page"><div class="slot-main stack"><h1>Page not found</h1><div class="empty">That page doesn’t exist. <a href="/">Back to Today</a></div></div></div>
   )
 }
 

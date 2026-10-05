@@ -4,7 +4,7 @@ import type { SearchEntry } from '../../shared/plan-types'
 import { closeOverlay, engine, logProblem, needsOnboarding, overlay, say, setTheme, showDesign, whyNote } from '../lib/app'
 import { today } from '../lib/clock'
 import { navigate } from '../lib/nav'
-import { loadSearch, plan, taskById } from '../lib/plan'
+import { loadSearch, plan, taskById, taskLabel } from '../lib/plan'
 import { startTimer } from '../tools/timer'
 import type { ThemePref } from '../theme/themes'
 import { Dialog } from './Dialog'
@@ -37,7 +37,7 @@ function WhyNote({ taskId }: { taskId: string }) {
   const chunk = useWeekChunk(task?.week ?? 1)
   const why = chunk?.tasks[taskId]?.why
   return (
-    <Dialog title={`Why-note · ${taskId}`} onClose={closeOverlay}>
+    <Dialog title={`Why-note · ${taskLabel(taskId)}`} onClose={closeOverlay}>
       <div class="stack">
         {chunk?.tasks[taskId] ? <Html html={chunk.tasks[taskId].html} class="prose small muted" /> : null}
         {why ? <p><strong>{why}</strong></p> : null}
@@ -104,9 +104,9 @@ function LogProblem({ difficulty, minutes, minimum }: { difficulty?: 'medium' | 
         }}
       >
         {minimum ? <p class="muted">One problem. Still counts. Never zero, never guilt.</p> : null}
-        <div class="row" role="radiogroup" aria-label="Difficulty">
+        <div class="row" role="group" aria-label="Difficulty">
           {(['easy', 'medium', 'hard'] as const).map((x) => (
-            <button key={x} type="button" role="radio" aria-checked={d === x} class="chip" aria-pressed={d === x} onClick={() => setD(x)}>{x}</button>
+            <button key={x} type="button" class="chip" aria-pressed={d === x} onClick={() => setD(x)}>{x}</button>
           ))}
         </div>
         <div class="field-row field-row--2">
@@ -192,9 +192,15 @@ export function commandsFor(q: string): Item[] {
     out.push({ label: `Log ${d}${mins ? ` · ${mins} min` : ''}`, hint: 'problem', run: () => { closeOverlay(); if (logProblem(d, mins, true, undefined, today.value)) say(`Logged: ${d}${mins ? `, ${mins} min` : ''}.`) } })
   }
   m = /^timer\s+(\d{1,3})$/.exec(s)
-  if (m && Number(m[1]) > 0) out.push({ label: `Start ${m[1]}-minute timer`, hint: 'timer', run: () => { closeOverlay(); startTimer('free', Number(m![1])) } })
+  if (m && Number(m[1]) > 0) {
+    const minutes = Number(m[1])
+    out.push({ label: `Start ${minutes}-minute timer`, hint: 'timer', run: () => { closeOverlay(); startTimer('free', minutes) } })
+  }
   m = /^theme\s+(system|dark|light|paper)$/.exec(s)
-  if (m) out.push({ label: `Theme: ${m[1]}`, hint: 'theme', run: () => { closeOverlay(); setTheme(m![1] as ThemePref) } })
+  if (m) {
+    const pref = m[1] as ThemePref
+    out.push({ label: `Theme: ${pref}`, hint: 'theme', run: () => { closeOverlay(); setTheme(pref) } })
+  }
   return out
 }
 
@@ -222,7 +228,7 @@ function Palette() {
       const item: Item =
         e.k === 'w' ? { label: e.t, hint: 'week', run: go(`/weeks/${e.id}`) }
         : e.k === 'd' ? { label: e.t, hint: 'design', run: () => { closeOverlay(); navigate(`/library?design=${e.id}`); showDesign(e.id) } }
-        : { label: e.t, hint: e.id, run: go(`/weeks/${taskById.get(e.id)?.week ?? plan.weeks[0].n}#${e.id}`) }
+        : { label: e.t, hint: taskLabel(e.id), run: go(`/weeks/${taskById.get(e.id)?.week ?? plan.weeks[0].n}#${e.id}`) }
       scored.push({ score, item })
     }
     scored.sort((a, b) => a.score - b.score)
@@ -234,7 +240,7 @@ function Palette() {
   return (
     <Dialog title="Command palette" onClose={closeOverlay} bare>
       <input
-        type="text" role="combobox" aria-expanded="true" aria-controls="palette-list" aria-label="Search or run a command" autofocus
+        type="text" role="combobox" aria-expanded="true" aria-controls="palette-list" aria-activedescendant={items.length ? `palette-opt-${index}` : undefined} aria-label="Search or run a command" autofocus
         placeholder="Jump to a week, design or tool · log medium 22 · timer 25 · theme paper" value={q}
         onInput={(e) => setQ((e.target as HTMLInputElement).value)}
         onKeyDown={(e) => {
@@ -243,12 +249,10 @@ function Palette() {
           else if (e.key === 'Enter') { e.preventDefault(); items[index]?.run() }
         }}
       />
-      <ul id="palette-list" role="listbox">
+      <ul id="palette-list" role="listbox" aria-label="Results">
         {items.map((it, i) => (
-          <li key={`${it.label}-${i}`} role="option" aria-selected={i === index}>
-            <button type="button" onClick={it.run} onMouseMove={() => setIndex(i)}>
-              <span>{it.label}</span><span class="muted small mono">{it.hint}</span>
-            </button>
+          <li key={`${it.label}-${i}`} id={`palette-opt-${i}`} role="option" aria-selected={i === index} onClick={it.run} onMouseMove={() => setIndex(i)}>
+            <span>{it.label}</span><span class="muted small mono">{it.hint}</span>
           </li>
         ))}
         {!items.length ? <li class="muted" style="padding:0.8rem">Nothing matches “{q}”.</li> : null}

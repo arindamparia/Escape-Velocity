@@ -4,6 +4,8 @@ import type { ComponentChildren } from 'preact'
 import { useState } from 'preact/hooks'
 
 const W = 640
+/** The charts that share a row are drawn narrower, so their text is not shrunk to nothing. */
+const W_SMALL = 480
 const PAD = { l: 34, r: 10, t: 14, b: 26 }
 const MAX_BAR = 24
 
@@ -24,8 +26,8 @@ function Frame({ title, subtitle, children, table, legend }: {
   return (
     <figure class="card" style="margin:0">
       <figcaption class="row row--between" style="margin-bottom:0.6rem;align-items:flex-start">
-        <span><strong>{title}</strong>{subtitle ? <><br /><span class="small muted">{subtitle}</span></> : null}</span>
-        <button type="button" class="btn btn--small btn--ghost noprint" aria-pressed={asTable} onClick={() => setAsTable(!asTable)}>{asTable ? 'View chart' : 'View as table'}</button>
+        <span style="flex:1;min-width:0"><strong>{title}</strong>{subtitle ? <><br /><span class="small muted">{subtitle}</span></> : null}</span>
+        <button type="button" class="btn btn--small btn--ghost noprint" style="flex:none" aria-pressed={asTable} onClick={() => setAsTable(!asTable)}>{asTable ? 'View chart' : 'View as table'}</button>
       </figcaption>
       {asTable ? (
         <div class="tblwrap"><table class="tbl"><thead><tr>{table.head.map((h) => <th key={h}>{h}</th>)}</tr></thead>
@@ -75,7 +77,7 @@ export function ScoreSheet({ data, slots, target, title, subtitle }: { data: Bar
           )
         })}
         {Array.from({ length: slots }, (_, i) => <text key={i} x={PAD.l + slot * i + slot / 2} y={H - 6} text-anchor="middle" style={{ opacity: i < data.length ? 1 : 0.45 }}>W{i + 1}</text>)}
-        <text x={PAD.l} y={H - PAD.b - 36} style="font-size:9px;letter-spacing:0.08em">SCORE</text>
+        <text x={PAD.l - 6} y={H - PAD.b - 13} text-anchor="end" style="font-size:9px;letter-spacing:0.04em">SCORE</text>
       </svg>
       <p class="small muted" style="margin:0.3rem 0 0;min-height:1.4em" aria-live="polite">{hover !== null && data[hover] ? `Week ${data[hover].label}: ${data[hover].value} points${data[hover].hatched ? ' (light week, no target)' : ''}` : 'Hover or focus a column for its value.'}</p>
     </Frame>
@@ -90,7 +92,7 @@ export function ProblemsChart({ data, slots }: { data: StackDatum[]; slots: numb
   const H = 220
   const plotH = H - PAD.t - PAD.b
   const max = niceMax(Math.max(0, ...data.map((d) => d.easy + d.medium + d.hard)), 5)
-  const slot = (W - PAD.l - PAD.r) / slots
+  const slot = (W_SMALL - PAD.l - PAD.r) / slots
   const bw = Math.min(MAX_BAR, slot - 6)
   const y = (v: number) => PAD.t + plotH - (v / max) * plotH
   return (
@@ -100,9 +102,9 @@ export function ProblemsChart({ data, slots }: { data: StackDatum[]; slots: numb
         { name: 'Hard', swatch: <svg width="14" height="10" aria-hidden="true"><defs><pattern id={`${id}z`} width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="var(--accent)" stroke-width="2" /></pattern></defs><rect width="14" height="10" rx="2" fill={`url(#${id}z)`} stroke="var(--accent)" /></svg> },
         { name: 'Easy', swatch: <svg width="14" height="10" aria-hidden="true"><rect width="14" height="10" rx="2" fill="none" stroke="var(--text-muted)" stroke-width="1.5" /></svg> },
       ]}>
-      <svg class="chart" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Problems per week: ${data.map((d) => `week ${d.label}: ${d.easy} easy, ${d.medium} medium, ${d.hard} hard`).join('; ') || 'none yet'}`}>
+      <svg class="chart" viewBox={`0 0 ${W_SMALL} ${H}`} role="img" aria-label={`Problems per week: ${data.map((d) => `week ${d.label}: ${d.easy} easy, ${d.medium} medium, ${d.hard} hard`).join('; ') || 'none yet'}`}>
         <defs><pattern id={id} width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="var(--accent)" stroke-width="2" /></pattern></defs>
-        {[0, max / 2, max].map((t) => <g key={t}><line class="grid" x1={PAD.l} x2={W - PAD.r} y1={y(t)} y2={y(t)} /><text x={PAD.l - 6} y={y(t) + 4} text-anchor="end">{t}</text></g>)}
+        {[0, max / 2, max].map((t) => <g key={t}><line class="grid" x1={PAD.l} x2={W_SMALL - PAD.r} y1={y(t)} y2={y(t)} /><text x={PAD.l - 6} y={y(t) + 4} text-anchor="end">{t}</text></g>)}
         {data.map((d, i) => {
           const cx = PAD.l + slot * i + slot / 2
           const parts: [number, string, string, string][] = [[d.medium, 'var(--accent)', 'none', 'm'], [d.hard, `url(#${id})`, 'var(--accent)', 'h'], [d.easy, 'none', 'var(--text-muted)', 'e']]
@@ -135,15 +137,15 @@ export function LineChart({ title, subtitle, series, slots, labels, yMax, yMin =
 }) {
   const H = 200
   const plotH = H - PAD.t - PAD.b
-  const slot = (W - PAD.l - PAD.r) / slots
+  const slot = (W_SMALL - PAD.l - PAD.r) / slots
   const y = (v: number) => PAD.t + plotH - ((v - yMin) / (yMax - yMin)) * plotH
   const x = (i: number) => PAD.l + slot * i + slot / 2
   const any = series.some((s) => s.values.some((v) => v !== null))
   return (
     <Frame title={title} subtitle={subtitle} table={{ head: ['Week', ...series.map((s) => s.name)], rows: labels.map((l, i) => [`Week ${l}`, ...series.map((s) => (s.values[i] ?? '–'))]) }} legend={series.map((s) => ({ name: s.name, swatch: <svg width="22" height="10" aria-hidden="true"><line x1="0" y1="5" x2="22" y2="5" stroke="var(--accent)" stroke-width="2" />{s.marker === 'circle' ? <circle cx="11" cy="5" r="4" fill="var(--accent)" /> : <rect x="7" y="1" width="8" height="8" fill="var(--accent)" />}</svg> }))}>
-      <svg class="chart" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${title}: ${series.map((s) => `${s.name} ${s.values.map((v, i) => (v === null ? '' : `week ${labels[i]} ${v}`)).filter(Boolean).join(', ') || 'no data yet'}`).join('; ')}`}>
-        {[yMin, (yMin + yMax) / 2, yMax].map((t) => <g key={t}><line class="grid" x1={PAD.l} x2={W - PAD.r} y1={y(t)} y2={y(t)} /><text x={PAD.l - 6} y={y(t) + 4} text-anchor="end">{t}{unit ?? ''}</text></g>)}
-        {reference ? <g><line x1={PAD.l} x2={W - PAD.r} y1={y(reference.value)} y2={y(reference.value)} stroke="var(--text-muted)" stroke-width="1.5" stroke-dasharray="6 4" /><text x={W - PAD.r} y={y(reference.value) - 5} text-anchor="end">{reference.label}</text></g> : null}
+      <svg class="chart" viewBox={`0 0 ${W_SMALL} ${H}`} role="img" aria-label={`${title}: ${series.map((s) => `${s.name} ${s.values.map((v, i) => (v === null ? '' : `week ${labels[i]} ${v}`)).filter(Boolean).join(', ') || 'no data yet'}`).join('; ')}`}>
+        {[yMin, (yMin + yMax) / 2, yMax].map((t) => <g key={t}><line class="grid" x1={PAD.l} x2={W_SMALL - PAD.r} y1={y(t)} y2={y(t)} /><text x={PAD.l - 6} y={y(t) + 4} text-anchor="end">{t}{unit ?? ''}</text></g>)}
+        {reference ? <g><line x1={PAD.l} x2={W_SMALL - PAD.r} y1={y(reference.value)} y2={y(reference.value)} stroke="var(--text-muted)" stroke-width="1.5" stroke-dasharray="6 4" /><text x={W_SMALL - PAD.r} y={y(reference.value) - 5} text-anchor="end">{reference.label}</text></g> : null}
         {series.map((s) => {
           const pts = s.values.map((v, i) => (v === null ? null : [x(i), y(v)] as const))
           const path = pts.reduce((d, p, i) => (p ? `${d}${i === 0 || !pts[i - 1] ? 'M' : 'L'}${p[0]} ${p[1]}` : d), '')
@@ -157,7 +159,7 @@ export function LineChart({ title, subtitle, series, slots, labels, yMax, yMin =
           )
         })}
         {Array.from({ length: slots }, (_, i) => <text key={i} x={x(i)} y={H - 6} text-anchor="middle" style={{ opacity: i < labels.length ? 1 : 0.45 }}>W{i + 1}</text>)}
-        {!any ? <text x={W / 2} y={H / 2} text-anchor="middle" style="font-size:12px">No data yet. Log a medium with its minutes.</text> : null}
+        {!any ? <text x={W_SMALL / 2} y={H / 2} text-anchor="middle" style="font-size:12px">No data yet. Log a medium with its minutes.</text> : null}
       </svg>
     </Frame>
   )

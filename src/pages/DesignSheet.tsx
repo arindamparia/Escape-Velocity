@@ -50,8 +50,8 @@ export function DesignDetail({ id }: { id: string }) {
 
       <div class="stack" style="gap:0.7rem">
         <p class="eyebrow" style="margin:0">Status</p>
-        <div class="row" role="radiogroup" aria-label="Status">
-          {DESIGN_STATUSES.map((s) => <button key={s} type="button" role="radio" aria-checked={status === s} class="chip" aria-pressed={status === s} onClick={() => setStatus(s)}>{STATUS_LABEL[s]}</button>)}
+        <div class="row" role="group" aria-label="Status">
+          {DESIGN_STATUSES.map((s) => <button key={s} type="button" class="chip" aria-pressed={status === s} onClick={() => setStatus(s)}>{STATUS_LABEL[s]}</button>)}
         </div>
         {status !== 'not-started' ? (
           <div class="field-row field-row--2">

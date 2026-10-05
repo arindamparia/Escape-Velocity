@@ -1,6 +1,7 @@
 import { useState } from 'preact/hooks'
 import { engine, findNote } from '../lib/app'
 import { navigate } from '../lib/nav'
+import { taskLabel } from '../lib/plan'
 import { TextBlock } from '../ui/Html'
 import { NoteEditor } from '../ui/NoteEditor'
 import { useDesigns, usePage } from '../ui/hooks'
@@ -20,7 +21,7 @@ function WhyNotes() {
         return (
           <li key={c.id} class="task" data-done={!!body.trim()} style="grid-template-columns:1fr auto">
             <div>
-              <div class="task__meta"><span class="chip">Week {c.week} · {c.day}</span><span class="mono muted small">{c.id}</span></div>
+              <div class="task__meta"><span class="chip">{c.day}</span><span class="muted small">{taskLabel(c.id)}</span></div>
               <strong>{c.front}</strong>
               {open === c.id ? <div style="margin-top:0.6rem"><NoteEditor kind="why" refId={c.id} rows={7} placeholder="In my own words…" /></div> : body.trim() ? <div class="small muted" style="margin-top:0.4rem;max-height:4.5em;overflow:hidden"><TextBlock text={body} /></div> : null}
             </div>

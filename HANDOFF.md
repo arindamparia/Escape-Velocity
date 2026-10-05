@@ -1,40 +1,48 @@
 # Handoff
 
-Status at the end of the first session. Read `CLAUDE.md` first, then the plan (`plan/escape-velocity-plan.md`, Part 1).
+Status at the end of the second session. Read `CLAUDE.md` first, then `AUDIT.md` (the build checked against every section of the plan), then the plan itself (`plan/escape-velocity-plan.md`, Part 1).
 
-## Done (plan build steps 1 to 7, mostly)
+## Done
 
-- **Compiler** `scripts/lib/compile.ts` (+ CLI `scripts/compile-plan.ts`): 171 tasks (163 weekly + 8 readiness), 37 designs, 27 flashcards, 13 weeks. Fails on every rule in plan 18.1 (each has a failing fixture in `tests/unit/compiler.test.ts`). Maths -> MathML via KaTeX at build time.
-- **Worker + D1** (`worker/`, `migrations/0001_init.sql`, `wrangler.jsonc`): `GET /api/state`, `POST /api/ops`, `GET /api/export`; idempotent ops; Cloudflare Access JWT re-verified inside the Worker (RS256, issuer, audience, expiry, owner email); fails closed when not configured.
-- **Client data layer**: dates, points, SRS (Leitner 1/3/7/14/30 days, 10 cards/day cap, redraws at +7/+21), reducer, store (IndexedDB snapshot + outbox with coalescing), sync (backoff, signed-out detection, rejected-op dropping), clock (Kolkata midnight rollover), constellation (Kruskal MST), stats, envelope calculator, learning-loop state, mock mode.
-- **UI**: Today (next action, hero, evidence, equation, constellation, welcome-back, light days, minimum day), Weeks, Study (loop, redraws, flashcards, timer, mock, envelope, formulas, notes, cheat sheet), Library (+ design detail), Progress (hand-rolled SVG charts, scorecard, readiness ring), Sunday review, Mindset, Settings, Sources, command palette, keyboard shortcuts, onboarding, themes.
-- **Budgets** enforced by `scripts/check-budgets.ts`: Today JS 33.8 KB gz of 35, CSS 4.7 KB of 15, font 4.8 KB.
-- **Tests**: 149 passing (compiler, dates, points, SRS, sync, clock, Today logic, sky, loop, mock, envelope, stats, Worker API + auth + parity).
-- Screenshots checked by eye (Chromium) on Today at 1512x982@2, 2560x1440@1, 390x844@3 in Dark/Light/Paper, plus Weeks, Study, Library, Progress.
+Everything from the first session (compiler, Worker + D1, local-first client, every page and tool, budgets), plus:
+
+- **Browser tests** (Playwright, 13 specs, 250 tests; `npm run test:e2e`): screens at 1512x982@2, 2560x1440@1 and 390x844@3 in Dark, Light and Paper with baselines; the ePaper greyscale checks; offline, retried sync, two devices, signed-out; "Update ready" with a really changed `sw.js`; every Kolkata date rule; every task type's tool; keyboard and palette; Paper's no-motion/shadow/gradient/dashed-border rule on every element; axe in every theme, page and dialog; contrast; keyboard reachability; speed and layout-shift budgets; the walk-through of every study tool; first run, themes, timer, celebrations, error page, titles and installing; the printed cheat sheet.
+- **Lighthouse CI** (`npm run lhci`): LCP 442 to 669 ms, CLS 0, TBT 0, and performance, accessibility and best practices 100 on Today, Weeks, Library, Progress and Study.
+- **README** with the run, test and deploy steps.
+- **Real bugs found and fixed** by all this: listed in `AUDIT.md` (a blank page when a page failed to download, a palette command that crashed, the loop's completion screen vanishing, a gradient and dashed borders in Paper, layout shift, a first-visit flash of "Welcome back", sideways scrolling on a phone, accessibility violations, the flashcard daily cap miscounting offline reviews, and more).
+- **Task IDs are no longer shown.** `w01-02` appears as "Week 1 · Task 2" and `r-03` as "Readiness · Item 3" (`taskLabel`/`refLabel` in `src/lib/plan.ts`); the IDs stay the permanent keys.
+- **A simpler look**: see "Decisions" below.
 
 ## Not done yet (in priority order)
 
-1. **Playwright e2e** (plan section 19; `e2e/` is empty, no `playwright.config.ts` yet). Needed: screens at 1512x982@2, 2560x1440@1, 390x844@3 x Dark/Light/Paper with baselines; ePaper check (every page in Paper under CSS `filter: grayscale(1)`, done / today / light day still distinguishable); offline (open, go offline, tick, reload, still ticked, back online -> synced); "Update ready" (serve a changed `sw.js`); axe-core zero serious violations in all themes; two-device sync; signed-out banner; Kolkata midnight rollover (use `page.clock`); Puja/Diwali light days; every task type opens its tool; Paper has no animation/shadow/gradient anywhere; repeat open paints real content in < 150 ms (`performance.mark('ev:today-painted')`, offline). Plan: `webServer` = built `dist/` via `wrangler dev --persist-to .wrangler/e2e` on its own port; add a guarded `POST /api/dev/reset` (only when `ENVIRONMENT === 'dev'`) to clear tables between tests. Playwright's Chromium and WebKit are already installed on this Mac.
-2. **Lighthouse CI** (`@lhci/cli` is installed): LCP < 1.0 s first visit, CLS 0, INP < 50 ms. Needs `CHROME_PATH` pointing at Playwright's Chromium.
-3. **Manual walk-through of the tools** with real data (nothing past rendering was clicked through in a browser): learning loop (step 2 locked until the step-1 timer completes, finish ticks the task and schedules redraws), redraw queue, flashcards, mock mode, notes, cheat sheet, Library design sheet, Sunday review. Expect small bugs.
-4. **README** and the deploy runbook (below).
-5. Polish noticed but not done: Library list could use the 72-char line length; the sync dot has no label when idle; phone layout of the Weeks timeline not reviewed.
-
-## Deploying (needs the owner; nothing here is done yet)
-
-1. `npx wrangler login`; `npx wrangler d1 create escape-velocity`; paste the `database_id` into `wrangler.jsonc`.
-2. Set `OWNER_EMAIL`, `ACCESS_TEAM_DOMAIN` (e.g. `myteam.cloudflareaccess.com`) and `ACCESS_AUD` (Application Audience tag) in `wrangler.jsonc` `vars`. The Worker deliberately returns 401 until they are real values.
-3. `npx wrangler d1 migrations apply escape-velocity --remote`, then `npm run build && npx wrangler deploy`.
-4. Turn on Cloudflare Access for the Worker (Workers & Pages > the Worker > Access), allow only the owner's email, and check a private window is asked to sign in.
-5. Install to the Dock (Safari: File > Add to Dock).
+1. **On the Mac**: `npm run test:e2e -- --update-snapshots`, look at the new pictures, commit them; then `E2E_WEBKIT=1 npm run test:e2e` for Safari. The INP limit is 50 ms there (it is relaxed only in a software-rendered container).
+2. **Deploy** (needs the owner; steps in `README.md`): `wrangler login`, create the D1 database, set the Access variables, migrate, `wrangler deploy`, turn on Access, Add to Dock. Then check on the two real screens that a tick shows on the other one, and that a private window is asked to sign in.
+3. **Look at the BenQ in its ePaper mode** with Paper selected. The greyscale tests pass, but only a real panel shows how it feels.
+4. Polish noticed but not done: the Library list could use the 72-character line length; the Weeks timeline on a phone is a single tall list (fine, not designed further); on very narrow phones "Log a problem" wraps to two lines in the Today card.
+5. **Watch the Today budget**: JS for Today is 34.5 KB of 35. The next thing added to Today has to pay for itself (move something to a lazy chunk).
 
 ## Decisions I made where the plan was silent or inconsistent (tell me if you disagree)
 
-- The plan says the formula sheet holds "all 13 maths derivations", but **Week 13 has no `maths` task**, so there are 12. I did not invent a 13th.
-- **Light weeks** (2, 3, 5) have no points target, so a constellation there lights when every task with points is ticked.
-- A **flashcard exists once its why-note has text** (the back is your note); "mastered" = Leitner box >= 4.
+From the first session, still standing:
+
+- The formula sheet has **12** derivations, not 13: week 13 has no `maths` task.
+- **Light weeks** (2, 3, 5) have no points target; their constellation lights when every task with points is ticked.
+- A **flashcard exists once its why-note has text**; "mastered" is Leitner box 4 or more.
 - A second tap on a task within 450 ms is ignored, so "ticking twice quickly leaves it ticked".
-- **design2 pick** is stored as a `free` note with `refId = "pick:<taskId>"` (the settings table only allows 4 keys).
-- Reported interview problems (weeks 3 to 9) are shown one per day on the DSA hero; the plan only lists them.
-- zod validation of ops loads on idle (not before first paint) to hit the 35 KB budget; the Worker validates every op regardless.
-- Package versions: Vitest pinned to 4.x; npm install-scripts approved for `esbuild` and `workerd`.
+- The **design2 pick** is a `free` note with `refId = "pick:<taskId>"`.
+- Reported interview problems (weeks 3 to 9) are suggested one per day on the DSA hero.
+- zod validation of ops loads on idle; the Worker validates every op regardless.
+
+New in this session:
+
+- **Friendly labels** instead of IDs: "Week 4 · Task 7", "Readiness · Item 3", "STAR story 2", "Learning loop · step 3", a design's name.
+- **Simpler screens**. A task row shows its type, its label and its points (the day tag is gone, because rows are already grouped by day). The next-up task's buttons are shown once, in the big card, not again in the list. "Your why" is a quote with a gold rule, not a second card. Progress shows the score sheet full width and the other three charts in a grid. Settings has a sliders icon (the old cog looked like a sun) and the sync state says "Saved". On a phone, the Library's filters start closed.
+- **Paper keeps every border solid** (plan 16), so a light day is marked by its moon icon and the words "light day", not by a dashed border. Its progress bar is solid ink.
+- **A new device waits up to 600 ms for its first sync** before painting, so it never shows an empty state that then jumps. A device with a local copy is not delayed. The first screen's content chunk is also awaited (300 ms at most).
+- **The mono font is `font-display: optional` and preloaded**: it never swaps in late (that moved text by a sub-pixel), and on a slow first visit the system monospace is used for that view.
+- **`content-visibility: auto` only below the first screenful** of a list: above it, it caused layout shift.
+- **A page that fails to download shows "This page could not be downloaded; the network may be down."** with Retry (which reloads: a browser remembers a failed import).
+- **The flashcard daily cap counts by the day the card was reviewed** (recovered from its schedule), not by the server's timestamp.
+- **Screenshot baselines are Linux Chromium and per platform**, and are viewport screenshots at CSS-pixel scale (the page still renders at 2x or 3x). They are about 10 MB; say if you would rather not commit them.
+- **The browser in e2e runs in Los Angeles time** on purpose, to catch any use of the machine's own zone.
+- **INP**: asserted on our own handler time (under 16 ms) and on the whole interaction (50 ms by default, `E2E_INP_MS` to relax it in a container), because Lighthouse cannot click.

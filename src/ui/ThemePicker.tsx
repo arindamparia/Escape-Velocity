@@ -5,9 +5,9 @@ const HINT: Record<string, string> = { system: 'Follows your Mac', dark: 'Night 
 
 export function ThemePicker() {
   return (
-    <div class="row" role="radiogroup" aria-label="Theme">
+    <div class="row" role="group" aria-label="Theme">
       {THEME_PREFS.map((p, i) => (
-        <button key={p} type="button" role="radio" aria-checked={themePref.value === p} class="chip" aria-pressed={themePref.value === p} onClick={() => setTheme(p)} title={HINT[p]}>
+        <button key={p} type="button" class="chip" aria-pressed={themePref.value === p} onClick={() => setTheme(p)} title={HINT[p]}>
           <span class="mono">{i + 1}</span> {THEME_LABEL[p]}
         </button>
       ))}

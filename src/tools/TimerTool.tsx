@@ -1,8 +1,11 @@
 import { engine } from '../lib/app'
 import { today } from '../lib/clock'
 import { kolkataToday } from '../lib/dates'
+import { refLabel } from '../lib/plan'
 import { startTimer, timer } from './timer'
 import { TimerCard } from './TimerCard'
+
+const KIND_LABEL: Record<string, string> = { dsa: 'DSA', boss: 'Boss problem', hard: 'Hard problem', concept: 'Concept', infra: 'Infra', lld: 'LLD', loop: 'Learning loop', restart: 'Restart', mock: 'Mock mode', free: 'Focus' }
 
 const PRESET_BUTTONS: [string, string, number][] = [['DSA', 'dsa', 25], ['Hard / boss', 'boss', 40], ['Concept', 'concept', 45], ['LLD', 'lld', 90]]
 
@@ -26,7 +29,7 @@ export function TimerTool() {
       )}
       <div class="card">
         <p class="eyebrow">Today: {todayMin} focused minutes</p>
-        {recent.length ? <ul class="small" style="margin:0;padding-left:1.1rem">{recent.map((s) => <li key={s.id}><span class="mono">{s.endedAt.slice(0, 16).replace('T', ' ')}</span> · {s.kind}{s.refId ? ` · ${s.refId}` : ''} · {s.plannedMin} min</li>)}</ul> : <p class="muted small" style="margin:0">No sessions yet.</p>}
+        {recent.length ? <ul class="small" style="margin:0;padding-left:1.1rem">{recent.map((s) => <li key={s.id}><span class="mono">{s.endedAt.slice(0, 16).replace('T', ' ')}</span> · {s.refId ? refLabel(s.refId) : KIND_LABEL[s.kind] ?? s.kind} · {s.plannedMin} min</li>)}</ul> : <p class="muted small" style="margin:0">No sessions yet.</p>}
       </div>
     </div>
   )

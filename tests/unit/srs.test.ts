@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { DesignStatusRow, FlashcardStateRow } from '../../shared/state'
-import { dueCards, LEITNER_DAYS, MAX_CARDS_PER_DAY, nextCardState, redrawSchedule, redrawsDue, statusAfterRedraw } from '../../src/lib/srs'
+import { dueCards, LEITNER_DAYS, lastReviewedOn, MAX_CARDS_PER_DAY, nextCardState, redrawSchedule, redrawsDue, reviewedOnDay, statusAfterRedraw } from '../../src/lib/srs'
 
 const card = (id: string, over: Partial<FlashcardStateRow> = {}): FlashcardStateRow => ({
   cardId: id, box: 1, dueOn: '2026-10-05', reviews: 1, lastGrade: 'good', updatedAt: '2026-10-04T10:00:00.000Z', ...over,
@@ -25,6 +25,27 @@ describe('Leitner boxes', () => {
   it('again resets to box 1; hard stays put', () => {
     expect(nextCardState({ box: 4, reviews: 6 }, 'again', '2026-10-05')).toMatchObject({ box: 1, dueOn: '2026-10-06', reviews: 7 })
     expect(nextCardState({ box: 3, reviews: 2 }, 'hard', '2026-10-05')).toMatchObject({ box: 3, dueOn: '2026-10-12' })
+  })
+})
+
+describe('the day a card was reviewed (independent of when the server stored it)', () => {
+  it('is recovered from the schedule: dueOn minus the interval of its box', () => {
+    const next = nextCardState(undefined, 'good', '2026-10-05') // box 2, due in 3 days
+    expect(lastReviewedOn({ box: next.box, dueOn: next.dueOn })).toBe('2026-10-05')
+    const again = nextCardState({ box: 4, reviews: 3 }, 'again', '2026-10-09')
+    expect(lastReviewedOn({ box: again.box, dueOn: again.dueOn })).toBe('2026-10-09')
+  })
+
+  it('a review made offline on 5 Oct and synced on 6 Oct still counts as 5 Oct', () => {
+    const next = nextCardState(undefined, 'good', '2026-10-05')
+    // the server stored it the next morning
+    const stored = card('w01-01', { box: next.box, dueOn: next.dueOn, updatedAt: '2026-10-06T04:00:00.000Z' })
+    const states = new Map([['w01-01', stored]])
+    expect(reviewedOnDay(states.values(), '2026-10-05')).toBe(1)
+    expect(reviewedOnDay(states.values(), '2026-10-06')).toBe(0)
+    // so the cap on 6 Oct is not used up by a review that happened on 5 Oct
+    const ids = Array.from({ length: 12 }, (_, i) => `w01-${String(i + 1).padStart(2, '0')}`)
+    expect(dueCards(ids, states, '2026-10-06')).toHaveLength(10)
   })
 })
 
