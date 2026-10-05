@@ -21,7 +21,6 @@ const Mindset = lazyPage(() => import('./pages/Mindset'))
 const Sources = lazyPage(() => import('./pages/Sources'))
 const Settings = lazyPage(() => import('./pages/Settings'))
 const Guide = lazyPage(() => import('./pages/Guide'))
-const Problems = lazyPage(() => import('./pages/Problems'))
 
 const NAV: { href: string; label: string; match: (p: string) => boolean }[] = [
   { href: '/', label: 'Today', match: (p) => p === '/' },
@@ -77,7 +76,11 @@ function Banners() {
   const s = sync.status.value
   return (
     <>
-      {s === 'signed-out' ? (
+      {s === 'signed-out' && sync.signInNotSetUp.value ? (
+        <div class="banner banner--warn" role="alert">
+          <span><Icon name="warn" /> Sign-in is not set up yet: Cloudflare Access has to be turned on for this site. Your changes are saved on this device and will sync once it is.</span>
+        </div>
+      ) : s === 'signed-out' ? (
         <div class="banner banner--warn" role="alert">
           <span><Icon name="warn" /> Signed out. Your changes are saved on this device and will sync after you sign in.</span>
           <button type="button" class="btn btn--small btn--primary" onClick={() => location.reload()}>Sign in again</button>
@@ -160,14 +163,13 @@ function Shell() {
               <Route path="/sources" component={Sources} />
               <Route path="/settings" component={Settings} />
               <Route path="/guide" component={Guide} />
-              <Route path="/problems" component={Problems} />
               <Route default component={NotFound} />
             </Router>
           </ErrorBoundary>
         </Boundary>
       </main>
       <footer class="sitefoot noprint">
-        <a href="/problems">Solved problems</a><a href="/guide">How this works</a><a href="/library?tab=resources">Resources and sources</a><a href="/settings">Settings</a>
+        <a href="/progress/problems">Solved problems</a><a href="/guide">How this works</a><a href="/library?tab=resources">Resources and sources</a><a href="/settings">Settings</a>
         <button type="button" class="btn btn--link" onClick={() => openOverlay({ kind: 'shortcuts' })}>Keyboard shortcuts</button>
       </footer>
       <TabBar />

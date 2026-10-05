@@ -93,8 +93,6 @@ function LogProblem({ difficulty, minutes, minimum }: { difficulty?: 'medium' | 
   const [date, setDate] = useState(today.value)
   const guess = titleFromProblemUrl(link)
   const linkBad = link.trim() !== '' && canonicalProblemUrl(link) === null
-  const known = canonicalProblemUrl(link)
-  const already = known ? engine.state.value.problemLog.find((p) => canonicalProblemUrl(p.url) === known) : undefined
   return (
     <Dialog title={minimum ? 'Minimum day: one problem' : 'Log a problem'} onClose={closeOverlay}>
       <form
@@ -122,7 +120,6 @@ function LogProblem({ difficulty, minutes, minimum }: { difficulty?: 'medium' | 
         </div>
         <label>Problem link<input type="url" value={link} maxLength={500} onInput={(e) => setLink((e.target as HTMLInputElement).value)} placeholder="https://leetcode.com/problems/course-schedule-ii/" aria-invalid={linkBad} /></label>
         {linkBad ? <p class="small" role="alert" style="margin:0">That does not look like a link: it should start with https://</p> : null}
-        {already ? <p class="small muted" style="margin:0">You already have this one{already.source === 'algotracker' ? ' from AlgoTracker' : ''}: logging it again will not count it twice.</p> : null}
         <label>Name (optional)<input type="text" value={title} maxLength={200} onInput={(e) => setTitle((e.target as HTMLInputElement).value)} placeholder={guess ?? 'Course Schedule II'} /></label>
         <label class="check">
           <input type="checkbox" checked={noAi} onChange={(e) => setNoAi((e.target as HTMLInputElement).checked)} /> <span>Solved without AI</span>
@@ -182,7 +179,7 @@ function Onboarding() {
 
 interface Item { label: string; hint?: string; run: () => void }
 
-const PAGES: [string, string][] = [['Solved problems', '/problems'], ['How this works', '/guide'], ['Today', '/'], ['Weeks', '/weeks'], ['Study', '/study'], ['Library', '/library'], ['Progress', '/progress'], ['Mindset', '/mindset'], ['Settings', '/settings']]
+const PAGES: [string, string][] = [['Solved problems', '/progress/problems'], ['How this works', '/guide'], ['Today', '/'], ['Weeks', '/weeks'], ['Study', '/study'], ['Library', '/library'], ['Progress', '/progress'], ['Mindset', '/mindset'], ['Settings', '/settings']]
 const TOOLS: [string, string][] = [
   ['Learning loop', '/study/loop'], ['Redraw queue', '/study/redraws'], ['Flashcards', '/study/flashcards'], ['Focus timer', '/study/timer'],
   ['Mock mode', '/study/mock'], ['Envelope calculator', '/study/envelope'], ['Formula sheet', '/study/formulas'], ['Notes', '/study/notes'],

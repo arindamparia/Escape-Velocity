@@ -11,6 +11,7 @@ import { Icon } from '../ui/Icon'
 import { LineChart, ProblemsChart, Ring, ScoreSheet } from '../ui/charts'
 import { usePage, useTitle } from '../ui/hooks'
 import { Review } from './Review'
+import { SolvedProblems } from './SolvedProblems'
 import { WeekForm } from './WeekForm'
 
 /** Where to go to make progress on each readiness item. */
@@ -85,7 +86,7 @@ function ScorecardTable({ current }: { current: number }) {
 }
 
 export default function Progress({ view }: { view?: string }) {
-  useTitle(view === 'review' ? 'Sunday review' : 'Progress')
+  useTitle(view === 'review' ? 'Sunday review' : view === 'problems' ? 'Solved problems' : 'Progress')
   const progress = usePage('progress')
   const state = engine.state.value
   const done = engine.doneSet.value
@@ -96,11 +97,20 @@ export default function Progress({ view }: { view?: string }) {
   const stats = past.map((w) => weekStats(state.problemLog, w, plan.config.startDate))
   const labels = past.map(String)
 
-  if (view === 'review') return <div class="page"><div class="slot-main"><Review /></div></div>
+  const nav = (
+    <nav class="tabs" role="tablist" aria-label="Progress">
+      {([['', 'Overview', '/progress'], ['problems', 'Solved problems', '/progress/problems'], ['review', 'Sunday review', '/progress/review']] as const).map(([v, label, href]) => (
+        <a key={v} role="tab" href={href} aria-selected={(view ?? '') === v}>{label}</a>
+      ))}
+    </nav>
+  )
+  if (view === 'review') return <div class="page"><div class="slot-main stack">{nav}<Review /></div></div>
+  if (view === 'problems') return <div class="page"><div class="slot-main stack">{nav}<SolvedProblems /></div></div>
 
   return (
     <div class="page">
       <div class="slot-main stack">
+        {nav}
         <header>
           <p class="eyebrow">Am I actually getting better?</p>
           <h1>Progress</h1>

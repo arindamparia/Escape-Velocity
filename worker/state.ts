@@ -37,8 +37,6 @@ export async function readState(db: D1Database): Promise<AppState> {
       noAi: r.no_ai === 1,
       title: str(r.title),
       url: str(r.url),
-      source: r.source === 'algotracker' ? ('algotracker' as const) : ('manual' as const),
-      externalId: str(r.external_id),
       createdAt: String(r.created_at),
     })),
     designStatus: ds.results.map((r) => ({

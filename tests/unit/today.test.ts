@@ -60,7 +60,7 @@ describe('the one next action', () => {
 
 const stateWith = (over: Partial<AppState>): AppState => ({ ...EMPTY_STATE, ...over })
 const problem = (loggedOn: string, difficulty: 'easy' | 'medium' | 'hard' = 'medium', noAi = true) => ({
-  id: crypto.randomUUID(), loggedOn, difficulty, minutes: 20, noAi, title: null, url: null, source: 'manual' as const, externalId: null, createdAt: '',
+  id: crypto.randomUUID(), loggedOn, difficulty, minutes: 20, noAi, title: null, url: null, createdAt: '',
 })
 
 describe('missed days and the welcome-back restart', () => {

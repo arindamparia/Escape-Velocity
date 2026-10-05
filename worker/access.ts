@@ -49,6 +49,11 @@ export function resetAccessKeyCache(): void {
   keyCache = null
 }
 
+/** False until the owner has created the Access application and put its team domain and audience tag in the Worker's vars. */
+export function accessConfigured(env: Env): boolean {
+  return !!env.ACCESS_TEAM_DOMAIN && !!env.ACCESS_AUD && !env.ACCESS_AUD.startsWith('<') && !env.ACCESS_TEAM_DOMAIN.startsWith('<')
+}
+
 export type AccessResult = { ok: true; email: string } | { ok: false; reason: string }
 
 export async function verifyAccess(request: Request, env: Env, nowSec = Math.floor(Date.now() / 1000)): Promise<AccessResult> {

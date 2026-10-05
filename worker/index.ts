@@ -2,8 +2,8 @@
 // (wrangler.jsonc: assets.run_worker_first = ["/api/*"]).
 import { Hono } from 'hono'
 import { OpsRequestSchema, type Op } from '../shared/schemas'
-import { algotrackerStatus, parseSolved, reconcile, syncAlgotracker } from './algotracker'
-import { verifyAccess } from './access'
+import { parseSolved, readSolved, setDevSolved } from './solved'
+import { accessConfigured, verifyAccess } from './access'
 import type { Env } from './env'
 import { applyOps, checkAgainstPlan, OpError } from './ops'
 import { readExport, readState } from './state'
@@ -21,6 +21,8 @@ export const app = new Hono<{ Bindings: Env }>().basePath('/api')
 // Auth is enforced in the Worker too. The only bypass is ENVIRONMENT === 'dev' (local .dev.vars).
 app.use('*', async (c, next) => {
   if (c.env.ENVIRONMENT === 'dev') return next()
+  // not an expired session: sign-in itself is not set up yet, and the app says so instead of "signed out"
+  if (!accessConfigured(c.env)) return err('access_not_configured', 'Cloudflare Access is not set up for this site yet', 401)
   const access = await verifyAccess(c.req.raw, c.env)
   if (!access.ok) return err('unauthorized', access.reason, 401)
   return next()
@@ -30,6 +32,7 @@ app.use('*', async (c, next) => {
 // is set in .dev.vars or by the e2e web server and never in wrangler.jsonc, so a deployed Worker returns 404.
 app.post('/dev/reset', async (c) => {
   if (c.env.ENVIRONMENT !== 'dev') return err('not_found', 'No such API route', 404)
+  setDevSolved(null)
   const db = c.env.DB
   await db.batch([
     db.prepare('DELETE FROM task_progress'),
@@ -42,26 +45,22 @@ app.post('/dev/reset', async (c) => {
     db.prepare('DELETE FROM focus_session'),
     db.prepare('DELETE FROM settings'),
     db.prepare('DELETE FROM applied_op'),
-    db.prepare('DELETE FROM sync_state'),
   ])
   return json({ reset: true })
 })
 
-// Every sync of the app also asks AlgoTracker whether anything changed there (throttled; a failure never blocks the state).
-// Test-only: pretend AlgoTracker answered with this list (rows as its database returns them), through the real reconcile.
-app.post('/dev/algotracker', async (c) => {
+// Test-only: pretend AlgoTracker's database answered with these rows (dev only, like the reset above).
+app.post('/dev/solved', async (c) => {
   if (c.env.ENVIRONMENT !== 'dev') return err('not_found', 'No such API route', 404)
-  const rows = parseSolved(((await c.req.json().catch(() => null)) as { rows?: unknown } | null)?.rows)
-  return json(await reconcile(c.env.DB, rows))
+  const body = (await c.req.json().catch(() => null)) as { rows?: unknown } | null
+  setDevSolved(body?.rows ? parseSolved(body.rows) : null)
+  return json({ ok: true })
 })
 
-app.get('/state', async (c) => {
-  await syncAlgotracker(c.env).catch(() => {})
-  return json(await readState(c.env.DB))
-})
+app.get('/state', async (c) => json(await readState(c.env.DB)))
 
-app.get('/algotracker', async (c) => json(await algotrackerStatus(c.env)))
-app.post('/algotracker/sync', async (c) => json(await syncAlgotracker(c.env, { force: true })))
+// Problems solved in AlgoTracker, read live from its database (see worker/solved.ts).
+app.get('/solved', async (c) => json(await readSolved(c.env)))
 
 app.get('/export', async (c) => {
   const body = await readExport(c.env.DB)
@@ -118,6 +117,4 @@ app.onError((e) => {
 
 export default {
   fetch: app.fetch,
-  // cron (wrangler.jsonc triggers): read AlgoTracker even when the app is closed, so the log is already up to date
-  scheduled: (_event, env, ctx) => { ctx.waitUntil(syncAlgotracker(env, { force: true })) },
 } satisfies ExportedHandler<Env>

@@ -59,7 +59,7 @@ export default function Guide() {
           <h2 style="margin:0">I want to…</h2>
           <ul class="prose">
             <li>log a problem I solved, with its link: <a href="/">Today</a>, “Log a problem” (or press ⌘K and type “log medium 22 https://…”)</li>
-            <li>see everything I have solved, from here and AlgoTracker: <a href="/problems">Problems</a></li>
+            <li>see everything I have solved, from here and AlgoTracker: <a href="/progress/problems">Solved problems</a></li>
             <li>start a timer: Today, or press ⌘K and type “timer 25”</li>
             <li>write my “why”: <a href="/mindset">Mindset</a></li>
             <li>review flashcards or redraws: <a href="/study/flashcards">Flashcards</a>, <a href="/study/redraws">Redraw queue</a></li>

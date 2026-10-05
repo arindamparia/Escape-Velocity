@@ -36,7 +36,7 @@ export const PAGES = [
   { name: 'mindset', path: '/mindset', heading: /./ },
   { name: 'settings', path: '/settings', heading: /Settings/ },
   { name: 'guide', path: '/guide', heading: /How this works/ },
-  { name: 'problems', path: '/problems', heading: /Problems/ },
+  { name: 'solved', path: '/progress/problems', heading: /Solved problems/ },
 ] as const
 
 /* ------------------------------------------------------------------ time */
@@ -63,13 +63,12 @@ export class Api {
     }
   }
 
-  /** Pretend AlgoTracker answered with these solved problems (the Worker's real reconcile runs on them). */
-  async algotracker(rows: { n: number; name: string; difficulty?: 'Easy' | 'Medium' | 'Hard'; slug?: string; solvedAt?: string }[]) {
-    const res = await this.request.post('/api/dev/algotracker', {
-      data: { rows: rows.map((r) => ({ lc_number: r.n, name: r.name, url: `https://leetcode.com/problems/${r.slug ?? r.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}/`, topic: 'Arrays', difficulty: r.difficulty ?? 'Medium', solved_at: r.solvedAt ?? '2026-10-06T05:00:00.000Z' })) },
+  /** Pretend AlgoTracker's database answered with these solved problems (dev server only). Newest first, as the real query returns them. */
+  async solved(rows: { n: number; name: string; topic?: string; difficulty?: 'Easy' | 'Medium' | 'Hard'; slug?: string; at: string }[] | null) {
+    const res = await this.request.post('/api/dev/solved', {
+      data: { rows: rows && rows.map((r) => ({ lc_number: r.n, name: r.name, url: `https://leetcode.com/problems/${r.slug ?? r.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}/`, topic: r.topic ?? 'Arrays', difficulty: r.difficulty ?? 'Medium', solved_at: r.at })) },
     })
     expect(res.ok(), await res.text()).toBeTruthy()
-    return res.json() as Promise<{ added: number; removed: number; linked: number }>
   }
 
   tick = (...taskIds: string[]) => this.send(taskIds.map((taskId) => this.op('task.set', { taskId, done: true })))

@@ -4,13 +4,15 @@ Status at the end of the third session. Read `CLAUDE.md` first, then `AUDIT.md` 
 
 ## Third session: what changed
 
-- **Simpler on purpose.** No PWA, service worker, manifest, offline cache, "Update ready" banner, performance budgets or Lighthouse. A change shows as soon as you reload. (An old worker in a browser removes itself: `public/sw.js` and `main.tsx`.) Local-first data stays. The Reload-button bug disappeared with the banner.
-- **New look.** Warm cream and ember in Light, amber stars on deep navy in Dark, green only for "done"; softer shapes; fewer words, with detail behind links; a week progress bar on Today; a clear "Also due today" card; labelled Search and Settings buttons; a footer with How this works / Resources / Settings / Shortcuts.
+- **Simpler on purpose.** No PWA, service worker, manifest, offline cache, "Update ready" banner, performance budgets, Lighthouse or cron. A change shows as soon as you reload. (An old worker in a browser removes itself: `public/sw.js` and `main.tsx`.) Local-first data stays.
+- **New look.** Warm cream and ember in Light, amber stars on deep navy in Dark, green only for "done"; fewer words, detail behind links; a week progress bar on Today; an "Also due today" card; labelled Search and Settings buttons; a footer (Solved problems / How this works / Resources / Settings / Shortcuts).
 - **Linked everywhere.** Task tags open the glossary entry, task labels open the task in its week, progress tiles open where the number comes from, readiness items say where to work, `?design=` links open the design.
-- **How this works** (`/guide`): a normal day, the five pages, "I want to…", and a glossary of about 40 plan, interview and capstone terms (`src/pages/glossary.ts`).
-- **Capstone** (`/weeks/capstone`), now a page of its own: what it is, an architecture diagram with eight numbered steps, your 10 Sundays with progress, parts and must-haves as linked chips, what it lets you say in an interview, resume bullets with blanks, and what to protect if a Sunday slips. DSA and Interview prep are pages too.
-- **Instant sync**: other devices' changes are picked up within 15 seconds (was 60).
-- **Screenshot baselines are now macOS** (made on this Mac); the Linux ones were removed.
+- **How this works** (`/guide`): a normal day, the five pages, "I want to…", and a glossary of about 40 terms (`src/pages/glossary.ts`).
+- **Capstone** (`/weeks/capstone`) is now the checkout of an online store: cart checks, stock reservations with a TTL and no overselling, an order state machine with compensation, signed webhooks in and out, reconciliation, a flash-sale oversell test, a failure-injection suite. The plan text and the ten milestones were rewritten (IDs and points unchanged); the page has a nine-step architecture diagram, a progress tracker, "what it lets you say in an interview", resume bullets with blanks, and what to protect if a Sunday slips. DSA and Interview prep are pages too.
+- **Problems carry their link.** Logging a problem takes its URL (the name is guessed from a LeetCode link). `⌘K`: `log medium 22 <link>`.
+- **Progress, Solved problems tab.** Everything solved in AlgoTracker, grouped by type (its topic), newest group and newest problem first, read live from its Neon database through `GET /api/solved` (one read-only SELECT; nothing is copied into D1). All of them count as solved without AI, in the list and in the tiles on Today; a problem logged here with the same link counts once. Problems logged here appear under "Logged here". Needs the secret `ALGOTRACKER_DATABASE_URL` (README).
+- **Deployed to Cloudflare**: https://escape-velocity.arindamparia321.workers.dev (D1 `escape-velocity`, migrations applied, your local data imported). Sign-in (Cloudflare Access) is **not set up yet**, so every `/api` call is refused and the app says "Sign-in is not set up yet" until you do step 6 of the README deploy section.
+- **Screenshot baselines are now macOS**; the Linux ones were removed.
 
 ## Done (sessions one and two)
 
@@ -26,7 +28,8 @@ Everything from the first session (compiler, Worker + D1, local-first client, ev
 ## Not done yet (in priority order)
 
 1. Run `E2E_WEBKIT=1 npm run test:e2e` once for Safari.
-2. **Deploy** (needs the owner; steps in `README.md`): `wrangler login`, create the D1 database, set the Access variables, migrate, `wrangler deploy`, turn on Access. Then check on the two real screens that a tick shows on the other one, and that a private window is asked to sign in.
+2. **Turn on Cloudflare Access** (the one deploy step left, it needs the dashboard): create the Access application for the Worker, allow only arindamparia321@gmail.com, copy its team domain and Audience tag into `ACCESS_TEAM_DOMAIN` and `ACCESS_AUD` in `wrangler.jsonc`, `npm run build && npx wrangler deploy`. Then check that a private window is asked to sign in and that a tick on one device shows on the other.
+2b. **Make AlgoTracker's database access read-only** (README, "Solved problems from AlgoTracker"): the connection string now in the Worker secret is the owner login, so create the `ev_reader` role and replace the secret with its string.
 3. **Look at the BenQ in its ePaper mode** with Paper selected. The greyscale tests pass, but only a real panel shows how it feels.
 4. Polish noticed but not done: the Library list could use the 72-character line length; the Weeks timeline on a phone is a single tall list (fine, not designed further); on very narrow phones "Log a problem" wraps to two lines in the Today card.
 

@@ -35,10 +35,9 @@ export const GLOSSARY: TermGroup[] = [
   },
   {
     title: 'Your problems',
-    blurb: 'Where solved problems come from.',
+    blurb: 'Where solved problems are listed.',
     terms: [
-      { id: 'problems', term: 'Solved problems', what: 'Every problem you have solved, each with its link, on the Problems page. Log one here with its link, or solve it in AlgoTracker.' },
-      { id: 'algotracker', term: 'AlgoTracker link', what: 'Your DSA tracker (algotracker.xyz). When it is linked, problems you solve there appear here within minutes, and un-solving one there removes it here. A problem in both places counts once. Setup is in the README.' },
+      { id: 'problems', term: 'Solved problems', what: 'Progress, Solved problems: everything you have solved, grouped by type with the latest first, read live from AlgoTracker (algotracker.xyz). Problems you log here with their link are added under “Logged here”.' },
     ],
   },
   {

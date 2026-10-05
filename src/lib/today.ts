@@ -1,6 +1,7 @@
 // What Today shows. Pure functions over the plan and the user's state, so the motivation rules are testable.
 import type { PlanDay, PlanTask } from '../../shared/plan-types'
-import type { AppState } from '../../shared/state'
+import { canonicalProblemUrl } from '../../shared/constants'
+import type { AppState, SolvedProblem } from '../../shared/state'
 import { blockOf, dayNum, DOW_NAMES, kolkataToday, lightDayOn, planDow, planPhase, weekEnd, weekNumber, weekStart, type DayBlock, type LightDayRange, type PlanPhase } from './dates'
 import { plan } from './plan'
 import { weekPoints, weekTarget } from './points'
@@ -109,11 +110,14 @@ export function constellationLit(week: number, done: ReadonlySet<string>): boole
   return weekPoints(plan.tasks, done, week) >= target
 }
 
-export function evidence(s: AppState, done: ReadonlySet<string>): Evidence {
+/** `solved` = problems solved in AlgoTracker, all of them without AI; one logged here with the same link is counted once. */
+export function evidence(s: AppState, done: ReadonlySet<string>, solved: readonly Pick<SolvedProblem, 'url' | 'difficulty'>[] = []): Evidence {
+  const known = new Set(solved.map((x) => canonicalProblemUrl(x.url)).filter(Boolean))
+  const mine = s.problemLog.filter((p) => p.noAi && !(canonicalProblemUrl(p.url) && known.has(canonicalProblemUrl(p.url))))
+  const count = (d: 'medium' | 'hard') => mine.filter((p) => p.difficulty === d).length + solved.filter((x) => x.difficulty.toLowerCase() === d).length
   return {
-    // since the plan began: problems solved before day one (AlgoTracker goes back to March) are history, not plan progress
-    mediums: s.problemLog.filter((p) => p.difficulty === 'medium' && p.noAi && p.loggedOn >= plan.config.startDate).length,
-    hards: s.problemLog.filter((p) => p.difficulty === 'hard' && p.noAi && p.loggedOn >= plan.config.startDate).length,
+    mediums: count('medium'),
+    hards: count('hard'),
     designsOwned: s.designStatus.filter((d) => d.status === 'redrawn-2').length,
     cardsMastered: s.flashcards.filter((c) => c.box >= 4).length,
     constellations: Array.from({ length: plan.config.weeksCount }, (_, i) => i + 1).filter((w) => constellationLit(w, done)).length,
