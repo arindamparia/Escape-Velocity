@@ -130,3 +130,18 @@ test.describe('Solved problems, inside Progress', () => {
     await expect(page.getByText('Nothing solved yet.')).toBeVisible()
   })
 })
+
+test('AlgoTracker is read on page load and on Refresh, never on a timer or when the tab comes back', async ({ page, api }) => {
+  await api.onboard()
+  await api.solved([{ n: 1, name: 'Two Sum', at: '2026-10-07T03:00:00Z' }])
+  let reads = 0
+  await page.route('**/api/solved', (route) => { reads++; return route.continue() })
+  await openApp(page, '/')
+  await expect.poll(() => reads).toBe(1)
+  await page.evaluate(() => { Object.defineProperty(document, 'visibilityState', { value: 'hidden', configurable: true }); document.dispatchEvent(new Event('visibilitychange')) })
+  await page.evaluate(() => { Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true }); document.dispatchEvent(new Event('visibilitychange')) })
+  await page.waitForTimeout(1500)
+  expect(reads).toBe(1)
+  await page.getByRole('region', { name: 'Evidence' }).getByRole('button', { name: 'Refresh' }).click()
+  await expect.poll(() => reads).toBe(2)
+})
