@@ -38,7 +38,7 @@ Totals at the time of writing: 157 unit and Worker/D1 tests (Vitest) and the Pla
 | 7 Stack | Done | Preact, Signals, preact-iso, Vite, Hono, zod, D1, Access, KaTeX at build time, hand-rolled SVG charts. |
 | 8 Project layout | Done | Plus `e2e/`, `playwright.config.ts`, `lighthouserc.cjs`. |
 | 9 Wrangler config | Done | `wrangler.jsonc` matches, with the Access variables added. |
-| 10 Sync model | Done | Ops are desired state; outbox in order, 20 per request; idempotent; sync on open, `online`, visibility and every 60 s. |
+| 10 Sync model | Done | Ops are desired state; outbox in order, 20 per request; idempotent; sync on open, on `online` and after each local change; no timer, nothing on tab focus (reload to pull another device). |
 | 11 Database schema | Done | `migrations/0001_init.sql` is identical to the plan's SQL (compared mechanically, ignoring comments). |
 | 12 API | Done | `/api/state`, `/api/ops`, `/api/export`. `POST /api/dev/reset` exists only when `ENVIRONMENT` is `dev` (404 otherwise, tested with a valid owner token). |
 | 13 Points | Done | Derived, never stored; readiness worth 0; target hidden in light weeks. |
