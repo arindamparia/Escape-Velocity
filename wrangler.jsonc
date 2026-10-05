@@ -16,6 +16,7 @@
       "migrations_dir": "migrations"
     }
   ],
+  "triggers": { "crons": [] },
   "vars": {
     "ENVIRONMENT": "production",
     "PLAN_TZ": "Asia/Kolkata",
