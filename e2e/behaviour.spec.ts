@@ -103,7 +103,7 @@ test.describe('the timer', () => {
     await api.activeOn('2026-10-06')
     await openApp(page, '/', { at: kolkata('2026-10-07T10:00:00'), ticking: true })
     await page.getByRole('button', { name: /Start 25-min timer/ }).first().click()
-    const card = page.getByRole('region', { name: 'Focus timer' })
+    const card = page.locator('header.topbar').getByRole('group', { name: 'Timer in the top bar' })
     await expect(card.getByRole('timer')).toHaveText(/^2[45]:\d\d$/)
     await expect(page).toHaveTitle(/^2[45]:\d\d · DSA$/)
 
@@ -113,9 +113,9 @@ test.describe('the timer', () => {
     await expect(card.getByRole('timer')).toHaveText(/^1[45]:\d\d$/)
 
     await page.clock.fastForward('16:00')
-    await expect(card).toContainText('Time is up. Nice work.')
+    await expect(card).toContainText('Time’s up')
     await expect(page).toHaveTitle('Time is up · Escape Velocity')
-    await card.getByRole('button', { name: 'Log it (25 min)' }).click()
+    await card.getByRole('button', { name: 'Log it' }).click()
     const dialog = page.getByRole('dialog', { name: 'Log a problem' })
     await expect(dialog.getByLabel('Minutes')).toHaveValue('25')
     await expect(dialog.getByRole('button', { name: 'medium' })).toHaveAttribute('aria-pressed', 'true')
@@ -131,11 +131,11 @@ test.describe('the timer', () => {
     const boss = firstTask('boss')
     await openApp(page, `/weeks/${boss.week}`, { at: kolkata('2026-10-11T10:00:00'), ticking: true })
     await taskRow(page, boss.id).getByRole('button', { name: /Start 40-min timer/ }).click()
-    const card = page.getByRole('region', { name: 'Focus timer' })
+    const card = page.locator('header.topbar').getByRole('group', { name: 'Timer in the top bar' })
     await page.clock.fastForward('45:00')
     await expect(card.getByRole('timer')).toHaveText(/^\+0?[45]:\d\d$/)
-    await expect(card).toContainText('Past the box. Finish when you finish; no guilt.')
-    await card.getByRole('button', { name: /^Log it \(/ }).click()
+    await expect(card).toContainText('Past the box') // no countdown to fail: it just keeps counting
+    await card.getByRole('button', { name: 'Log it' }).click()
     await expect(page.getByRole('dialog', { name: 'Log a problem' }).getByRole('button', { name: 'hard' })).toHaveAttribute('aria-pressed', 'true')
   })
 

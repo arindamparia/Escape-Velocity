@@ -11,9 +11,7 @@ import { actionsFor } from './ui/Task'
 import { Boundary } from './ui/Boundary'
 import { lazyPage } from './ui/lazyPage'
 import { Icon } from './ui/Icon'
-import { TimerCard } from './tools/TimerCard'
 import { TimerChip } from './tools/TimerChip'
-import { timer } from './tools/timer'
 
 const Overlays = lazy(() => import('./ui/Overlays'))
 const Weeks = lazyPage(() => import('./pages/Weeks'))
@@ -158,7 +156,6 @@ function Shell() {
       <Banners />
       <TopBar />
       <main id="main">
-        {timer.value && path !== '/' ? <div class="page" style="padding-bottom:0"><div class="slot-main"><TimerCard /></div></div> : null}
         <Boundary key={path.split('/')[1] || 'today'}>
           <ErrorBoundary onError={(e) => console.error(e)}>
             <Router>

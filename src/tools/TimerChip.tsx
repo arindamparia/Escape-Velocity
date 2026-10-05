@@ -1,11 +1,10 @@
 // The timer in the top bar, which is always on screen: the time and one action while it runs, a one-click start when it
-// does not. The full card (restart, log) is still on Today and on the Timer page; this is the part you glance at.
+// does not. It is the only timer on screen: there is no second copy in the page.
 import { useEffect, useRef } from 'preact/hooks'
 import { openOverlay } from '../lib/app'
 import { useNow } from '../ui/hooks'
 import { Icon } from '../ui/Icon'
-import { KIND_LABEL } from './TimerCard'
-import { checkTimer, dismissTimer, elapsedMs, fmt, isDue, remainingMs, startTimer, stopTimer, TIMER_CHOICES, timer } from './timer'
+import { checkTimer, dismissTimer, elapsedMs, fmt, isDue, KIND_LABEL, remainingMs, startTimer, stopTimer, TIMER_CHOICES, timer } from './timer'
 
 function StartMenu() {
   const ref = useRef<HTMLDetailsElement>(null)
@@ -35,6 +34,12 @@ export function TimerChip() {
   const t = timer.value
   const now = useNow(1000)
   useEffect(() => { checkTimer(now) }, [now])
+  // the countdown in the browser tab, for when this tab is in the background
+  useEffect(() => {
+    if (!t) return
+    const ms = remainingMs(t, now)
+    if (!t.finishedAt && !t.openEnded && ms > 0) document.title = `${fmt(ms)} · ${KIND_LABEL[t.kind] ?? 'Timer'}`
+  }, [t, now])
   if (!t) return <StartMenu />
 
   const finished = !!t.finishedAt
@@ -51,10 +56,10 @@ export function TimerChip() {
   }
   return (
     <div class="timerchip" data-state={finished ? 'done' : over ? 'over' : 'run'} role="group" aria-label="Timer in the top bar">
-      <a class="timerchip__main" href="/study/timer" title="Open the timer">
+      <a class="timerchip__main" href="/study/timer" title={`${KIND_LABEL[t.kind] ?? 'Focus'} · ${t.plannedMin} min${t.openEnded ? ', then open-ended' : ''}: open the timer page`}>
         <Icon name="clock" />
         <span class="timerchip__time mono" role="timer">{over ? '+' : ''}{fmt(shown)}</span>
-        <span class="timerchip__kind small">{finished ? 'Time’s up' : KIND_LABEL[t.kind] ?? 'Focus'}</span>
+        <span class="timerchip__kind small">{finished ? 'Time’s up' : over ? 'Past the box' : KIND_LABEL[t.kind] ?? 'Focus'}</span>
       </a>
       <button type="button" class="timerchip__act" onClick={act}>{logIt ? 'Log it' : finished ? 'Close' : t.openEnded ? 'Finish' : 'Stop'}</button>
       <i class="timerchip__bar" aria-hidden="true" style={{ width: `${pct}%` }} />

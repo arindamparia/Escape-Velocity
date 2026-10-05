@@ -5,7 +5,8 @@ import type { Page } from '@playwright/test'
 import type { TaskType } from '../shared/plan-types'
 
 const primary = (page: Page, id: string) => taskRow(page, id).locator('.task__actions .btn--primary')
-const timerCard = (page: Page) => page.getByRole('region', { name: 'Focus timer' })
+/** the timer: one, in the top bar */
+const timerCard = (page: Page) => page.locator('header.topbar').getByRole('group', { name: 'Timer in the top bar' })
 
 async function openTask(page: Page, id: string) {
   const t = plan.tasks.find((x) => x.id === id)!
@@ -27,7 +28,7 @@ test.describe('every task type opens its inline tool', () => {
       const task = firstTask(type, where)
       await openTask(page, task.id)
       await primary(page, task.id).click()
-      await expect(timerCard(page)).toContainText(label)
+      await expect(timerCard(page).locator('a.timerchip__main')).toHaveAttribute('title', new RegExp(label.replace(' · ', ' · ')))
       await expect(timerCard(page).getByRole('timer')).toHaveText(/\d\d:\d\d/)
     })
   }
@@ -165,7 +166,7 @@ test.describe('keyboard and command palette', () => {
     const first = page.locator('[data-task][data-focus="true"]')
     await expect(first).toHaveCount(1)
     await page.keyboard.press('s')
-    await expect(timerCard(page)).toContainText('25 min')
+    await expect(timerCard(page).locator('a.timerchip__main')).toHaveAttribute('title', /25 min/)
     await page.keyboard.press('x')
     await expect(first.locator('.task__check')).toHaveAttribute('aria-pressed', 'true')
     await expect.poll(async () => (await api.doneIds()).length).toBe(1)
@@ -211,7 +212,7 @@ test.describe('keyboard and command palette', () => {
     await run('log medium 22')
     await expect.poll(async () => (await api.state()).problemLog.map((p) => [p.difficulty, p.minutes])).toEqual([['medium', 22]])
     await run('timer 25')
-    await expect(timerCard(page)).toContainText('Focus · 25 min')
+    await expect(timerCard(page).locator('a.timerchip__main')).toHaveAttribute('title', /Focus · 25 min/)
     await run('theme paper')
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'paper')
     await run('ticketmaster')

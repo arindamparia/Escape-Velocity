@@ -434,9 +434,6 @@ dialog::backdrop { background: rgb(5 8 20 / 0.6); }
 .pal__foot kbd { margin-right: 0.2rem; }
 @media (max-width: 899px) { .palette { margin-top: 4vh; } .pal__foot { display: none; } }
 
-.timer { text-align: center; }
-.timer__time { font-size: 3.2rem; font-weight: 500; letter-spacing: 0.02em; line-height: 1.1; }
-.timer__bar { margin: 0.75rem 0 1rem; }
 
 .skeleton { min-height: 6rem; border: 1px dashed var(--line); border-radius: 12px; }
 .empty { padding: 1.4rem; border: 1px dashed var(--line); border-radius: 12px; color: var(--text-muted); text-align: center; }

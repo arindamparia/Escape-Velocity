@@ -143,7 +143,7 @@ test.describe('no backlog, ever', () => {
     await expect(hero(page)).toContainText('No backlog here. Ten minutes and you’re back.')
     await expect(page.locator('[data-task]')).toHaveCount(0)
     await page.getByRole('button', { name: 'Start 10 minutes' }).click()
-    await expect(page.getByRole('region', { name: 'Focus timer' })).toContainText('Restart · 10 min')
+    await expect(page.locator('header.topbar').getByRole('group', { name: 'Timer in the top bar' }).locator('a.timerchip__main')).toHaveAttribute('title', /Restart · 10 min/)
   })
 
   test('with activity yesterday there is no welcome-back screen', async ({ page, api }) => {

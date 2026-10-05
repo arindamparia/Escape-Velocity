@@ -10,8 +10,7 @@ import { algotracker } from '../lib/solved'
 import { weekPoints, weekTarget } from '../lib/points'
 import { activityDates, dayInfo, dueSummary, missedDays, pickNextUp, streakWeeks, tasksOn, weeklyTasks } from '../lib/today'
 import { navigate } from '../lib/nav'
-import { TimerCard } from '../tools/TimerCard'
-import { PRESETS, startTimer, timer } from '../tools/timer'
+import { PRESETS, startTimer } from '../tools/timer'
 import { lazyPage } from '../ui/lazyPage'
 import { useNow, useTitle, useWeekChunk } from '../ui/hooks'
 import { Html } from '../ui/Html'
@@ -92,7 +91,6 @@ export default function Today() {
   const weekly = weeklyTasks(info.week)
   const next = pickNextUp(info.week, info.dow, info.block, done)
   const welcomeBack = info.phase === 'during' && missed >= 2 && !hasActivityToday && !info.light
-  const timerOn = timer.value !== null
 
   // keyboard focus order: next-up first, then today's list, then this week's
   const visible = useMemo<PlanTask[]>(() => {
@@ -223,7 +221,6 @@ export default function Today() {
         </header>
 
         {info.phase === 'before' && !whyNote.value.trim() ? null : <WhyStrip />}
-        {timerOn ? <TimerCard /> : null}
         {hero}
         {info.phase === 'during' && !light ? <DueToday /> : null}
 

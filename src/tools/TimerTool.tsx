@@ -3,7 +3,6 @@ import { today } from '../lib/clock'
 import { kolkataToday } from '../lib/dates'
 import { refLabel } from '../lib/plan'
 import { startTimer, TIMER_CHOICES, timer } from './timer'
-import { TimerCard } from './TimerCard'
 
 const KIND_LABEL: Record<string, string> = { dsa: 'DSA', boss: 'Boss problem', hard: 'Hard problem', concept: 'Concept', infra: 'Infra', lld: 'LLD', loop: 'Learning loop', restart: 'Restart', mock: 'Mock mode', free: 'Focus' }
 
@@ -15,7 +14,7 @@ export function TimerTool() {
   return (
     <div class="stack">
       <p class="muted">The timer stores when you started, not a ticking counter, so sleep, reloads and background tabs can’t make it drift.</p>
-      {timer.value ? <TimerCard /> : (
+      {timer.value ? <p class="card muted" style="margin:0">A timer is running: it is in the top bar, with its Stop button.</p> : (
         <div class="card stack">
           <p class="eyebrow">Start a timer</p>
           <div class="row">{TIMER_CHOICES.map(([label, kind, min]) => <button key={kind} type="button" class="btn" onClick={() => startTimer(kind === 'boss' ? 'boss' : kind, min, { openEnded: kind === 'boss' })}>{label} · {min} min</button>)}</div>
