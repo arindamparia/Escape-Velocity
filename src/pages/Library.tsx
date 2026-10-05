@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'preact/hooks'
 import { useLocation } from 'preact-iso'
 import type { DesignFull } from '../../shared/plan-types'
-import { engine, selectedDesign, showDesign } from '../lib/app'
+import { engine, overlay, selectedDesign, showDesign } from '../lib/app'
 import { navigate } from '../lib/nav'
 import { Html } from '../ui/Html'
 import { usePage, useTitle } from '../ui/hooks'
@@ -87,7 +87,8 @@ export default function Library() {
   const tab = (TABS.find((t) => t[0] === query.tab)?.[0] ?? 'designs') as Tab
   useTitle('Library')
   // a link to /library?design=<id> (from the capstone, the palette, a reading list) opens that design: in the side panel on a wide screen, as a sheet otherwise
-  useEffect(() => { if (query.design) showDesign(query.design) }, [query.design])
+  // (it never replaces a dialog the person has opened since the link was followed, such as the palette)
+  useEffect(() => { if (query.design && !overlay.peek()) showDesign(query.design) }, [query.design])
   const company = query.company
   const [f, setF] = useState<Filters>({ group: '', access: '', st: '', q: '' })
   const set = (p: Partial<Filters>) => setF((x) => ({ ...x, ...p }))
