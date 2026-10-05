@@ -7,7 +7,7 @@ import { preloadToday } from './pages/Today'
 import { prefetchFor } from './lib/plan'
 import './theme/tokens.css'
 import './theme/app.css'
-import { applyTheme, initThemes, themePref, type ThemePref } from './theme/themes'
+import { applyTheme, hasSavedTheme, initThemes, themePref, type ThemePref } from './theme/themes'
 import { setChimeSource } from './tools/timer'
 import { chimeOn } from './lib/app'
 import { effect } from '@preact/signals'
@@ -48,10 +48,10 @@ async function boot() {
   idle(() => void engine.recheckOutbox())
   removeOldServiceWorker()
 
-  // the synced theme setting wins over what localStorage said, once it is known
+  // this browser's own choice (localStorage) wins; the synced setting only decides on a device that has never picked one
   effect(() => {
     const synced = engine.settings.value.get('theme') as ThemePref | undefined
-    if (synced && synced !== themePref.peek()) applyTheme(synced)
+    if (synced && !hasSavedTheme() && synced !== themePref.peek()) applyTheme(synced)
   })
 }
 

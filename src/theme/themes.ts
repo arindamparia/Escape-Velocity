@@ -16,6 +16,11 @@ function readPref(): ThemePref {
   return 'system'
 }
 
+/** True once this browser has a saved choice; that choice then stays, whatever other devices set. */
+export function hasSavedTheme(): boolean {
+  try { return localStorage.getItem('ev:theme') !== null } catch { return false }
+}
+
 export const themePref = signal<ThemePref>(readPref())
 
 const media = typeof matchMedia === 'function' ? matchMedia('(prefers-color-scheme: light)') : null
