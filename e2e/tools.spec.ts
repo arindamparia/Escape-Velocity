@@ -94,7 +94,7 @@ test.describe('every task type opens its inline tool', () => {
 
   const pages: [TaskType, string, RegExp, string | RegExp][] = [
     ['redraw', 'Open redraw queue', /\/study\/redraws$/, 'Redraw queue'],
-    ['mock', 'Start mock mode', /\/study\/mock$/, 'Mock mode'],
+    ['mock', 'Start mock mode', /\/study\/mock$/, 'Mock interview'],
     ['story', 'Open STAR notes', /\/study\/notes\?tab=stories$/, 'Notes'],
     ['review', 'Start Sunday review', /\/progress\/review$/, /./],
   ]
@@ -115,9 +115,10 @@ test.describe('every task type opens its inline tool', () => {
     await openTask(page, task.id)
     await primary(page, task.id).click()
     await expect(page).toHaveURL(/\/weeks\/capstone$/)
+    await expect(page.getByRole('heading', { level: 1, name: 'Capstone' })).toBeVisible()
     await expect(page.getByRole('tab', { name: 'Capstone' })).toHaveAttribute('aria-selected', 'true')
-    await expect(page.getByText('Architecture flow')).toBeVisible()
-    await expect(page.getByText('Milestones')).toBeVisible()
+    await expect(page.getByRole('img', { name: /^Architecture:/ })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Your 10 Sundays' })).toBeVisible()
   })
 
   test('mindset: "Write your why" opens the why editor, and Today then shows it first', async ({ page, api }) => {
@@ -194,8 +195,11 @@ test.describe('keyboard and command palette', () => {
     await openApp(page, '/')
     const palette = page.getByRole('dialog', { name: 'Command palette' })
     const run = async (text: string) => {
-      await page.keyboard.press('Control+k')
-      await expect(palette).toBeVisible()
+      // the shortcut can land while the last dialog is still closing: press again until the palette is up
+      await expect(async () => {
+        if (!(await palette.isVisible())) await page.keyboard.press('Control+k')
+        await expect(palette).toBeVisible({ timeout: 1500 })
+      }).toPass({ timeout: 10_000 })
       await palette.getByRole('combobox').fill(text)
       await page.keyboard.press('Enter')
       await expect(palette).toHaveCount(0)

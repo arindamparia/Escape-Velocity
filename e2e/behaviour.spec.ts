@@ -89,7 +89,7 @@ test.describe('themes', () => {
     await page.keyboard.press('4')
     await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#F2EFE6')
     await page.keyboard.press('2')
-    await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#0B1020')
+    await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#0A0E1A')
   })
 })
 
@@ -209,7 +209,7 @@ test.describe('when something goes wrong', () => {
   })
 })
 
-test.describe('names and installing', () => {
+test.describe('page titles', () => {
   const titles: [string, string][] = [
     ['/', 'Today · Escape Velocity'], ['/weeks/3', 'Week 3 · Escape Velocity'], ['/study/loop', 'Learning loop · Escape Velocity'],
     ['/study/flashcards', 'Flashcards · Escape Velocity'], ['/library', 'Library · Escape Velocity'], ['/progress', 'Progress · Escape Velocity'],
@@ -223,19 +223,4 @@ test.describe('names and installing', () => {
     })
   }
 
-  test('the manifest names the app, and every icon it lists is served', async ({ page, request, api }) => {
-    await api.onboard()
-    await openApp(page, '/')
-    const href = await page.locator('link[rel="manifest"]').getAttribute('href')
-    const manifest = await (await request.get(href!)).json()
-    expect(manifest).toMatchObject({ name: 'Escape Velocity', short_name: 'Escape Velocity', display: 'standalone', start_url: '/', scope: '/' })
-    const types = manifest.icons.map((i: { type: string }) => i.type)
-    expect(types).toEqual(expect.arrayContaining(['image/svg+xml', 'image/png']))
-    for (const icon of manifest.icons) {
-      const res = await request.get(icon.src)
-      expect(res.ok(), icon.src).toBe(true)
-      expect(res.headers()['content-type']).toContain(icon.type)
-    }
-    expect((await request.get(await page.locator('link[rel="apple-touch-icon"]').getAttribute('href') as string)).ok()).toBe(true)
-  })
 })

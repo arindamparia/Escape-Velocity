@@ -6,13 +6,11 @@
   "scripts": {
     "compile": "tsx scripts/compile-plan.ts",
     "dev": "npm run compile && vite",
-    "build": "npm run compile && tsc --noEmit && vite build && tsx scripts/check-budgets.ts",
+    "build": "npm run compile && tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "deploy": "npm run build && wrangler deploy",
-    "lhci": "npm run build && node scripts/lhci.mjs",
-    "test:all": "vitest run && playwright test"
+    "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
     "@preact/signals": "^2.11.3",
@@ -27,7 +25,6 @@
     "@cloudflare/vitest-pool-workers": "^0.22.0",
     "@cloudflare/workers-types": "^5.20261004.1",
     "@fontsource/jetbrains-mono": "^5.3.0",
-    "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.63.0",
     "@preact/preset-vite": "^2.10.6",
     "@types/node": "^26.6.4",
@@ -38,10 +35,7 @@
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vite": "^8.3.2",
-    "vite-plugin-pwa": "^2.0.0",
     "vitest": "^4.1.11",
-    "workbox-build": "^7.4.1",
-    "workbox-window": "^7.4.1",
     "wrangler": "^4.147.0",
     "yaml": "^2.9.1"
   },

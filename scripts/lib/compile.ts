@@ -639,6 +639,16 @@ export function compilePlan(source: string): CompileOutput {
   const capstoneFlow = flowText.split(' → ').map((x) => x.trim().replace(/\.$/, '')).filter(Boolean)
   if (capstoneFlow.length < 3) errors.push('Could not read the capstone "Flow:" line')
 
+  // The capstone's facts, straight from its bullet list ("- **Parts:** ..."), so the page can show them as a checklist
+  const capstoneIntro = bodyLines(capSection).find((l) => l.trim() && !l.startsWith('-') && !l.startsWith('Flow:')) ?? ''
+  const capstoneFacts = bodyLines(capSection).flatMap((line) => {
+    const m = /^- \*\*([^*]+?):\*\*\s*(.+)$/.exec(line)
+    if (!m) return []
+    const text = plain(m[2]).replace(/\.$/, '')
+    return [{ label: m[1].trim(), html: renderInline(m[2]), parts: text.split(/,\s+/).map((x) => x.replace(/^and\s+/, '').trim()).filter(Boolean) }]
+  })
+  if (capstoneFacts.length < 4) errors.push('Could not read the capstone bullet list ("- **Parts:** ...")')
+
   const interview = first('weeks.interview')
   const stories = listItems(bodyLines(interview)).map(plain)
 
@@ -694,6 +704,8 @@ export function compilePlan(source: string): CompileOutput {
       dsaTable: (dsaTable?.rows ?? []).map((r) => ({ weeks: r['Weeks'], focus: r['Focus'] })),
       capstoneHtml: sectionHtml(capSection),
       capstoneFlow,
+      capstoneIntroHtml: renderInline(capstoneIntro),
+      capstoneFacts,
       interviewHtml: sectionHtml(interview),
       stories,
     },

@@ -35,6 +35,7 @@ export const PAGES = [
   { name: 'progress', path: '/progress', heading: /./ },
   { name: 'mindset', path: '/mindset', heading: /./ },
   { name: 'settings', path: '/settings', heading: /Settings/ },
+  { name: 'guide', path: '/guide', heading: /How this works/ },
 ] as const
 
 /* ------------------------------------------------------------------ time */
@@ -143,15 +144,6 @@ export async function settle(page: Page): Promise<void> {
 
 export const taskRow = (page: Page, id: string) => page.locator(`[data-task="${id}"]`)
 export const tickButton = (page: Page, id: string) => taskRow(page, id).locator('.task__check')
-
-/** Waits until the service worker is active (the precache is complete by then) and controls the page. */
-export async function installOffline(page: Page): Promise<void> {
-  await page.evaluate(async () => { await navigator.serviceWorker.ready })
-  // the worker does not claim already-open pages (so a new version never swaps code under you): one reload hands over control
-  await page.reload()
-  await page.waitForFunction(() => !!navigator.serviceWorker.controller)
-  await settle(page)
-}
 
 export async function axeSeriousViolations(page: Page, context?: string) {
   const results = await new AxeBuilder({ page }).analyze()

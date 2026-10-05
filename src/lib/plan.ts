@@ -83,12 +83,3 @@ export function prefetchFor(path: string, today: string): Promise<unknown> {
     default: return Promise.resolve()
   }
 }
-
-/** Warm every chunk on idle so the whole app works offline and navigation is instant. */
-export function preloadAll(): void {
-  const idle = (cb: () => void) => ('requestIdleCallback' in window ? window.requestIdleCallback(cb) : setTimeout(cb, 300))
-  idle(() => {
-    for (const k of Object.keys(pageLoaders)) pageLoaders[k]().catch(() => {})
-    for (const k of Object.keys(weekLoaders)) weekLoaders[k]().catch(() => {})
-  })
-}

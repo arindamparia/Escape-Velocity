@@ -163,6 +163,9 @@ export interface PageChunks {
     dsaTable: { weeks: string; focus: string }[]
     capstoneHtml: string
     capstoneFlow: string[]
+    /** The capstone's one-line description, and its bullet list (Language, Parts, Must-haves, Done means, Cost guard) */
+    capstoneIntroHtml: string
+    capstoneFacts: { label: string; html: string; parts: string[] }[]
     interviewHtml: string
     stories: string[]
   }

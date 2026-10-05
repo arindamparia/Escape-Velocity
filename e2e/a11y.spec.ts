@@ -24,6 +24,13 @@ test.describe('axe: pages', () => {
   })
 })
 
+/** Closes the open dialog and puts focus back on the page, as a person's own next key press would find it. */
+async function closeDialog(page: Page) {
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('dialog')).toHaveCount(0)
+  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur())
+}
+
 test.describe('axe: dialogs', () => {
   for (const theme of THEMES) {
     test(`palette, shortcuts, why-note, log a problem, equation, design sheet in ${theme}`, async ({ page, api }) => {
@@ -32,16 +39,16 @@ test.describe('axe: dialogs', () => {
       const scan = async (name: string) => { out.push(...(await axeSeriousViolations(page, `${theme}/${name}`))) }
       await openApp(page, '/', { theme })
       await page.keyboard.press('Control+k'); await expect(page.getByRole('dialog')).toBeVisible(); await scan('palette')
-      await page.keyboard.press('Escape'); await expect(page.getByRole('dialog')).toHaveCount(0)
-      await page.keyboard.press('?'); await expect(page.getByRole('dialog')).toBeVisible(); await scan('shortcuts')
-      await page.keyboard.press('Escape'); await expect(page.getByRole('dialog')).toHaveCount(0)
+      await closeDialog(page)
+      await page.locator('footer.sitefoot').getByRole('button', { name: 'Keyboard shortcuts' }).click(); await expect(page.getByRole('dialog')).toBeVisible(); await scan('shortcuts')
+      await closeDialog(page)
       await page.getByRole('button', { name: 'Bad day? Minimum day' }).click(); await expect(page.getByRole('dialog')).toBeVisible(); await scan('log')
-      await page.keyboard.press('Escape'); await expect(page.getByRole('dialog')).toHaveCount(0)
+      await closeDialog(page)
       await openApp(page, '/weeks/1', { theme })
       await page.getByRole('button', { name: 'Open note' }).first().click(); await expect(page.getByRole('dialog')).toBeVisible(); await scan('why-note')
-      await page.keyboard.press('Escape'); await expect(page.getByRole('dialog')).toHaveCount(0)
+      await closeDialog(page)
       await page.getByRole('button', { name: 'Open equation card' }).click(); await expect(page.getByRole('dialog')).toBeVisible(); await scan('equation')
-      await page.keyboard.press('Escape'); await expect(page.getByRole('dialog')).toHaveCount(0)
+      await closeDialog(page)
       await openApp(page, '/library', { theme })
       await page.getByRole('button', { name: /Ticketmaster/ }).first().click(); await expect(page.getByRole('dialog')).toBeVisible(); await scan('design sheet')
       expect(out).toEqual([])

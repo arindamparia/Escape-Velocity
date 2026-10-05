@@ -94,7 +94,7 @@ test.describe('an expired Access session', () => {
     await tickButton(page, B).click()
     await expect.poll(() => api.doneIds(), { timeout: 20_000 }).toEqual([B])
     // the list of refused changes lives in memory, so go to Settings inside the app, not with a fresh page load
-    await page.getByRole('link', { name: 'Settings' }).click()
+    await page.locator('header.topbar').getByRole('link', { name: 'Settings' }).click()
     await expect(page.getByRole('alert')).toContainText('refused by the server')
   })
 })

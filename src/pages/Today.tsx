@@ -1,24 +1,28 @@
-import { ErrorBoundary, lazy } from 'preact-iso'
-import { useEffect, useMemo, useState } from 'preact/hooks'
-import type { PlanTask } from '../../shared/plan-types'
+import { lazy } from 'preact-iso'
+import { useEffect, useMemo } from 'preact/hooks'
+import type { PlanDay, PlanTask } from '../../shared/plan-types'
 import { engine, openOverlay, toggleTask, whyNote } from '../lib/app'
 import { today } from '../lib/clock'
-import { daysUntil, formatShort, weekHasLightDay } from '../lib/dates'
+import { daysUntil, formatShort } from '../lib/dates'
 import { focusId, focusList } from '../lib/focus'
 import { plan } from '../lib/plan'
 import { weekPoints, weekTarget } from '../lib/points'
-import { activityDates, dayInfo, missedDays, pickNextUp, streakWeeks, tasksOn, weeklyTasks } from '../lib/today'
+import { activityDates, dayInfo, dueSummary, missedDays, pickNextUp, streakWeeks, tasksOn, weeklyTasks } from '../lib/today'
 import { navigate } from '../lib/nav'
 import { TimerCard } from '../tools/TimerCard'
 import { PRESETS, startTimer, timer } from '../tools/timer'
-import { EquationCard } from '../ui/Equation'
-import { EvidenceStrip } from '../ui/Evidence'
-import { useNow, usePage, useTitle, useWeekChunk } from '../ui/hooks'
+import { lazyPage } from '../ui/lazyPage'
+import { useNow, useTitle, useWeekChunk } from '../ui/hooks'
 import { Html } from '../ui/Html'
 import { Icon } from '../ui/Icon'
 import { actionsFor, TaskRow, TYPE_LABEL } from '../ui/Task'
 
-const Constellation = lazy(() => import('../ui/Constellation'))
+const RuleOfTheDay = lazy(() => import('../ui/TodayExtras').then((m) => m.RuleOfTheDay))
+// The right column and the day rail are not needed for the first paint. They are fetched right away and awaited briefly
+// before the first render (see main.tsx), so they usually appear with everything else; their space is reserved.
+const TodayAside = lazyPage(() => import('../ui/TodayExtras'), <div style="min-height:44rem" />)
+const TodayRail = lazyPage<{ week: number; todayName: PlanDay }>(() => import('../ui/TodayExtras').then((m) => ({ default: m.TodayRail })), <div style="min-height:24rem" />)
+export const preloadToday = () => Promise.all([TodayAside.preload(), TodayRail.preload()])
 
 const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
@@ -26,14 +30,6 @@ function longDate(ymd: string): string {
   const [y, m, d] = ymd.split('-').map(Number)
   const dt = new Date(Date.UTC(y, m - 1, d))
   return `${DAY_NAMES[(dt.getUTCDay() + 6) % 7]} ${formatShort(ymd)}`
-}
-
-/** One rule at a time, after a missed day or a minimum day. */
-function RuleOfTheDay({ seed }: { seed: number }) {
-  const page = usePage('today')
-  if (!page) return null
-  const r = page.rules[seed % page.rules.length]
-  return <p class="small muted" style="margin-top:0.9rem"><strong>A rule for your head:</strong> <Html html={r.html} class="" inline /></p>
 }
 
 function WhyStrip() {
@@ -51,71 +47,23 @@ function WhyStrip() {
   )
 }
 
-function Skeleton({ h = '9rem' }: { h?: string }) {
-  return <div class="skeleton" style={`min-height:${h}`} />
-}
-
-function WeekDays({ week, todayName }: { week: number; todayName: string }) {
-  const done = engine.doneSet.value
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const
+/** Study work that is waiting today, one tap away. Shown only when something is due: never a backlog list. */
+function DueToday() {
+  const { cards, redraws } = dueSummary(engine.state.value, today.value)
+  if (!cards && !redraws) return null
   return (
-    <nav aria-label="This week by day">
-      <p class="eyebrow">Week {week} by day</p>
-      <ul class="dayrail">
-        {days.map((d, i) => {
-          const list = tasksOn(week, d).filter((t) => t.type !== 'rest')
-          const n = list.filter((t) => done.has(t.id)).length
-          const date = plan.weeks[week - 1].startDate
-          const ymd = new Date(Date.UTC(+date.slice(0, 4), +date.slice(5, 7) - 1, +date.slice(8, 10) + i)).toISOString().slice(0, 10)
-          const light = plan.config.lightDays.some((l) => ymd >= l.from && ymd <= l.to)
-          return (
-            <li key={d}>
-              <a href={`/weeks/${week}`} aria-current={d === todayName ? 'date' : undefined} data-light={light}>
-                <span>{d}</span>
-                <span class="muted small">{light ? <><Icon name="moon" /> light day</> : list.length ? `${n} of ${list.length}` : '–'}</span>
-                <span>{d === todayName ? 'Today' : list.length && n === list.length ? <Icon name="check" label="all done" /> : ''}</span>
-              </a>
-            </li>
-          )
-        })}
+    <section class="card due" aria-label="Also due today">
+      <p class="eyebrow">Also due today</p>
+      <ul>
+        {cards ? <li><a href="/study/flashcards"><strong>{cards}</strong> flashcard{cards === 1 ? '' : 's'} to review</a><span class="muted small"> · your why-notes, quick</span></li> : null}
+        {redraws ? <li><a href="/study/redraws"><strong>{redraws}</strong> design{redraws === 1 ? '' : 's'} to redraw</a><span class="muted small"> · from memory, then check</span></li> : null}
       </ul>
-    </nav>
-  )
-}
-
-function Routine() {
-  const page = usePage('today')
-  return (
-    <details>
-      <summary>How my day works</summary>
-      <div style="margin-top:0.8rem">{page ? <Html html={page.routineHtml} class="prose small" /> : <Skeleton h="4rem" />}</div>
-    </details>
-  )
-}
-
-function MiniTimeline({ week }: { week: number }) {
-  const done = engine.doneSet.value
-  return (
-    <section class="card" aria-label="Plan timeline">
-      <p class="eyebrow">13 weeks</p>
-      <ol class="timeline" style="list-style:none">
-        {plan.weeks.map((w) => {
-          const pts = weekPoints(plan.tasks, done, w.n)
-          const target = weekTarget(w.n, plan.config)
-          const light = weekHasLightDay(w.n, plan.config.startDate, plan.config.lightDays)
-          return (
-            <li key={w.n}>
-              <a href={`/weeks/${w.n}`} aria-current={w.n === week ? 'true' : undefined} data-light={light}>
-                <span class="mono">{String(w.n).padStart(2, '0')}</span>
-                <span class="tl__theme small">{w.theme}</span>
-                <span class="mono small muted">{light ? <Icon name="moon" label="light week" /> : null} {pts}{target ? `/${target}` : ''}</span>
-              </a>
-            </li>
-          )
-        })}
-      </ol>
     </section>
   )
+}
+
+function Skeleton({ h = '9rem' }: { h?: string }) {
+  return <div class="skeleton" style={`min-height:${h}`} />
 }
 
 export default function Today() {
@@ -130,13 +78,8 @@ export default function Today() {
   const missed = useMemo(() => missedDays(activity, date, plan.config.startDate, plan.config.lightDays), [activity, date])
   const streak = useMemo(() => streakWeeks(activity, date, plan.config.startDate), [activity, date])
   const hasActivityToday = activity.has(date)
-  const [showSky, setShowSky] = useState(false)
   const week = plan.weeks[info.week - 1]
 
-  useEffect(() => {
-    const idle = (cb: () => void) => ('requestIdleCallback' in window ? window.requestIdleCallback(cb) : setTimeout(cb, 120))
-    idle(() => setShowSky(true))
-  }, [])
   // "Meaningful content painted" (plan 6): the mark waits for the week's real task text, then for the frame that shows it
   useEffect(() => {
     if (!chunk || performance.getEntriesByName('ev:today-painted').length) return
@@ -271,19 +214,21 @@ export default function Today() {
             <p class="muted">
               {info.dow === 0 ? <strong>New week, new constellation. </strong> : null}
               {target ? <>{points} of {target} points this week. </> : <>{points} points this week, no target (a light week). </>}
-              {streak > 0 ? <>{streak}-week streak, counting weeks with 3 or more active days.</> : null}
+              {streak > 0 ? <>{streak}-week streak.</> : null}
             </p>
           ) : null}
+          {info.phase === 'during' && target ? <div class="bar weekbar" role="progressbar" aria-label={`Week ${info.week} points`} aria-valuemin={0} aria-valuemax={target} aria-valuenow={Math.min(points, target)}><i style={{ width: `${Math.min(100, (points / target) * 100)}%` }} /></div> : null}
         </header>
 
         {info.phase === 'before' && !whyNote.value.trim() ? null : <WhyStrip />}
         {timerOn ? <TimerCard /> : null}
         {hero}
+        {info.phase === 'during' && !light ? <DueToday /> : null}
 
         {info.phase === 'during' ? (
           <section aria-label="Today's tasks">
             <div class="row row--between" style="margin-bottom:0.6rem">
-              <h2 style="margin:0">{longDate(date)}</h2>
+              <h2 style="margin:0">Today’s tasks <span class="muted small" style="font-weight:400">{dayList.filter((t) => done.has(t.id)).length} of {dayList.length} done</span></h2>
               {!light && !welcomeBack ? (
                 <button type="button" class="btn btn--small btn--ghost" onClick={() => openOverlay({ kind: 'log', difficulty: 'medium', minimum: true })}>Bad day? Minimum day</button>
               ) : null}
@@ -292,7 +237,7 @@ export default function Today() {
               <button type="button" class="btn btn--link" onClick={() => navigate(`/weeks/${info.week}`)}>See this week’s plan</button>
             ) : dayList.length ? (
               <ul class="tasks">
-                {dayList.map((t) => <TaskRow key={t.id} task={t} chunk={chunk} focused={focusId.value === t.id} actions={!(heroOffersTask && t.id === next?.id)} />)}
+                {dayList.map((t) => <TaskRow key={t.id} task={t} chunk={chunk} focused={focusId.value === t.id} actions={!(heroOffersTask && t.id === next?.id)} inWeek />)}
               </ul>
             ) : (
               <div class="empty">Nothing is scheduled for {info.dayName}. {weekly.length ? 'This week’s open tasks are below.' : ''}</div>
@@ -301,7 +246,7 @@ export default function Today() {
               <details style="margin-top:1rem" open={dayList.length === 0}>
                 <summary>This week, any day ({weekly.filter((t) => done.has(t.id)).length} of {weekly.length} done)</summary>
                 <ul class="tasks" style="margin-top:0.6rem">
-                  {weekly.map((t) => <TaskRow key={t.id} task={t} chunk={chunk} focused={focusId.value === t.id} />)}
+                  {weekly.map((t) => <TaskRow key={t.id} task={t} chunk={chunk} focused={focusId.value === t.id} inWeek />)}
                 </ul>
               </details>
             ) : null}
@@ -310,18 +255,11 @@ export default function Today() {
       </div>
 
       <div class="slot-aside">
-        <EvidenceStrip />
-        {info.phase === 'during' ? <EquationCard week={info.week} chunk={chunk} /> : null}
-        <section class="card" aria-label="Constellation">
-          <p class="eyebrow">This week’s constellation</p>
-          <div style="aspect-ratio:16/10">{showSky ? <ErrorBoundary onError={(e) => console.error(e)}><Constellation week={info.week} /></ErrorBoundary> : <div class="sky" />}</div>
-        </section>
-        <div class="only-wide"><MiniTimeline week={info.week} /></div>
-        <Routine />
+        <TodayAside week={info.week} chunk={chunk} during={info.phase === 'during'} />
       </div>
 
       <aside class="slot-rail" aria-label="This week">
-        <WeekDays week={info.week} todayName={info.dayName} />
+        <TodayRail week={info.week} todayName={info.dayName} />
       </aside>
     </div>
   )

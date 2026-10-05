@@ -4,6 +4,7 @@ import type { AppState } from '../../shared/state'
 import { blockOf, dayNum, DOW_NAMES, kolkataToday, lightDayOn, planDow, planPhase, weekEnd, weekNumber, weekStart, type DayBlock, type LightDayRange, type PlanPhase } from './dates'
 import { plan } from './plan'
 import { weekPoints, weekTarget } from './points'
+import { dueCards, redrawsDue } from './srs'
 
 export interface DayInfo {
   phase: PlanPhase
@@ -119,3 +120,10 @@ export function evidence(s: AppState, done: ReadonlySet<string>): Evidence {
 }
 
 export { weekEnd }
+
+/** What is waiting in the study tools today: flashcards (a card exists once its why-note has text) and redraws. */
+export function dueSummary(s: AppState, today: string): { cards: number; redraws: number } {
+  const states = new Map(s.flashcards.map((c) => [c.cardId, c]))
+  const eligible = plan.flashcardIds.filter((id) => (s.notes.find((n) => n.kind === 'why' && n.refId === id)?.body ?? '').trim())
+  return { cards: dueCards(eligible, states, today).length, redraws: redrawsDue(s.designStatus, today).length }
+}

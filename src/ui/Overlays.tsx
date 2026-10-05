@@ -161,6 +161,7 @@ function Onboarding() {
           <WhyField rows={5} />
         </div>
         <div><h3>Theme</h3><ThemePicker /></div>
+        <p class="small muted" style="margin:0">Not sure how it works? <a href="/guide" onClick={() => { engine.dispatch('setting.set', { key: 'onboarded', value: '1' }); closeOverlay() }}>Read the one-page guide</a> any time; it is also linked at the bottom of every page.</p>
         <div class="row"><button type="button" class="btn btn--primary btn--big" onClick={() => { engine.dispatch('setting.set', { key: 'onboarded', value: '1' }); closeOverlay() }}>Start</button></div>
       </div>
     </Dialog>
@@ -171,7 +172,7 @@ function Onboarding() {
 
 interface Item { label: string; hint?: string; run: () => void }
 
-const PAGES: [string, string][] = [['Today', '/'], ['Weeks', '/weeks'], ['Study', '/study'], ['Library', '/library'], ['Progress', '/progress'], ['Mindset', '/mindset'], ['Settings', '/settings']]
+const PAGES: [string, string][] = [['How this works', '/guide'], ['Today', '/'], ['Weeks', '/weeks'], ['Study', '/study'], ['Library', '/library'], ['Progress', '/progress'], ['Mindset', '/mindset'], ['Settings', '/settings']]
 const TOOLS: [string, string][] = [
   ['Learning loop', '/study/loop'], ['Redraw queue', '/study/redraws'], ['Flashcards', '/study/flashcards'], ['Focus timer', '/study/timer'],
   ['Mock mode', '/study/mock'], ['Envelope calculator', '/study/envelope'], ['Formula sheet', '/study/formulas'], ['Notes', '/study/notes'],

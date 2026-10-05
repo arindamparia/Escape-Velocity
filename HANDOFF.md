@@ -1,8 +1,18 @@
 # Handoff
 
-Status at the end of the second session. Read `CLAUDE.md` first, then `AUDIT.md` (the build checked against every section of the plan), then the plan itself (`plan/escape-velocity-plan.md`, Part 1).
+Status at the end of the third session. Read `CLAUDE.md` first, then `AUDIT.md` (the build checked against every section of the plan), then the plan itself (`plan/escape-velocity-plan.md`, Part 1).
 
-## Done
+## Third session: what changed
+
+- **Simpler on purpose.** No PWA, service worker, manifest, offline cache, "Update ready" banner, performance budgets or Lighthouse. A change shows as soon as you reload. (An old worker in a browser removes itself: `public/sw.js` and `main.tsx`.) Local-first data stays. The Reload-button bug disappeared with the banner.
+- **New look.** Warm cream and ember in Light, amber stars on deep navy in Dark, green only for "done"; softer shapes; fewer words, with detail behind links; a week progress bar on Today; a clear "Also due today" card; labelled Search and Settings buttons; a footer with How this works / Resources / Settings / Shortcuts.
+- **Linked everywhere.** Task tags open the glossary entry, task labels open the task in its week, progress tiles open where the number comes from, readiness items say where to work, `?design=` links open the design.
+- **How this works** (`/guide`): a normal day, the five pages, "I want to…", and a glossary of about 40 plan, interview and capstone terms (`src/pages/glossary.ts`).
+- **Capstone** (`/weeks/capstone`), now a page of its own: what it is, an architecture diagram with eight numbered steps, your 10 Sundays with progress, parts and must-haves as linked chips, what it lets you say in an interview, resume bullets with blanks, and what to protect if a Sunday slips. DSA and Interview prep are pages too.
+- **Instant sync**: other devices' changes are picked up within 15 seconds (was 60).
+- **Screenshot baselines are now macOS** (made on this Mac); the Linux ones were removed.
+
+## Done (sessions one and two)
 
 Everything from the first session (compiler, Worker + D1, local-first client, every page and tool, budgets), plus:
 
@@ -15,11 +25,10 @@ Everything from the first session (compiler, Worker + D1, local-first client, ev
 
 ## Not done yet (in priority order)
 
-1. **On the Mac**: `npm run test:e2e -- --update-snapshots`, look at the new pictures, commit them; then `E2E_WEBKIT=1 npm run test:e2e` for Safari. The INP limit is 50 ms there (it is relaxed only in a software-rendered container).
-2. **Deploy** (needs the owner; steps in `README.md`): `wrangler login`, create the D1 database, set the Access variables, migrate, `wrangler deploy`, turn on Access, Add to Dock. Then check on the two real screens that a tick shows on the other one, and that a private window is asked to sign in.
+1. Run `E2E_WEBKIT=1 npm run test:e2e` once for Safari.
+2. **Deploy** (needs the owner; steps in `README.md`): `wrangler login`, create the D1 database, set the Access variables, migrate, `wrangler deploy`, turn on Access. Then check on the two real screens that a tick shows on the other one, and that a private window is asked to sign in.
 3. **Look at the BenQ in its ePaper mode** with Paper selected. The greyscale tests pass, but only a real panel shows how it feels.
 4. Polish noticed but not done: the Library list could use the 72-character line length; the Weeks timeline on a phone is a single tall list (fine, not designed further); on very narrow phones "Log a problem" wraps to two lines in the Today card.
-5. **Watch the Today budget**: JS for Today is 34.5 KB of 35. The next thing added to Today has to pay for itself (move something to a lazy chunk).
 
 ## Decisions I made where the plan was silent or inconsistent (tell me if you disagree)
 

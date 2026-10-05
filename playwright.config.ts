@@ -26,7 +26,6 @@ export default defineConfig({
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL: `http://localhost:${PORT}`,
-    serviceWorkers: 'allow',
     // The plan runs in Asia/Kolkata whatever the machine's zone is. Running the browser in another zone makes any
     // accidental use of local time show up as a failure.
     timezoneId: 'America/Los_Angeles',

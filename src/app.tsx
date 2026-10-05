@@ -9,7 +9,6 @@ import { actionsFor } from './ui/Task'
 import { Boundary } from './ui/Boundary'
 import { lazyPage } from './ui/lazyPage'
 import { Icon } from './ui/Icon'
-import { needRefresh, applyUpdate } from './lib/pwa'
 import { TimerCard } from './tools/TimerCard'
 import { timer } from './tools/timer'
 
@@ -21,6 +20,7 @@ const Progress = lazyPage(() => import('./pages/Progress'))
 const Mindset = lazyPage(() => import('./pages/Mindset'))
 const Sources = lazyPage(() => import('./pages/Sources'))
 const Settings = lazyPage(() => import('./pages/Settings'))
+const Guide = lazyPage(() => import('./pages/Guide'))
 
 const NAV: { href: string; label: string; match: (p: string) => boolean }[] = [
   { href: '/', label: 'Today', match: (p) => p === '/' },
@@ -53,9 +53,9 @@ function TopBar() {
       <span class="spacer" />
       <SyncDot />
       <button type="button" class="iconbtn" aria-label="Command palette (⌘K)" title="Command palette (⌘K)" onClick={() => openOverlay({ kind: 'palette' })}>
-        <Icon name="search" /><kbd class="noprint">⌘K</kbd>
+        <Icon name="search" /><span class="btn-label">Search</span><kbd class="noprint">⌘K</kbd>
       </button>
-      <a class="iconbtn" href="/settings" aria-label="Settings" aria-current={path === '/settings' ? 'page' : undefined}><Icon name="sliders" /></a>
+      <a class="iconbtn" href="/settings" aria-label="Settings" aria-current={path === '/settings' ? 'page' : undefined}><Icon name="sliders" /><span class="btn-label">Settings</span></a>
     </header>
   )
 }
@@ -80,12 +80,6 @@ function Banners() {
         <div class="banner banner--warn" role="alert">
           <span><Icon name="warn" /> Signed out. Your changes are saved on this device and will sync after you sign in.</span>
           <button type="button" class="btn btn--small btn--primary" onClick={() => location.reload()}>Sign in again</button>
-        </div>
-      ) : null}
-      {needRefresh.value ? (
-        <div class="banner" role="status">
-          <span>Update ready.</span>
-          <button type="button" class="btn btn--small btn--primary" onClick={applyUpdate}>Reload</button>
         </div>
       ) : null}
     </>
@@ -164,11 +158,16 @@ function Shell() {
               <Route path="/mindset" component={Mindset} />
               <Route path="/sources" component={Sources} />
               <Route path="/settings" component={Settings} />
+              <Route path="/guide" component={Guide} />
               <Route default component={NotFound} />
             </Router>
           </ErrorBoundary>
         </Boundary>
       </main>
+      <footer class="sitefoot noprint">
+        <a href="/guide">How this works</a><a href="/library?tab=resources">Resources and sources</a><a href="/settings">Settings</a>
+        <button type="button" class="btn btn--link" onClick={() => openOverlay({ kind: 'shortcuts' })}>Keyboard shortcuts</button>
+      </footer>
       <TabBar />
       {overlay.value || needsOnboarding.value ? <ErrorBoundary onError={(e) => console.error(e)}><Overlays /></ErrorBoundary> : null}
       <Toast />

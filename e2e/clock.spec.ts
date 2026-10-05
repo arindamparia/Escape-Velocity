@@ -13,7 +13,7 @@ test.describe('the Kolkata day', () => {
     await expect(eyebrow(page)).toHaveText('Wednesday 7 Oct · week 1 of 13')
     await page.clock.runFor(31_000)
     await expect(eyebrow(page)).toHaveText('Thursday 8 Oct · week 1 of 13')
-    await expect(page.getByRole('heading', { name: 'Thursday 8 Oct' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /^Today’s tasks/ })).toBeVisible()
   })
 
   test('Sunday night to Monday morning starts the next week, and says so', async ({ page, api }) => {

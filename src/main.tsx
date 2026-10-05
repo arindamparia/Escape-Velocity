@@ -3,8 +3,8 @@ import { App } from './app'
 import { engine, sync, whyNote } from './lib/app'
 import { startClock } from './lib/clock'
 import { kolkataToday } from './lib/dates'
-import { prefetchFor, preloadAll } from './lib/plan'
-import { registerServiceWorker } from './lib/pwa'
+import { preloadToday } from './pages/Today'
+import { prefetchFor } from './lib/plan'
 import './theme/tokens.css'
 import './theme/app.css'
 import { applyTheme, initThemes, themePref, type ThemePref } from './theme/themes'
@@ -15,6 +15,15 @@ import { effect } from '@preact/signals'
 performance.mark('ev:boot')
 initThemes()
 setChimeSource(() => chimeOn.peek())
+
+/**
+ * An earlier version installed a service worker that cached the app. Nothing is cached any more, so a change shows the
+ * moment the page is reloaded; this removes the old worker and its caches from a browser that still has them.
+ */
+function removeOldServiceWorker() {
+  if ('serviceWorker' in navigator) void navigator.serviceWorker.getRegistrations().then((rs) => rs.forEach((r) => void r.unregister()))
+  if ('caches' in window) void caches.keys().then((ks) => ks.forEach((k) => void caches.delete(k)))
+}
 
 async function boot() {
   // Real content comes from the local copy: IndexedDB is read before the first render, so repeat opens never wait
@@ -29,16 +38,15 @@ async function boot() {
   // The first screen's content chunk is tiny and comes from the precache. Waiting for it (at most 300 ms) means the
   // first paint already holds the real text, so nothing is replaced and nothing shifts afterwards (plan 18.17).
   await Promise.race([
-    Promise.all([prefetchFor(location.pathname, kolkataToday()).catch(() => {}), engine.restored ? null : firstSync]),
+    Promise.all([prefetchFor(location.pathname, kolkataToday()).catch(() => {}), location.pathname === '/' ? preloadToday().catch(() => {}) : null, engine.restored ? null : firstSync]),
     new Promise((r) => setTimeout(r, engine.restored ? 300 : 600)),
   ])
   render(<App />, document.getElementById('app')!)
   performance.mark('ev:first-render')
   startClock()
-  preloadAll()
   const idle = (cb: () => void) => ('requestIdleCallback' in window ? window.requestIdleCallback(cb) : setTimeout(cb, 200))
   idle(() => void engine.recheckOutbox())
-  void registerServiceWorker()
+  removeOldServiceWorker()
 
   // the synced theme setting wins over what localStorage said, once it is known
   effect(() => {
