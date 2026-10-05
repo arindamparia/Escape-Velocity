@@ -39,10 +39,10 @@ test.describe('themes', () => {
     expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe('rgb(242, 239, 230)') // #F2EFE6
   })
 
-  test('the synced setting wins over what this browser remembered, and updates it', async ({ page, api }) => {
+  test('a device that never picked a theme takes the synced one and remembers it', async ({ page, api }) => {
     await api.onboard()
     await api.setting('theme', 'light')
-    await openApp(page, '/', { theme: 'dark' }) // this browser last used Dark
+    await openApp(page, '/') // no theme saved in this browser
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
     await expect.poll(() => page.evaluate(() => localStorage.getItem('ev:theme'))).toBe('light')
   })
@@ -223,4 +223,14 @@ test.describe('page titles', () => {
     })
   }
 
+})
+
+test('the theme you picked on this device stays, even if another device synced a different one', async ({ page, api }) => {
+  await api.onboard()
+  await api.setting('theme', 'light') // what another device said
+  await page.addInitScript(() => { try { localStorage.setItem('ev:theme', 'paper') } catch { /* blocked */ } })
+  await openApp(page, '/')
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'paper')
+  await page.reload()
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'paper')
 })
