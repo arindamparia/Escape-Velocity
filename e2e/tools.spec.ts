@@ -188,7 +188,7 @@ test.describe('keyboard and command palette', () => {
       else await expect(page.locator('html')).not.toHaveAttribute('data-tone', 'night')
     }
     await page.keyboard.press('2')
-    await expect.poll(async () => (await api.state()).settings.find((s) => s.key === 'theme')?.value).toBe('paper-night')
+    await expect.poll(() => page.evaluate(() => localStorage.getItem('ev:theme'))).toBe('paper-night')
     await page.reload()
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'paper')
     await expect(page.locator('html')).toHaveAttribute('data-tone', 'night')

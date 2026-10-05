@@ -7,10 +7,9 @@ import { preloadToday } from './pages/Today'
 import { prefetchFor } from './lib/plan'
 import './theme/tokens.css'
 import './theme/app.css'
-import { applyTheme, hasSavedTheme, initThemes, themePref, type ThemePref } from './theme/themes'
+import { initThemes } from './theme/themes'
 import { setChimeSource } from './tools/timer'
 import { chimeOn } from './lib/app'
-import { effect } from '@preact/signals'
 
 performance.mark('ev:boot')
 initThemes()
@@ -47,12 +46,6 @@ async function boot() {
   const idle = (cb: () => void) => ('requestIdleCallback' in window ? window.requestIdleCallback(cb) : setTimeout(cb, 200))
   idle(() => void engine.recheckOutbox())
   removeOldServiceWorker()
-
-  // this browser's own choice (localStorage) wins; the synced setting only decides on a device that has never picked one
-  effect(() => {
-    const synced = engine.settings.value.get('theme') as ThemePref | undefined
-    if (synced && !hasSavedTheme() && synced !== themePref.peek()) applyTheme(synced)
-  })
 }
 
 void boot()

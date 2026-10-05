@@ -1,5 +1,8 @@
-// Background sync: send the outbox (at most 20 ops per request, in order), then replace local state with the
-// server's. Retries use backoff and never block the UI. Session expiry (Cloudflare Access) is detected, not guessed.
+// Background sync: send the outbox (at most 20 ops per request, in order). Opening the page, coming back online and
+// a refused op also replace local state with the server's; a plain local change only sends its op, because the server
+// did what the op said and downloading everything again would be waste. Changes made while a request is in flight
+// go in the next one, and the store already merges repeated edits to one thing, so bursts batch without a timer.
+// Retries use backoff and never block the UI. Session expiry (Cloudflare Access) is detected, not guessed.
 import { signal } from '@preact/signals'
 import { MAX_OPS_PER_REQUEST } from '../../shared/constants'
 import type { AppState } from '../../shared/state'
@@ -63,6 +66,8 @@ export function createSync(engine: Engine, deps: SyncDeps = {}) {
 
   let running: Promise<void> | null = null
   let again = false
+  /** a pull was asked for while a push was in flight */
+  let pullAgain = false
   let failures = 0
   let retryHandle: unknown = null
 
@@ -75,7 +80,8 @@ export function createSync(engine: Engine, deps: SyncDeps = {}) {
     }, delay)
   }
 
-  async function runOnce(): Promise<void> {
+  async function runOnce(wantPull: boolean): Promise<void> {
+    let pull = wantPull
     status.value = engine.outbox.peek().length ? 'saving' : status.peek()
     while (engine.outbox.peek().length) {
       const batch = engine.outbox.peek().slice(0, MAX_OPS_PER_REQUEST)
@@ -92,6 +98,7 @@ export function createSync(engine: Engine, deps: SyncDeps = {}) {
         const bad = out.opId && ids.has(out.opId) ? new Set([out.opId]) : ids
         rejected.value = [...rejected.peek(), ...[...bad].map((opId) => ({ opId, message: out.message }))]
         engine.removeFromOutbox(bad)
+        pull = true // the server did not take it: bring back what it really holds, so the screen does not show a change that was refused
       } else if (out.kind === 'signed-out') {
         status.value = 'signed-out'
         signInNotSetUp.value = !!out.notSetUp
@@ -102,6 +109,12 @@ export function createSync(engine: Engine, deps: SyncDeps = {}) {
         scheduleRetry()
         return
       }
+    }
+
+    if (!pull) {
+      // push only: the change is saved on the server, nothing to download
+      status.value = engine.outbox.peek().length ? 'saving' : 'idle'
+      return
     }
 
     const st = await call<AppState>(f, '/api/state')
@@ -129,9 +142,11 @@ export function createSync(engine: Engine, deps: SyncDeps = {}) {
     }
   }
 
-  function run(): Promise<void> {
+  /** Send what is queued, then (unless `pull` is false) bring the server's state back. */
+  function run(pull = true): Promise<void> {
     if (running) {
       again = true
+      pullAgain ||= pull
       return running
     }
     if (retryHandle) {
@@ -140,23 +155,25 @@ export function createSync(engine: Engine, deps: SyncDeps = {}) {
     }
     running = (async () => {
       try {
-        await runOnce()
+        await runOnce(pull)
       } finally {
         running = null
         if (again) {
           again = false
-          void run()
+          const next = pullAgain
+          pullAgain = false
+          void run(next)
         }
       }
     })()
     return running
   }
 
-  /** Sync when the page opens, when the network comes back, and after each local save. No timer, nothing on tab focus: reload to pull another device's changes. */
+  /** Pull and push when the page opens and when the network comes back; after a local save only push. No timer, nothing on tab focus: reload to pull another device's changes. */
   function start(runNow = true): () => void {
     const onOnline = () => void run()
     window.addEventListener('online', onOnline)
-    const offSaved = engine.onSaved(() => void run())
+    const offSaved = engine.onSaved(() => void run(false))
     if (runNow) void run()
     return () => {
       window.removeEventListener('online', onOnline)

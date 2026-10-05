@@ -13,7 +13,7 @@ test.describe('first run', () => {
     await welcome.getByRole('group', { name: 'Theme' }).getByRole('button', { name: /Light/ }).click()
     await welcome.getByRole('button', { name: 'Start', exact: true }).click()
     await expect(page.getByRole('dialog')).toHaveCount(0)
-    await expect.poll(async () => Object.fromEntries((await api.state()).settings.map((s) => [s.key, s.value]))).toMatchObject({ onboarded: '1', why_note: 'Because I want to explain trade-offs out loud.', theme: 'light' })
+    await expect.poll(async () => Object.fromEntries((await api.state()).settings.map((s) => [s.key, s.value]))).toMatchObject({ onboarded: '1', why_note: 'Because I want to explain trade-offs out loud.' })
     await page.reload()
     await expect(page.locator('main h1').first()).toBeVisible()
     await expect(page.getByRole('dialog')).toHaveCount(0)
@@ -39,12 +39,14 @@ test.describe('themes', () => {
     expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe('rgb(242, 239, 230)') // #F2EFE6
   })
 
-  test('a device that never picked a theme takes the synced one and remembers it', async ({ page, api }) => {
+  test('the look is this device\'s own: it is remembered here and never sent to the server', async ({ page, api }) => {
     await api.onboard()
-    await api.setting('theme', 'light')
-    await openApp(page, '/') // no theme saved in this browser
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
-    await expect.poll(() => page.evaluate(() => localStorage.getItem('ev:theme'))).toBe('light')
+    await openApp(page, '/', { theme: 'light' })
+    await page.keyboard.press('2') // Paper night
+    await expect(page.locator('html')).toHaveAttribute('data-tone', 'night')
+    expect(await page.evaluate(() => localStorage.getItem('ev:theme'))).toBe('paper-night')
+    await page.waitForTimeout(1500)
+    expect((await api.state()).settings.map((s) => s.key)).not.toContain('theme')
   })
 
   test('System follows the operating system, live; Paper is always a manual choice', async ({ page, api }) => {

@@ -49,9 +49,9 @@ export const needsOnboarding = computed(
 )
 export const chimeOn = computed(() => engine.settings.value.get('chime') === '1')
 
+/** The look is this device's own (localStorage, applied before first paint): it is never sent to the server. */
 export function setTheme(pref: ThemePref): void {
   applyTheme(pref)
-  engine.dispatch('setting.set', { key: 'theme', value: pref })
 }
 
 /* ---- ticking ---- */

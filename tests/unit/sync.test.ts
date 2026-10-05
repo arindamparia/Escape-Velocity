@@ -298,3 +298,57 @@ describe('survives a reload', () => {
     await vi.waitFor(() => expect(savedBeforeFetch).toBe(true))
   })
 })
+
+describe('what a sync costs in server calls', () => {
+  const stateReads = (fetchFn: ReturnType<typeof setup>['fetchFn']) => fetchFn.mock.calls.filter((c) => String(c[0]) === '/api/state').length
+  const opPosts = (fetchFn: ReturnType<typeof setup>['fetchFn']) => fetchFn.mock.calls.filter((c) => String(c[0]) === '/api/ops').length
+
+  it('opening the page pushes the outbox and then pulls the state, once', async () => {
+    const { engine, sync, fetchFn } = setup()
+    tick(engine, 'w04-01')
+    await sync.run()
+    expect(opPosts(fetchFn)).toBe(1)
+    expect(stateReads(fetchFn)).toBe(1)
+  })
+
+  it('a local change only sends its op: the state is not downloaded again', async () => {
+    const { engine, sync, server, fetchFn } = setup()
+    tick(engine, 'w04-01')
+    await sync.run(false)
+    expect(opPosts(fetchFn)).toBe(1)
+    expect(stateReads(fetchFn)).toBe(0)
+    expect(server.state.taskProgress.map((t) => t.taskId)).toEqual(['w04-01'])
+    expect(engine.outbox.value).toEqual([])
+  })
+
+  it('changes made while a request is in flight go in the next one, still without a download', async () => {
+    const { engine, sync, server, fetchFn } = setup()
+    tick(engine, 'w04-01')
+    const first = sync.run(false)
+    tick(engine, 'w04-02') // arrives while the first request is on its way
+    void sync.run(false)
+    await first
+    await vi.waitFor(() => expect(server.state.taskProgress).toHaveLength(2))
+    expect(opPosts(fetchFn)).toBeLessThanOrEqual(2)
+    expect(stateReads(fetchFn)).toBe(0)
+  })
+
+  it('a pull asked for during a push is not forgotten', async () => {
+    const { engine, sync, fetchFn } = setup()
+    tick(engine, 'w04-01')
+    const push = sync.run(false)
+    void sync.run(true) // the network came back while the push was running
+    await push
+    await vi.waitFor(() => expect(stateReads(fetchFn)).toBe(1))
+  })
+
+  it('an op the server refuses brings the real state back, so the screen stops showing it', async () => {
+    const { engine, sync, mode, fetchFn } = setup()
+    tick(engine, 'w04-01')
+    tick(engine, 'w04-02')
+    mode.next = 'reject-second'
+    await sync.run(false)
+    expect(stateReads(fetchFn)).toBe(1)
+    expect(engine.state.value.taskProgress.map((t) => t.taskId)).toEqual(['w04-01'])
+  })
+})

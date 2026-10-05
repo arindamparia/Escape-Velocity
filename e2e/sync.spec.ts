@@ -121,3 +121,41 @@ test('nothing polls the server: no /api/state call while the page just sits ther
   await page.waitForTimeout(500)
   expect(calls).toBe(0)
 })
+
+test.describe('how many server calls does each thing cost', () => {
+  const watch = (page: import('@playwright/test').Page) => {
+    const calls: string[] = []
+    page.on('request', (r) => { const u = new URL(r.url()); if (u.pathname.startsWith('/api/')) calls.push(`${r.method()} ${u.pathname}`) })
+    return { calls, count: (what: string) => calls.filter((c) => c === what).length, clear: () => { calls.length = 0 } }
+  }
+
+  test('opening the page: one state read, one AlgoTracker read, nothing else', async ({ page, api }) => {
+    await api.onboard()
+    const w = watch(page)
+    await openApp(page, '/')
+    await page.waitForTimeout(1500)
+    expect(w.calls.sort()).toEqual(['GET /api/solved', 'GET /api/state'])
+  })
+
+  test('changing the theme costs no server call at all: it is a setting of this device', async ({ page, api }) => {
+    await api.onboard()
+    await openApp(page, '/')
+    await page.waitForTimeout(500)
+    const w = watch(page)
+    for (const key of ['3', '2', '1', '4']) await page.keyboard.press(key)
+    await page.waitForTimeout(2000)
+    expect(w.calls).toEqual([])
+  })
+
+  test('ticking sends only the change (at most two requests for a quick burst) and never re-downloads the state', async ({ page, api }) => {
+    await api.onboard()
+    await openApp(page, '/weeks/1')
+    await page.waitForTimeout(500)
+    const w = watch(page)
+    for (const id of [A, B]) await tickButton(page, id).click()
+    await expect.poll(() => api.doneIds()).toEqual([A, B])
+    await page.waitForTimeout(1500)
+    expect(w.count('GET /api/state')).toBe(0)
+    expect(w.count('POST /api/ops')).toBeLessThanOrEqual(2)
+  })
+})
