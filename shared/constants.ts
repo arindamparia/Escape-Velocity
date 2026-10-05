@@ -5,7 +5,7 @@ export const DIFFICULTIES = ['easy', 'medium', 'hard'] as const
 export const DESIGN_STATUSES = ['not-started', 'attempted', 'redrawn-1', 'redrawn-2'] as const
 export const NOTE_KINDS = ['why', 'design', 'story', 'free'] as const
 export const GRADES = ['again', 'hard', 'good'] as const
-export const THEMES = ['system', 'dark', 'light', 'paper'] as const
+export const THEMES = ['system', 'dark', 'light', 'paper', 'paper-night'] as const
 
 /**
  * A problem's canonical address, so the same problem is recognised however the link was written: LeetCode links become

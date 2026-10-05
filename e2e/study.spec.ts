@@ -1,5 +1,5 @@
 // Study links from the resources doc: under each task, on each design's page, and as an index on Sources.
-import { expect, openApp, test } from './support'
+import { expect, openApp, plan, tickButton, test } from './support'
 
 test('a task has a Study panel: free first, premium marked, links open in a new tab', async ({ page, api }) => {
   await api.onboard()
@@ -39,4 +39,23 @@ test('Study links lists the channels and every week, and the Library tab shows t
   await expect(weeks.first().getByRole('link', { name: 'Delivery Framework', exact: true })).toBeVisible()
   await openApp(page, '/library?tab=resources')
   await expect(page.getByRole('region', { name: 'Links by week' })).toBeVisible()
+})
+
+test('the Next up card on Today carries the Study links of its task', async ({ page, api }) => {
+  await api.onboard()
+  await api.tick('w01-06') // Wednesday's DSA is done, so the next task is the night's Networking Essentials
+  await openApp(page, '/')
+  const hero = page.getByRole('region', { name: 'Next up' })
+  await expect(hero.locator('details.study summary')).toContainText(/video/)
+})
+
+test('a tick pops when you complete a task, and a task that loads done does not', async ({ page, api }) => {
+  await api.onboard()
+  const first = plan.tasks.find((t) => t.week === 1 && t.points > 0)!
+  await api.tick(plan.tasks.filter((t) => t.week === 1 && t.points > 0)[1].id)
+  await openApp(page, '/weeks/1')
+  await expect(page.locator('.task__check--pop')).toHaveCount(0) // the already-done task did not pop on load
+  await tickButton(page, first.id).click()
+  await expect(page.locator(`[data-task="${first.id}"] .task__check--pop`)).toHaveCount(1)
+  await expect(page.locator('.task__check--pop')).toHaveCount(0) // and it settles
 })

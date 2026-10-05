@@ -16,6 +16,7 @@ import { lazyPage } from '../ui/lazyPage'
 import { useNow, useTitle, useWeekChunk } from '../ui/hooks'
 import { Html } from '../ui/Html'
 import { Icon } from '../ui/Icon'
+import { StudyPanel } from '../ui/Resources'
 import { actionsFor, TaskRow, TYPE_LABEL } from '../ui/Task'
 
 const RuleOfTheDay = lazy(() => import('../ui/TodayExtras').then((m) => m.RuleOfTheDay))
@@ -173,8 +174,8 @@ export default function Today() {
           <p class="small muted">This week’s focus: <strong>{chunk.dsaFocus}</strong>{suggestion ? <> · try one reported problem: <strong>{suggestion}</strong></> : null}</p>
         ) : null}
         {next.type === 'boss' ? <p class="small muted">No hints for the first hour.</p> : null}
-        {(next.type === 'concept' || next.type === 'infra') && entry?.why ? <p class="small"><strong>Why:</strong> {entry.why}</p> : null}
         {design && next.type === 'design' ? <p class="small"><strong>Derive it first:</strong> {design.derive}</p> : null}
+        <StudyPanel items={chunk?.resources?.[next.id]} design={next.type === 'design' || next.type === 'design2'} />
         <div class="hero__actions" style="margin-top:1rem">
           {next.type === 'design2' ? (
             actions.map((a) => (

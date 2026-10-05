@@ -64,7 +64,7 @@ export default function Guide() {
             <li>write my “why”: <a href="/mindset">Mindset</a></li>
             <li>review flashcards or redraws: <a href="/study/flashcards">Flashcards</a>, <a href="/study/redraws">Redraw queue</a></li>
             <li>see my scores and the weekly review: <a href="/progress">Progress</a></li>
-            <li>switch to the e-paper style (Paper): press 4, or <a href="/settings">Settings</a></li>
+            <li>switch between Paper (press 1), Paper night (2), Light (3), Dark (4) and System (5), or <a href="/settings">Settings</a></li>
             <li>download a backup: <a href="/settings">Settings</a></li>
           </ul>
         </section>

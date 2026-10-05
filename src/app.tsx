@@ -95,7 +95,7 @@ function Toast() {
   return toast.value ? <div class="toast" role="status">{toast.value}</div> : null
 }
 
-/** Keyboard: j/k move, x ticks, s starts the task's tool, t jumps to Today, ⌘K palette, 1-4 themes, ? shortcuts. */
+/** Keyboard: j/k move, x ticks, s starts the task's tool, t jumps to Today, ⌘K palette, 1-5 themes, ? shortcuts. */
 function useShortcuts() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -128,7 +128,7 @@ function useShortcuts() {
         }
         case 't': navigate('/'); break
         case '?': openOverlay({ kind: 'shortcuts' }); break
-        case '1': case '2': case '3': case '4': {
+        case '1': case '2': case '3': case '4': case '5': {
           const p = THEME_PREFS[Number(e.key) - 1]
           setTheme(p)
           say(`Theme: ${p}`)

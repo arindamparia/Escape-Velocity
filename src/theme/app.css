@@ -273,6 +273,7 @@ kbd {
   border-bottom: 3px solid transparent; white-space: nowrap;
 }
 .tabs [aria-selected='true'], .tabs [aria-current='page'] { color: var(--text); border-bottom-color: var(--accent); }
+@media (max-width: 480px) { .tabs button, .tabs a { padding: 0.55rem 0.5rem; font-size: 0.92rem; } }
 
 /* ---------- tasks ---------- */
 .tasks { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
@@ -294,6 +295,8 @@ kbd {
 .task[data-done='true'] { background: color-mix(in srgb, var(--done) 7%, var(--surface)); border-color: color-mix(in srgb, var(--done) 35%, var(--line)); }
 [data-theme='paper'] .task[data-done='true'] { background: var(--surface); border-color: var(--line); }
 .task[data-done='true'] .task__check { background: var(--done); border-color: var(--done); color: var(--bg); transform: scale(1.04); }
+.task__check--pop { animation: tick-pop 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.4); }
+@keyframes tick-pop { 0% { transform: scale(0.8); } 55% { transform: scale(1.18); } 100% { transform: scale(1.04); } }
 .task__check[data-locked] { cursor: not-allowed; }
 .task__check[data-locked]:hover { border-color: var(--done); }
 .task[data-done='true'] .task__text { color: var(--text-muted); text-decoration: line-through; text-decoration-thickness: 1px; }
@@ -377,7 +380,7 @@ dialog {
 }
 dialog::backdrop { background: rgb(5 8 20 / 0.6); }
 [data-theme='paper'] dialog { border-width: 2px; border-radius: 2px; }
-[data-theme='paper'] dialog::backdrop { background: rgb(242 239 230 / 0.85); }
+[data-theme='paper']:not([data-tone='night']) dialog::backdrop { background: rgb(242 239 230 / 0.85); }
 .dialog__head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.9rem 1.15rem; border-bottom: 1px solid var(--line); }
 .dialog__head h2 { margin: 0; font-size: 1.1rem; }
 .dialog__body { padding: 1.15rem; overflow: auto; max-height: calc(100vh - 9rem); }
@@ -506,3 +509,30 @@ label.check > span { flex: 1; min-width: 0; }
 .resweek > summary { cursor: pointer; font-weight: 600; }
 .reschannels { display: grid; gap: 0.6rem; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); margin: 0; padding: 0; list-style: none; }
 .reschannels li { background: var(--surface-2); border-radius: var(--radius); padding: 0.7rem 0.9rem; }
+
+/* ---------- Paper polish (both tones): typesetting, not decoration. Ink only, solid lines, nothing that moves. ---------- */
+[data-theme='paper'] h1, [data-theme='paper'] h2, [data-theme='paper'] h3 { text-wrap: balance; }
+[data-theme='paper'] p, [data-theme='paper'] li { text-wrap: pretty; }
+[data-theme='paper'] a { text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+[data-theme='paper'] a:hover { text-decoration-thickness: 2px; }
+/* a page's title block reads like a masthead: a heavy solid rule under it (Paper keeps every border solid) */
+[data-theme='paper'] .slot-main > header { border-bottom: 2px solid var(--line); padding-bottom: 0.9rem; margin-bottom: 0.4rem; }
+/* the card you act on is framed twice, like a plate in a book */
+[data-theme='paper'] .hero { outline: 1px solid var(--line); outline-offset: -8px; }
+/* book tables: rules above and below the head, hairlines between rows, no cell boxes */
+[data-theme='paper'] .prose table, [data-theme='paper'] .tbl { border-top: 2px solid var(--line); border-bottom: 2px solid var(--line); }
+[data-theme='paper'] .prose th, [data-theme='paper'] .prose td, [data-theme='paper'] .tbl th, [data-theme='paper'] .tbl td { border-width: 0 0 1px; }
+[data-theme='paper'] .prose th, [data-theme='paper'] .tbl th { border-bottom: 2px solid var(--line); }
+/* lists use en dashes, the way a printed page does */
+[data-theme='paper'] .prose ul > li::marker { content: '– '; }
+[data-theme='paper'] .reslist li::marker { content: ''; }
+/* small caps for the labels above titles */
+[data-theme='paper'] .eyebrow { font-variant-caps: all-small-caps; letter-spacing: 0.1em; font-size: 0.86rem; font-weight: 700; }
+/* the done mark is a solid ink disc with the tick knocked out, and a finished task reads as struck through in every tone */
+[data-theme='paper'] .task[data-done='true'] .task__text { text-decoration-thickness: 2px; }
+
+/* Paper night: light ink on warm black. A little air between letters and a lighter touch on bold, so glyphs do not bleed. */
+[data-theme='paper'][data-tone='night'] body { letter-spacing: 0.012em; }
+[data-theme='paper'][data-tone='night'] h1, [data-theme='paper'][data-tone='night'] h2, [data-theme='paper'][data-tone='night'] h3 { font-weight: 700; letter-spacing: -0.01em; }
+[data-theme='paper'][data-tone='night'] dialog::backdrop { background: rgb(21 19 15 / 0.88); }
+[data-theme='paper'][data-tone='night'] .btn--primary { border-color: var(--text); }

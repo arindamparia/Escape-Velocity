@@ -23,7 +23,7 @@ export const SCREENS = {
 } as const
 export type ScreenName = keyof typeof SCREENS
 
-export const THEMES = ['dark', 'light', 'paper'] as const
+export const THEMES = ['dark', 'light', 'paper', 'paper-night'] as const
 export type Theme = (typeof THEMES)[number]
 
 /** Every page a person can land on. */

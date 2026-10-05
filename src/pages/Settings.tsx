@@ -32,7 +32,7 @@ export default function Settings() {
           <p class="small muted" style="margin:0">Every device keeps a full copy and syncs in the background. D1 also keeps 7 days of Time Travel backups.</p>
         </section>
         <section class="card stack"><h2>Keyboard</h2>
-          <p class="small muted" style="margin:0"><kbd>j</kbd> <kbd>k</kbd> move, <kbd>x</kbd> tick, <kbd>s</kbd> start, <kbd>t</kbd> Today, <kbd>⌘K</kbd> palette, <kbd>1</kbd> to <kbd>4</kbd> themes.</p>
+          <p class="small muted" style="margin:0"><kbd>j</kbd> <kbd>k</kbd> move, <kbd>x</kbd> tick, <kbd>s</kbd> start, <kbd>t</kbd> Today, <kbd>⌘K</kbd> palette, <kbd>1</kbd> to <kbd>5</kbd> themes.</p>
           <div><button type="button" class="btn btn--small" onClick={() => openOverlay({ kind: 'shortcuts' })}>All shortcuts</button></div>
         </section>
         <section class="card stack"><h2>About</h2>

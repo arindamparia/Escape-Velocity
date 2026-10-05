@@ -1,7 +1,7 @@
 import { setTheme } from '../lib/app'
 import { THEME_LABEL, THEME_PREFS, themePref } from '../theme/themes'
 
-const HINT: Record<string, string> = { system: 'Follows your Mac', dark: 'Night sky', light: 'Day sky', paper: 'E-paper, no motion' }
+const HINT: Record<string, string> = { system: 'Follows your Mac', dark: 'Night sky', light: 'Day sky', paper: 'E-paper, no motion', 'paper-night': 'E-paper in the dark, no motion' }
 
 export function ThemePicker() {
   return (

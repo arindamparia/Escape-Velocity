@@ -1,21 +1,26 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="paper">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Today · Escape Velocity</title>
     <meta name="description" content="13 weeks. 37 designs. One jump." />
-    <meta name="theme-color" content="#0A0E1A" />
+    <meta name="theme-color" content="#F2EFE6" />
     <link rel="icon" href="/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <script>
       // Set the theme before first paint, so there is no flash. The synced setting wins afterwards.
       (function () {
         try {
-          var p = localStorage.getItem('ev:theme') || 'system'
-          var t = p === 'system' ? (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark') : p
-          document.documentElement.setAttribute('data-theme', t)
-          document.documentElement.setAttribute('data-theme-pref', p)
+          var p = localStorage.getItem('ev:theme') || 'paper'
+          var t = p === 'system' ? (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark') : p === 'paper-night' ? 'paper' : p
+          var r = document.documentElement
+          r.setAttribute('data-theme', t)
+          r.setAttribute('data-theme-pref', p)
+          if (p === 'paper-night') {
+            r.setAttribute('data-tone', 'night')
+            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#15130F')
+          }
         } catch (e) {}
       })()
     </script>

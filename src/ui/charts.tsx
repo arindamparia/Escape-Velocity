@@ -79,7 +79,7 @@ export function ScoreSheet({ data, slots, target, title, subtitle }: { data: Bar
         {Array.from({ length: slots }, (_, i) => <text key={i} x={PAD.l + slot * i + slot / 2} y={H - 6} text-anchor="middle" style={{ opacity: i < data.length ? 1 : 0.45 }}>W{i + 1}</text>)}
         <text x={PAD.l - 6} y={H - PAD.b - 13} text-anchor="end" style="font-size:9px;letter-spacing:0.04em">SCORE</text>
       </svg>
-      <p class="small muted" style="margin:0.3rem 0 0;min-height:1.4em" aria-live="polite">{hover !== null && data[hover] ? `Week ${data[hover].label}: ${data[hover].value} points${data[hover].hatched ? ' (light week, no target)' : ''}` : 'Hover or focus a column for its value.'}</p>
+      <p class="small muted" style="margin:0.3rem 0 0;min-height:1.4em" aria-live="polite">{hover !== null && data[hover] ? `Week ${data[hover].label}: ${data[hover].value} points${data[hover].hatched ? ' (light week, no target)' : ''}` : 'Tap, hover or focus a column for its value.'}</p>
     </Frame>
   )
 }

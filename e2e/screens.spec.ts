@@ -27,7 +27,7 @@ for (const name of Object.keys(SCREENS) as ScreenName[]) {
               tabbar: getComputedStyle(document.querySelector('.tabbar')!).display,
               nav: getComputedStyle(document.querySelector('.nav')!).display,
               font: parseFloat(getComputedStyle(document.documentElement).fontSize),
-              theme: document.documentElement.getAttribute('data-theme'),
+              theme: document.documentElement.getAttribute('data-theme-pref'),
             }
           })
           expect(layout.theme).toBe(theme)

@@ -64,6 +64,25 @@
   --lh: 1.65;
 }
 
+/* Paper night: Paper in a dark tone (data-theme stays "paper", so every Paper rule below and in app.css still applies).
+   From the dark-mode guidance: warm off-black and off-white (never #000 or #fff), ink-strength contrast, a muted
+   line so bright borders do not glare or bleed on a dark panel, a little more leading for light-on-dark text. */
+[data-theme='paper'][data-tone='night'] {
+  color-scheme: dark;
+  --bg: #15130f;
+  --surface: #15130f;
+  --surface-2: #15130f;
+  --text: #efe9d9;
+  --text-muted: #cdc6b3;
+  --accent: #efe9d9;
+  --accent-ink: #15130f;
+  --line: #b4ad9b;
+  --done: #efe9d9;
+  --warn: #efe9d9;
+  --hero-tint: #15130f;
+  --lh: 1.72;
+}
+
 /* Paper: no motion, no shadows, no gradients, no blur. */
 [data-theme='paper'] *,
 [data-theme='paper'] *::before,

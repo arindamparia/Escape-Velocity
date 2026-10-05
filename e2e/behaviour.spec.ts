@@ -56,7 +56,7 @@ test.describe('themes', () => {
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
     await page.emulateMedia({ colorScheme: 'light' })
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
-    await page.keyboard.press('4') // Paper
+    await page.keyboard.press('1') // Paper
     await page.emulateMedia({ colorScheme: 'dark' })
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'paper')
   })
@@ -86,9 +86,11 @@ test.describe('themes', () => {
   test('the choice is remembered on the device and the tab colour follows it', async ({ page, api }) => {
     await api.onboard()
     await openApp(page, '/')
-    await page.keyboard.press('4')
+    await page.keyboard.press('1')
     await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#F2EFE6')
     await page.keyboard.press('2')
+    await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#15130F')
+    await page.keyboard.press('4')
     await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#0A0E1A')
   })
 })

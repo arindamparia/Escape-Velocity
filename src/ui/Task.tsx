@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'preact/hooks'
 import type { PlanTask, TaskType, WeekChunk } from '../../shared/plan-types'
 import { engine, findNote, openOverlay, saveNote, toggleTask } from '../lib/app'
 import { navigate } from '../lib/nav'
@@ -83,10 +84,17 @@ export function actionsFor(task: PlanTask, chunk: WeekChunk | null): TaskAction[
 export function TaskCheck({ task }: { task: PlanTask }) {
   const done = engine.doneSet.value.has(task.id)
   const locked = engine.autoDoneSet.value.has(task.id)
+  // a short pop when a task becomes done in front of you, never on a page that merely loads with it done
+  const was = useRef(done)
+  const [pop, setPop] = useState(false)
+  useEffect(() => {
+    if (done && !was.current) { setPop(true); const t = setTimeout(() => setPop(false), 450); was.current = done; return () => clearTimeout(t) }
+    was.current = done
+  }, [done])
   return (
     <button
       type="button"
-      class="task__check"
+      class={`task__check${pop ? ' task__check--pop' : ''}`}
       aria-pressed={done}
       aria-disabled={locked || undefined}
       data-locked={locked || undefined}

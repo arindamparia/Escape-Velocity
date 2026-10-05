@@ -142,7 +142,7 @@ function EquationOverlay({ taskId }: { taskId: string }) {
 
 const SHORTCUTS: [string, string][] = [
   ['j / k', 'Move down / up the task list'], ['x', 'Tick or untick the focused task'], ['s', 'Start the focused task’s tool'],
-  ['t', 'Jump to Today'], ['⌘K', 'Command palette'], ['1 2 3 4', 'Theme: System, Dark, Light, Paper'], ['?', 'This list'],
+  ['t', 'Jump to Today'], ['⌘K', 'Command palette'], ['1 2 3 4 5', 'Theme: Paper, Paper night, Light, Dark, System'], ['?', 'This list'],
 ]
 
 function Shortcuts() {
@@ -205,7 +205,7 @@ export function commandsFor(q: string): Item[] {
     const minutes = Number(m[1])
     out.push({ label: `Start ${minutes}-minute timer`, hint: 'timer', run: () => { closeOverlay(); startTimer('free', minutes) } })
   }
-  m = /^theme\s+(system|dark|light|paper)$/.exec(s)
+  m = /^theme\s+(system|dark|light|paper|paper-night)$/.exec(s)
   if (m) {
     const pref = m[1] as ThemePref
     out.push({ label: `Theme: ${pref}`, hint: 'theme', run: () => { closeOverlay(); setTheme(pref) } })

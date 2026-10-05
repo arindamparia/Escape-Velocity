@@ -178,16 +178,20 @@ test.describe('keyboard and command palette', () => {
     await expect(page).toHaveURL(/\/$/)
   })
 
-  test('1 to 4 switch the theme, and the choice survives a reload', async ({ page, api }) => {
+  test('1 to 5 switch the theme (Paper, Paper night, Light, Dark, System), and the choice survives a reload', async ({ page, api }) => {
     await api.onboard()
     await openApp(page, '/')
-    for (const [key, theme] of [['2', 'dark'], ['3', 'light'], ['4', 'paper']] as const) {
+    for (const [key, theme, tone] of [['4', 'dark', null], ['3', 'light', null], ['2', 'paper', 'night'], ['1', 'paper', null]] as const) {
       await page.keyboard.press(key)
       await expect(page.locator('html')).toHaveAttribute('data-theme', theme)
+      if (tone) await expect(page.locator('html')).toHaveAttribute('data-tone', tone)
+      else await expect(page.locator('html')).not.toHaveAttribute('data-tone', 'night')
     }
-    await expect.poll(async () => (await api.state()).settings.find((s) => s.key === 'theme')?.value).toBe('paper')
+    await page.keyboard.press('2')
+    await expect.poll(async () => (await api.state()).settings.find((s) => s.key === 'theme')?.value).toBe('paper-night')
     await page.reload()
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'paper')
+    await expect(page.locator('html')).toHaveAttribute('data-tone', 'night')
   })
 
   test('⌘K / Ctrl+K opens the palette: jump to a design, log a problem, start a timer, switch theme', async ({ page, api }) => {

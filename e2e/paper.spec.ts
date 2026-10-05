@@ -46,14 +46,34 @@ const PATHS = [
 ]
 
 test.describe('Paper: nothing moves, nothing is raised, nothing fades', () => {
-  for (const path of PATHS) {
-    test(path, async ({ page, api }) => {
-      await api.seedTypical()
-      await openApp(page, path, { theme: 'paper' })
-      await expect(page.locator('html')).toHaveAttribute('data-theme', 'paper')
-      expect(await offenders(page)).toEqual([])
-    })
+  for (const theme of ['paper', 'paper-night'] as const) {
+    for (const path of PATHS) {
+      test(`${theme}: ${path}`, async ({ page, api }) => {
+        await api.seedTypical()
+        await openApp(page, path, { theme })
+        await expect(page.locator('html')).toHaveAttribute('data-theme', 'paper') // Paper night is Paper in a dark tone
+        if (theme === 'paper-night') await expect(page.locator('html')).toHaveAttribute('data-tone', 'night')
+        else await expect(page.locator('html')).not.toHaveAttribute('data-tone', 'night')
+        expect(await offenders(page)).toEqual([])
+      })
+    }
   }
+
+  test('Paper night is warm off-black with off-white ink, never pure black or white', async ({ page, api }) => {
+    await api.onboard()
+    await openApp(page, '/', { theme: 'paper-night' })
+    const c = await page.evaluate(() => { const cs = getComputedStyle(document.body); return { bg: cs.backgroundColor, ink: cs.color } })
+    expect(c.bg).toBe('rgb(21, 19, 15)')
+    expect(c.ink).toBe('rgb(239, 233, 217)')
+  })
+
+  test('Paper is the default: a browser that has never picked a theme gets it', async ({ page, api }) => {
+    await api.onboard()
+    await openApp(page, '/', { theme: undefined })
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'paper')
+    await expect(page.locator('html')).not.toHaveAttribute('data-tone', 'night')
+    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe('rgb(242, 239, 230)')
+  })
 
   test('with the timer running, a toast showing, and each dialog open', async ({ page, api }) => {
     await api.seedTypical()
