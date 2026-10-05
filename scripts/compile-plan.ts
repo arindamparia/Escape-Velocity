@@ -3,6 +3,7 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { compilePlan, PlanCompileError } from './lib/compile'
+import { buildChunks, corpusHash } from './lib/rag'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const planPath = join(root, 'plan', 'escape-velocity-plan.md')
@@ -21,6 +22,8 @@ try {
   for (const [key, chunk] of Object.entries(result.weekChunks)) write(`weeks/${key}.json`, chunk)
   for (const [name, chunk] of Object.entries(result.pages)) write(`pages/${name}.json`, chunk)
   write('search.json', result.search)
+  const rag = buildChunks(result)
+  write('rag.json', { hash: corpusHash(rag), chunks: rag })
   const c = result.core.counts
   console.log(
     `Compiled ${c.tasks} tasks (${c.weeklyTasks} weekly + ${c.readiness} readiness), ${c.designs} designs, ` +

@@ -4,7 +4,7 @@ import { useNow } from '../ui/hooks'
 import { Icon } from '../ui/Icon'
 import { checkTimer, dismissTimer, elapsedMs, fmt, isDue, remainingMs, startTimer, stopTimer, timer } from './timer'
 
-const KIND_LABEL: Record<string, string> = { dsa: 'DSA', boss: 'Boss problem', concept: 'Concept', infra: 'Infra', lld: 'LLD', loop: 'Learning loop', restart: 'Restart', mock: 'Mock', free: 'Focus', hard: 'Hard' }
+export const KIND_LABEL: Record<string, string> = { dsa: 'DSA', boss: 'Boss problem', concept: 'Concept', infra: 'Infra', lld: 'LLD', loop: 'Learning loop', restart: 'Restart', mock: 'Mock', free: 'Focus', hard: 'Hard' }
 
 /** The running focus timer. The display is derived from the start timestamp every second. */
 export function TimerCard() {

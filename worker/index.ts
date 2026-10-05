@@ -2,6 +2,7 @@
 // (wrangler.jsonc: assets.run_worker_first = ["/api/*"]).
 import { Hono } from 'hono'
 import { OpsRequestSchema, type Op } from '../shared/schemas'
+import { ask, aiStatus, AskError, reindex } from './ask'
 import { parseSolved, readSolved, setDevSolved } from './solved'
 import { accessConfigured, verifyAccess } from './access'
 import type { Env } from './env'
@@ -45,6 +46,7 @@ app.post('/dev/reset', async (c) => {
     db.prepare('DELETE FROM focus_session'),
     db.prepare('DELETE FROM settings'),
     db.prepare('DELETE FROM applied_op'),
+    db.prepare('DELETE FROM ai_usage'),
   ])
   return json({ reset: true })
 })
@@ -61,6 +63,26 @@ app.get('/state', async (c) => json(await readState(c.env.DB)))
 
 // Problems solved in AlgoTracker, read live from its database (see worker/solved.ts).
 app.get('/solved', async (c) => json(await readSolved(c.env)))
+
+// The AI search (worker/ask.ts): a grounded answer, the corpus status, and the one-click semantic reindex.
+app.post('/ask', async (c) => {
+  const body = await c.req.json().catch(() => null)
+  try {
+    return json(await ask(c.env, body))
+  } catch (e) {
+    if (e instanceof AskError) return err(e.code, e.message, e.status)
+    throw e
+  }
+})
+app.get('/ai/status', async (c) => json(await aiStatus(c.env)))
+app.post('/ai/reindex', async (c) => {
+  try {
+    return json(await reindex(c.env))
+  } catch (e) {
+    if (e instanceof AskError) return err(e.code, e.message, e.status)
+    return err('upstream', 'Indexing failed. Check that the Vectorize index exists with 768 dimensions and cosine distance.', 502)
+  }
+})
 
 app.get('/export', async (c) => {
   const body = await readExport(c.env.DB)

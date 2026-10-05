@@ -1,5 +1,5 @@
 export type IconName =
-  | 'check' | 'circle' | 'play' | 'pause' | 'star' | 'search' | 'moon' | 'sliders' | 'link' | 'warn' | 'orbit' | 'close' | 'chevron' | 'book' | 'dot' | 'lock'
+  | 'check' | 'circle' | 'play' | 'pause' | 'star' | 'search' | 'moon' | 'sliders' | 'link' | 'warn' | 'orbit' | 'close' | 'chevron' | 'book' | 'dot' | 'lock' | 'clock'
 
 export function Icon({ name, label }: { name: IconName; label?: string }) {
   return (

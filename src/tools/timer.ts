@@ -44,6 +44,8 @@ if (typeof window !== 'undefined') {
 
 /** Presets per task type: DSA 25 min, hard/boss 40, concept 45, LLD 90. */
 export const PRESETS: Record<string, number> = { dsa: 25, boss: 40, hard: 40, concept: 45, infra: 45, lld: 90, restart: 10, mock: 45 }
+/** The quick-start choices (top bar menu and the Timer page): label, kind, minutes. Hard and boss problems run open-ended. */
+export const TIMER_CHOICES: [string, string, number][] = [['DSA', 'dsa', 25], ['Hard / boss', 'boss', 40], ['Concept', 'concept', 45], ['LLD', 'lld', 90]]
 export const LOOP_STEP_MIN = [45, 30, 15, 15, 5] as const
 
 export function startTimer(kind: string, plannedMin: number, opts: { refId?: string; label?: string; openEnded?: boolean } = {}): void {

@@ -1,6 +1,39 @@
-import { chimeOn, engine, openOverlay, sync } from '../lib/app'
+import { useEffect, useState } from 'preact/hooks'
+import type { AiStatus } from '../../shared/ask'
+import { chimeOn, engine, openOverlay, say, sync } from '../lib/app'
 import { ThemePicker } from '../ui/ThemePicker'
 import { useTitle } from '../ui/hooks'
+
+/** Is the AI search switched on, how much of today's allowance is used, and does Pinecone hold this build's content? */
+function AiSearch() {
+  const [st, setSt] = useState<AiStatus | null | 'off'>(null)
+  const [busy, setBusy] = useState(false)
+  const load = () => fetch('/api/ai/status', { redirect: 'manual' }).then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status))))).then((j: AiStatus) => setSt(j)).catch(() => setSt('off'))
+  useEffect(() => { void load() }, [])
+  const rebuild = async () => {
+    setBusy(true)
+    try {
+      const r = await fetch('/api/ai/reindex', { method: 'POST', redirect: 'manual' })
+      const j = (await r.json().catch(() => null)) as { indexed?: number; error?: { message?: string } } | null
+      say(r.ok ? `Indexed ${j?.indexed ?? 0} chunks. It can take a few seconds to show.` : (j?.error?.message ?? 'Could not rebuild the index.'), 4200)
+    } finally { setBusy(false); setTimeout(() => void load(), 2500) }
+  }
+  return (
+    <section class="card stack"><h2>AI search</h2>
+      {st === null ? <p class="muted small" style="margin:0">Checking…</p> : st === 'off' ? <p class="muted small" style="margin:0">Could not read the status (offline or signed out).</p> : (
+        <>
+          <dl class="kv" style="margin:0">
+            <dt>Answers</dt><dd>{st.configured ? `On (${st.model})` : 'Off: add the OPENAI_API_KEY secret'}</dd>
+            <dt>Today</dt><dd>{st.usedToday} of {st.limit} questions</dd>
+            <dt>Search by meaning</dt><dd>{!st.semantic ? 'Off (keywords only): add PINECONE_API_KEY and PINECONE_INDEX_HOST' : st.fresh ? `Up to date (${st.indexed} chunks)` : st.indexed === null ? 'Could not reach Pinecone' : `Out of date (${st.indexed} of ${st.chunks} chunks): rebuild`}</dd>
+          </dl>
+          {st.semantic && !st.fresh ? <div><button type="button" class="btn" disabled={busy} onClick={() => void rebuild()}>{busy ? 'Rebuilding…' : 'Rebuild the index'}</button></div> : null}
+          <p class="small muted" style="margin:0">Type <kbd>?</kbd> and a question in the search box (⌘K). Only your question and snippets of the plan are sent; your notes, stats and why are never included. The keys live on the server.</p>
+        </>
+      )}
+    </section>
+  )
+}
 
 export default function Settings() {
   useTitle('Settings')
@@ -31,6 +64,7 @@ export default function Settings() {
           <div class="row"><button type="button" class="btn" onClick={() => void sync.run()}>Sync now</button><a class="btn" href="/api/export" download>Download backup (JSON)</a></div>
           <p class="small muted" style="margin:0">Every device keeps a full copy and syncs in the background. D1 also keeps 7 days of Time Travel backups.</p>
         </section>
+        <AiSearch />
         <section class="card stack"><h2>Keyboard</h2>
           <p class="small muted" style="margin:0"><kbd>j</kbd> <kbd>k</kbd> move, <kbd>x</kbd> tick, <kbd>s</kbd> start, <kbd>t</kbd> Today, <kbd>⌘K</kbd> palette, <kbd>1</kbd> to <kbd>5</kbd> themes.</p>
           <div><button type="button" class="btn btn--small" onClick={() => openOverlay({ kind: 'shortcuts' })}>All shortcuts</button></div>

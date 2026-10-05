@@ -7,7 +7,7 @@ const PORT = 8788
 const BUILD = process.env.E2E_SKIP_BUILD ? '' : 'npm run build && '
 const SERVER =
   `${BUILD}npx wrangler d1 migrations apply escape-velocity --local --persist-to .wrangler/e2e && ` +
-  `npx wrangler dev --port ${PORT} --local --persist-to .wrangler/e2e --var ENVIRONMENT:dev --var OWNER_EMAIL:e2e@localhost --var ALGOTRACKER_DATABASE_URL: `
+  `npx wrangler dev --port ${PORT} --local --persist-to .wrangler/e2e --var ENVIRONMENT:dev --var OWNER_EMAIL:e2e@localhost --var ALGOTRACKER_DATABASE_URL: --var OPENAI_API_KEY: --var PINECONE_API_KEY: `
 
 // On a Mac Playwright finds its own browsers. A container with a preinstalled Chromium sets PW_CHROMIUM_PATH.
 const executablePath = process.env.PW_CHROMIUM_PATH

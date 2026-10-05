@@ -11,6 +11,7 @@ import { Boundary } from './ui/Boundary'
 import { lazyPage } from './ui/lazyPage'
 import { Icon } from './ui/Icon'
 import { TimerCard } from './tools/TimerCard'
+import { TimerChip } from './tools/TimerChip'
 import { timer } from './tools/timer'
 
 const Overlays = lazy(() => import('./ui/Overlays'))
@@ -53,6 +54,7 @@ function TopBar() {
       </nav>
       <span class="spacer" />
       <SyncDot />
+      <TimerChip />
       <button type="button" class="iconbtn" aria-label="Command palette (⌘K)" title="Command palette (⌘K)" onClick={() => openOverlay({ kind: 'palette' })}>
         <Icon name="search" /><span class="btn-label">Search</span><kbd class="noprint">⌘K</kbd>
       </button>

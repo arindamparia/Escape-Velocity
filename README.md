@@ -67,3 +67,21 @@ scripts/     compiler, icons                   migrations/  D1 schema (append-on
 shared/      types and zod schemas             tests/       unit/ and worker/ (Vitest)
 src/         the app (lib, pages, tools, ui)   e2e/         Playwright specs
 ```
+
+## AI search (Ask in the search box)
+
+Type `?` and a question in the search box (⌘K), or press ⌘↵ on any search. The Worker (`worker/ask.ts`) finds the best chunks of your plan, asks OpenAI to answer from them only, checks every id in the reply, and the box shows the answer with its sources as rows. Actions it suggests (change theme, start a timer) are rows you confirm; nothing runs by itself.
+
+How it finds things: your plan's content (595 chunks, `src/generated/rag.json`, no personal data) is bundled in the Worker, and Pinecone adds a search by meaning ("avoid double charging" finds idempotency). Without Pinecone it still works from the box's own matches and keywords.
+
+| Setting | What | How |
+| --- | --- | --- |
+| `OPENAI_API_KEY` | answers | secret: `npx wrangler secret put OPENAI_API_KEY` |
+| `OPENAI_MODEL` | model (default `gpt-4.1-mini`) | optional var |
+| `AI_DAILY_LIMIT` | questions per day (default 100) | optional var; a cost guard counted in D1 (`ai_usage`) |
+| `PINECONE_API_KEY` | semantic search | secret: `npx wrangler secret put PINECONE_API_KEY` |
+| `PINECONE_INDEX_HOST` | the index's host | var in `wrangler.jsonc` |
+
+Pinecone index (once): an integrated-embedding index, `llama-text-embed-v2`, created with `POST https://api.pinecone.io/indexes/create-for-model` (name `escape-velocity`, aws us-east-1). Fill it with `PINECONE_API_KEY=… PINECONE_INDEX_HOST=… npx tsx scripts/index-pinecone.ts`, or press "Rebuild the index" in Settings. Each version of the content gets its own namespace (`plan-<hash>`), so after you change the plan, rebuild once and the old version is removed. Settings shows whether it is up to date.
+
+Privacy: only your question, the plan snippets it matched and the list of actions are sent to OpenAI and Pinecone. Notes, stats, why and solved problems are never sent. The keys are Worker secrets behind Cloudflare Access. If a key was ever pasted into a chat or a file, rotate it.

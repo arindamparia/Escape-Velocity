@@ -13,5 +13,5 @@
     "noEmit": true,
     "types": ["@cloudflare/workers-types", "@cloudflare/vitest-pool-workers/types"]
   },
-  "include": ["./**/*.ts", "../shared/**/*.ts", "../src/lib/dates.ts", "../src/lib/srs.ts", "../src/generated/plan-core.json", "../tests/worker/**/*.ts"]
+  "include": ["./**/*.ts", "../shared/**/*.ts", "../src/lib/dates.ts", "../src/lib/srs.ts", "../src/generated/plan-core.json", "../src/generated/rag.json", "../tests/worker/**/*.ts"]
 }

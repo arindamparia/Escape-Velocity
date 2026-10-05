@@ -1,14 +1,11 @@
 import { lazy } from 'preact-iso'
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
-import type { SearchEntry } from '../../shared/plan-types'
+import { useEffect, useRef, useState } from 'preact/hooks'
 import { canonicalProblemUrl, titleFromProblemUrl } from '../../shared/constants'
-import { closeOverlay, engine, logProblem, needsOnboarding, overlay, say, setTheme, showDesign, whyNote } from '../lib/app'
+import { closeOverlay, engine, logProblem, needsOnboarding, overlay, say, whyNote } from '../lib/app'
 import { today } from '../lib/clock'
-import { navigate } from '../lib/nav'
-import { loadSearch, plan, taskById, taskLabel } from '../lib/plan'
-import { startTimer } from '../tools/timer'
-import type { ThemePref } from '../theme/themes'
+import { taskById, taskLabel } from '../lib/plan'
 import { Dialog } from './Dialog'
+import { Palette } from './Palette'
 import { EquationCard } from './Equation'
 import { useWeekChunk, usePage } from './hooks'
 import { Html } from './Html'
@@ -175,97 +172,3 @@ function Onboarding() {
   )
 }
 
-/* ------------------------------------------------------------------ command palette */
-
-interface Item { label: string; hint?: string; run: () => void }
-
-const PAGES: [string, string][] = [['Solved problems', '/progress/problems'], ['How this works', '/guide'], ['Today', '/'], ['Weeks', '/weeks'], ['Study', '/study'], ['Library', '/library'], ['Progress', '/progress'], ['Mindset', '/mindset'], ['Settings', '/settings']]
-const TOOLS: [string, string][] = [
-  ['Learning loop', '/study/loop'], ['Redraw queue', '/study/redraws'], ['Flashcards', '/study/flashcards'], ['Focus timer', '/study/timer'],
-  ['Mock mode', '/study/mock'], ['Envelope calculator', '/study/envelope'], ['Formula sheet', '/study/formulas'], ['Notes', '/study/notes'],
-  ['Cheat sheet', '/study/cheatsheet'], ['Sunday review', '/progress/review'], ['Capstone', '/weeks/capstone'],
-]
-
-function go(url: string): () => void {
-  return () => { closeOverlay(); navigate(url) }
-}
-
-export function commandsFor(q: string): Item[] {
-  const s = q.trim().toLowerCase()
-  const out: Item[] = []
-  let m = /^log\s+(easy|medium|hard)(?:\s+(\d{1,3}))?(?:\s+(https?:\/\/\S+))?$/i.exec(q.trim())
-  if (m) {
-    const d = m[1].toLowerCase() as 'easy' | 'medium' | 'hard'
-    const mins = m[2] ? Number(m[2]) : undefined
-    const url = m[3]
-    out.push({ label: `Log ${d}${mins ? ` · ${mins} min` : ''}${url ? ' with its link' : ''}`, hint: 'problem', run: () => { closeOverlay(); if (logProblem(d, mins, true, titleFromProblemUrl(url) ?? undefined, today.value, url)) say(`Logged: ${d}${mins ? `, ${mins} min` : ''}.`) } })
-  }
-  m = /^timer\s+(\d{1,3})$/.exec(s)
-  if (m && Number(m[1]) > 0) {
-    const minutes = Number(m[1])
-    out.push({ label: `Start ${minutes}-minute timer`, hint: 'timer', run: () => { closeOverlay(); startTimer('free', minutes) } })
-  }
-  m = /^theme\s+(system|dark|light|paper|paper-night)$/.exec(s)
-  if (m) {
-    const pref = m[1] as ThemePref
-    out.push({ label: `Theme: ${pref}`, hint: 'theme', run: () => { closeOverlay(); setTheme(pref) } })
-  }
-  return out
-}
-
-function Palette() {
-  const [q, setQ] = useState('')
-  const [index, setIndex] = useState(0)
-  const [search, setSearch] = useState<SearchEntry[]>([])
-  useEffect(() => { loadSearch().then(setSearch).catch(() => {}) }, [])
-
-  const items = useMemo<Item[]>(() => {
-    const out: Item[] = commandsFor(q)
-    const terms = q.trim().toLowerCase().split(/\s+/).filter(Boolean)
-    if (!terms.length) {
-      for (const [l, u] of PAGES) out.push({ label: l, hint: 'page', run: go(u) })
-      for (const [l, u] of TOOLS) out.push({ label: l, hint: 'tool', run: go(u) })
-      return out
-    }
-    const hay = (l: string, extra = '') => `${l} ${extra}`.toLowerCase()
-    for (const [l, u] of [...PAGES, ...TOOLS]) if (terms.every((t) => hay(l).includes(t))) out.push({ label: l, hint: PAGES.some((p) => p[0] === l) ? 'page' : 'tool', run: go(u) })
-    const scored: { score: number; item: Item }[] = []
-    for (const e of search) {
-      const h = hay(e.t, e.x)
-      if (!terms.every((t) => h.includes(t))) continue
-      const score = (e.t.toLowerCase().startsWith(terms[0]) ? 0 : 1) + (e.k === 'w' ? 0 : e.k === 'd' ? 0.2 : 0.5)
-      const item: Item =
-        e.k === 'w' ? { label: e.t, hint: 'week', run: go(`/weeks/${e.id}`) }
-        : e.k === 'd' ? { label: e.t, hint: 'design', run: () => { closeOverlay(); navigate(`/library?design=${e.id}`); showDesign(e.id) } }
-        : { label: e.t, hint: taskLabel(e.id), run: go(`/weeks/${taskById.get(e.id)?.week ?? plan.weeks[0].n}#${e.id}`) }
-      scored.push({ score, item })
-    }
-    scored.sort((a, b) => a.score - b.score)
-    for (const s of scored.slice(0, 14)) out.push(s.item)
-    return out.slice(0, 16)
-  }, [q, search])
-
-  useEffect(() => setIndex(0), [q])
-  return (
-    <Dialog title="Command palette" onClose={closeOverlay} bare>
-      <input
-        type="text" role="combobox" aria-expanded="true" aria-controls="palette-list" aria-activedescendant={items.length ? `palette-opt-${index}` : undefined} aria-label="Search or run a command" autofocus
-        placeholder="Jump to a week, design or tool · log medium 22 <link> · timer 25 · theme paper" value={q}
-        onInput={(e) => setQ((e.target as HTMLInputElement).value)}
-        onKeyDown={(e) => {
-          if (e.key === 'ArrowDown') { e.preventDefault(); setIndex((i) => Math.min(items.length - 1, i + 1)) }
-          else if (e.key === 'ArrowUp') { e.preventDefault(); setIndex((i) => Math.max(0, i - 1)) }
-          else if (e.key === 'Enter') { e.preventDefault(); items[index]?.run() }
-        }}
-      />
-      <ul id="palette-list" role="listbox" aria-label="Results">
-        {items.map((it, i) => (
-          <li key={`${it.label}-${i}`} id={`palette-opt-${i}`} role="option" aria-selected={i === index} onClick={it.run} onMouseMove={() => setIndex(i)}>
-            <span>{it.label}</span><span class="muted small mono">{it.hint}</span>
-          </li>
-        ))}
-        {!items.length ? <li class="muted" style="padding:0.8rem">Nothing matches “{q}”.</li> : null}
-      </ul>
-    </Dialog>
-  )
-}
