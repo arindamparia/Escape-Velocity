@@ -9,3 +9,6 @@ playwright-report
 .claude
 .DS_Store
 backups
+
+# Playwright screenshot baselines: per machine and large, so they stay local. Make them with: npx playwright test e2e/screens.spec.ts e2e/epaper.spec.ts --update-snapshots
+e2e/*-snapshots/
