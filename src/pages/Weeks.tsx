@@ -1,5 +1,5 @@
 import { ErrorBoundary, lazy } from 'preact-iso'
-import { useEffect, useMemo } from 'preact/hooks'
+import { useMemo } from 'preact/hooks'
 import { engine } from '../lib/app'
 import { today } from '../lib/clock'
 import { weekHasLightDay } from '../lib/dates'
@@ -52,14 +52,6 @@ function WeekDetail({ n, current }: { n: number; current: number }) {
   const target = weekTarget(n, plan.config)
   const light = weekHasLightDay(n, plan.config.startDate, plan.config.lightDays)
   const lightLabels = plan.config.lightDays.filter((l) => l.from <= w.endDate && l.to >= w.startDate).map((l) => l.label)
-
-  // jump to a task from the palette (/weeks/4#w04-07)
-  useEffect(() => {
-    const id = location.hash.slice(1)
-    if (!id) return
-    const el = document.querySelector(`[data-task="${id}"]`)
-    el?.scrollIntoView({ block: 'center' })
-  }, [n, chunk])
 
   return (
     <div class="stack">

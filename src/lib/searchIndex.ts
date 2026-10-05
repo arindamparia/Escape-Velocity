@@ -3,6 +3,7 @@ import type { PageChunks, SearchEntry } from '../../shared/plan-types'
 import { canonicalProblemUrl, titleFromProblemUrl } from '../../shared/constants'
 import { closeOverlay, engine, logProblem, openOverlay, say, setTheme, showDesign, toggleTask } from './app'
 import { today } from './clock'
+import { PAGES, SECTIONS, urls, weekOfTask } from './destinations'
 import { navigate } from './nav'
 import { plan, taskById, taskLabel, weekLoaded } from './plan'
 import { loadSolved } from './solved'
@@ -36,30 +37,6 @@ const THEME_KEYS: Record<ThemePref, string> = {
   dark: 'appearance look colours night dark mode sky black',
   system: 'appearance look colours automatic auto os follow',
 }
-
-const PAGES: [string, string, string, string][] = [
-  ['Today', '/', 'home next up what now', 'Your next task, your why, your progress so far'],
-  ['Weeks', '/weeks', 'plan calendar timeline schedule 13 weeks', 'All 13 weeks, day by day'],
-  ['Study', '/study', 'tools learn', 'The learning loop, flashcards, redraws and the other tools'],
-  ['Library', '/library', 'designs systems browse', '37 designs, machine coding, what companies ask'],
-  ['Progress', '/progress', 'stats points scorecard charts numbers', 'Points, charts, the scorecard and the ready check'],
-  ['Solved problems', '/progress/problems', 'leetcode algotracker dsa list done', 'Everything you solved, grouped by type'],
-  ['Study links', '/sources', 'resources videos docs youtube links sources', 'Every video and doc in the plan, by week'],
-  ['How this works', '/guide', 'help glossary terms explain guide what is', 'The guide and the glossary of every term in the plan'],
-  ['Mindset', '/mindset', 'why motivation rules', 'Your why and the plan’s rules'],
-  ['Settings', '/settings', 'preferences options theme chime shortcuts', 'Theme, sound, sync and shortcuts'],
-  ['Learning loop', '/study/loop', 'design derive six steps', 'Derive a design in six steps'],
-  ['Redraw queue', '/study/redraws', 'redraw memory spaced', 'Designs due to be redrawn from memory'],
-  ['Flashcards', '/study/flashcards', 'cards review why-notes srs spaced', 'Review the cards your why-notes made'],
-  ['Focus timer', '/study/timer', 'pomodoro stopwatch countdown focus', 'Start, stop and see your sessions'],
-  ['Mock mode', '/study/mock', 'mock interview practice', 'Run a timed mock interview'],
-  ['Envelope calculator', '/study/envelope', 'estimation back of envelope capacity qps storage', 'Back-of-the-envelope numbers'],
-  ['Formula sheet', '/study/formulas', 'maths derivation equations', 'The formulas behind the Thursday maths'],
-  ['Notes', '/study/notes', 'why-notes stories star writing', 'Your why-notes, STAR stories and free notes'],
-  ['Cheat sheet', '/study/cheatsheet', 'summary revision', 'Your one-page cheat sheet'],
-  ['Sunday review', '/progress/review', 'weekly review scorecard row', 'Fill in this week’s scorecard row'],
-  ['Capstone', '/weeks/capstone', 'project checkout order inventory webhooks diagram', 'The checkout project you build on Sundays'],
-]
 
 /** Things you can do. Dynamic ones (the next task, stopping a running timer) come from `liveActions`. */
 export function actionEntries(): Entry[] {
@@ -111,34 +88,40 @@ export function liveActions(): Entry[] {
 }
 
 export function pageEntries(): Entry[] {
-  return PAGES.map(([title, url, keys, sub]) => ({ id: `page:${url}`, kind: 'page' as const, title, sub, keys, run: go(url) }))
+  return [...PAGES, ...SECTIONS].map((p) => ({ id: p.id, kind: 'page' as const, title: p.title, sub: p.sub, keys: p.keys, hint: p.hint, run: go(p.url) }))
 }
 
 export function termEntries(): Entry[] {
-  return GLOSSARY.flatMap((g) => g.terms.map((t) => ({ id: `term:${t.id}`, kind: 'term' as const, title: t.term, sub: t.what, keys: g.title, hint: 'guide', run: go(`/guide#${t.id}`) })))
+  return GLOSSARY.flatMap((g) => g.terms.map((t) => ({ id: `term:${t.id}`, kind: 'term' as const, title: t.term, sub: t.what, keys: g.title, hint: 'guide', run: go(urls.term(t.id)) })))
 }
 
 /** Weeks, tasks and designs come from the compiled search list. */
 export function planEntries(list: readonly SearchEntry[]): Entry[] {
   return list.map((e): Entry => {
-    if (e.k === 'w') return { id: `week:${e.id}`, kind: 'week', title: e.t, keys: e.x, hint: 'week', run: go(`/weeks/${e.id}`) }
-    if (e.k === 'd') return { id: `design:${e.id}`, kind: 'design', title: e.t, sub: e.x, hint: 'design', run: () => { closeOverlay(); navigate(`/library?design=${e.id}`); showDesign(e.id) } }
+    if (e.k === 'w') return { id: `week:${e.id}`, kind: 'week', title: e.t, keys: e.x, hint: 'week', run: go(urls.week(e.id)) }
+    if (e.k === 'd') return { id: `design:${e.id}`, kind: 'design', title: e.t, sub: e.x, hint: 'design', run: () => { closeOverlay(); navigate(urls.design(e.id)); showDesign(e.id) } }
     const task = taskById.get(e.id)
-    return { id: `task:${e.id}`, kind: 'task', title: clip(e.t, 110), sub: taskLabel(e.id), keys: e.x, hint: task?.week ? `Week ${task.week}` : 'task', boost: 0, run: go(`/weeks/${task?.week ?? plan.weeks[0].n}#${e.id}`) }
+    return { id: `task:${e.id}`, kind: 'task', title: clip(e.t, 110), sub: taskLabel(e.id), keys: e.x, hint: task?.week ? `Week ${task.week}` : 'task', boost: 0, run: go(urls.task(e.id, task?.week ?? weekOfTask(e.id) ?? plan.weeks[0].n)) }
   })
 }
 
 export function libraryEntries(lib: PageChunks['library']): Entry[] {
   const out: Entry[] = []
+  // the same video is used in several weeks: one row for it, listing every topic it serves
+  const byUrl = new Map<string, { r: (typeof lib.resources)[number]; topics: string[] }>()
   for (const r of lib.resources) {
+    const seen = byUrl.get(r.url)
+    if (seen) { if (!seen.topics.includes(r.topic)) seen.topics.push(r.topic) } else byUrl.set(r.url, { r, topics: [r.topic] })
+  }
+  for (const { r, topics } of byUrl.values()) {
     out.push({
-      id: `link:${r.url}`, kind: r.kind === 'video' ? 'video' : 'doc', title: r.title, sub: `${r.source}${r.minutes ? ` · ${r.minutes} min` : ''} · ${r.topic}`,
-      keys: `${r.topic} ${r.source} ${r.access === 'free' ? 'free' : r.access}`, hint: '↗', external: true,
+      id: `link:${r.url}`, kind: r.kind === 'video' ? 'video' : 'doc', title: r.title, sub: `${r.source}${r.minutes ? ` · ${r.minutes} min` : ''} · ${topics.slice(0, 2).join(', ')}${topics.length > 2 ? '…' : ''}`,
+      keys: `${topics.join(' ')} ${r.source} ${r.access === 'free' ? 'free' : r.access}`, hint: '↗', external: true,
       run: () => { closeOverlay(); window.open(r.url, '_blank', 'noopener,noreferrer') },
     })
   }
-  for (const p of lib.machineCoding) out.push({ id: `problem:${p.problem}`, kind: 'problem', title: p.problem, sub: `Machine coding · ${p.company} · week ${p.week}`, keys: `lld ${p.company}`, hint: 'LLD', run: go('/library?tab=machine') })
-  for (const c of lib.companies) out.push({ id: `company:${c.company}`, kind: 'company', title: c.company, sub: c.rounds, keys: c.questions, hint: 'company', run: go(`/library?tab=companies&company=${encodeURIComponent(c.company)}`) })
+  for (const p of lib.machineCoding) out.push({ id: `problem:${p.problem}`, kind: 'problem', title: p.problem, sub: `Machine coding · ${p.company} · week ${p.week}`, keys: `lld ${p.company}`, hint: 'LLD', run: go(urls.machine()) })
+  for (const c of lib.companies) out.push({ id: `company:${c.company}`, kind: 'company', title: c.company, sub: c.rounds, keys: c.questions, hint: 'company', run: go(urls.company(c.company)) })
   return out
 }
 
@@ -164,13 +147,13 @@ export function smartEntries(q: string): Entry[] {
   m = /^(?:w|wk|week)\s*(\d{1,2})$/i.exec(s)
   if (m && Number(m[1]) >= 1 && Number(m[1]) <= plan.weeks.length) {
     const n = Number(m[1])
-    out.push({ id: 'smart:week', kind: 'week', title: `Go to week ${n}`, sub: plan.weeks[n - 1]?.title, boost: 200, hint: '↵', run: go(`/weeks/${n}`) })
+    out.push({ id: 'smart:week', kind: 'week', title: `Go to week ${n}`, sub: plan.weeks[n - 1]?.title, boost: 200, hint: '↵', run: go(urls.week(n)) })
   }
   m = /^(?:w|wk|week)\s*(\d{1,2})\s*(?:[-.·]|task|t)\s*(\d{1,2})$/i.exec(s)
   if (m) {
     const id = `w${String(m[1]).padStart(2, '0')}-${String(m[2]).padStart(2, '0')}`
     const t = taskById.get(id)
-    if (t) out.push({ id: 'smart:task', kind: 'task', title: `Go to ${taskLabel(id)}`, boost: 200, hint: '↵', run: go(`/weeks/${t.week}#${id}`) })
+    if (t) out.push({ id: 'smart:task', kind: 'task', title: `Go to ${taskLabel(id)}`, boost: 200, hint: '↵', run: go(urls.task(id, t.week ?? weekOfTask(id) ?? 1)) })
   }
   return out
 }

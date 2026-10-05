@@ -91,6 +91,9 @@ main { min-height: calc(100vh - 3.6rem); }
 .term { padding: 0.8rem 0.95rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); scroll-margin-top: 5rem; }
 .term dt { font-weight: 700; margin-bottom: 0.2rem; }
 .term dd { margin: 0; color: var(--text-muted); font-size: 0.93rem; }
+/* where a link landed you: a solid frame (never colour alone, and fine in Paper) */
+[data-hit] { outline: 3px solid var(--accent); outline-offset: 4px; border-radius: var(--radius); scroll-margin-top: 5rem; }
+[data-theme='paper'] [data-hit] { outline-color: var(--text); }
 .term[data-hit] { border-color: var(--accent); box-shadow: inset 4px 0 0 var(--accent); }
 .term[data-hit] dt { color: var(--accent); }
 .jump { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.35rem; }

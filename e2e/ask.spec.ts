@@ -35,11 +35,12 @@ test('a "?" question asks, sends the box\'s matches and the action catalogue, an
   expect(sent!.actions.map((a) => a.id)).toContain('action:theme:dark')
   expect(sent!.actions.every((a) => a.id.startsWith('action:'))).toBe(true)
   await expect(p.getByText('From your plan')).toBeVisible()
-  await expect(p.getByRole('option', { name: /Idempotency/ })).toContainText('what the key is')
-  await expect(p.getByRole('option', { name: /Payment System/ })).toContainText('the full design')
-  expect(await p.getByRole('option').count()).toBe(2) // the made-up id was dropped
+  const from = p.locator('[data-block="from"]') // the answer's own sources; the box's local results are listed under them
+  await expect(from.filter({ hasText: 'Idempotency' })).toContainText('what the key is')
+  await expect(from.filter({ hasText: 'Payment System' })).toContainText('the full design')
+  expect(await from.count()).toBe(2) // the made-up id was dropped
   await expect(p.getByText('3 of 100 questions used today')).toBeVisible()
-  await p.getByRole('option', { name: /Payment System/ }).click()
+  await from.filter({ hasText: 'Payment System' }).click()
   await expect(page).toHaveURL(/design=payment-system/)
 })
 
@@ -67,8 +68,7 @@ test('suggested actions are rows you confirm: the theme does not change until yo
   await p.getByRole('combobox').fill('? switch to dark mode')
   await page.keyboard.press('Enter')
   await expect(p.getByText('Suggested: press Enter to confirm')).toBeVisible()
-  const options = p.getByRole('option')
-  expect(await options.count()).toBe(1) // the id that is not in the catalogue never shows
+  expect(await p.locator('[data-block="do"]').count()).toBe(1) // the id that is not in the catalogue never shows
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'paper') // not run for you
   await page.keyboard.press('Enter')
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
@@ -121,4 +121,100 @@ test('Settings shows whether the AI search is on, and offers a rebuild only when
   await expect(page.getByText('Off: add the OPENAI_API_KEY secret')).toBeVisible() // the e2e server has no keys
   await expect(page.getByText('keywords only')).toBeVisible()
   await expect(page.getByRole('button', { name: 'Rebuild the index' })).toHaveCount(0)
+})
+
+test('each kind of source an answer cites takes you to that place, not to a page that merely contains it', async ({ page, api }) => {
+  await api.onboard()
+  const cases: [string, RegExp, string][] = [
+    ['section:routine', /\/#routine$/, '#routine'],
+    ['section:rules', /\/mindset#rules$/, '#rules'],
+    ['section:points', /\/progress#points$/, '#points'],
+    ['section:capstone-flow', /\/weeks\/capstone#flow$/, '#flow'],
+    ['section:settings-theme', /\/settings#theme$/, '#theme'],
+    ['task:w04-05', /\/weeks\/4#w04-05$/, '[data-task="w04-05"]'],
+    ['term:idempotency', /\/guide#idempotency$/, '#idempotency'],
+    ['week:6', /\/weeks\/6$/, 'main h1'],
+  ]
+  for (const [id, url, target] of cases) {
+    await openApp(page, '/weeks/2')
+    await page.route('**/api/ask', (route) => reply(route, answer({ results: [{ id, why: 'because' }] })))
+    const p = await open(page)
+    await p.getByRole('combobox').fill('? where is it')
+    await page.keyboard.press('Enter')
+    await expect(p.getByRole('region', { name: 'AI answer' })).toBeVisible()
+    await expect(p.locator('[data-block="from"]')).toHaveCount(1)
+    await p.locator('[data-block="from"]').first().click()
+    await expect(page, id).toHaveURL(url)
+    const el = page.locator(target).first()
+    await expect(el, `${id} is visible`).toBeVisible()
+    if (target !== 'main h1') await expect(el, `${id} is marked`).toHaveAttribute('data-hit', '')
+    if (id === 'section:routine') await expect(page.locator('#routine'), 'the routine is opened').toHaveJSProperty('open', true)
+    await page.unroute('**/api/ask')
+  }
+})
+
+test.describe('Enter asks the AI when you typed a question or a phrase', () => {
+  test('a phrase + Enter asks, and what the box found stays listed under the answer', async ({ page, api }) => {
+    await api.onboard()
+    await openApp(page, '/')
+    let calls = 0
+    await page.route('**/api/ask', async (route) => { calls++; await reply(route, answer()) })
+    const p = await open(page)
+    await p.getByRole('combobox').fill('payment idempotency retries')
+    await page.keyboard.press('Enter')
+    await expect(p.getByRole('region', { name: 'AI answer' })).toContainText('idempotency key')
+    expect(calls).toBe(1)
+    await expect(p.locator('.pal__head').filter({ hasText: 'Also found' }).first()).toBeVisible() // the local results are still there
+    await page.keyboard.press('Enter') // a second Enter opens the first source
+    await expect(page).toHaveURL(/guide#idempotency/)
+  })
+
+  test('a single word, a command or a short link still goes straight to the top result without asking', async ({ page, api }) => {
+    await api.onboard()
+    await openApp(page, '/')
+    let calls = 0
+    await page.route('**/api/ask', async (route) => { calls++; await reply(route, answer()) })
+    let p = await open(page)
+    await p.getByRole('combobox').fill('settings')
+    await page.keyboard.press('Enter')
+    await expect(page).toHaveURL(/\/settings$/)
+    p = await open(page)
+    await p.getByRole('combobox').fill('theme dark') // two words, but the top hit is a command
+    await page.keyboard.press('Enter')
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
+    p = await open(page)
+    await p.getByRole('combobox').fill('w4')
+    await page.keyboard.press('Enter')
+    await expect(page).toHaveURL(/\/weeks\/4$/)
+    expect(calls).toBe(0)
+  })
+
+  test('once you pick a row with the arrows, Enter opens that row, not the AI', async ({ page, api }) => {
+    await api.onboard()
+    await openApp(page, '/')
+    let calls = 0
+    await page.route('**/api/ask', async (route) => { calls++; await reply(route, answer()) })
+    const p = await open(page)
+    await p.getByRole('combobox').fill('study links videos')
+    await page.keyboard.press('ArrowDown')
+    await page.keyboard.press('ArrowUp')
+    await page.keyboard.press('Enter')
+    await page.waitForTimeout(500)
+    expect(calls).toBe(0)
+    await expect(p).toHaveCount(0) // it opened a result and closed
+  })
+
+  test('pressing Enter again while it is thinking does not ask twice', async ({ page, api }) => {
+    await api.onboard()
+    await openApp(page, '/')
+    let calls = 0
+    await page.route('**/api/ask', async (route) => { calls++; await new Promise((r) => setTimeout(r, 700)); await reply(route, answer()) })
+    const p = await open(page)
+    await p.getByRole('combobox').fill('how does the outbox work')
+    await page.keyboard.press('Enter')
+    await page.keyboard.press('Enter')
+    await page.keyboard.press('Enter')
+    await expect(p.getByRole('region', { name: 'AI answer' })).toContainText('idempotency key')
+    expect(calls).toBe(1)
+  })
 })

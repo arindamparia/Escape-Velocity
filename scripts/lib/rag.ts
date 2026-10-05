@@ -19,14 +19,14 @@ const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1).trim
 
 /** how the app works, in the words someone would ask it in */
 const HELP: [string, string, string, string][] = [
-  ['help:themes', 'action:theme:paper', 'Changing the look', 'There are five themes: Paper (e-paper, ink on cream, nothing moves; the default), Paper night (the same in the dark), Light, Dark and System. Press 1 to 5, or type theme in the search box. The choice is kept on this device.'],
-  ['help:timer', 'action:timer:dsa', 'The focus timer', 'Start a timer from the clock button in the top bar, from a task, or by typing timer 25. It counts down in the top bar so you always see it, chimes at the end, and for coding problems offers to log the problem. Hard and boss problems run open-ended.'],
+  ['help:themes', 'section:settings-theme', 'Changing the look', 'There are five themes: Paper (e-paper, ink on cream, nothing moves; the default), Paper night (the same in the dark), Light, Dark and System. Press 1 to 5, or type theme in the search box. The choice is kept on this device.'],
+  ['help:timer', 'page:/study/timer', 'The focus timer', 'Start a timer from the clock button in the top bar, from a task, or by typing timer 25. It counts down in the top bar so you always see it, chimes at the end, and for coding problems offers to log the problem. Hard and boss problems run open-ended.'],
   ['help:log', 'action:log:medium', 'Logging a problem', 'Type log medium 22 and a problem link in the search box, or open Log a problem. Problems solved in AlgoTracker are read from its database automatically, so you never log them twice.'],
   ['help:solved', 'page:/progress/problems', 'Solved problems', 'Progress has a Solved problems tab, read live from AlgoTracker, grouped by type with the newest first. A DSA task ticks itself when that day has enough solved problems, any difficulty.'],
-  ['help:points', 'page:/progress', 'Points and the constellation', 'Each ticked task earns its points. A normal week aims for about 50. Every ticked task lights a star; when the week reaches its target the shape glows. Points measure output, never your worth.'],
+  ['help:points', 'section:points', 'Points and the constellation', 'Each ticked task earns its points. A normal week aims for about 50. Every ticked task lights a star; when the week reaches its target the shape glows. Points measure output, never your worth.'],
   ['help:minimum', 'action:minimum', 'A bad day', 'On a bad day do one problem and stop: use Minimum day. It counts as an active day. Missed a day? Move on; do not stack yesterday on today.'],
-  ['help:shortcuts', 'action:shortcuts', 'Keyboard shortcuts', 'j and k move through tasks, x ticks, s starts the task’s tool, t goes to Today, Control or Command K opens the search box, 1 to 5 change the theme, ? lists the keys.'],
-  ['help:sync', 'page:/settings', 'Saving and syncing', 'Everything is saved on this device first and sent to the server a moment later. Opening the page pulls the server’s copy; reload to see changes made on another device. The theme is local to each device.'],
+  ['help:shortcuts', 'section:settings-keyboard', 'Keyboard shortcuts', 'j and k move through tasks, x ticks, s starts the task’s tool, t goes to Today, Control or Command K opens the search box, 1 to 5 change the theme, ? lists the keys.'],
+  ['help:sync', 'section:settings-sync', 'Saving and syncing', 'Everything is saved on this device first and sent to the server a moment later. Opening the page pulls the server’s copy; reload to see changes made on another device. The theme is local to each device.'],
   ['help:links', 'page:/sources', 'Videos and docs', 'Every task has a Study line with its videos (with their length) and docs, free ones first. All of them are listed by week on the Study links page. Watch the video, answer the why-question yourself, then skim the doc.'],
 ]
 
@@ -80,13 +80,13 @@ export function buildChunks(out: CompileOutput): RagChunk[] {
   }
 
   // the plan's rules, routine, capstone and readiness items belong to a page rather than to one entry
-  out.pages.today.rules.forEach((r, i) => chunks.push({ id: `rule:${i + 1}`, entry: 'page:/mindset', kind: 'rule', title: `Rule ${i + 1}`, text: clip(plain(r.html), 400) }))
-  out.pages.today.routineTable.forEach((r, i) => chunks.push({ id: `routine:${i + 1}`, entry: 'page:/', kind: 'rule', title: `Routine: ${r.slot}`, text: clip(`${r.slot}: ${r.what} (${r.time})`, 400) }))
+  out.pages.today.rules.forEach((r, i) => chunks.push({ id: `rule:${i + 1}`, entry: 'section:rules', kind: 'rule', title: `Rule ${i + 1}`, text: clip(plain(r.html), 400) }))
+  out.pages.today.routineTable.forEach((r, i) => chunks.push({ id: `routine:${i + 1}`, entry: 'section:routine', kind: 'rule', title: `Routine: ${r.slot}`, text: clip(`${r.slot}: ${r.what} (${r.time})`, 400) }))
   for (const f of out.pages.weeks.capstoneFacts) {
-    chunks.push({ id: `capstone:${f.label}`, entry: 'page:/weeks/capstone', kind: 'project', title: `Capstone: ${f.label}`, text: clip(`Capstone ${f.label}: ${plain(f.html)}`, 500) })
+    chunks.push({ id: `capstone:${f.label}`, entry: 'section:capstone-parts', kind: 'project', title: `Capstone: ${f.label}`, text: clip(`Capstone ${f.label}: ${plain(f.html)}`, 500) })
   }
-  chunks.push({ id: 'capstone:flow', entry: 'page:/weeks/capstone', kind: 'project', title: 'Capstone flow', text: `The capstone checkout flow: ${out.pages.weeks.capstoneFlow.join(', then ')}.` })
-  Object.entries(out.pages.progress.readiness).forEach(([id, html]) => chunks.push({ id: `ready:${id}`, entry: 'page:/progress', kind: 'ready', title: `Ready check ${id}`, text: clip(plain(html), 400) }))
+  chunks.push({ id: 'capstone:flow', entry: 'section:capstone-flow', kind: 'project', title: 'Capstone flow', text: `The capstone checkout flow: ${out.pages.weeks.capstoneFlow.join(', then ')}.` })
+  Object.entries(out.pages.progress.readiness).forEach(([id, html]) => chunks.push({ id: `ready:${id}`, entry: 'section:ready', kind: 'ready', title: `Ready check ${id}`, text: clip(plain(html), 400) }))
 
   for (const [id, entry, title, text] of HELP) chunks.push({ id, entry, kind: 'help', title, text })
 

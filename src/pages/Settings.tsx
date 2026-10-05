@@ -19,7 +19,7 @@ function AiSearch() {
     } finally { setBusy(false); setTimeout(() => void load(), 2500) }
   }
   return (
-    <section class="card stack"><h2>AI search</h2>
+    <section class="card stack" id="ai"><h2>AI search</h2>
       {st === null ? <p class="muted small" style="margin:0">Checking…</p> : st === 'off' ? <p class="muted small" style="margin:0">Could not read the status (offline or signed out).</p> : (
         <>
           <dl class="kv" style="margin:0">
@@ -45,16 +45,16 @@ export default function Settings() {
     <div class="page">
       <div class="slot-main stack">
         <h1>Settings</h1>
-        <section class="card stack"><h2>Theme</h2>
+        <section class="card stack" id="theme"><h2>Theme</h2>
           <ThemePicker />
           <p class="small muted" style="margin:0">Match the monitor mode you’re in: Dark and Light for the BenQ’s coding modes, Paper for its Paper Color or ePaper modes. Paper has no motion, shadows or gradients, and it’s also the print style.</p>
         </section>
-        <section class="card stack"><h2>Sound</h2>
+        <section class="card stack" id="sound"><h2>Sound</h2>
           <label class="check">
             <input type="checkbox" checked={chimeOn.value} onChange={(e) => engine.dispatch('setting.set', { key: 'chime', value: (e.target as HTMLInputElement).checked ? '1' : '0' })} /> <span>Soft chime when a timer ends</span>
           </label>
         </section>
-        <section class="card stack"><h2>Sync and backup</h2>
+        <section class="card stack" id="sync"><h2>Sync and backup</h2>
           <dl class="kv" style="margin:0">
             <dt>Status</dt><dd>{s === 'idle' ? 'All saved' : s === 'saving' ? 'Saving…' : s === 'offline' ? 'Offline: changes are saved on this device' : s === 'signed-out' ? 'Signed out' : 'Retrying'}</dd>
             <dt>Waiting to send</dt><dd>{pending} change{pending === 1 ? '' : 's'}</dd>
@@ -65,7 +65,7 @@ export default function Settings() {
           <p class="small muted" style="margin:0">Every device keeps a full copy and syncs in the background. D1 also keeps 7 days of Time Travel backups.</p>
         </section>
         <AiSearch />
-        <section class="card stack"><h2>Keyboard</h2>
+        <section class="card stack" id="keyboard"><h2>Keyboard</h2>
           <p class="small muted" style="margin:0"><kbd>j</kbd> <kbd>k</kbd> move, <kbd>x</kbd> tick, <kbd>s</kbd> start, <kbd>t</kbd> Today, <kbd>⌘K</kbd> palette, <kbd>1</kbd> to <kbd>5</kbd> themes.</p>
           <div><button type="button" class="btn btn--small" onClick={() => openOverlay({ kind: 'shortcuts' })}>All shortcuts</button></div>
         </section>

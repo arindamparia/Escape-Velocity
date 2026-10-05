@@ -52,7 +52,7 @@ export function CapstoneOverview() {
         </div>
       </section>
 
-      <section class="stack" aria-label="How it fits together">
+      <section class="stack" id="flow" aria-label="How it fits together">
         <h2 style="margin:0">How it fits together</h2>
         <CapstoneDiagram />
         <ol class="flowsteps">
@@ -60,7 +60,7 @@ export function CapstoneOverview() {
         </ol>
       </section>
 
-      <section aria-label="Milestones">
+      <section id="sundays" aria-label="Milestones">
         <div class="row row--between"><h2 style="margin:0">Your 10 Sundays</h2><span class="mono small">{shipped} of {tasks.length} shipped</span></div>
         <div class="bar" style="margin:0.5rem 0 0.9rem" role="progressbar" aria-label="Capstone milestones shipped" aria-valuemin={0} aria-valuemax={tasks.length} aria-valuenow={shipped}><i style={{ width: `${(shipped / tasks.length) * 100}%` }} /></div>
         <ol class="milestones">
@@ -74,7 +74,7 @@ export function CapstoneOverview() {
         </ol>
       </section>
 
-      <section class="stack" aria-label="What goes in it">
+      <section class="stack" id="parts" aria-label="What goes in it">
         <h2 style="margin:0">What goes in it</h2>
         {['Parts', 'Must-haves'].map((label) => { const f = fact(label); return f ? (
           <div key={label}>
@@ -98,7 +98,7 @@ export function CapstoneOverview() {
         </ul>
       </section>
 
-      <section class="card stack" aria-label="On your resume">
+      <section class="card stack" id="resume" aria-label="On your resume">
         <h2 style="margin:0">On your resume</h2>
         <p class="muted" style="margin:0">Say what you built, how, and the number you measured. Fill the brackets from your own runs.</p>
         <ul class="bullets">{BULLETS.map((b) => <li key={b}>{b}</li>)}</ul>

@@ -45,7 +45,7 @@ function Readiness() {
     'r-08': `${stories} of 6 stories written.`,
   }
   return (
-    <section class="card stack" aria-label="Readiness">
+    <section class="card stack" id="ready" aria-label="Readiness">
       <div class="row" style="gap:1.2rem;align-items:center"><Ring done={n} total={total} /><div><p class="eyebrow">Ready check</p><p style="margin:0" class="muted small">Eight things that say you’re ready. They are worth no points; they only fill the ring.</p></div></div>
       {readinessTasks.map((t) => {
         const isDone = done.has(t.id)
@@ -128,7 +128,7 @@ export default function Progress({ view }: { view?: string }) {
       </div>
       <div class="slot-aside">
         <Readiness />
-        <details class="card"><summary>How points work</summary><div style="margin-top:0.8rem">{progress ? <Html html={progress.pointsHtml} class="prose small" /> : <div class="skeleton" />}</div></details>
+        <details class="card" id="points"><summary>How points work</summary><div style="margin-top:0.8rem">{progress ? <Html html={progress.pointsHtml} class="prose small" /> : <div class="skeleton" />}</div></details>
         {info.phase === 'after' ? <div class="card"><p style="margin:0"><Icon name="star" /> 13 constellations. Go collect offers.</p></div> : null}
         <p class="small muted">Weekly target: {weekTarget(info.week, plan.config) ?? 'none this week'}.</p>
       </div>

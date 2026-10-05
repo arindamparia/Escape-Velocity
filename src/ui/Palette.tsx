@@ -55,6 +55,7 @@ export function Palette() {
   const [q, setQ] = useState('')
   const [filter, setFilter] = useState<Filter>('all')
   const [index, setIndex] = useState(0)
+  const moved = useRef(false) // true once a row was picked with the arrows or the mouse: then Enter opens that row
   const [list, setList] = useState<SearchEntry[]>([])
   const [ask, setAsk] = useState<{ q: string; status: 'loading' | 'ok' | 'error'; data?: AskResponse; error?: { code: string; message: string } } | null>(null)
   const lib = usePage('library')
@@ -105,6 +106,8 @@ export function Palette() {
       .then((data) => setAsk((cur) => (cur?.q === question ? { q: question, status: 'ok', data } : cur)))
       .catch((e) => setAsk((cur) => (cur?.q === question ? { q: question, status: 'error', error: { code: e instanceof AskFailure ? e.code : 'upstream', message: e instanceof Error ? e.message : String(e) } } : cur)))
   }
+  // Enter asks the AI for a question or a phrase; it still runs a command or opens the top result for a lone word
+  const enterAsks = searching && !commandsOnly && !smart.length && (asking || /\?\s*$/.test(q) || (tokenize(text).length >= 2 && hits[0]?.item.kind !== 'action'))
   const askRef = useRef(startAsk)
   askRef.current = startAsk
   const askEntry = useMemo<Entry>(() => ({ id: 'smart:ask', kind: 'action', title: `Ask AI: “${text.trim()}”`, sub: 'Answers from your plan, with the rows it used as sources', hint: '⌘↵', boost: 0, run: () => askRef.current() }), [text])
@@ -117,6 +120,8 @@ export function Palette() {
       const acts = (ask.data?.actions ?? []).flatMap((id) => { const entry = byId.get(id); return entry ? [{ entry, marks: [] as [number, number][] }] : [] })
       if (rows.length) out.push({ key: 'from', label: 'From your plan', rows, more: 0 })
       if (acts.length) out.push({ key: 'do', label: 'Suggested: press Enter to confirm', rows: acts, more: 0 })
+      // what the box found itself stays below the answer
+      for (const s of sections(hits, 3) as Section<Entry>[]) out.push({ key: `also-${s.key}`, label: `Also found: ${s.label}`, rows: s.hits.map((h) => ({ entry: h.item, marks: h.marks })), more: 0 })
       return out
     }
     if (searching) {
@@ -154,7 +159,7 @@ export function Palette() {
     if (!row.entry.id.startsWith('smart:')) pushRecent(row.entry.id)
     row.entry.run()
   }
-  const move = (to: number) => setIndex(flat.length ? ((to % flat.length) + flat.length) % flat.length : 0)
+  const move = (to: number) => { moved.current = true; setIndex(flat.length ? ((to % flat.length) + flat.length) % flat.length : 0) }
 
   let n = -1
   return (
@@ -165,14 +170,19 @@ export function Palette() {
           ref={input} type="text" role="combobox" aria-expanded="true" aria-controls="palette-list" aria-autocomplete="list" autocomplete="off" spellcheck={false} autofocus
           aria-activedescendant={flat.length ? `palette-opt-${index}` : undefined} aria-label="Search or run a command"
           placeholder="Search the plan, or type a command: theme, timer 25, log medium 22, kafka…" value={q}
-          onInput={(e) => { setQ((e.target as HTMLInputElement).value); setIndex(0); setAsk(null) }}
+          onInput={(e) => { setQ((e.target as HTMLInputElement).value); setIndex(0); setAsk(null); moved.current = false }}
           onKeyDown={(e) => {
             if (e.key === 'ArrowDown' || (e.ctrlKey && e.key.toLowerCase() === 'n')) { e.preventDefault(); move(index + 1) }
             else if (e.key === 'ArrowUp' || (e.ctrlKey && e.key.toLowerCase() === 'p')) { e.preventDefault(); move(index - 1) }
-            else if (e.key === 'PageDown') { e.preventDefault(); setIndex((i) => Math.min(flat.length - 1, i + 6)) }
-            else if (e.key === 'PageUp') { e.preventDefault(); setIndex((i) => Math.max(0, i - 6)) }
+            else if (e.key === 'PageDown') { e.preventDefault(); moved.current = true; setIndex((i) => Math.min(flat.length - 1, i + 6)) }
+            else if (e.key === 'PageUp') { e.preventDefault(); moved.current = true; setIndex((i) => Math.max(0, i - 6)) }
             else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); startAsk() }
-            else if (e.key === 'Enter') { e.preventDefault(); choose(flat[index]) }
+            else if (e.key === 'Enter') {
+              e.preventDefault()
+              if (ask?.status === 'loading') return // already asking
+              if (!ask && !moved.current && enterAsks) startAsk()
+              else choose(flat[index])
+            }
             else if (e.key === 'Escape' && ask) { e.preventDefault(); e.stopPropagation(); setAsk(null) } // back to the results first, then close
           }}
         />
@@ -212,7 +222,7 @@ export function Palette() {
             {b.rows.map((r) => {
               const i = ++n
               return (
-                <li key={`${r.entry.id}-${i}`} id={`palette-opt-${i}`} role="option" aria-selected={i === index} class="pal__row" onClick={() => choose(r)} onMouseMove={() => { if (i !== index) setIndex(i) }}>
+                <li key={`${r.entry.id}-${i}`} id={`palette-opt-${i}`} data-block={b.key} role="option" aria-selected={i === index} class="pal__row" onClick={() => choose(r)} onMouseMove={() => { if (i !== index) { moved.current = true; setIndex(i) } }}>
                   <span class="pal__icon" title={KIND_WORD[r.entry.kind]}><Icon name={ICON[r.entry.kind]} /></span>
                   <span class="pal__text">
                     <span class="pal__title"><Marked text={r.entry.title} marks={r.marks} /></span>
@@ -224,8 +234,8 @@ export function Palette() {
             })}
           </>
         ))}
-        {!searching && !ask && active === 'all' ? <li role="presentation" class="pal__tip muted small">Ask in plain words: start with <kbd>?</kbd>, for example “? how do I avoid double charging a customer”.</li> : null}
-        {ask && !flat.length && ask.status === 'ok' ? <li role="presentation" class="pal__none muted small">No rows to show for this answer.</li> : null}
+        {!searching && !ask && active === 'all' ? <li role="presentation" class="pal__tip muted small">Ask in plain words and press <kbd>Enter</kbd>, for example “how do I avoid double charging a customer”. A single word still opens the top result.</li> : null}
+        
         {searching && !ask && !hits.length && !smart.length ? (
           <li role="presentation" class="pal__none">
             <p style="margin:0">Nothing matches “{text.trim()}”.</p>
@@ -233,7 +243,7 @@ export function Palette() {
           </li>
         ) : null}
       </ul>
-      <p class="pal__foot small muted noprint"><span><kbd>↑</kbd> <kbd>↓</kbd> move</span><span><kbd>↵</kbd> choose</span><span><kbd>&gt;</kbd> commands</span><span><kbd>?</kbd> ask AI</span><span><kbd>esc</kbd> {ask ? 'back' : 'close'}</span></p>
+      <p class="pal__foot small muted noprint"><span><kbd>↑</kbd> <kbd>↓</kbd> move</span><span><kbd>↵</kbd> choose, or ask AI on a question</span><span><kbd>&gt;</kbd> commands</span><span><kbd>?</kbd> ask AI</span><span><kbd>esc</kbd> {ask ? 'back' : 'close'}</span></p>
       <p class="sr" role="status" aria-live="polite">{searching ? `${flat.length} result${flat.length === 1 ? '' : 's'}` : ''}</p>
     </Dialog>
   )

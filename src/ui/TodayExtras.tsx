@@ -61,7 +61,7 @@ export function WeekDays({ week, todayName }: { week: number; todayName: string 
 export function Routine() {
   const page = usePage('today')
   return (
-    <details>
+    <details id="routine">
       <summary>How my day works</summary>
       <div style="margin-top:0.8rem">{page ? <Html html={page.routineHtml} class="prose small" /> : <Skeleton h="4rem" />}</div>
     </details>

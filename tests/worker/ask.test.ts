@@ -68,10 +68,15 @@ describe('what goes to OpenAI', () => {
     expect(sent.bodies[0].url).toBe('https://api.openai.com/v1/chat/completions')
     expect((sent.bodies[0].init.headers as Record<string, string>).Authorization).toBe(`Bearer ${KEY}`)
     expect(b.model).toBe('gpt-4.1-mini')
-    expect(b.response_format).toEqual({ type: 'json_object' })
+    // a strict schema: every id the model may return is one that was offered, every action one from the catalogue
+    const rf = b.response_format as { type: string; json_schema: { strict: boolean; schema: { properties: { results: { items: { properties: { id: { enum: string[] } } } }; actions: { items: { enum: string[] } } } } } }
+    expect(rf.type).toBe('json_schema')
+    expect(rf.json_schema.strict).toBe(true)
     expect(b.messages[0].content).toMatch(/CONTEXT only/)
     expect(b.messages[0].content).toMatch(/cannot change anything yourself/) // it may suggest an action, never claim to have done one
     const u = userPayload()
+    expect(rf.json_schema.schema.properties.results.items.properties.id.enum).toEqual(u.CONTEXT.map((c) => c.id))
+    expect(rf.json_schema.schema.properties.actions.items.enum).toEqual(ACTIONS.map((a) => a.id))
     expect(Object.keys(u).sort()).toEqual(['ACTIONS', 'CONTEXT', 'question', 'today', 'where'])
     expect(u.CONTEXT.length).toBeGreaterThan(0)
     expect(u.CONTEXT.some((c) => /idempotency/i.test(c.title))).toBe(true) // found from the words alone, the box sent no candidates (a paraphrase is what Vectorize is for)
@@ -79,11 +84,11 @@ describe('what goes to OpenAI', () => {
   })
 
   it('puts the box\'s own matches first, whether it names a chunk or an entry', async () => {
-    await ask(q({ q: 'where is the outbox', candidates: ['page:/weeks/capstone', 'design:bitly', 'term:idempotency'] }))
+    await ask(q({ q: 'where is the outbox', candidates: ['section:capstone-flow', 'design:bitly', 'term:idempotency'] }))
     const ids = userPayload().CONTEXT.map((c) => c.id)
     expect(ids).toContain('design:bitly')
     expect(ids).toContain('term:idempotency')
-    expect(ids.some((id) => id.startsWith('capstone:'))).toBe(true) // a page id brings the chunks that belong to it
+    expect(ids).toContain('capstone:flow') // a section id brings the chunks that belong to it
     expect(new Set(ids).size).toBe(ids.length)
     expect(ids.length).toBeLessThanOrEqual(14)
   })
@@ -114,10 +119,10 @@ describe('what comes back is checked', () => {
     expect(body.mode).toBe('local')
   })
 
-  it('maps a rule or capstone chunk to the page it belongs to', () => {
-    const chunks = gather({ q: 'what is the capstone', candidates: ['page:/weeks/capstone'], actions: [] }, [])
+  it('maps a rule or capstone chunk to the section it belongs to', () => {
+    const chunks = gather({ q: 'what is the capstone', candidates: ['section:capstone-flow'], actions: [] }, [])
     const clean = sanitize({ answer: 'a', results: [{ id: chunks[0].id, why: 'w' }] }, chunks, new Set())
-    expect(clean.results[0].id).toBe('page:/weeks/capstone')
+    expect(clean.results[0].id).toBe('section:capstone-flow')
   })
 
   it('never lets the key out, in the answer or in an error', async () => {
@@ -126,6 +131,20 @@ describe('what comes back is checked', () => {
     reply = () => new Response(JSON.stringify({ error: { message: `bad key ${KEY}` } }), { status: 401 })
     const bad = await (await ask(q())).text()
     expect(bad).not.toContain(KEY)
+  })
+})
+
+describe('a model that cannot take a schema', () => {
+  it('is asked again in plain JSON mode, and the answer is still checked', async () => {
+    let n = 0
+    reply = () => (++n === 1
+      ? new Response(JSON.stringify({ error: { message: "Invalid parameter: 'response_format' of type 'json_schema' is not supported with this model." } }), { status: 400 })
+      : completion({ answer: 'ok', results: [{ id: 'term:idempotency', why: 'w' }, { id: 'task:w99-99', why: 'made up' }], actions: [] }))
+    const body = (await (await ask(q({ candidates: ['term:idempotency'] }), { ...BASE, OPENAI_MODEL: 'gpt-3.5-turbo' })).json()) as AskResponse
+    expect(sent.bodies).toHaveLength(2)
+    expect(JSON.parse(String(sent.bodies[0].init.body)).response_format.type).toBe('json_schema')
+    expect(JSON.parse(String(sent.bodies[1].init.body)).response_format).toEqual({ type: 'json_object' })
+    expect(body.results).toEqual([{ id: 'term:idempotency', why: 'w' }]) // the made-up id is still dropped
   })
 })
 

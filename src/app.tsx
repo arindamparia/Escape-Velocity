@@ -2,6 +2,7 @@ import { ErrorBoundary, LocationProvider, Route, Router, lazy, useLocation } fro
 import { useEffect } from 'preact/hooks'
 import { closeOverlay, engine, needsOnboarding, openOverlay, overlay, say, setTheme, sync, toast, toggleTask } from './lib/app'
 import { focusId, focusList } from './lib/focus'
+import { followHash, watchHash } from './lib/anchor'
 import { navigate } from './lib/nav'
 import { readSolvedOnOpen } from './lib/solved'
 import Today from './pages/Today'
@@ -147,8 +148,11 @@ function useShortcuts() {
 function Shell() {
   useShortcuts()
   useEffect(readSolvedOnOpen, [])
-  const { path } = useLocation()
+  useEffect(() => watchHash(), [])
+  const { path, url } = useLocation()
   useEffect(() => { window.scrollTo(0, 0) }, [path.split('/')[1]])
+  // a link the app handles itself (a task tag, a link in a page) changes the route without a popstate: follow its #section too
+  useEffect(() => { requestAnimationFrame(() => followHash()) }, [url])
   return (
     <>
       <Banners />

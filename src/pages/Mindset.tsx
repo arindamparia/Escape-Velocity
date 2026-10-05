@@ -14,7 +14,7 @@ export default function Mindset() {
     <div class="page">
       <div class="slot-main stack">
         <h1>Mindset</h1>
-        <section class="card stack" aria-label="Your why">
+        <section class="card stack" id="why" aria-label="Your why">
           <h2 style="margin:0">Your why</h2>
           <p class="muted" style="margin:0">In five lines, in your own words. Not your parents’ reasons, not LinkedIn’s.</p>
           <WhyField rows={6} />
@@ -23,12 +23,12 @@ export default function Mindset() {
         {!page ? <div class="skeleton" style="min-height:20rem" /> : (
           <>
             <Html html={page.mainHtml} class="prose" />
-            <section class="stack"><h2>Rules for your head</h2><Html html={page.rulesHtml} class="prose" /></section>
+            <section class="stack" id="rules"><h2>Rules for your head</h2><Html html={page.rulesHtml} class="prose" /></section>
           </>
         )}
       </div>
       <div class="slot-aside">
-        {page ? <section class="card"><details><summary>Why this plan</summary><div style="margin-top:0.8rem"><Html html={page.whyPlanHtml} class="prose small" /></div></details></section> : null}
+        {page ? <section class="card"><details id="why-plan"><summary>Why this plan</summary><div style="margin-top:0.8rem"><Html html={page.whyPlanHtml} class="prose small" /></div></details></section> : null}
       </div>
     </div>
   )

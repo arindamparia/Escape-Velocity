@@ -1,4 +1,3 @@
-import { useEffect } from 'preact/hooks'
 import { useTitle } from '../ui/hooks'
 import { GLOSSARY } from './glossary'
 import { Icon } from '../ui/Icon'
@@ -19,18 +18,6 @@ const DAY: [string, string][] = [
 
 export default function Guide() {
   useTitle('How this works')
-  // /guide#capstone scrolls to that term and highlights it (:target)
-  // (the app changes pages without a browser navigation, so :target alone would not highlight it)
-  useEffect(() => {
-    const show = () => {
-      document.querySelectorAll('.term[data-hit]').forEach((e) => e.removeAttribute('data-hit'))
-      const el = document.getElementById(location.hash.slice(1))
-      if (el) { el.setAttribute('data-hit', ''); el.scrollIntoView({ block: 'center' }) }
-    }
-    show()
-    addEventListener('hashchange', show)
-    return () => removeEventListener('hashchange', show)
-  }, [])
   return (
     <div class="page">
       <div class="slot-main stack">
