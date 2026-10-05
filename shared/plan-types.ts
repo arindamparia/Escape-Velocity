@@ -103,6 +103,8 @@ export interface ResourceRow {
   title: string
   source: string
   url: string
+  /** videos: length in minutes (or the length of the chapter a deep link starts) */
+  minutes?: number
 }
 
 export interface WeekChunk {

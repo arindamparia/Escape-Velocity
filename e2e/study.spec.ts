@@ -6,7 +6,7 @@ test('a task has a Study panel: free first, premium marked, links open in a new 
   await openApp(page, '/weeks/6') // Saturday: Payment System, free ByteByteGo and Airbnb next to the premium doc
   const row = page.locator('[data-task="w06-07"]')
   const study = row.locator('details.study')
-  await expect(study.locator('summary')).toContainText(/\d+ links?, \d+ free/)
+  await expect(study.locator('summary')).toContainText(/\d+ videos? · \d+ min/)
   await study.locator('summary').click()
   const items = study.locator('li')
   expect(await items.count()).toBeGreaterThan(3)

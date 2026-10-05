@@ -220,6 +220,32 @@ describe('compiler: every failure rule fails the build', () => {
     }
   })
 
+  it('every task with study links has a video, videos come first, and videos say how long they are', () => {
+    const out = compilePlan(source)
+    for (const w of Object.values(out.weekChunks)) {
+      for (const [id, list] of Object.entries(w.resources)) {
+        expect(list.some((r) => r.kind === 'video'), `${id} has no video`).toBe(true)
+        const free = list.filter((r) => r.access === 'free').map((r) => r.kind)
+        expect(free, id).toEqual([...free].sort((a, b) => ['video', 'doc', 'repo'].indexOf(a) - ['video', 'doc', 'repo'].indexOf(b)))
+      }
+    }
+    const videos = out.pages.library.resources.filter((r) => r.kind === 'video')
+    expect(videos.filter((r) => !r.minutes).map((r) => r.url)).toEqual(['https://www.youtube.com/@ConceptAndCodingByShrayansh/playlists']) // a playlist has no single length
+    // the long courses are linked at the chapter, not from the start
+    expect(videos.filter((r) => /NhDYbskXRgc/.test(r.url)).every((r) => /&t=\d+s/.test(r.url))).toBe(true)
+  })
+
+  it('the Thursday maths, the capstone Sundays, the mocks, the stories and the DSA weeks each get their own study links', () => {
+    const out = compilePlan(source)
+    const has = (week: string, id: string) => Object.keys(out.weekChunks[week].resources).includes(id)
+    expect(has('04', 'w04-06')).toBe(true) // Little's law (maths)
+    expect(has('07', 'w07-10')).toBe(true) // outbox and webhooks (capstone)
+    expect(has('13', 'w13-02')).toBe(true) // wallet ledger (mock)
+    expect(has('11', 'w11-10')).toBe(true) // STAR stories
+    expect(has('04', 'w04-01')).toBe(true) // graphs (DSA)
+    expect(out.weekChunks['04'].resources['w04-06'].every((r) => /^Maths:/.test(r.topic))).toBe(true) // not mixed with the concept task of the same Thursday
+  })
+
   it('reports every problem at once, not just the first', () => {
     const src = mutate('`w01-01` `dsa`', '`w01-01` `dsax`').replace('<!-- surface: weeks.dsa -->\n', '')
     expect(errorsOf(src).length).toBeGreaterThanOrEqual(2)

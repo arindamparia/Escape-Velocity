@@ -650,6 +650,7 @@ export function compilePlan(source: string): CompileOutput {
   const studyRoot = studyTree[0]
   const resourceRows: ResourceRow[] = []
   const resTable = tableOf(studyTree.find((x) => x.heading === 'Resources by week'), errors, 'resources by week', ['Week', 'Day', 'Topic', 'Design ID', 'Kind', 'Access', 'Title', 'Source', 'Link'])
+  const TOPIC_TYPE: Record<string, TaskType> = { Maths: 'maths', Capstone: 'capstone', Mock: 'mock', Mocks: 'mock', Story: 'story', DSA: 'dsa' }
   const channelTable = tableOf(studyTree.find((x) => /^Free channels/.test(x.heading)), errors, 'free channels', ['Channel', 'Use for', 'Weeks', 'Start with'])
   const designIds = new Set(designs.map((d) => d.id))
   const ACCESS_ORDER: ResourceAccess[] = ['free', 'partial', 'premium']
@@ -671,6 +672,8 @@ export function compilePlan(source: string): CompileOutput {
       if (r.designId && t.designs?.includes(r.designId)) n += 10
       for (const w of topicWords(r.topic)) if (text.includes(w)) n += 2
       if (/^LLD/.test(r.topic) && t.type === 'lld') n += 6
+      const prefix = TOPIC_TYPE[/^(\w+):/.exec(r.topic)?.[1] ?? '']
+      if (prefix) n += t.type === prefix ? 20 : -20
       if (/docker|kubernetes|helm|aws|terraform|github actions|ci\/cd|ingress/i.test(r.topic) && t.type === 'infra') n += 4
       if (t.type === 'concept' || t.type === 'infra' || t.type === 'read') n += 1
       return n
@@ -690,7 +693,8 @@ export function compilePlan(source: string): CompileOutput {
     const day = row['Day'] === '—' ? '' : row['Day']
     if (span.length && !DAYS.includes(day as PlanDay)) errors.push(`${at}: day "${row['Day']}" is not a plan day`)
     if (!span.length && day) errors.push(`${at}: an Extra row has no day`)
-    const out: ResourceRow = { week: row['Week'], day, topic: row['Topic'], ...(designId ? { designId } : {}), kind, access, title: row['Title'], source: row['Source'], url: row['Link'] }
+    const minutes = /^\d+$/.test(row['Min'] ?? '') ? Number(row['Min']) : undefined
+    const out: ResourceRow = { week: row['Week'], day, topic: row['Topic'], ...(designId ? { designId } : {}), kind, access, title: row['Title'], source: row['Source'], url: row['Link'], ...(minutes ? { minutes } : {}) }
     resourceRows.push(out)
     for (const w of span) {
       const t = taskFor(out, w)
@@ -699,7 +703,9 @@ export function compilePlan(source: string): CompileOutput {
       ;(chunk.resources[t.id] ??= []).push(out)
     }
   }
-  const byAccess = (a: ResourceRow, b: ResourceRow) => ACCESS_ORDER.indexOf(a.access) - ACCESS_ORDER.indexOf(b.access)
+  // free before partial before premium; inside each, videos first (they are how this plan is best learned), then docs, then code
+  const KIND_ORDER: ResourceKind[] = ['video', 'doc', 'repo']
+  const byAccess = (a: ResourceRow, b: ResourceRow) => ACCESS_ORDER.indexOf(a.access) - ACCESS_ORDER.indexOf(b.access) || KIND_ORDER.indexOf(a.kind) - KIND_ORDER.indexOf(b.kind)
   for (const w of Object.values(weekChunks)) for (const list of Object.values(w.resources)) list.sort(byAccess) // stable: free first, the doc's order after
   resourceRows.sort(byAccess)
   const studyBody = studyRoot ? studyRoot.body.map((b) => b.text) : []
