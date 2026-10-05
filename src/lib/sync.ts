@@ -152,20 +152,15 @@ export function createSync(engine: Engine, deps: SyncDeps = {}) {
     return running
   }
 
-  /** Sync on open, on `online`, on visibility change, after each local save, and every 15 s while visible. */
+  /** Sync when the page opens, when the network comes back, and after each local save. No timer, nothing on tab focus: reload to pull another device's changes. */
   function start(runNow = true): () => void {
-    const onVisible = () => { if (document.visibilityState === 'visible') void run() }
     const onOnline = () => void run()
-    document.addEventListener('visibilitychange', onVisible)
     window.addEventListener('online', onOnline)
     const offSaved = engine.onSaved(() => void run())
-    const interval = setInterval(() => { if (document.visibilityState === 'visible') void run() }, 15_000)
     if (runNow) void run()
     return () => {
-      document.removeEventListener('visibilitychange', onVisible)
       window.removeEventListener('online', onOnline)
       offSaved()
-      clearInterval(interval)
     }
   }
 

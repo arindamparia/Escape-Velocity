@@ -1,8 +1,9 @@
 // Plan 19 "Sync", and the definition-of-done items about two devices and an expired Access session.
-import { SCREENS, expect, openApp, plan, tickButton, test } from './support'
+import { SCREENS, expect, openApp, plan, settle, tickButton, test, WED } from './support'
 
 const [A, B] = plan.tasks.filter((t) => t.week === 1).map((t) => t.id)
-const visible = (page: import('@playwright/test').Page) => page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')))
+/** Another device's changes arrive when the page is reloaded: nothing polls. */
+const reload = async (page: import('@playwright/test').Page) => { await page.reload(); await settle(page) }
 
 test.describe('two devices', () => {
   test('a tick on the MacBook shows on the BenQ after the next sync, and back', async ({ browser, baseURL, api }) => {
@@ -15,12 +16,12 @@ test.describe('two devices', () => {
 
     await tickButton(m, A).click()
     await expect.poll(() => api.doneIds()).toEqual([A])
-    await visible(b) // the BenQ comes back to the foreground: it syncs
+    await reload(b) // the BenQ is reloaded: it syncs
     await expect(tickButton(b, A)).toHaveAttribute('aria-pressed', 'true')
 
     await tickButton(b, A).click() // untick on the other device
     await expect.poll(() => api.doneIds()).toEqual([])
-    await visible(m)
+    await reload(m)
     await expect(tickButton(m, A)).toHaveAttribute('aria-pressed', 'false')
     await mac.close()
     await benq.close()
@@ -43,7 +44,7 @@ test.describe('two devices', () => {
     await c1.setOffline(false)
     await p1.evaluate(() => window.dispatchEvent(new Event('online')))
     await expect.poll(() => api.doneIds(), { timeout: 20_000 }).toEqual([A, B])
-    await visible(p2)
+    await reload(p2)
     await expect(tickButton(p1, B)).toHaveAttribute('aria-pressed', 'true')
     await expect(tickButton(p2, A)).toHaveAttribute('aria-pressed', 'true')
     await c1.close()
@@ -108,4 +109,15 @@ test.describe('an expired Access session', () => {
     await page.locator('header.topbar').getByRole('link', { name: 'Settings' }).click()
     await expect(page.getByRole('alert')).toContainText('refused by the server')
   })
+})
+
+test('nothing polls the server: no /api/state call while the page just sits there, or when the tab comes back', async ({ page, api }) => {
+  await api.onboard()
+  await openApp(page, '/', { at: WED, ticking: true })
+  let calls = 0
+  await page.route('**/api/state', (route) => { calls++; return route.continue() })
+  await page.clock.fastForward(5 * 60_000) // five minutes pass
+  await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')))
+  await page.waitForTimeout(500)
+  expect(calls).toBe(0)
 })
