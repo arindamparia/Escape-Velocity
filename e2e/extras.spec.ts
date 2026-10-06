@@ -84,13 +84,15 @@ test.describe('equations', () => {
     await expect.poll(async () => (await api.doneIds())[0]).toMatch(/^eq-\d\d$/)
   })
 
-  test('Today shows the week\'s equation and the bonus one as a small second line', async ({ page, api }) => {
+  test('Today shows the week\'s equation and the bonus one as a panel of its own', async ({ page, api }) => {
     await api.onboard()
     await openApp(page, '/', { at: kolkata('2026-10-28T10:00:00') }) // week 4 has a Thursday derivation and a bonus equation
-    const card = page.getByRole('region', { name: 'Equation of the week' })
-    await expect(card).toBeVisible()
-    await expect(card.getByText('bonus', { exact: true })).toBeVisible()
-    await card.getByRole('button', { name: /Zipf hit ratio/ }).click()
+    await expect(page.getByRole('region', { name: 'Equation of the week' })).toBeVisible()
+    const bonus = page.getByRole('region', { name: 'Bonus equation' })
+    await expect(bonus).toContainText('Zipf hit ratio')
+    await expect(bonus.locator('math')).toBeVisible() // the formula is in view
+    await expect(bonus).toContainText('Skip it freely')
+    await bonus.getByRole('button', { name: 'Try it' }).click()
     await expect(page.getByRole('dialog')).toContainText('Bonus equation')
   })
 })

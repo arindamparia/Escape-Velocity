@@ -631,3 +631,12 @@ label.check > span { flex: 1; min-width: 0; }
 [data-theme='paper'] .timermenu__item:hover, [data-theme='paper'] .timermenu__item:focus-visible { background: transparent; outline: 2px solid var(--text); outline-offset: -2px; }
 
 .kv dd, .kv dt { overflow-wrap: anywhere; min-width: 0; }
+
+/* the bonus equation on Today: a panel of its own, so an extra reads as an invitation and not as small print */
+.bonus { margin-top: 1.1rem; padding: 0.9rem 1rem 1rem; border: 1px solid var(--line); border-left: 5px solid var(--accent); border-radius: var(--radius); background: var(--surface-2); display: grid; gap: 0.55rem; }
+.bonus__head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; }
+.bonus__mark { display: inline-grid; place-items: center; width: 1.7rem; height: 1.7rem; border-radius: 50%; border: 2px solid var(--accent); color: var(--accent); }
+.bonus__name { margin: 0; font-weight: 700; font-size: 1.02rem; }
+.bonus__formula { padding: 0.55rem 0.8rem; border: 1px dashed var(--line); border-radius: var(--radius); background: var(--surface); text-align: center; font-size: 1.12rem; overflow-x: auto; }
+[data-theme='paper'] .bonus__formula { border-style: solid; }
+.bonus[data-done='true'] { border-left-style: dotted; }

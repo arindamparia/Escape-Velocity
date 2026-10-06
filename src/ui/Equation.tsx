@@ -44,13 +44,32 @@ export function EquationCard({ week, chunk, taskId, compact = false }: { week: n
         </button>
         <span class="muted small">{taskLabel(task.id)} · +{task.points} · <a href="/study/formulas">all derivations</a></span>
       </div>
-      {bonus && compact ? (
-        <p class="small" style="margin:0.8rem 0 0">
-          <span class="chip">bonus</span>{' '}
-          <button type="button" class="btn btn--link" onClick={() => openOverlay({ kind: 'equation', taskId: bonus.id })}>{(chunk?.tasks[bonus.id]?.text ?? 'Bonus equation').replace(/^Bonus equation:\s*/, '')}</button>
-          <span class="muted"> · +{bonus.points}{engine.doneSet.value.has(bonus.id) ? ' · done' : ''}</span>
-        </p>
-      ) : null}
+      {bonus && compact ? <BonusPanel task={bonus} chunk={chunk} /> : null}
+    </section>
+  )
+}
+
+/** The week's bonus equation on Today: its own panel, with the formula in view, what it is worth, and a way in. */
+function BonusPanel({ task, chunk }: { task: { id: string; points: number }; chunk: WeekChunk | null }) {
+  const done = engine.doneSet.value.has(task.id)
+  const name = (chunk?.tasks[task.id]?.text ?? 'Bonus equation').replace(/^Bonus equation:\s*/, '')
+  const formula = /<math[\s\S]*?<\/math>/.exec(chunk?.math[task.id] ?? '')?.[0]
+  return (
+    <section class="bonus" data-done={done} aria-label="Bonus equation">
+      <div class="bonus__head">
+        <span class="bonus__mark" aria-hidden="true"><Icon name="star" /></span>
+        <p class="eyebrow" style="margin:0">Bonus equation</p>
+        <span class="chip">+{task.points}</span>
+        <span class="chip">15 min</span>
+      </div>
+      <p class="bonus__name">{name.charAt(0).toUpperCase() + name.slice(1)}</p>
+      {formula ? <Html html={formula} class="bonus__formula" /> : null}
+      <div class="row">
+        <button type="button" class={`btn btn--small${done ? '' : ' btn--primary'}`} onClick={() => openOverlay({ kind: 'equation', taskId: task.id })}>
+          {done ? <><Icon name="check" /> Done: open it again</> : 'Try it'}
+        </button>
+        <span class="small muted">A little extra, tied to this week. Skip it freely.</span>
+      </div>
     </section>
   )
 }
