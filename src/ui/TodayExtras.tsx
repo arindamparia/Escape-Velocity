@@ -45,7 +45,7 @@ export function WeekDays({ week, todayName }: { week: number; todayName: string 
           const light = plan.config.lightDays.some((l) => ymd >= l.from && ymd <= l.to)
           return (
             <li key={d}>
-              <a href={`/weeks/${week}`} aria-current={d === todayName ? 'date' : undefined} data-light={light}>
+              <a href={`/weeks/${week}#day-${d}`} aria-current={d === todayName ? 'date' : undefined} data-light={light}>
                 <span>{d}</span>
                 <span class="muted small">{light ? <><Icon name="moon" /> light day</> : list.length ? `${n} of ${list.length}` : '–'}</span>
                 <span>{d === todayName ? 'Today' : list.length && n === list.length ? <Icon name="check" label="all done" /> : ''}</span>

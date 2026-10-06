@@ -76,7 +76,7 @@ function WeekDetail({ n, current }: { n: number; current: number }) {
         const list = tasks.filter((t) => t.day === d)
         if (!list.length) return null
         return (
-          <section key={d} aria-label={d === 'Week' ? 'Any day this week' : d}>
+          <section key={d} id={`day-${d}`} aria-label={d === 'Week' ? 'Any day this week' : d}>
             <h2 style="font-size:1rem" class="muted">{d === 'Week' ? 'Any day this week' : d}</h2>
             <ul class="tasks">{list.map((t) => <TaskRow key={t.id} task={t} chunk={chunk} />)}</ul>
           </section>

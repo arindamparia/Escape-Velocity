@@ -1,4 +1,6 @@
+import { useState } from 'preact/hooks'
 import { engine } from '../lib/app'
+import { capstoneSteps, capstoneTerms } from '../lib/capstone'
 import { plan } from '../lib/plan'
 import { CapstoneDiagram, FLOW_STEPS } from '../ui/CapstoneDiagram'
 import { Html } from '../ui/Html'
@@ -37,8 +39,13 @@ export function CapstoneOverview() {
   const tasks = plan.tasks.filter((t) => t.type === 'capstone')
   const shipped = tasks.filter((t) => done.has(t.id)).length
   const current = tasks.find((t) => !done.has(t.id))
+  // the milestone shown on the diagram: the one in the link, else the next one to build
+  const [picked, setPicked] = useState<string | null>(() => tasks.find((t) => `#${t.id}` === location.hash)?.id ?? null)
+  const focus = picked ?? current?.id ?? null
+  const focusTask = tasks.find((t) => t.id === focus)
   if (!page) return <div class="skeleton" />
   const text = (t: (typeof tasks)[number]) => weeks.get(t.week!)?.tasks[t.id]?.text ?? ''
+  const litSteps = focusTask ? capstoneSteps(text(focusTask)) : []
   const fact = (label: string) => page.capstoneFacts.find((f) => f.label === label)
   return (
     <div class="stack" style="gap:1.6rem">
@@ -54,9 +61,10 @@ export function CapstoneOverview() {
 
       <section class="stack" id="flow" aria-label="How it fits together">
         <h2 style="margin:0">How it fits together</h2>
-        <CapstoneDiagram />
+        {focusTask ? <p class="small" role="status"><span class="muted">On the diagram:</span> <strong>Week {focusTask.week}</strong>{litSteps.length ? <> touches {litSteps.length === 9 ? 'the whole flow' : `step${litSteps.length === 1 ? '' : 's'} ${litSteps.join(', ')}`}.</> : <> is about the whole system.</>} <span class="muted">Pick another milestone below to move the rings.</span></p> : null}
+        <CapstoneDiagram lit={litSteps.length === 9 ? [] : litSteps} />
         <ol class="flowsteps">
-          {FLOW_STEPS.map(([a, b], i) => <li key={a}><span class="flowsteps__n" aria-hidden="true">{i + 1}</span><span><strong>{a}</strong> {b}</span></li>)}
+          {FLOW_STEPS.map(([a, b], i) => <li key={a} data-lit={litSteps.includes(i + 1) && litSteps.length < 9}><span class="flowsteps__n" aria-hidden="true">{i + 1}</span><span><strong>{a}</strong> {b}</span></li>)}
         </ol>
       </section>
 
@@ -65,10 +73,18 @@ export function CapstoneOverview() {
         <div class="bar" style="margin:0.5rem 0 0.9rem" role="progressbar" aria-label="Capstone milestones shipped" aria-valuemin={0} aria-valuemax={tasks.length} aria-valuenow={shipped}><i style={{ width: `${(shipped / tasks.length) * 100}%` }} /></div>
         <ol class="milestones">
           {tasks.map((t) => (
-            <li key={t.id} data-done={done.has(t.id)} data-current={current?.id === t.id}>
+            <li key={t.id} id={t.id} data-done={done.has(t.id)} data-current={current?.id === t.id} data-focus={focus === t.id}>
               <span class="ms__mark" aria-hidden="true">{done.has(t.id) ? <Icon name="check" /> : null}</span>
-              <a href={`/weeks/${t.week}#${t.id}`}><span class="mono muted small">Week {t.week}</span> {text(t)}</a>
-              {current?.id === t.id ? <span class="chip chip--accent">Next</span> : null}
+              <div>
+                <a href={`/weeks/${t.week}#${t.id}`}><span class="mono muted small">Week {t.week}</span> {text(t)}</a>
+                <p class="small" style="margin:0.2rem 0 0">
+                  {capstoneTerms(text(t)).slice(0, 5).map((x, i) => <>{i ? ', ' : ''}<a key={x.id} href={`/guide#${x.id}`} title="What is this?">{x.name}</a></>)}
+                </p>
+              </div>
+              <span class="row" style="justify-content:flex-end">
+                {current?.id === t.id ? <span class="chip chip--accent">Next</span> : null}
+                <button type="button" class="btn btn--small btn--ghost" aria-pressed={focus === t.id} onClick={() => setPicked(t.id)}>Show on diagram</button>
+              </span>
             </li>
           ))}
         </ol>

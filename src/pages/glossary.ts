@@ -94,7 +94,7 @@ export const GLOSSARY: TermGroup[] = [
 ]
 
 /** Capstone parts and must-haves that have an explanation above, matched by the words in the plan's bullet. */
-const CAPSTONE_LINKS: [RegExp, string][] = [
+export const CAPSTONE_LINKS: [RegExp, string][] = [
   [/idempotency/i, 'idempotency'], [/stock reservation/i, 'reservation'], [/overselling/i, 'oversell'], [/compensation/i, 'compensation'],
   [/outbound|webhook sender/i, 'outbound-webhook'], [/failure-injection/i, 'failure-injection'], [/state machine/i, 'state-machine'], [/outbox/i, 'outbox'], [/webhook/i, 'webhook'],
   [/dead-letter/i, 'dlq'], [/reconciliation/i, 'reconciliation'], [/kafka/i, 'kafka'], [/k6|load test/i, 'load-test'],

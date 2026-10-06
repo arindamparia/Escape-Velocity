@@ -110,12 +110,12 @@ test.describe('every task type opens its inline tool', () => {
     })
   }
 
-  test('capstone: "Open capstone tab" opens the capstone track with the flow and milestones', async ({ page, api }) => {
+  test('capstone: "Open this milestone" opens the capstone track at that milestone, with the flow and milestones', async ({ page, api }) => {
     await api.onboard()
     const task = firstTask('capstone')
     await openTask(page, task.id)
     await primary(page, task.id).click()
-    await expect(page).toHaveURL(/\/weeks\/capstone$/)
+    await expect(page).toHaveURL(new RegExp(`/weeks/capstone#${task.id}$`))
     await expect(page.getByRole('heading', { level: 1, name: 'Capstone' })).toBeVisible()
     await expect(page.getByRole('tab', { name: 'Capstone' })).toHaveAttribute('aria-selected', 'true')
     await expect(page.getByRole('img', { name: /^Architecture:/ })).toBeVisible()

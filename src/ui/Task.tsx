@@ -6,6 +6,7 @@ import { plan, taskLabel } from '../lib/plan'
 import { dsaProgress } from '../lib/problems'
 import { Html } from './Html'
 import { Icon } from './Icon'
+import { CapstoneLinks } from './CapstoneLinks'
 import { StudyPanel } from './Resources'
 import { PRESETS, startTimer } from '../tools/timer'
 
@@ -75,7 +76,7 @@ export function actionsFor(task: PlanTask, chunk: WeekChunk | null): TaskAction[
     case 'redraw':
       return [{ label: 'Open redraw queue', primary: true, run: () => navigate('/study/redraws') }]
     case 'capstone':
-      return [{ label: 'Open capstone tab', primary: true, run: () => navigate('/weeks/capstone') }]
+      return [{ label: 'Open this milestone', primary: true, run: () => navigate(`/weeks/capstone#${id}`) }]
     case 'mock':
       return [{ label: 'Start mock mode', primary: true, run: () => navigate('/study/mock') }]
     case 'story':
@@ -134,11 +135,12 @@ export function TaskRow({ task, chunk, focused = false, actions = true, inWeek =
         <div class="task__meta">
           {termOf(task) ? <a class="chip" href={`/guide#${termOf(task)}`} title="What is this?">{labelOf(task)}</a> : <span class="chip">{labelOf(task)}</span>}
           {task.optional ? <span class="chip" title="An extra: skip it freely. It never counts against the day or the week.">optional</span> : null}
-          {task.company ? <span class="chip chip--accent">asked at {task.company}</span> : null}
+          {task.company ? <a class="chip chip--accent" href={`/library?tab=companies&company=${encodeURIComponent(task.company)}`} title="What this company asks">asked at {task.company}</a> : null}
           {inWeek && task.week ? <a class="small" href={`/weeks/${task.week}#${task.id}`} title="See this task in its week">{taskLabel(task.id)}</a> : <span class="muted small">{taskLabel(task.id)}</span>}
           <span class="task__pts" title="points">+{task.points}</span>
         </div>
         {entry ? <Html class="task__text" html={entry.html} inline /> : <span class="task__text muted">…</span>}
+        {task.type === 'capstone' && entry ? <CapstoneLinks taskId={task.id} text={entry.text} /> : null}
         <StudyPanel items={chunk?.resources?.[task.id]} design={task.type === 'design' || task.type === 'design2'} />
         <DsaProgress task={task} locked={engine.autoDoneSet.value.has(task.id)} />
         {pick ? <div class="small muted">Your pick: <strong>{chunk?.designs[pick]?.name ?? pick}</strong></div> : null}

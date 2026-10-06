@@ -640,3 +640,11 @@ label.check > span { flex: 1; min-width: 0; }
 .bonus__formula { padding: 0.55rem 0.8rem; border: 1px dashed var(--line); border-radius: var(--radius); background: var(--surface); text-align: center; font-size: 1.12rem; overflow-x: auto; }
 [data-theme='paper'] .bonus__formula { border-style: solid; }
 .bonus[data-done='true'] { border-left-style: dotted; }
+.tomorrow { margin: 0.2rem 0 0; padding: 0.6rem 0.8rem; border-top: 1px solid var(--line); }
+/* capstone: the steps a milestone touches */
+.dg-ring { fill: none; stroke: var(--accent); stroke-width: 3; }
+[data-theme='paper'] .dg-ring { stroke: var(--text); stroke-width: 3.5; }
+.dg-lit circle:not(.dg-ring) { fill: var(--accent); }
+.flowsteps li[data-lit='true'] { box-shadow: inset 4px 0 0 var(--accent); padding-left: 0.6rem; font-weight: 600; }
+.milestones li[data-focus='true'] { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: var(--radius); }
+.capstone-links { margin: 0.25rem 0 0; }

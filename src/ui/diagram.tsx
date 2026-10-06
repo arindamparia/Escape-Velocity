@@ -26,11 +26,11 @@ export function Node({ x, y, w, h, title, sub, kind }: { x: number; y: number; w
 }
 
 /** An arrow. `m` is the id of the arrowhead marker (each drawing defines its own: ids must be unique on a page). */
-export function Arrow({ d, dashed, bad, n, at, m = 'dg-head' }: { d: string; dashed?: boolean; bad?: boolean; n?: number; at?: [number, number]; m?: string }) {
+export function Arrow({ d, dashed, bad, n, at, m = 'dg-head', lit }: { d: string; dashed?: boolean; bad?: boolean; n?: number; at?: [number, number]; m?: string; lit?: boolean }) {
   return (
-    <g class={`dg-arrow${bad ? ' dg-bad' : ''}`}>
+    <g class={`dg-arrow${bad ? ' dg-bad' : ''}${lit ? ' dg-lit' : ''}`}>
       <path d={d} stroke-dasharray={dashed || bad ? '5 4' : undefined} marker-end={`url(#${m})`} />
-      {n && at ? <><circle cx={at[0]} cy={at[1]} r="10" /><text x={at[0]} y={at[1] + 4} text-anchor="middle">{n}</text></> : null}
+      {n && at ? <>{lit ? <circle class="dg-ring" cx={at[0]} cy={at[1]} r="16" /> : null}<circle cx={at[0]} cy={at[1]} r="10" /><text x={at[0]} y={at[1] + 4} text-anchor="middle">{n}</text></> : null}
     </g>
   )
 }

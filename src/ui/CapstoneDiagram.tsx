@@ -16,7 +16,7 @@ export const FLOW_STEPS: [string, string][] = [
   ['A reconciliation job compares', 'orders, payments, stock and the provider’s own records, and flags any mismatch.'],
 ]
 
-export function CapstoneDiagram() {
+export function CapstoneDiagram({ lit = [] }: { lit?: number[] }) {
   return (
     <figure style="margin:0">
       <svg class="dg" viewBox="0 0 780 430" role="img" aria-label="Architecture: a client calls the Order API, which checks the cart and idempotency keys in Redis, asks the Inventory service to reserve stock, and saves the order and an outbox table in Postgres. An outbox relay publishes events to Kafka and sends signed webhooks to the store. The Payment service consumes the events, charges a mock payment provider, receives its webhooks, writes the status back to Postgres and tells Inventory to commit or release the stock. A reconciliation job compares the provider with the payment records.">
@@ -39,19 +39,19 @@ export function CapstoneDiagram() {
 
         <Node x={170} y={360} w={390} h={54} title="Reconciliation job" sub="compares orders, payments, stock and the provider" kind="job" />
 
-        <Arrow d="M120 177 H180" n={1} at={[150, 177]} />
-        <Arrow d="M245 140 V74" n={2} at={[245, 107]} />
-        <Arrow d="M290 140 V108 H420 V84" n={3} at={[355, 108]} />
-        <Arrow d="M310 172 H370" n={4} at={[340, 172]} />
+        <Arrow d="M120 177 H180" n={1} at={[150, 177]} lit={lit.includes(1)} />
+        <Arrow d="M245 140 V74" n={2} at={[245, 107]} lit={lit.includes(2)} />
+        <Arrow d="M290 140 V108 H420 V84" n={3} at={[355, 108]} lit={lit.includes(3)} />
+        <Arrow d="M310 172 H370" n={4} at={[340, 172]} lit={lit.includes(4)} />
         <Arrow d="M590 172 H640" />
-        <Arrow d="M705 204 V250" n={5} at={[705, 227]} />
+        <Arrow d="M705 204 V250" n={5} at={[705, 227]} lit={lit.includes(5)} />
         <Arrow d="M640 277 H560" />
-        <Arrow d="M370 270 H310" n={6} at={[340, 270]} />
-        <Arrow d="M310 298 H370" dashed n={7} at={[340, 298]} />
+        <Arrow d="M370 270 H310" n={6} at={[340, 270]} lit={lit.includes(6)} />
+        <Arrow d="M310 298 H370" dashed n={7} at={[340, 298]} lit={lit.includes(7)} />
         <Arrow d="M465 250 V204" dashed />
         <Arrow d="M560 262 H612 V52 H560" dashed />
-        <Arrow d="M705 140 V74" dashed n={8} at={[705, 107]} />
-        <Arrow d="M240 360 V314" dashed n={9} at={[240, 337]} />
+        <Arrow d="M705 140 V74" dashed n={8} at={[705, 107]} lit={lit.includes(8)} />
+        <Arrow d="M240 360 V314" dashed n={9} at={[240, 337]} lit={lit.includes(9)} />
         <Arrow d="M465 360 V314" dashed />
       </svg>
       <figcaption class="dg-legend small muted">

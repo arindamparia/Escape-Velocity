@@ -3,7 +3,7 @@ import { useEffect, useMemo } from 'preact/hooks'
 import type { PlanDay, PlanTask } from '../../shared/plan-types'
 import { engine, openOverlay, toggleTask, whyNote } from '../lib/app'
 import { today } from '../lib/clock'
-import { DAY_STARTS_HOUR, daysUntil, formatShort, isLateNight } from '../lib/dates'
+import { addDays, DAY_STARTS_HOUR, daysUntil, formatShort, isLateNight } from '../lib/dates'
 import { focusId, focusList } from '../lib/focus'
 import { plan } from '../lib/plan'
 import { algotracker } from '../lib/solved'
@@ -15,8 +15,9 @@ import { lazyPage } from '../ui/lazyPage'
 import { useNow, useTitle, useWeekChunk } from '../ui/hooks'
 import { Html } from '../ui/Html'
 import { Icon } from '../ui/Icon'
+import { CapstoneLinks } from '../ui/CapstoneLinks'
 import { StudyPanel } from '../ui/Resources'
-import { actionsFor, TaskRow, TYPE_LABEL } from '../ui/Task'
+import { actionsFor, labelOf, TaskRow, TYPE_LABEL } from '../ui/Task'
 
 const RuleOfTheDay = lazy(() => import('../ui/TodayExtras').then((m) => m.RuleOfTheDay))
 // The right column and the day rail are not needed for the first paint. They are fetched right away and awaited briefly
@@ -60,6 +61,20 @@ function DueToday() {
         {redraws ? <li><a href="/study/redraws"><strong>{redraws}</strong> design{redraws === 1 ? '' : 's'} to redraw</a><span class="muted small"> · from memory, then check</span></li> : null}
       </ul>
     </section>
+  )
+}
+
+/** One line about tomorrow: what kinds of work, and a link to the day. */
+function Tomorrow({ info }: { info: ReturnType<typeof dayInfo> }) {
+  const list = tasksOn(info.week, info.dayName).filter((t) => t.type !== 'rest')
+  const link = `/weeks/${info.week}#day-${info.dayName}`
+  const kinds = [...new Set(list.map((t) => labelOf(t) + (t.optional ? ' (optional)' : '')))]
+  return (
+    <p class="small tomorrow" data-testid="tomorrow">
+      <span class="eyebrow" style="display:inline;margin:0">Tomorrow, {DAY_NAMES[info.dow]}</span>{' '}
+      {info.light ? <><Icon name="moon" /> {info.light.label}: a light day.</> : kinds.length ? <>{kinds.join(', ')}.</> : <>nothing scheduled.</>}{' '}
+      <a href={link}>See {info.dayName}</a>
+    </p>
   )
 }
 
@@ -173,6 +188,7 @@ export default function Today() {
         ) : null}
         {next.type === 'boss' ? <p class="small muted">No hints for the first hour.</p> : null}
         {design && next.type === 'design' ? <p class="small"><strong>Derive it first:</strong> {design.derive}</p> : null}
+        {next.type === 'capstone' && entry ? <CapstoneLinks taskId={next.id} text={entry.text} /> : null}
         <StudyPanel items={chunk?.resources?.[next.id]} design={next.type === 'design' || next.type === 'design2'} />
         <div class="hero__actions" style="margin-top:1rem">
           {next.type === 'design2' ? (
@@ -202,6 +218,10 @@ export default function Today() {
   }
 
   const dayList = todays.filter((t) => t.type !== 'rest' || !light)
+  // the any-day list stays open while something in it is still undone (the weekly DSA is already the morning's next action)
+  const weeklyOpen = coreTasks(weekly).some((t) => !done.has(t.id) && t.type !== 'dsa')
+  // a look ahead, so a Friday paper, a Saturday cold attempt or a Sunday mock never arrives as a surprise
+  const tomorrow = info.phase === 'during' ? dayInfo(addDays(date, 1)) : null
   // the next-up card already offers this task's buttons, so its row below is only the tick and the text
   const heroOffersTask = !!next && info.phase === 'during' && !light && !welcomeBack
   return (
@@ -243,7 +263,7 @@ export default function Today() {
               <div class="empty">Nothing is scheduled for {info.dayName}. {weekly.length ? 'This week’s open tasks are below.' : ''}</div>
             )}
             {!welcomeBack && weekly.length ? (
-              <details style="margin-top:1rem" open={dayList.length === 0}>
+              <details style="margin-top:1rem" open={dayList.length === 0 || weeklyOpen}>
                 <summary>This week, any day ({coreTasks(weekly).filter((t) => done.has(t.id)).length} of {coreTasks(weekly).length} done)</summary>
                 <ul class="tasks" style="margin-top:0.6rem">
                   {weekly.map((t) => <TaskRow key={t.id} task={t} chunk={chunk} focused={focusId.value === t.id} inWeek />)}
@@ -252,6 +272,7 @@ export default function Today() {
             ) : null}
           </section>
         ) : null}
+        {tomorrow && tomorrow.phase === 'during' ? <Tomorrow info={tomorrow} /> : null}
       </div>
 
       <div class="slot-aside">
