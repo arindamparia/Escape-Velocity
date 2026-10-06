@@ -317,6 +317,27 @@ describe('compiler: the extras (papers, equations, gaps)', () => {
     expect(html).toContain('Week 2 · Task 5')
   })
 
+  it('Arpit Bhayani leads his kind of link on every task, with the other sources kept as options', () => {
+    let tasksWithHim = 0
+    for (const w of Object.values(out.weekChunks)) {
+      for (const [id, list] of Object.entries(w.resources)) {
+        for (const kind of ['video', 'doc', 'repo'] as const) {
+          const same = list.filter((r) => r.kind === kind && r.access === 'free')
+          const him = same.map((r) => /Arpit Bhayani/.test(r.source))
+          if (!him.some(Boolean)) continue
+          tasksWithHim++
+          expect(him, `${id} ${kind}: his links come first`).toEqual([...him].sort((a, b) => Number(b) - Number(a)))
+        }
+      }
+    }
+    expect(tasksWithHim).toBeGreaterThan(15)
+    // the new tasks keep non-Arpit options beside his
+    const w08 = out.weekChunks['08'].resources['w08-15']
+    expect(w08[0].source).toBe('Arpit Bhayani')
+    expect(w08.some((r) => r.source !== 'Arpit Bhayani')).toBe(true)
+    expect(out.weekChunks['07'].resources['w07-16'][0].url).toContain('LnqKfLcszEg') // his DynamoDB paper explainer leads
+  })
+
   it('the five new designs are in the library and offered as second designs', () => {
     const ids = ['s3-like-blob-store', 'online-offline-indicator', 'deep-research-agent', 'recommendation-engine', 'live-stream-with-cdn']
     const all = out.pages.library.groups.flatMap((g) => g.designs.map((d) => d.id))

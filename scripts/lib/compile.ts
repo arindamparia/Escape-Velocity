@@ -856,7 +856,9 @@ export function compilePlan(source: string): CompileOutput {
   }
   // free before partial before premium; inside each, videos first (they are how this plan is best learned), then docs, then code
   const KIND_ORDER: ResourceKind[] = ['video', 'doc', 'repo']
-  const byAccess = (a: ResourceRow, b: ResourceRow) => ACCESS_ORDER.indexOf(a.access) - ACCESS_ORDER.indexOf(b.access) || KIND_ORDER.indexOf(a.kind) - KIND_ORDER.indexOf(b.kind)
+  // Arpit Bhayani's own videos and posts lead their kind: the owner's most trusted source, so he comes first and the rest stay as options
+  const arpitFirst = (r: ResourceRow) => (/Arpit Bhayani/.test(r.source) ? 0 : 1)
+  const byAccess = (a: ResourceRow, b: ResourceRow) => ACCESS_ORDER.indexOf(a.access) - ACCESS_ORDER.indexOf(b.access) || KIND_ORDER.indexOf(a.kind) - KIND_ORDER.indexOf(b.kind) || arpitFirst(a) - arpitFirst(b)
   for (const w of Object.values(weekChunks)) for (const list of Object.values(w.resources)) list.sort(byAccess) // stable: free first, the doc's order after
   resourceRows.sort(byAccess)
   const studyBody = studyRoot ? studyRoot.body.map((b) => b.text) : []

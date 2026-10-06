@@ -1518,6 +1518,8 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 2 | Thu | Isolation levels and write skew | — | video | free | Serializable Snapshot Isolation | Jordan has no life | https://www.youtube.com/watch?v=4TAKYRzm_dA | 8 |
 | 2 | Thu | Isolation levels and write skew | — | doc | free | Decoding isolation, the I in ACID | Arpit Bhayani | https://arpitbhayani.me/blogs/isolation | — |
 | 2 | Thu | Isolation levels and write skew | — | doc | free | Why databases deadlock | Arpit Bhayani | https://arpitbhayani.me/blogs/database-deadlocks | — |
+| 2 | Thu | Isolation levels and write skew | — | video | free | Everything you need to know about Read Uncommitted isolation | Arpit Bhayani | https://www.youtube.com/watch?v=AiPGbVjl3JY | 10 |
+| 2 | Thu | Isolation levels and write skew | — | video | free | Understanding the phantom reads problem, with hands-on examples | Arpit Bhayani | https://www.youtube.com/watch?v=n_t0IO0mq5Q | 13 |
 | 2 | Week | DSA: arrays, two pointers, sliding window, prefix sums | — | video | free | Introduction to Sliding Window and 2 Pointers | take U forward (Striver) | https://www.youtube.com/watch?v=9kdHxplyl5I | 37 |
 | 2 | Week | DSA: arrays, two pointers, sliding window, prefix sums | — | video | free | Prefix Sum in 4 minutes | AlgoMaster | https://www.youtube.com/watch?v=yuws7YK0Yng | 4 |
 | 3 | Thu | Sharding | — | doc | free | Sharding | Hello Interview | https://www.hellointerview.com/learn/system-design/core-concepts/sharding | — |
@@ -1550,6 +1552,7 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 4 | Wed | Connection pools and pgbouncer | — | video | free | PgBouncer Tutorial | Code with Lucian | https://www.youtube.com/watch?v=ddKm7a7xOpk | 19 |
 | 4 | Wed | Connection pools and pgbouncer | — | doc | free | pgbouncer features: the three pooling modes | pgbouncer | https://www.pgbouncer.org/features.html | — |
 | 4 | Wed | Connection pools and pgbouncer | — | repo | free | System design exercises in Go: the connection-pool exercise | Arpit Bhayani's course | https://github.com/addi-11/system-design-excercises | — |
+| 4 | Wed | Connection pools and pgbouncer | — | video | free | PostgreSQL connection management and the per-client process model | Arpit Bhayani | https://www.youtube.com/watch?v=o7qLKfILuD8 | 9 |
 | 4 | Thu | Dealing with contention | — | video | free | Optimistic locking clearly explained (Java and SQL) | ByteMonk | https://www.youtube.com/watch?v=d41JuPT_Wls | 7 |
 | 4 | Thu | Dealing with contention | — | doc | partial | Dealing with Contention | Hello Interview | https://www.hellointerview.com/learn/system-design/patterns/dealing-with-contention | — |
 | 4 | Thu | Dealing with contention | — | doc | free | Common Patterns summary | Hello Interview | https://www.hellointerview.com/learn/system-design/in-a-hurry/patterns | — |
@@ -1607,6 +1610,7 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 6 | Mon | Circuit breakers and bulkheads | — | video | free | Top 5 Microservices Resilience Patterns | ByteMonk | https://www.youtube.com/watch?v=RfPNuaj5Ax0 | 7 |
 | 6 | Mon | Circuit breakers and bulkheads | — | doc | free | Circuit Breaker | Martin Fowler | https://martinfowler.com/bliki/CircuitBreaker.html | — |
 | 6 | Mon | Circuit breakers and bulkheads | — | doc | free | Timeouts, retries and backoff with jitter | AWS Builders' Library | https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/ | — |
+| 6 | Mon | Circuit breakers and bulkheads | — | video | free | How to safely and gracefully handle timeouts in microservices | Arpit Bhayani | https://www.youtube.com/watch?v=Hxja4crycBg | 24 |
 | 6 | Tue | Temporal | — | doc | free | Temporal deep dive | Hello Interview | https://www.hellointerview.com/learn/system-design/deep-dives/temporal | — |
 | 6 | Tue | Temporal | — | video | free | Temporal in 7 minutes | Temporal | https://www.youtube.com/watch?v=2HjnQlnA5eY | 7 |
 | 6 | Tue | Temporal | — | video | free | Maxim Fateev on Durable Execution with Temporal (SE Radio 596) | IEEE Computer Society | https://www.youtube.com/watch?v=fMh2ZYJST0E | 69 |
@@ -1651,6 +1655,8 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 7 | Tue | Replication, RPO and RTO | — | doc | free | MySQL replication internals | Arpit Bhayani | https://arpitbhayani.me/blogs/mysql-replication-internals | — |
 | 7 | Tue | Replication, RPO and RTO | — | doc | free | Multi-master replication | Arpit Bhayani | https://arpitbhayani.me/blogs/multi-master-replication | — |
 | 7 | Tue | Replication, RPO and RTO | — | doc | free | Leaderless replication | Arpit Bhayani | https://arpitbhayani.me/blogs/leaderless-replication | — |
+| 7 | Tue | Replication, RPO and RTO | — | video | free | How Bitbucket reduced master database load by 50% and solved read-your-write consistency | Arpit Bhayani | https://www.youtube.com/watch?v=sbDVs71wIVk | 19 |
+| 7 | Tue | Replication, RPO and RTO | — | video | free | GitHub outage: how databases are managed in production | Arpit Bhayani | https://www.youtube.com/watch?v=4mVJQJbw6Vw | 24 |
 | 7 | Wed | AWS: RDS, S3, SQS, SNS, CloudWatch | — | video | free | AWS Cloud Practitioner course: Storage services (S3) | freeCodeCamp | https://www.youtube.com/watch?v=NhDYbskXRgc&t=21757s | 38 |
 | 7 | Wed | AWS: RDS, S3, SQS, SNS, CloudWatch | — | video | free | AWS Cloud Practitioner course: Databases (RDS) | freeCodeCamp | https://www.youtube.com/watch?v=NhDYbskXRgc&t=24015s | 30 |
 | 7 | Wed | AWS: RDS, S3, SQS, SNS, CloudWatch | — | video | free | AWS SQS vs SNS vs EventBridge: when to use what | Be A Better Dev | https://www.youtube.com/watch?v=RoKAEzdcr7k | 23 |
@@ -1658,6 +1664,7 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 7 | Wed | Hot shards and shuffle sharding | — | video | free | How Shopify avoids hot shards by moving data across databases without any downtime | Arpit Bhayani | https://www.youtube.com/watch?v=7v-wrJjcg4k | 21 |
 | 7 | Wed | Hot shards and shuffle sharding | — | video | free | Fault isolation using shuffle sharding | Conf42 SRE 2021 (Andrew Robinson) | https://www.youtube.com/watch?v=Ag0Yn7CzYSY | 15 |
 | 7 | Wed | Hot shards and shuffle sharding | — | doc | free | Workload isolation using shuffle sharding | AWS | https://builder.aws.com/content/3F06NpJ8YeoIGP8VHTw4n81pFn8/workload-isolation-using-shuffle-sharding | — |
+| 7 | Wed | Hot shards and shuffle sharding | — | video | free | How GitHub sharded their databases without downtime | Arpit Bhayani | https://www.youtube.com/watch?v=Tq1fif3rcnQ | 20 |
 | 7 | Thu | Online Auction (option) | online-auction | doc | premium | Online Auction | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/online-auction | — |
 | 7 | Thu | Online Auction (option) | online-auction | video | free | Senior/Staff Mock Interview: Design Online Auction | Hello Interview | https://www.youtube.com/watch?v=o8nSXW-B7Rw | 63 |
 | 7 | Thu | Online Auction (option) | online-auction | video | free | Online Auction & Bidding Service | System Design Fight Club | https://www.youtube.com/watch?v=g8XqFuDkga0 | 29 |
@@ -1665,6 +1672,7 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 7 | Thu | Web Crawler (option) | web-crawler | video | free | Design a Web Crawler | Hello Interview | https://www.youtube.com/watch?v=krsuaUp__pM | 65 |
 | 7 | Thu | Maths: quorum | — | video | free | Distributed Systems 5.2: Quorums | Martin Kleppmann | https://www.youtube.com/watch?v=uNxl3BFcKSA | 10 |
 | 7 | Fri | Paper: Dynamo | — | video | free | Dynamo: Why Amazon Ditched SQL | Jordan has no life | https://www.youtube.com/watch?v=TtrmHQCGbb0 | 49 |
+| 7 | Fri | Paper: Dynamo | — | video | free | Amazon DynamoDB: paper explained | Arpit Bhayani | https://www.youtube.com/watch?v=LnqKfLcszEg | 93 |
 | 7 | Sat | Flash Sale | flash-sale | doc | premium | Flash Sale | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/flash-sale | — |
 | 7 | Sat | Flash Sale | flash-sale | doc | free | Shopify inventory reservations | Hello Interview | https://www.hellointerview.com/learn/system-design/in-the-wild/shopify-inventory-reservations | — |
 | 7 | Sat | Flash Sale | flash-sale | video | free | Senior Mock Interview: Design an e-commerce platform | Hello Interview | https://www.youtube.com/watch?v=RuGY_1pap74 | 72 |
@@ -1685,6 +1693,7 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 8 | Tue | API gateway | — | video | free | API gateway vs load balancer | ByteMonk | https://www.youtube.com/watch?v=_ErhwTPSpws | 9 |
 | 8 | Tue | Scaling WebSockets | — | video | free | How to scale WebSockets to millions of connections | Ably Realtime | https://www.youtube.com/watch?v=vXJsJ52vwAA | 14 |
 | 8 | Tue | Scaling WebSockets | — | repo | free | System design exercises in Go: the SSE and broker exercises | Arpit Bhayani's course | https://github.com/addi-11/system-design-excercises | — |
+| 8 | Tue | Scaling WebSockets | — | video | free | Why and how Trello moved from RabbitMQ to Kafka for WebSocket real-time updates | Arpit Bhayani | https://www.youtube.com/watch?v=LJzS6dUV-GE | 23 |
 | 8 | Wed | Kubernetes basics | — | video | free | From zero to Kubernetes hero: pods, clusters, scaling (5 min) | ByteMonk | https://www.youtube.com/watch?v=Dwufy7QtZR0 | 6 |
 | 8 | Wed | Kubernetes basics | — | doc | free | Kubernetes concepts | Kubernetes docs | https://kubernetes.io/docs/concepts/ | — |
 | 8 | Wed | Kubernetes basics | — | video | free | Kubernetes course: main components and architecture | TechWorld with Nana | https://www.youtube.com/watch?v=X48VuDVv0do&t=320s | 29 |
@@ -1697,6 +1706,8 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 8 | Wed | Leader election and fencing | — | doc | free | Heartbeats in distributed systems | Arpit Bhayani | https://arpitbhayani.me/blogs/heartbeats-in-distributed-systems | — |
 | 8 | Wed | Leader election and fencing | — | doc | free | How to do distributed locking (fencing tokens) | Martin Kleppmann | https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html | — |
 | 8 | Wed | Leader election and fencing | — | doc | premium | ZooKeeper deep dive | Hello Interview | https://www.hellointerview.com/learn/system-design/deep-dives/zookeeper | — |
+| 8 | Wed | Leader election and fencing | — | video | free | LCR algorithm for leader election in distributed systems | Arpit Bhayani | https://www.youtube.com/watch?v=NDBJr37dBzc | 14 |
+| 8 | Wed | Leader election and fencing | — | video | free | HS algorithm for leader election in distributed systems | Arpit Bhayani | https://www.youtube.com/watch?v=inzQQm-kXCo | 19 |
 | 8 | Thu | FB Live Comments (option) | fb-live-comments | doc | free | Design FB Live Comments | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/fb-live-comments | — |
 | 8 | Thu | FB Live Comments (option) | fb-live-comments | video | free | Design Live Comments | Hello Interview | https://www.youtube.com/watch?v=LjLx0fCd1k8 | 56 |
 | 8 | Thu | LeetCode (option) | leetcode | doc | free | Design LeetCode | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/leetcode | — |
@@ -1727,6 +1738,9 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 9 | Wed | Load balancers and single points of failure | — | video | free | How to avoid a single point of failure in distributed systems | Gaurav Sen | https://www.youtube.com/watch?v=-BOysyYErLY | 7 |
 | 9 | Wed | Load balancers and single points of failure | — | video | free | Top 6 Load Balancing Algorithms Every Developer Should Know | ByteByteGo | https://www.youtube.com/watch?v=dBmxNsS3BGE | 5 |
 | 9 | Wed | Load balancers and single points of failure | — | repo | free | System design exercises in Go: load balancers and consistent hashing | Arpit Bhayani's course | https://github.com/addi-11/system-design-excercises | — |
+| 9 | Wed | Load balancers and single points of failure | — | video | free | Load balancers are not magic: dissecting the Atlassian outage | Arpit Bhayani | https://www.youtube.com/watch?v=KwGyA6B7qrI | 13 |
+| 9 | Wed | Load balancers and single points of failure | — | video | free | What are L4 load balancers and how do they work? | Arpit Bhayani | https://www.youtube.com/watch?v=RcarDmgWezY | 18 |
+| 9 | Wed | Load balancers and single points of failure | — | video | free | How Google designed highly available load balancers using anycast | Arpit Bhayani | https://www.youtube.com/watch?v=WjT253DBlXk | 45 |
 | 9 | Thu | Notification System (option) | notification-system | doc | premium | Notification System | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/notification-system | — |
 | 9 | Thu | Notification System (option) | notification-system | doc | free | Design a scalable notification service | AlgoMaster | https://blog.algomaster.io/p/design-a-scalable-notification-service | — |
 | 9 | Thu | Notification System (option) | notification-system | doc | free | How Razorpay's notification service handles increasing load | Razorpay Engineering | https://engineering.razorpay.com/how-razorpays-notification-service-handles-increasing-load-f787623a490f | — |
@@ -1763,6 +1777,7 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 10 | Thu | Maths: queues and utilisation | — | video | free | Queueing theory (simple) | Liz Thompson | https://www.youtube.com/watch?v=ch0MRQcZSUE | 9 |
 | 10 | Thu | Maths: queues and utilisation | — | doc | free | Using load shedding to avoid overload | Amazon Builders' Library | https://aws.amazon.com/builders-library/using-load-shedding-to-avoid-overload/ | — |
 | 10 | Fri | Paper: Understanding Inverse Document Frequency | — | video | free | Term Frequency Inverse Document Frequency (TF-IDF) explained | DataMListic | https://www.youtube.com/watch?v=zLMEnNbdh4Q | 9 |
+| 10 | Fri | Paper: Understanding Inverse Document Frequency | — | video | free | Inverted index: the data structure behind search engines | Arpit Bhayani | https://www.youtube.com/watch?v=iHHqnyThrqE | 15 |
 | 10 | Sat | FB News Feed | fb-news-feed | video | free | Twitter timeline architecture: fanout (the feed idea in 5 minutes) | ByteMonk | https://www.youtube.com/watch?v=FEkXjNFrL1o | 6 |
 | 10 | Sat | FB News Feed | fb-news-feed | doc | free | Design FB News Feed | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/fb-news-feed | — |
 | 10 | Sat | FB News Feed | fb-news-feed | video | free | Design FB News Feed | Hello Interview | https://www.youtube.com/watch?v=Qj4-GruzyDU | 26 |
@@ -1783,6 +1798,7 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 11 | Tue | Picking the store: columnar and graph | — | video | free | What is a columnar database? (vs row-oriented) | Anton Putra | https://www.youtube.com/watch?v=1MnvuNg33pA | 8 |
 | 11 | Tue | Picking the store: columnar and graph | — | doc | free | What is a columnar database? | ClickHouse docs | https://clickhouse.com/docs/faq/general/columnar-database | — |
 | 11 | Tue | Picking the store: columnar and graph | — | doc | free | How indexes work on partitioned and sharded data | Arpit Bhayani | https://arpitbhayani.me/blogs/how-indexes-work-on-partitioned-and-sharded-data | — |
+| 11 | Tue | Picking the store: columnar and graph | — | video | free | How indexes work in distributed databases, their trade-offs and challenges | Arpit Bhayani | https://www.youtube.com/watch?v=eQ3eNd5WbH8 | 16 |
 | 11 | Wed | CI/CD with GitHub Actions | — | doc | free | GitHub Actions docs | GitHub | https://docs.github.com/en/actions | — |
 | 11 | Wed | CI/CD with GitHub Actions | — | video | free | GitHub Actions Tutorial: basic concepts and CI/CD with Docker | TechWorld with Nana | https://www.youtube.com/watch?v=R8_veQiYBjI | 32 |
 | 11 | Thu | YouTube Top K (option) | youtube-top-k | doc | free | Design YouTube's Top K videos | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/top-k | — |
@@ -1811,6 +1827,8 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 12 | Wed | Storage engines: LSM trees and B-trees | — | video | free | How Databases Actually Store Your Data (B-Trees vs LSM Trees) | ByteMonk | https://www.youtube.com/watch?v=Q9xD4J3tezw | 11 |
 | 12 | Wed | Storage engines: LSM trees and B-trees | — | doc | free | Bitcask | Arpit Bhayani | https://arpitbhayani.me/blogs/bitcask | — |
 | 12 | Wed | Storage engines: LSM trees and B-trees | — | repo | free | System design exercises in Go: LSM tree, B+ tree and Bitcask | Arpit Bhayani's course | https://github.com/addi-11/system-design-excercises | — |
+| 12 | Wed | Storage engines: LSM trees and B-trees | — | video | free | Bitcask explained: a log-structured fast key-value store | Arpit Bhayani | https://www.youtube.com/watch?v=0WI_tJRUMqM | 16 |
+| 12 | Wed | Storage engines: LSM trees and B-trees | — | video | free | Why do databases store data in B+ trees? | Arpit Bhayani | https://www.youtube.com/watch?v=09E-tVAUqQw | 30 |
 | Extra | — | Terraform (optional) | — | doc | free | Terraform tutorials | HashiCorp | https://developer.hashicorp.com/terraform/tutorials | — |
 | Extra | — | Terraform (optional) | — | video | free | Terraform explained in 15 mins | TechWorld with Nana | https://www.youtube.com/watch?v=l5k1ai_GBDE | 18 |
 | 12 | Thu | Robinhood (option) | robinhood | video | free | What really happens when you buy a stock? | ByteMonk | https://www.youtube.com/watch?v=4wvIU0O1xro | 7 |
@@ -1845,6 +1863,8 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | Extra | — | Metrics Monitoring | metrics-monitoring | doc | free | Prometheus overview (how a metrics system is built) | Prometheus docs | https://prometheus.io/docs/introduction/overview/ | — |
 | Extra | — | Metrics Monitoring | metrics-monitoring | video | free | Design Metrics Monitoring & Alerting System | TechPrep | https://www.youtube.com/watch?v=T-8DgGQ7wUo | 21 |
 | Extra | — | Metrics Monitoring | metrics-monitoring | video | free | How do time series databases work? | Hello Interview | https://www.youtube.com/watch?v=Qd76ZmfRs_Q | 37 |
+| Extra | — | Paper: Designing Access Methods: The RUM Conjecture | — | video | free | Understanding database trade-offs: the RUM conjecture, paper explained | Arpit Bhayani | https://www.youtube.com/watch?v=ZxvulmKXIto | 8 |
+| Extra | — | Reading papers | — | video | free | My process of reading, understanding and remembering research papers | Arpit Bhayani | https://www.youtube.com/watch?v=V5-KxHdmbDo | 14 |
 
 ### Free channels, and when to use each
 
@@ -1858,7 +1878,7 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | Aced (formerly Exponent) | Full mock interviews to watch before your own | 8+ | https://www.youtube.com/watch?v=L9TfZdODuFQ |
 | ByteMonk | Short visual explainers: payments (PayPal), saga, Redis, WebSockets, circuit breaker, HFT | 2–12 | https://www.youtube.com/watch?v=7MXV7RfNtv0 |
 | take U forward (Striver) | DSA by topic: arrays, binary search, graphs, DP, trees | 2–6 | https://www.youtube.com/watch?v=9kdHxplyl5I |
-| Arpit Bhayani | Payments, idempotency, sharding, consistent hashing | 4–7 | https://www.youtube.com/watch?v=m6DtqSb1BDM |
+| Arpit Bhayani | Start here for most concept nights: isolation, replication, leader election, load balancers, storage engines, hot shards, and his paper walkthroughs (his links are listed first on every task) | 2–12 | https://www.youtube.com/watch?v=m6DtqSb1BDM |
 | Computerphile, Martin Kleppmann | Intuition for the Thursday maths (collisions, quorums) | 1, 7 | https://www.youtube.com/watch?v=uNxl3BFcKSA |
 | CodeNCode, Concept && Coding | LLD in Java | Every Saturday LLD | https://www.youtube.com/watch?v=wIo7igW3sW4 |
 
