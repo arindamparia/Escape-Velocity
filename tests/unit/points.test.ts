@@ -15,9 +15,9 @@ describe('points', () => {
   })
 
   it('every task ticked equals the week maximum, and week 4 matches the plan by hand', () => {
-    // w04: 10+2+2+2+2+3+10+8+5+8+6+0
-    expect(weekMaxPoints(plan.tasks, 4)).toBe(58)
-    expect(weekPoints(plan.tasks, all(4), 4)).toBe(58)
+    // w04: 10+2+2+2+2+3+10+8+5+8+6+0, then the gap task (+3), the paper (+2) and the bonus equation (+1)
+    expect(weekMaxPoints(plan.tasks, 4)).toBe(58 + 3 + 2 + 1)
+    expect(weekPoints(plan.tasks, all(4), 4)).toBe(64)
   })
 
   it('readiness items are worth 0 and only drive the ring', () => {

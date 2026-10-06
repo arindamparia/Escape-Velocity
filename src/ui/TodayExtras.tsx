@@ -2,7 +2,7 @@ import { engine } from '../lib/app'
 import { weekHasLightDay } from '../lib/dates'
 import { plan } from '../lib/plan'
 import { weekPoints, weekTarget } from '../lib/points'
-import { tasksOn } from '../lib/today'
+import { coreTasks, tasksOn } from '../lib/today'
 import { Html } from './Html'
 import { Icon } from './Icon'
 import { usePage } from './hooks'
@@ -38,7 +38,7 @@ export function WeekDays({ week, todayName }: { week: number; todayName: string 
       <p class="eyebrow">Week {week} by day</p>
       <ul class="dayrail">
         {days.map((d, i) => {
-          const list = tasksOn(week, d).filter((t) => t.type !== 'rest')
+          const list = coreTasks(tasksOn(week, d)).filter((t) => t.type !== 'rest')
           const n = list.filter((t) => done.has(t.id)).length
           const date = plan.weeks[week - 1].startDate
           const ymd = new Date(Date.UTC(+date.slice(0, 4), +date.slice(5, 7) - 1, +date.slice(8, 10) + i)).toISOString().slice(0, 10)
@@ -104,7 +104,7 @@ export default function TodayAside({ week, chunk, during }: { week: number; chun
   return (
     <>
       <EvidenceStrip />
-      {during ? <EquationCard week={week} chunk={chunk} /> : null}
+      {during ? <EquationCard week={week} chunk={chunk} compact /> : null}
       <section class="card" aria-label="Constellation">
         <p class="eyebrow">This week’s constellation</p>
         <div style="aspect-ratio:16/10">{showSky ? <ErrorBoundary onError={(e) => console.error(e)}><Constellation week={week} /></ErrorBoundary> : <div class="sky" />}</div>

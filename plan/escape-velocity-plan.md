@@ -1,7 +1,7 @@
 ---
 title: Escape Velocity
 subtitle: From "I feel mediocre" to SDE-2 interviews at Indian fintech
-tagline: 13 weeks. 37 designs. One jump.
+tagline: 13 weeks. 42 designs. One jump.
 owner: Arindam
 start_date: 2026-10-05
 end_date: 2027-01-03
@@ -27,10 +27,10 @@ This part is written so the site can be built from it without guessing. Read sec
 
 ## 1. What you're building
 
-**Escape Velocity** is a private study app for this plan: the steady push it takes to break out of orbit and into the next role. Tagline: "13 weeks. 37 designs. One jump." Three principles decide every trade-off:
+**Escape Velocity** is a private study app for this plan: the steady push it takes to break out of orbit and into the next role. Tagline: "13 weeks. 42 designs. One jump." Three principles decide every trade-off:
 
 1. **Instant.** It opens faster than you can think "I'll do it later". A repeat open shows real content in under 150 ms, even offline.
-2. **One next action.** It never shows 171 tasks at once. It shows the next thing to do, a big button to start it, and a timer.
+2. **One next action.** It never shows 200 tasks at once. It shows the next thing to do, a big button to start it, and a timer.
 3. **Evidence, not pressure.** It shows what you've done (problems solved, designs owned, constellations lit), never a backlog or a red streak.
 
 Constraints:
@@ -50,7 +50,7 @@ Constraints:
 | **Today** (home, `/`) | "What do I do right now?" | Next-up card, today's tasks, timer, evidence strip, equation of the week, constellation |
 | **Weeks** (`/weeks`) | "Where am I in the plan?" | 13-week timeline; week detail; tabs for DSA track, Capstone, Interview prep |
 | **Study** (`/study`) | "Which tool do I need?" | Learning loop, redraw queue, flashcards, focus timer, mock mode, envelope calculator, formula sheet, notes |
-| **Library** (`/library`) | "What should I design next, and what do companies ask?" | 37 designs, machine coding list, what companies ask, real systems, resources |
+| **Library** (`/library`) | "What should I design next, and what do companies ask?" | 42 designs, machine coding list, papers, what companies ask, gap check, real systems, resources |
 | **Progress** (`/progress`) | "Am I actually getting better?" | Scorecard, charts, readiness ring, Sunday review |
 
 Secondary, never in the main nav: **Mindset** (`/mindset`, opened from your why note on Today), **Settings** (theme, export), and the **command palette** (`⌘K`), which reaches everything.
@@ -88,6 +88,9 @@ Every content section in Parts 2 to 6 carries a `<!-- surface: … -->` marker d
 | Machine coding problems | `library.machine-coding` | Library tab |
 | Real systems to read | `library.reading` | Library tab; also offered after finishing the related design |
 | Resources and sources | `library.resources` | A Sources page, a "Study" panel on each task, and each design's Library page |
+| Papers | `library.papers` | Library tab "Papers", and the Friday paper tasks |
+| Equation bank | `library.equations` | The formula sheet (bonus equations, the shelf), and the equation card |
+| Gap check | `library.gaps` | Library tab "Gap check": the ten gaps with sketches, coverage tables, the course decision |
 
 ### Contextual surfacing: the tool comes to the task
 
@@ -101,7 +104,8 @@ When a task appears on Today or in week detail, its type decides what opens next
 | `design` | **Start learning loop** | Matching library entry (by link → design ID), its derive-it question, six forces |
 | `design2` | **Start short loop** (20 min cold, read, 1 card) | Both options as buttons; your pick is saved (autonomy) |
 | `lld` | **Start 90-min timer** | Company chip from the machine-coding table |
-| `maths` | **Open equation card** | The derivation rendered as maths; "derived it" tick |
+| `maths` | **Open equation card** | The derivation rendered as maths, a box for your answer, the check value behind a button, and a "derived it" tick |
+| `paper` | **Open the paper page** (and a 45-minute timer) | The paper, the number to find (hidden until you try), a decision card and a note. Optional |
 | `redraw` | **Open redraw queue** | Which designs are due, with your decision cards as the answer key |
 | `capstone` | **Open capstone tab** | Architecture flow, current milestone |
 | `mock` | **Start mock mode** | Random design and follow-up prompts |
@@ -540,15 +544,20 @@ These pairs were checked: text contrast is at least 14:1 in every theme, muted t
 ## 22. Content format reference (what the compiler reads)
 
 - **Front matter:** `start_date`, `end_date`, `weekly_points_target`, `light_days`.
-- **Surface marker:** `<!-- surface: weeks.dsa -->` on the line right after a heading. Required on every level-1 or level-2 heading in Parts 2 to 6 that has its own content before the next level-1 or level-2 heading; level-3 headings may carry one, otherwise they inherit. Allowed surfaces: `mindset.why-plan`, `mindset.main`, `library.companies`, `library.designs`, `library.machine-coding`, `library.reading`, `library.resources`, `study.loop-guide`, `study.loop-steps`, `study.decision-card`, `study.six-forces`, `study.formulas`, `today.rules`, `today.routine`, `progress.points-help`, `progress.readiness`, `progress.scorecard`, `weeks.timeline`, `weeks.tasks`, `weeks.dsa`, `weeks.capstone`, `weeks.interview`.
+- **Surface marker:** `<!-- surface: weeks.dsa -->` on the line right after a heading. Required on every level-1 or level-2 heading in Parts 2 to 6 that has its own content before the next level-1 or level-2 heading; level-3 headings may carry one, otherwise they inherit. Allowed surfaces: `mindset.why-plan`, `mindset.main`, `library.companies`, `library.designs`, `library.machine-coding`, `library.reading`, `library.resources`, `library.papers`, `library.equations`, `library.gaps`, `study.loop-guide`, `study.loop-steps`, `study.decision-card`, `study.six-forces`, `study.formulas`, `today.rules`, `today.routine`, `progress.points-help`, `progress.readiness`, `progress.scorecard`, `weeks.timeline`, `weeks.tasks`, `weeks.dsa`, `weeks.capstone`, `weeks.interview`.
 - **Week heading:** `### Week 04 · 26 Oct to 1 Nov · Caching and contention`
 - **Task line:** ``- [ ] `w04-07` `design` `+10` Sat · text…``
   - Pattern: ``^- \[( |x)\] `((?:w\d{2})-\d{2}|r-\d{2})` `([a-z0-9]+)` `\+(\d+)` (Mon|Tue|Wed|Thu|Fri|Sat|Sun|Week) · (.+)$``
-  - Types: `dsa`, `boss`, `concept`, `infra`, `design`, `design2`, `lld`, `maths`, `capstone`, `redraw`, `read`, `mock`, `story`, `career`, `mindset`, `review`, `rest`, `ai`, `ready`
+  - Types: `dsa`, `boss`, `concept`, `infra`, `design`, `design2`, `lld`, `maths`, `capstone`, `redraw`, `read`, `mock`, `story`, `career`, `mindset`, `review`, `rest`, `ai`, `ready`, `paper`
   - The box in this file is always empty; real ticks live in D1. `Week` as the day means "any day this week".
 - **Why-question:** in `concept` and `infra` tasks, the text after `Why:` up to the end of the line becomes the flashcard front. Tasks without `Why:` simply get no flashcard.
 - **Design link:** in `design` tasks, the first Hello Interview `problem-breakdowns` link maps to a library row by its URL; tasks that only name a derived design ("derive … yourself") map by the design's name.
-- **Maths:** in `maths` tasks, `^` exponents and plain formulas are converted to MathML at build time.
+- **Maths:** in `maths` tasks, `^` exponents and plain formulas are converted to MathML at build time. A maths task is **derive-first**: ``question ‖ check: the answer`` (split on the exact text ` ‖ check: `). The question is the task; the check is kept apart and the site hides it until you have tried. An empty check, or ` ‖ check: ` on any other type, fails the build.
+- **Equation bank** (`library.equations`): a `### Bonus equations` table (`ID | Wk | Name | Equation | Setup and what to derive | Check (derive first) | Tied to | Task`) and a `### The shelf` table (the same without `Task`, with `Best wk` for `Wk`). The Equation cell is TeX between dollar signs, converted to MathML at build time (a formula that does not convert fails the build). A bonus row names the one `maths` task, in its own week, that carries it; that task is an extra (`optional`). A shelf equation has no task and is ticked under its own `eq-NN` id. IDs are permanent.
+- **Papers** (`library.papers`): `### The schedule` is a table `Task | Wk | Paper | Link | Length | Why this week | The number to find | Anchor`. Every `paper` task needs exactly one row (matched by `Task`, same week); a row with `—` for Task is on the shelf. `★` in Anchor means a third pass. Each scheduled paper becomes a free doc on its task. `### How to read one in 45 minutes`, `### Alternates` (`Instead of | Try | Because`) and `### One honest warning` are read by heading.
+- **Extras** are the `paper` tasks and the bonus equations: they are **optional**. They are listed but never the next action, never counted in "n of m done", and never needed for a light week's star. None sits in a light week (2, 3 and 5).
+- **Gap check** (`library.gaps`): `### The ten gaps` is a table `ID | Gap | Task | Sketch | Why it matters | Derive it | Free sources`. Each task must be a concept or infra task (it ends in `Why:`, so it is a flashcard); `Sketch` names a drawing in `shared/sketches.ts`. Two tables whose headings contain "syllabus" (`His topic | Your plan | Status`) set the plan against a syllabus: a Status starts with `Covered`, `Partial gap`, `Gap` or `Skip`, and a gap says where it is closed (a gap ID like G4, or a design ID in backticks). A task id in any of these tables is shown as a link labelled "Week 4 · Task 7".
+- **Taglines count:** the front matter's "N designs" must equal the number of designs in the library.
 - **Design library rows:** tables under `# Part 5`, first column `ID` (kebab-case, permanent).
 - **Machine coding rows:** the table under `## Machine coding problems actually asked`.
 
@@ -659,7 +668,7 @@ Self-determination theory separates **controlled motivation** (studying to avoid
 2. **Answer "I'm mediocre" with data.** Open the scorecard and look at the numbers, the way you'd check a proof instead of trusting a feeling.
 3. **Catch the "should" voice.** Swap "I should study or I'm worthless" for the reason in your own why note.
 4. **Curiosity beats coverage.** If a design makes you curious, go one level deeper, even if you cover less that week.
-5. **Rest is training.** Festivals, Friday evenings and sleep are part of the plan.
+5. **Rest is training.** Festivals, sleep and most Friday evenings are part of the plan. A Friday paper is optional and is the first thing dropped.
 
 This draws on motivation research; it isn't therapy. If the low feeling stays most days for two weeks or more, or spreads to sleep, appetite or things you usually enjoy, talking to a counsellor is a smart, normal step.
 
@@ -671,7 +680,7 @@ This draws on motivation research; it isn't therapy. If the low feeling stays mo
 | Mon to Fri, morning (before work) | DSA: 1 to 2 problems, timed, no AI. Review the best solution, log it in your tracker | 60 min |
 | Mon, Tue, Thu, night | HLD concept of the day. Answer its why-questions in a half-page note, in your own words | 45 min |
 | Wed, night | Infra track: Docker, then AWS, then Kubernetes | 45 min |
-| Fri, night | Off | 0 |
+| Fri, night | Off, or one optional paper from week 4: 45 minutes, hard stop, no make-up | 0 to 45 min |
 | Saturday | Design through steps 1 to 5 of the learning loop (about 2 h). LLD or machine coding: 90 min, then review | 3.5 h |
 | Sunday | Boss problem (about 1 h), capstone build (2 h), redraw 2 old designs from memory (30 min), weekly review (30 min), mock interview from week 8 | about 4 h |
 
@@ -685,6 +694,7 @@ This draws on motivation research; it isn't therapy. If the low feeling stays mo
 5. **Timeboxes.** Medium 25 min, hard 40 min. Stuck at the limit: take one hint, finish, and mark it for a redo in two weeks.
 6. **Body first.** 7+ hours of sleep and a 20 to 30 minute walk or workout most days.
 7. **Festivals are planned in.** Durga Puja (16 to 21 Oct) and Kali Puja/Diwali (Sun 8 Nov) are light by design.
+8. **Core first.** Papers and bonus equations are extras: drop them before anything else. If a week overflows, cut that week's second design, never the Saturday design, the DSA or a mock.
 
 ## Points
 <!-- surface: progress.points-help -->
@@ -703,6 +713,9 @@ Points measure output, never your worth. Aim for about 50 a week; skip the targe
 | LLD with working code | 8 |
 | Capstone milestone shipped | 8 |
 | Mock interview | 10 |
+| Gap concept derived (isolation levels, replication, leader election and the rest), with your why-note written | 3 |
+| Paper read in 45 minutes, with a decision card (4 for the three starred papers, with the redraw) | 2 |
+| Bonus equation derived on paper | 1 |
 
 ---
 
@@ -743,11 +756,12 @@ Points measure output, never your worth. Aim for about 50 a week; skip the targe
 - [ ] `w01-09` `concept` `+2` Thu · Night: [API Design](https://www.hellointerview.com/learn/system-design/core-concepts/api-design), then Stripe's post on [idempotency](https://stripe.com/blog/idempotency). Why: why must the client, not the server, create the idempotency key?
 - [ ] `w01-10` `dsa` `+2` Fri · Morning: 1 medium. Night off
 - [ ] `w01-11` `design` `+10` Sat · Design #1 through the full loop: [Bitly](https://www.hellointerview.com/learn/system-design/problem-breakdowns/bitly). Attempt cold for 45 min before opening the breakdown
-- [ ] `w01-12` `maths` `+3` Sat · How many base62 characters cover 1 billion URLs? With random codes, roughly when do collisions start (birthday bound: about the square root of 62^7, around 1.9 million codes)? What does that tell you about generating codes?
+- [ ] `w01-12` `maths` `+3` Sat · How many base62 characters cover 1 billion URLs? With random codes, roughly when do collisions start? What does that tell you about generating codes? ‖ check: 62^5 is about 916 million (too few) and 62^6 about 56.8 billion, so 6 characters. The birthday bound is about the square root of 62^7, around 1.9 million codes, so random codes need a collision check
 - [ ] `w01-13` `lld` `+8` Sat · SOLID refresh, then a parking lot in Java. Untimed; clean classes and a working main
 - [ ] `w01-14` `boss` `+5` Sun · Boss problem: one LeetCode hard you pick yourself. No hints for the first hour
 - [ ] `w01-15` `story` `+8` Sun · Design doc for your UCP middleware (2 h): the six forces, the request flow from the Gemini agent through your middleware to SFCC and Adyen, failure modes (Adyen timeout, duplicate webhook, SFCC down), and decision cards for 3 decisions you actually made
 - [ ] `w01-16` `review` `+0` Sun · Weekly review (30 min): fill in row 1 of the scorecard
+- [ ] `w01-17` `maths` `+1` Week · Bonus equation: requests per second from a daily volume, with a 3x peak
 
 ### Week 02 · 12 to 18 Oct · Data foundations (Puja from Fri)
 
@@ -758,8 +772,9 @@ DSA focus: arrays, two pointers, sliding window, prefix sums.
 - [ ] `w02-03` `concept` `+2` Tue · [Database Indexing](https://www.hellointerview.com/learn/system-design/core-concepts/db-indexing). Why: why does an index speed reads but slow writes, and why does an LSM tree favour writes?
 - [ ] `w02-04` `infra` `+2` Wed · Docker basics (images, layers, containers, volumes). Build and run a small Go container. Why: why does layer order in a Dockerfile change build time?
 - [ ] `w02-05` `concept` `+2` Thu · [PostgreSQL deep dive](https://www.hellointerview.com/learn/system-design/deep-dives/postgres). Why: two transfers debit the same account at once under READ COMMITTED. What goes wrong, and would you fix it with SELECT FOR UPDATE, an atomic UPDATE, or SERIALIZABLE?
-- [ ] `w02-06` `maths` `+3` Thu · B-tree height for 1 billion rows at fan-out 500 (log base 500 of 10^9 is about 3.3, so 4 levels). Why does that keep lookups fast?
+- [ ] `w02-06` `maths` `+3` Thu · B-tree height for 1 billion rows at fan-out 500. Why does that keep lookups fast? ‖ check: log base 500 of 10^9 is about 3.3, so 4 levels; the top levels stay cached, so most lookups cost one or two disk reads
 - [ ] `w02-07` `rest` `+0` Fri · Fri to Sun: Durga Puja. Fully off; enjoy it
+- [ ] `w02-08` `concept` `+3` Thu · Isolation levels in full: name the anomaly each level allows (dirty read, non-repeatable read, phantom, lost update, write skew), then build a write skew that SERIALIZABLE stops and snapshot isolation does not, on a wallet with a minimum balance. Read [Decoding isolation, the I in ACID](https://arpitbhayani.me/blogs/isolation) and [Why databases deadlock](https://arpitbhayani.me/blogs/database-deadlocks) only after your own answer. Why: which anomaly does each isolation level still allow, and how can two correct transactions on a wallet with a minimum balance both commit and still break the rule?
 
 ### Week 03 · 19 to 25 Oct · Partitioning (Puja till Wed)
 
@@ -768,7 +783,7 @@ DSA focus: binary search (including on the answer), heaps, intervals.
 - [ ] `w03-01` `rest` `+0` Mon · Mon to Wed: Puja, off (one problem a day only if you feel like it)
 - [ ] `w03-02` `dsa` `+4` Week · Morning DSA, Thu and Fri
 - [ ] `w03-03` `concept` `+2` Thu · [Sharding](https://www.hellointerview.com/learn/system-design/core-concepts/sharding) and [Consistent Hashing](https://www.hellointerview.com/learn/system-design/core-concepts/consistent-hashing). Why: why does hash(key) mod N break when you add a server?
-- [ ] `w03-04` `maths` `+3` Thu · Adding the (N+1)th node to a consistent-hash ring moves about 1/(N+1) of the keys. Why do virtual nodes even out the load?
+- [ ] `w03-04` `maths` `+3` Thu · You add the (N+1)th node to a consistent-hash ring. What fraction of the keys move? Why do virtual nodes even out the load? ‖ check: about 1/(N+1) of the keys; virtual nodes make each server own many small arcs, so its load averages out
 - [ ] `w03-05` `design` `+10` Sat · [Rate Limiter](https://www.hellointerview.com/learn/system-design/problem-breakdowns/distributed-rate-limiter), full loop
 - [ ] `w03-06` `lld` `+8` Sat · Splitwise (untimed)
 - [ ] `w03-07` `boss` `+5` Sun · Boss problem
@@ -785,13 +800,16 @@ DSA focus: graphs (BFS, DFS, topological sort, Dijkstra, union-find).
 - [ ] `w04-03` `concept` `+2` Tue · [Redis deep dive](https://www.hellointerview.com/learn/system-design/deep-dives/redis). Why: why is single-threaded Redis so fast, and when does that become a weakness?
 - [ ] `w04-04` `infra` `+2` Wed · Compose, multi-stage builds, small images. Containerise the capstone
 - [ ] `w04-05` `concept` `+2` Thu · [Dealing with Contention](https://www.hellointerview.com/learn/system-design/patterns/dealing-with-contention). Why: optimistic or pessimistic locking: which fits a seat booking, and which fits a wallet debit?
-- [ ] `w04-06` `maths` `+3` Thu · Little's law, L = λW. At 2,000 requests per second and 50 ms each, 100 requests are in flight. How many database connections do you need?
+- [ ] `w04-06` `maths` `+3` Thu · Little's law, L = λW. At 2,000 requests per second and 50 ms each, how many requests are in flight? How many database connections do you need? ‖ check: 100 in flight. Connections are λ times the time each request actually spends in the database, not 50 ms, so far fewer
 - [ ] `w04-07` `design` `+10` Sat · [Ticketmaster](https://www.hellointerview.com/learn/system-design/problem-breakdowns/ticketmaster), full loop
 - [ ] `w04-08` `lld` `+8` Sat · Timed, 2 h; asked at Groww: a thread-safe cache with pluggable eviction (LRU, LFU, FIFO via the strategy pattern) and unit tests. Uses locks, ConcurrentHashMap and ExecutorService
 - [ ] `w04-09` `boss` `+5` Sun · Boss problem
 - [ ] `w04-10` `capstone` `+8` Sun · Order API: Postgres schema, idempotency keys, the order state machine, and checkout checks for price, product, quantity limit and delivery pincode
 - [ ] `w04-11` `redraw` `+6` Sun · Redraw: Rate Limiter, Bitly
 - [ ] `w04-12` `review` `+0` Sun · Weekly review
+- [ ] `w04-13` `concept` `+3` Wed · Connection pools and database proxies: Postgres allows 100 connections and you run 20 pods with a pool of 20 each. Work out the problem, then add pgbouncer in transaction mode and list what stops working. It pairs with Thursday's Little's law. Read [pgbouncer's pooling modes](https://www.pgbouncer.org/features.html) after your answer. Why: how can 20 healthy pods take Postgres down, and what does a transaction-mode pooler take away from you?
+- [ ] `w04-14` `paper` `+2` Fri · Paper: [SIEVE is Simpler than LRU](https://junchengyang.com/publication/nsdi24-SIEVE.pdf). Three passes, 45 minutes. Read it before tomorrow's pluggable-eviction machine coding, then add SIEVE as a fourth policy behind the same interface (one FIFO queue, one hand pointer, one visited bit per object)
+- [ ] `w04-15` `maths` `+1` Week · Bonus equation: the Zipf hit ratio when you cache only the top 1% of keys
 
 ### Week 05 · 2 to 8 Nov · Events, async, checkpoint (Diwali Sun)
 
@@ -802,7 +820,7 @@ DSA focus: DP (1D and 2D, knapsack, LIS, interval DP).
 - [ ] `w05-03` `concept` `+2` Tue · [Multi-step Processes](https://www.hellointerview.com/learn/system-design/patterns/multi-step-processes) and [Change Data Capture](https://www.hellointerview.com/learn/system-design/deep-dives/change-data-capture). Why: why can't you write to Postgres and publish to Kafka as one step, and how does the outbox fix it?
 - [ ] `w05-04` `infra` `+2` Wed · AWS IAM, regions and AZs, VPC basics. Set a billing alarm before anything else
 - [ ] `w05-05` `concept` `+2` Thu · [Handling Large Blobs](https://www.hellointerview.com/learn/system-design/patterns/large-blobs). Why: what load do presigned URLs take off your servers?
-- [ ] `w05-06` `maths` `+3` Thu · 99.9% availability allows about 8.8 hours of downtime a year; 99.99% about 53 minutes. Two dependencies in series at 99.9% each give about 99.8%. Why does every extra dependency cost you?
+- [ ] `w05-06` `maths` `+3` Thu · How much downtime a year do 99.9% and 99.99% availability allow? What do two dependencies in series at 99.9% each give? Why does every extra dependency cost you? ‖ check: about 8.8 hours and 53 minutes; about 99.8% in series, because availabilities multiply
 - [ ] `w05-07` `design` `+10` Sat · [Dropbox](https://www.hellointerview.com/learn/system-design/problem-breakdowns/dropbox), full loop
 - [ ] `w05-08` `lld` `+8` Sat · Timed 90 min; asked at PhonePe: a to-do manager with add, update, remove, and analytics on completed and overdue tasks, with unit tests
 - [ ] `w05-09` `capstone` `+4` Sun · Diwali, light: add Kafka and Redis to Compose (1 hour)
@@ -818,7 +836,7 @@ DSA focus: trees, tries, monotonic stack and queue. From this week, alternate co
 - [ ] `w06-03` `concept` `+2` Tue · [Temporal deep dive](https://www.hellointerview.com/learn/system-design/deep-dives/temporal). Why: what does a workflow engine give you that a hand-written saga over Kafka doesn't?
 - [ ] `w06-04` `infra` `+2` Wed · EC2, ECR, ECS/Fargate, ALB
 - [ ] `w06-05` `design2` `+4` Thu · Second design (pick one; 20 min cold, then read, then 1 decision card): a UPI payment flow you derive yourself (state machine, bank callbacks, timeouts), or [Local Delivery Service](https://www.hellointerview.com/learn/system-design/problem-breakdowns/gopuff)
-- [ ] `w06-06` `maths` `+3` Thu · If 5 layers of services each make up to 3 attempts, one user request can become 3^5 = 243 calls to the bottom service during an outage. Why do retry budgets and jitter exist?
+- [ ] `w06-06` `maths` `+3` Thu · 5 layers of services each make up to 3 attempts. In the worst case, how many calls reach the bottom service from one user request? Why do retry budgets and jitter exist? ‖ check: 3^5 = 243. Budgets cap retries as a fraction of traffic; jitter stops clients retrying in lockstep
 - [ ] `w06-07` `design` `+10` Sat · [Payment System](https://www.hellointerview.com/learn/system-design/problem-breakdowns/payment-system) (Premium), or derive a payment gateway like Razorpay yourself
 - [ ] `w06-08` `lld` `+8` Sat · Timed 90 min; asked at CRED: a payment processing package from a long problem statement: payment methods, state transitions, retries, error handling, unit tests
 - [ ] `w06-09` `boss` `+5` Sun · Boss problem
@@ -827,6 +845,9 @@ DSA focus: trees, tries, monotonic stack and queue. From this week, alternate co
 - [ ] `w06-12` `redraw` `+6` Sun · Redraw: Dropbox, Rate Limiter
 - [ ] `w06-13` `ai` `+2` Week · AI-fluency rep: a small task with an AI assistant; verify and explain every line
 - [ ] `w06-14` `review` `+0` Sun · Weekly review
+- [ ] `w06-15` `concept` `+3` Mon · Circuit breakers and bulkheads: your payment provider starts taking 30 s instead of 200 ms. Trace exactly how your service dies, then show what a timeout, a retry cap, a circuit breaker and a bulkhead would each save, and what each costs you. Then read [Martin Fowler on circuit breakers](https://martinfowler.com/bliki/CircuitBreaker.html) and AWS on [timeouts, retries and backoff with jitter](https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/). Why: when a payment provider slows from 200 ms to 30 s, how does your own service die, and which of a timeout, a retry cap, a circuit breaker and a bulkhead stops it?
+- [ ] `w06-16` `paper` `+4` Fri · ★ Paper: [Spanner](https://static.googleusercontent.com/media/research.google.com/en//archive/spanner-osdi2012.pdf). All three passes. Redraw TrueTime from memory and explain external consistency out loud in 5 minutes. Note what two-phase commit costs as participants grow
+- [ ] `w06-17` `maths` `+1` Week · Bonus equation: Spanner's commit wait and the hot-row ceiling (check the lock claim in the paper)
 
 ### Week 07 · 16 to 22 Nov · Scaling reads and writes
 
@@ -836,8 +857,8 @@ DSA focus: mixed timed sets, 1 hard.
 - [ ] `w07-02` `concept` `+2` Mon · [Scaling Reads](https://www.hellointerview.com/learn/system-design/patterns/scaling-reads). Why: why do read replicas break "read your own writes", and how do you fix it?
 - [ ] `w07-03` `concept` `+2` Tue · [Scaling Writes](https://www.hellointerview.com/learn/system-design/patterns/scaling-writes). Why: what makes a partition key bad, and what does a hot partition look like in production?
 - [ ] `w07-04` `infra` `+2` Wed · RDS, S3, SQS and SNS, CloudWatch
-- [ ] `w07-05` `design2` `+4` Thu · Second design: [Online Auction](https://www.hellointerview.com/learn/system-design/problem-breakdowns/online-auction) or [Web Crawler](https://www.hellointerview.com/learn/system-design/problem-breakdowns/web-crawler)
-- [ ] `w07-06` `maths` `+3` Thu · With N = 3 replicas, why does R + W > N guarantee a read sees the latest write?
+- [ ] `w07-05` `design2` `+4` Thu · Second design: [Online Auction](https://www.hellointerview.com/learn/system-design/problem-breakdowns/online-auction) or [Web Crawler](https://www.hellointerview.com/learn/system-design/problem-breakdowns/web-crawler), or an S3-like blob store you derive (multipart upload, a metadata service, erasure coding)
+- [ ] `w07-06` `maths` `+3` Thu · With N = 3 replicas, why does R + W > N guarantee a read sees the latest write? ‖ check: any read set of R and write set of W must overlap in at least R + W − N replicas, and that is at least one when R + W > N
 - [ ] `w07-07` `design` `+10` Sat · [Flash Sale](https://www.hellointerview.com/learn/system-design/problem-breakdowns/flash-sale) (Premium) or derive it yourself; then read [Shopify inventory reservations](https://www.hellointerview.com/learn/system-design/in-the-wild/shopify-inventory-reservations)
 - [ ] `w07-08` `lld` `+8` Sat · Timed 90 min; asked at PhonePe: a multilevel cache with LFU eviction and read, write and delete across levels
 - [ ] `w07-09` `boss` `+5` Sun · Boss problem
@@ -845,6 +866,10 @@ DSA focus: mixed timed sets, 1 hard.
 - [ ] `w07-11` `redraw` `+6` Sun · Redraw: your week 6 design, Ticketmaster
 - [ ] `w07-12` `ai` `+2` Week · AI-fluency rep
 - [ ] `w07-13` `review` `+0` Sun · Weekly review
+- [ ] `w07-14` `concept` `+3` Tue · Replication, RPO and RTO: set them separately for the order table and for the audit ledger, then pick the replication mode and the backup strategy each needs, and say what a failover loses. Read his [master-replica](https://arpitbhayani.me/blogs/master-replica-replication), [MySQL internals](https://arpitbhayani.me/blogs/mysql-replication-internals), [multi-master](https://arpitbhayani.me/blogs/multi-master-replication) and [leaderless](https://arpitbhayani.me/blogs/leaderless-replication) posts after your answer. Why: why do an order table and an audit ledger need different RPO and RTO, and what does each replication mode lose when the primary dies mid-settlement?
+- [ ] `w07-15` `concept` `+3` Wed · Hot shards, three ways: one merchant is 40% of your writes. Fix it by splitting the key, by isolating the tenant and by shuffle sharding, and cost each in query complexity. Then read AWS on [shuffle sharding](https://builder.aws.com/content/3F06NpJ8YeoIGP8VHTw4n81pFn8/workload-isolation-using-shuffle-sharding). Why: if one merchant is 40% of your writes, what do key splitting, tenant isolation and shuffle sharding each fix, and what does each cost your queries?
+- [ ] `w07-16` `paper` `+4` Fri · ★ Paper: [Dynamo](https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf). All three passes. Then one page: where Dynamo and Spanner disagree, and which one a wallet balance needs
+- [ ] `w07-17` `maths` `+1` Week · Bonus equation: shuffle-sharding combinations and blast radius
 
 ### Week 08 · 23 to 29 Nov · Real-time
 
@@ -854,8 +879,8 @@ DSA focus: mixed timed sets, 1 hard.
 - [ ] `w08-02` `concept` `+2` Mon · [Real-time Updates](https://www.hellointerview.com/learn/system-design/patterns/realtime-updates). Why: polling, server-sent events or WebSockets: what does each cost the server per connected user?
 - [ ] `w08-03` `concept` `+2` Tue · [API Gateway deep dive](https://www.hellointerview.com/learn/system-design/deep-dives/api-gateway). Why: what belongs in the gateway (auth, rate limits), and what must stay inside services?
 - [ ] `w08-04` `infra` `+2` Wed · Kubernetes architecture: pods, deployments, services. Run kind locally
-- [ ] `w08-05` `design2` `+4` Thu · Second design: [FB Live Comments](https://www.hellointerview.com/learn/system-design/problem-breakdowns/fb-live-comments) or [LeetCode](https://www.hellointerview.com/learn/system-design/problem-breakdowns/leetcode)
-- [ ] `w08-06` `maths` `+3` Thu · A Bloom filter needs about 9.6 bits per item for a 1% false-positive rate, so 1 million items fit in about 1.2 MB. Derive it from the false-positive formula
+- [ ] `w08-05` `design2` `+4` Thu · Second design: [FB Live Comments](https://www.hellointerview.com/learn/system-design/problem-breakdowns/fb-live-comments) or [LeetCode](https://www.hellointerview.com/learn/system-design/problem-breakdowns/leetcode), or an online/offline indicator you derive (heartbeats, TTLs, and a million writes a second you must find a way not to make)
+- [ ] `w08-06` `maths` `+3` Thu · A Bloom filter holds 1 million items at a 1% false-positive rate. Derive the bits per item and the total size from the false-positive formula ‖ check: about 9.6 bits per item, so about 1.2 MB; the best number of hash functions, (m/n) ln 2, is about 7
 - [ ] `w08-07` `design` `+10` Sat · [WhatsApp](https://www.hellointerview.com/learn/system-design/problem-breakdowns/whatsapp), full loop
 - [ ] `w08-08` `lld` `+8` Sat · Timed 90 min; asked at Flipkart: an in-memory task scheduler
 - [ ] `w08-09` `capstone` `+8` Sun · Handle the provider's webhooks (signature check, dedupe, out-of-order events) and send your own signed, retried webhooks to the store; add the reconciliation job for orders, payments and stock
@@ -864,6 +889,10 @@ DSA focus: mixed timed sets, 1 hard.
 - [ ] `w08-12` `ai` `+2` Week · AI-fluency rep
 - [ ] `w08-13` `review` `+0` Sun · Weekly review
 - [ ] `w08-14` `boss` `+5` Sun · Boss problem
+- [ ] `w08-15` `concept` `+3` Wed · Leader election and fencing: elect one node to run settlement, then survive a 40 s GC pause on the leader without a double write. Kubernetes' own etcd is Raft, so this is the same lesson as tonight's Kubernetes task. Answer first, then read [Raft, visualised](https://thesecretlivesofdata.com/raft/), his [Why consensus](https://arpitbhayani.me/blogs/why-consensus) and [Heartbeats](https://arpitbhayani.me/blogs/heartbeats-in-distributed-systems), Kleppmann on [locks and fencing tokens](https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html), and Hello Interview's [ZooKeeper deep dive](https://www.hellointerview.com/learn/system-design/deep-dives/zookeeper) (Premium). Why: your reconciliation job runs on 3 nodes and must run once: how do you elect the one, and what stops a leader that wakes from a 40 s pause from writing?
+- [ ] `w08-16` `concept` `+3` Tue · Scaling WebSockets: 1 million sockets at 50k per node. Work out the node count, the memory, what happens on a deploy, and how a message for one user finds the one node holding that socket. Why: with 1 million connected users and 50k sockets a node, what happens on a deploy, and how does a message reach the one node holding that user's socket?
+- [ ] `w08-17` `paper` `+4` Fri · ★ Paper: [Chubby](https://static.googleusercontent.com/media/research.google.com/en//archive/chubby-osdi06.pdf). All three passes. Find the sequencer and connect it to the fencing-token problem in this week's leader-election task. Why did Google ship a lock service instead of a Paxos library?
+- [ ] `w08-18` `maths` `+1` Week · Bonus equation: the chance of a split vote in a Raft election
 
 ### Week 09 · 30 Nov to 6 Dec · AI systems, your edge
 
@@ -873,8 +902,8 @@ DSA focus: mixed timed sets, 1 hard.
 - [ ] `w09-02` `concept` `+2` Mon · [Vector Databases](https://www.hellointerview.com/learn/system-design/deep-dives/vector-databases). Why: why can't a B-tree do similarity search, and what does approximate nearest-neighbour search trade away?
 - [ ] `w09-03` `concept` `+2` Tue · LLM systems from your own work: gateway (routing, rate limits, cost), RAG, agent tool calls, evals, guardrails. Decision cards for where your UCP middleware draws the line on what the agent may do. Then a 15-minute quick-fire on LLM basics (tokens, temperature, top-p, top-k, embeddings, RAG), which appeared as MCQs in a Razorpay assessment
 - [ ] `w09-04` `infra` `+2` Wed · Ingress, ConfigMaps and Secrets, probes, HPA
-- [ ] `w09-05` `design2` `+4` Thu · Second design: [Notification System](https://www.hellointerview.com/learn/system-design/problem-breakdowns/notification-system) or [Job Scheduler](https://www.hellointerview.com/learn/system-design/problem-breakdowns/job-scheduler) (both Premium; otherwise [Web Crawler](https://www.hellointerview.com/learn/system-design/problem-breakdowns/web-crawler))
-- [ ] `w09-06` `maths` `+3` Thu · A request fans out to 100 servers, each slow 1% of the time. The chance at least one is slow is 1 − 0.99^100, about 63%. Why does p99 matter more than the average?
+- [ ] `w09-05` `design2` `+4` Thu · Second design: [Notification System](https://www.hellointerview.com/learn/system-design/problem-breakdowns/notification-system) or [Job Scheduler](https://www.hellointerview.com/learn/system-design/problem-breakdowns/job-scheduler) (both Premium; otherwise [Web Crawler](https://www.hellointerview.com/learn/system-design/problem-breakdowns/web-crawler) or a deep research agent at scale you derive)
+- [ ] `w09-06` `maths` `+3` Thu · A request fans out to 100 servers, each slow 1% of the time. What is the chance at least one is slow? Why does p99 matter more than the average? ‖ check: 1 − 0.99^100, about 63%
 - [ ] `w09-07` `design` `+10` Sat · [ChatGPT](https://www.hellointerview.com/learn/system-design/problem-breakdowns/chatgpt) (Premium), or derive an agentic checkout gateway from your UCP work
 - [ ] `w09-08` `lld` `+8` Sat · Timed 90 min: movie ticket booking with seat locking
 - [ ] `w09-09` `boss` `+5` Sun · Boss problem
@@ -882,6 +911,9 @@ DSA focus: mixed timed sets, 1 hard.
 - [ ] `w09-11` `redraw` `+6` Sun · Redraw: WhatsApp, your week 6 design
 - [ ] `w09-12` `ai` `+2` Week · AI-fluency rep
 - [ ] `w09-13` `review` `+0` Sun · Weekly review
+- [ ] `w09-14` `infra` `+3` Wed · Load balancers that are not a single point of failure: your ALB is the single point of failure; remove it. Derive the layers from DNS down (anycast, a virtual IP with failover, health checks, then the balancing algorithm) and justify least-connections over round-robin for a payment API with variable latency. It pairs with tonight's Ingress task. Why: what balances the load balancer, and why does least-connections beat round-robin when request times vary?
+- [ ] `w09-15` `paper` `+2` Fri · Paper: [vLLM and PagedAttention](https://arxiv.org/abs/2309.06180). One decision card: which operating-system idea did they borrow, and what does it save? Then use it to answer why one LLM request can cost 100 times another
+- [ ] `w09-16` `maths` `+1` Week · Bonus equation: hedged requests and the tail
 
 ### Week 10 · 7 to 13 Dec · Feeds, search, first applications
 
@@ -891,8 +923,8 @@ DSA focus: interview format, 2 problems in 45 min, out loud.
 - [ ] `w10-02` `concept` `+2` Mon · [Elasticsearch deep dive](https://www.hellointerview.com/learn/system-design/deep-dives/elasticsearch). Why: why is search a separate system from your main database, and how do the two stay in sync?
 - [ ] `w10-03` `concept` `+2` Tue · [Managing Long Running Tasks](https://www.hellointerview.com/learn/system-design/patterns/long-running-tasks). Why: why return 202 Accepted with a job ID instead of holding the connection open?
 - [ ] `w10-04` `infra` `+2` Wed · Helm, rolling deploys, debugging pods (logs, describe, events)
-- [ ] `w10-05` `design2` `+4` Thu · Second design: [FB Post Search](https://www.hellointerview.com/learn/system-design/problem-breakdowns/fb-post-search) or a payout system you derive (merchant payouts, bank failures, retries)
-- [ ] `w10-06` `maths` `+3` Thu · In a simple queue, time in the system grows like 1/(1 − utilisation). Going from 80% to 95% busy multiplies it by 4. Why do you never run a payment service near 100%?
+- [ ] `w10-05` `design2` `+4` Thu · Second design: [FB Post Search](https://www.hellointerview.com/learn/system-design/problem-breakdowns/fb-post-search) or a payout system you derive (merchant payouts, bank failures, retries), or a recommendation engine you derive (candidates first, then ranking)
+- [ ] `w10-06` `maths` `+3` Thu · In a simple queue, how does time in the system grow with utilisation? What is the multiplier going from 80% to 95% busy? Why do you never run a payment service near 100%? ‖ check: it grows like 1/(1 − utilisation), so from 5 times to 20 times the service time, a multiplier of 4
 - [ ] `w10-07` `design` `+10` Sat · [FB News Feed](https://www.hellointerview.com/learn/system-design/problem-breakdowns/fb-news-feed), full loop
 - [ ] `w10-08` `lld` `+8` Sat · Timed 90 min; asked at Razorpay: an in-memory relational database with tables, insert, update, delete, primary keys, indexes and column constraints
 - [ ] `w10-09` `capstone` `+8` Sun · k6 load test, including a flash sale where many buyers chase the last items; write up the bottleneck you found, how you fixed it, and that nothing oversold
@@ -903,6 +935,8 @@ DSA focus: interview format, 2 problems in 45 min, out loud.
 - [ ] `w10-14` `ai` `+2` Week · AI-fluency rep
 - [ ] `w10-15` `review` `+0` Sun · Weekly review
 - [ ] `w10-16` `boss` `+5` Sun · Boss problem
+- [ ] `w10-17` `paper` `+2` Fri · Paper: [Understanding Inverse Document Frequency](https://www.staff.city.ac.uk/~sbrp622/idfpapers/Robertson_idf_JDoc.pdf). Before reading, derive why a rare term should weigh more; then see which of the paper's arguments Robertson accepts and which he rejects
+- [ ] `w10-18` `maths` `+1` Week · Bonus equation: Kingman's formula, and why service-time variance matters
 
 ### Week 11 · 14 to 20 Dec · Streams and counting
 
@@ -913,7 +947,7 @@ DSA focus: interview format.
 - [ ] `w11-03` `concept` `+2` Tue · [Data Structures for Big Data](https://www.hellointerview.com/learn/system-design/deep-dives/data-structures-for-big-data). Why: what do HyperLogLog and count-min sketch give up, and why is it worth it?
 - [ ] `w11-04` `infra` `+2` Wed · CI/CD with GitHub Actions (build, test, push the image, deploy)
 - [ ] `w11-05` `design2` `+4` Thu · Second design: [YouTube Top K](https://www.hellointerview.com/learn/system-design/problem-breakdowns/top-k) or a real-time fraud detection system you derive (rules plus model scoring inside the payment's latency budget)
-- [ ] `w11-06` `maths` `+3` Thu · A count-min sketch with width e/ε and depth ln(1/δ) overestimates by at most εN with probability 1 − δ. Size one for ε = 0.1% and δ = 1%
+- [ ] `w11-06` `maths` `+3` Thu · A count-min sketch with width e/ε and depth ln(1/δ) overestimates by at most εN with probability 1 − δ. Size one for ε = 0.1% and δ = 1% ‖ check: width about 2,718, depth about 4.6 so 5, so about 13,600 counters
 - [ ] `w11-07` `design` `+10` Sat · [Ad Click Aggregator](https://www.hellointerview.com/learn/system-design/problem-breakdowns/ad-click-aggregator), then read [Razorpay's anomaly detection on Amazon MSK](https://aws.amazon.com/blogs/big-data/how-razorpay-built-real-time-anomaly-detection-with-amazon-msk/)
 - [ ] `w11-08` `lld` `+8` Sat · Timed 90 min; asked in a Razorpay assessment that allowed an AI assistant: a Git-like version control system (init, add, commit, log, diff, checkout). Use an AI assistant, but verify and explain every line
 - [ ] `w11-09` `capstone` `+8` Sun · CI/CD pipeline that also runs a failure-injection suite: crash the consumer, send a webhook twice, time out the provider
@@ -922,6 +956,9 @@ DSA focus: interview format.
 - [ ] `w11-12` `redraw` `+6` Sun · Redraw: FB News Feed, WhatsApp
 - [ ] `w11-13` `review` `+0` Sun · Weekly review
 - [ ] `w11-14` `boss` `+5` Sun · Boss problem
+- [ ] `w11-15` `concept` `+3` Tue · Picking the store: write one decision card that chooses a store for four workloads: orders, an audit ledger, merchant analytics and a fraud graph. Include columnar and graph stores, and name the force that decides each. Read his [local versus global indexes](https://arpitbhayani.me/blogs/how-indexes-work-on-partitioned-and-sharded-data) after your answer. Why: why is the ledger not in ClickHouse, and why are the analytics not in Postgres?
+- [ ] `w11-16` `paper` `+2` Fri · Paper: [Probabilistic Counting (Flajolet and Martin)](https://algo.inria.fr/flajolet/Publications/src/FlMa85.pdf), sections 1 to 3 only. Try to invent the trick first: you may keep only a few bytes and must estimate how many distinct items you saw
+- [ ] `w11-17` `maths` `+1` Week · Bonus equation: HyperLogLog accuracy against memory
 
 ### Week 12 · 21 to 27 Dec · Geo and wrap-up
 
@@ -930,9 +967,9 @@ DSA focus: interview format.
 - [ ] `w12-01` `dsa` `+10` Week · Morning DSA, Mon to Fri
 - [ ] `w12-02` `concept` `+2` Mon · [Proximity Search](https://www.hellointerview.com/learn/system-design/deep-dives/proximity-search). Why: geohash or quadtree: which adapts better to a dense city next to empty countryside?
 - [ ] `w12-03` `concept` `+2` Tue · [Cassandra](https://www.hellointerview.com/learn/system-design/deep-dives/cassandra) or [DynamoDB](https://www.hellointerview.com/learn/system-design/deep-dives/dynamodb) (pick one). Why: why do these stores make you design tables around your queries?
-- [ ] `w12-04` `infra` `+2` Wed · Terraform basics (optional)
+- [ ] `w12-04` `concept` `+3` Wed · Storage engines derived: build an LSM tree on paper from the single rule that writes must be sequential, deriving the memtable, the SSTable, compaction and the read amplification it causes. Then say when a B-tree wins. Read his [Bitcask](https://arpitbhayani.me/blogs/bitcask) after your answer. Why: why does an LSM tree favour writes, what does compaction cost you, and when does a B-tree win?
 - [ ] `w12-05` `design2` `+4` Thu · Second design: a stock order system with a 10 ms budget (asked at Groww), a reconciliation and merchant settlement engine, or [Robinhood](https://www.hellointerview.com/learn/system-design/problem-breakdowns/robinhood)
-- [ ] `w12-06` `maths` `+3` Thu · Each extra geohash character divides a cell by 32; 6 characters is roughly a 1.2 km by 0.6 km cell. Why pick the precision from the search radius?
+- [ ] `w12-06` `maths` `+3` Thu · How much does each extra geohash character shrink a cell? Roughly how big is a 6-character cell? Why pick the precision from the search radius? ‖ check: each character divides a cell by 32; 6 characters is roughly 1.2 km by 0.6 km
 - [ ] `w12-07` `design` `+10` Sat · [Uber](https://www.hellointerview.com/learn/system-design/problem-breakdowns/uber), full loop
 - [ ] `w12-08` `lld` `+8` Sat · Redo your weakest machine-coding problem, timed
 - [ ] `w12-09` `capstone` `+8` Sun · README, architecture diagram, failure-injection results, and a blog post on your site
@@ -942,6 +979,8 @@ DSA focus: interview format.
 - [ ] `w12-13` `redraw` `+6` Sun · Redraw: Ad Click Aggregator, your week 9 design
 - [ ] `w12-14` `review` `+0` Sun · Weekly review
 - [ ] `w12-15` `boss` `+5` Sun · Boss problem
+- [ ] `w12-16` `paper` `+2` Fri · Paper: [MyRocks](https://www.vldb.org/pvldb/vol13/p3217-matsunobu.pdf). Read it after Wednesday's LSM derivation and list every consequence of compaction you did not predict
+- [ ] `w12-17` `maths` `+1` Week · Bonus equation: a Snowflake-style ID and its per-node ceiling
 
 ### Week 13 · 28 Dec to 3 Jan · Ready check
 
@@ -953,6 +992,9 @@ DSA focus: interview format.
 - [ ] `w13-06` `career` `+2` Week · Ask for referrals at your target companies; research pay bands and know your number
 - [ ] `w13-07` `review` `+0` Sun · Go through the readiness checklist
 - [ ] `w13-08` `career` `+0` Sun · Target applications go out from Mon 4 Jan
+- [ ] `w13-09` `paper` `+4` Fri · ★ Unseen-paper exam: [Aurora DSQL](https://arxiv.org/abs/2607.13276). Read it once. Then write one page: how it avoids coordination on reads, what it gives up (only write-write conflicts abort), whether your wallet write-skew example gets through, and how it differs from Spanner
+- [ ] `w13-10` `paper` `+2` Sun · After Saturday's ledger mock, read [Jepsen's TigerBeetle analysis](https://jepsen.io/analyses/tigerbeetle-0.16.11). List what you got right, what you missed, and which of its guarantees you would not have thought to test
+- [ ] `w13-11` `maths` `+1` Week · Bonus equation: prove the double-entry invariant
 
 ---
 
@@ -1047,7 +1089,7 @@ Weekly review questions: What did I finish? What was hardest, and why? What one 
 # Part 5 · Design library
 <!-- surface: library.designs -->
 
-37 designs grouped by the lesson they teach. Never open a breakdown before your 45-minute cold attempt. Access: `free` and `premium` are Hello Interview breakdowns; `derive` means no breakdown exists.
+42 designs grouped by the lesson they teach. Never open a breakdown before your 45-minute cold attempt. Access: `free` and `premium` are Hello Interview breakdowns; `derive` means no breakdown exists.
 
 ### Foundations: read scaling, IDs, blobs, geo
 
@@ -1057,6 +1099,7 @@ Weekly review questions: What did I finish? What was hardest, and why? What one 
 | dropbox | Dropbox | free | Large files: presigned URLs, chunking, sync | Why should file bytes never pass through your app servers? | 5 | https://www.hellointerview.com/learn/system-design/problem-breakdowns/dropbox |
 | yelp | Yelp | free | Geospatial indexing and search | Why can't a normal B-tree index answer "what's near me"? | Extra | https://www.hellointerview.com/learn/system-design/problem-breakdowns/yelp |
 | local-delivery-service | Local Delivery Service | free | Proximity plus live inventory availability | How fresh must "in stock near you" be, and what does staleness cost? | Thu option 6 | https://www.hellointerview.com/learn/system-design/problem-breakdowns/gopuff |
+| s3-like-blob-store | S3-like blob store | derive | Multipart upload, a metadata service, durability, erasure coding | Where does 11 nines of durability actually come from, and what does the metadata service cost you? | Thu option 7 | |
 
 ### Correctness under contention: the core of fintech
 
@@ -1076,6 +1119,7 @@ Weekly review questions: What did I finish? What was hardest, and why? What one 
 | whatsapp | WhatsApp | free | WebSockets, delivery guarantees, offline users | How does a message reach a phone that was offline for three days, once, in order? | 8 | https://www.hellointerview.com/learn/system-design/problem-breakdowns/whatsapp |
 | fb-live-comments | FB Live Comments | free | Real-time fan-out, server-sent events, pub/sub | When are server-sent events enough, and when do you need WebSockets? | Thu option 8 | https://www.hellointerview.com/learn/system-design/problem-breakdowns/fb-live-comments |
 | notification-system | Notification System | premium | Multi-channel delivery, retries, preferences | What happens to millions of queued messages when your SMS provider goes down? | Thu option 9 | https://www.hellointerview.com/learn/system-design/problem-breakdowns/notification-system |
+| online-offline-indicator | Online/offline indicator | derive | Heartbeats, TTLs, read amplification, and the cost of a cheap-looking feature | A heartbeat every 10 s from 10 million users is a million writes a second. How do you avoid writing at all? | Thu option 8 | |
 
 ### Feeds and scaling reads
 
@@ -1083,6 +1127,7 @@ Weekly review questions: What did I finish? What was hardest, and why? What one 
 | --- | --- | --- | --- | --- | --- | --- |
 | fb-news-feed | FB News Feed | free | Fan-out on write vs on read, the celebrity problem | What breaks when one user has 50 million followers? | 10 | https://www.hellointerview.com/learn/system-design/problem-breakdowns/fb-news-feed |
 | instagram | Instagram | premium | Feeds plus media plus read scaling | Where does the CDN's job end and your service's begin? | Extra | https://www.hellointerview.com/learn/system-design/problem-breakdowns/instagram |
+| recommendation-engine | Recommendation engine | derive | Candidate generation then ranking, the offline and online split, feature freshness | Why are recommendations computed before the user asks, and which part cannot be? | Thu option 10 | |
 
 ### Counting and streams
 
@@ -1101,6 +1146,7 @@ Weekly review questions: What did I finish? What was hardest, and why? What one 
 | youtube | YouTube | free | Upload pipeline, transcoding, CDN | Why can uploads be slow and async while playback must start fast? | Extra | https://www.hellointerview.com/learn/system-design/problem-breakdowns/youtube |
 | leetcode | LeetCode | free | Running untrusted code safely, contest leaderboards | How do you run a stranger's code safely and still return a verdict in seconds? | Thu option 8 | https://www.hellointerview.com/learn/system-design/problem-breakdowns/leetcode |
 | price-tracking-service | Price Tracking Service | free | Scheduled scraping plus alerts | How do you check prices on millions of products without getting blocked? | Extra | https://www.hellointerview.com/learn/system-design/problem-breakdowns/camelcamelcamel |
+| live-stream-with-cdn | Live stream with a CDN | derive | Segmenting, CDN fan-out, the latency-against-cost dial | Why is "live" about 10 s behind, and what would each second you remove cost? | Extra | |
 
 ### Search and geo at scale
 
@@ -1115,6 +1161,7 @@ Weekly review questions: What did I finish? What was hardest, and why? What one 
 | ID | Design | Access | What it really teaches | Derive-it question | Week | Link |
 | --- | --- | --- | --- | --- | --- | --- |
 | chatgpt | ChatGPT | premium | LLM serving, streamed responses, cost-aware rate limits | Where do you put the rate limit when one request can cost 100 times another? | 9 | https://www.hellointerview.com/learn/system-design/problem-breakdowns/chatgpt |
+| deep-research-agent | Deep research agent at scale | derive | Agent orchestration, fan-out, per-request cost ceilings, partial results | One query becomes 200 tool calls. How do you cap cost and latency and still return something useful? | Thu option 9 | |
 
 ### Fintech designs you derive yourself
 
@@ -1152,12 +1199,242 @@ Design every one for change: a new eviction policy should be a new class, not a 
 
 - After Bitly and again after Payment System: [Stripe, Designing robust and predictable APIs with idempotency](https://stripe.com/blog/idempotency)
 - After Flash Sale: [Shopify inventory reservations](https://www.hellointerview.com/learn/system-design/in-the-wild/shopify-inventory-reservations)
+- After Flash Sale: [5 techniques Meta uses to scale a database to millions of clients](https://www.hellointerview.com/learn/system-design/in-the-wild/meta-zgateway-zippydb)
+- After Job Scheduler and Ticketmaster: [ZooKeeper deep dive](https://www.hellointerview.com/learn/system-design/deep-dives/zookeeper) (Premium)
+- After Notification System and Flash Sale: [AWS, workload isolation using shuffle sharding](https://builder.aws.com/content/3F06NpJ8YeoIGP8VHTw4n81pFn8/workload-isolation-using-shuffle-sharding)
 - After Notification System: [How Razorpay's notification service handles increasing load](https://engineering.razorpay.com/how-razorpays-notification-service-handles-increasing-load-f787623a490f)
 - After Ad Click Aggregator: [How Razorpay built real-time anomaly detection with Amazon MSK](https://aws.amazon.com/blogs/big-data/how-razorpay-built-real-time-anomaly-detection-with-amazon-msk/)
 - After Payment System or the payment router: [Juspay Hyperswitch](https://github.com/juspay/hyperswitch)
 - After Job Scheduler and WhatsApp: [Slack job queue](https://www.hellointerview.com/learn/system-design/in-the-wild/slack-job-queue) and [Discord message storage](https://www.hellointerview.com/learn/system-design/in-the-wild/discord-messages-scylladb)
 
 **About Premium.** Start with the free designs. At the week 5 checkpoint, if the loop is working, buy Hello Interview Premium (one-time payment; check the current price) mainly for Payment System, Flash Sale, Notification System, Robinhood, Job Scheduler and ChatGPT. Without it, the derive-yourself designs and real-system readings cover the same lessons.
+
+## Papers, one a week
+<!-- surface: library.papers -->
+
+A paper shows a real team's trade-off with the numbers attached, and no interview-prep site gives you that. The track is short on purpose: one paper a week from week 4, on **Friday night, 45 minutes, hard stop**. It is optional and it is always the first thing dropped: skip it with no make-up when the week is hard. Missing a paper costs nothing; missing a Saturday design costs a week. Weeks 1 to 3 and 5 have none (week 1's Friday night is off, and the Puja and Diwali weeks are light by design); the papers that fit them are on the shelf below.
+
+The papers form one argument, not twelve topics: measure before you add complexity (SIEVE), then **three answers to one question, how much consistency do you buy and what does it cost** (Spanner, then Dynamo, then, in week 13, Aurora DSQL), then who coordinates the coordinators (Chubby), an old trick in a new place (vLLM), why a heuristic works (IDF), approximation as a design tool (Flajolet and Martin), and an engine decision at scale (MyRocks). By January you can hold the Spanner, Dynamo and DSQL triangle in your head, which is the most useful thing a paper track can give an SDE-2. A paper never lands after the Saturday design that covers the same system, because that would spoil your cold attempt. **Week 13 is an exam:** a paper you have never seen, read once, and critiqued with only the vocabulary you built.
+
+### How to read one in 45 minutes
+<!-- surface: library.papers -->
+
+Use Keshav's [three-pass method](https://web.stanford.edu/class/cs114/reading-keshav.pdf), fitted to 45 minutes. It is faster than a craft schedule of days per paper, and it is enough for an interview.
+
+1. **Pass 1, 10 minutes.** Title, abstract, headings, conclusion, figures. Then Keshav's five Cs, one line each: category, context, correctness, contributions, clarity.
+2. **Pass 2, 30 minutes.** Read properly; skip proofs and most of the evaluation. Hunt for the trade-off and its number, then write it as a decision card.
+3. **5 minutes.** One paragraph in your own words and one sketch, no peeking.
+4. **Starred papers only, pass 3.** Redraw the system from memory and explain it out loud in 5 minutes. It is your redraw habit applied to a paper, and it doubles as mock practice.
+
+If pass 2 loses you, abandon the paper. A paper you quit is a correctly priced decision, not a failure.
+
+### The schedule
+<!-- surface: library.papers -->
+
+★ marks the three starred papers, which get the third pass. **The number to find** is what to put on your decision card. Each was found in the paper, but confirm it yourself as you read: finding it is the exercise. A row with no task is on the shelf, with the week it fits best.
+
+| Task | Wk | Paper | Link | Length | Why this week | The number to find | Anchor |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| w04-14 | 4 | SIEVE is Simpler than LRU | https://junchengyang.com/publication/nsdi24-SIEVE.pdf | about 16 pages with references | Read it the night before the eviction machine-coding problem, then add SIEVE as a fourth policy behind the same interface. It needs only a FIFO queue, one "hand" pointer and one visited bit per object | 1,559 traces; about 21% lower miss ratio than LRU on a large CDN cache; about twice the throughput of an optimised 16-thread LRU | |
+| w06-16 | 6 | Spanner | https://static.googleusercontent.com/media/research.google.com/en//archive/spanner-osdi2012.pdf | 14 pages | Your Monday task asks what a payment system gives up in a partition. Spanner refuses to give anything up and shows the bill | TrueTime ε is about 4 ms most of the time; read-write transactions about 14 ms; two-phase commit grows from about 17 ms with 1 participant to about 43 ms with 50 and about 150 ms with 200 | ★ |
+| w07-16 | 7 | Dynamo | https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf | 16 pages | The source of Thursday's R + W > N maths. Read it the week after Spanner on purpose: it is the opposite philosophy | (N, R, W) = (3, 2, 2) is the common configuration; the 99.9th percentile latency is around 200 ms, an order of magnitude above the average | ★ |
+| w08-17 | 8 | Chubby | https://static.googleusercontent.com/media/research.google.com/en//archive/chubby-osdi06.pdf | about 16 pages | The same week as the leader-election task. Why Google built a lock service instead of giving everyone a Paxos library. It introduces **sequencers**, which are fencing tokens, so it is the primary source for the point Kleppmann makes | Why coarse-grained locks, held for hours or days? Find the sequencer and say what it protects against | ★ |
+| w09-15 | 9 | vLLM and PagedAttention | https://arxiv.org/abs/2309.06180 | SOSP 2023 | Your ChatGPT design asks why one request can cost 100 times another; this is the memory-management answer, borrowed from operating-system paging | 2 to 4 times the throughput of FasterTransformer and Orca at the same latency | |
+| w10-17 | 10 | Understanding Inverse Document Frequency | https://www.staff.city.ac.uk/~sbrp622/idfpapers/Robertson_idf_JDoc.pdf | about 18 pages | Monday's task asks why search is a separate system; this asks why the standard ranking heuristic works at all | Robertson rejects the information-theory and Zipf arguments and accepts the relevance-weighting one. Moderately mathematical, not heavy | |
+| w11-16 | 11 | Probabilistic Counting Algorithms (Flajolet and Martin) | https://algo.inria.fr/flajolet/Publications/src/FlMa85.pdf | 28 pages: read sections 1 to 3 only | The origin of HyperLogLog. The rest is analysis you can skip. Try to invent the trick before Section 2 | Standard error is about 0.78/√m: with 64 bitmaps, roughly 10% | |
+| w12-16 | 12 | MyRocks | https://www.vldb.org/pvldb/vol13/p3217-matsunobu.pdf | 14 pages | The same week as the LSM derivation. You derive an engine on paper, then see what moving a social graph onto one cost and bought | Roughly 62% smaller than compressed InnoDB; about 75% fewer bytes written to flash. Why did the bottleneck shift from IOPS to capacity? | |
+| w13-09 | 13 | Aurora DSQL: Scalable, Multi-Region OLTP | https://arxiv.org/abs/2607.13276 | 9 sections (Brooker et al., AWS, July 2026) | An exam, not a lesson. It forces everything you built to work together: snapshot isolation, two-phase commit, optimistic concurrency, clocks. Marc Brooker's [design posts](https://brooker.co.za/blog/2024/12/04/inside-dsql.html) from Dec 2024 explain the same system, for after the exam | Coordination-free reads via MVCC and precision clocks; optimistic writes; about 7.4 ms p99 single-region commit; only write-write conflicts abort | ★ |
+| w13-10 | 13 | Jepsen: TigerBeetle 0.16.11 | https://jepsen.io/analyses/tigerbeetle-0.16.11 | a report, not a paper | Your wallet ledger, checked against a real system: double-entry accounts and transfers, strong serializability, deterministic simulation, recovery from disk corruption. Read it after Saturday's ledger mock, never before | Jepsen found 7 crashes and 2 safety issues, and said it appeared to meet its promise of strong serializability from 0.16.30 | |
+| — | 1 | Web Search for a Planet: The Google Cluster Architecture | https://storage.googleapis.com/gweb-research2023-media/pubtools/4448.pdf | a short magazine article | A gentle first paper beside Numbers to Know: the argument for commodity hardware plus replication, with the cost reasoning | A cluster of more than 15,000 commodity PCs: what do they say they gain against fewer, bigger servers? | |
+| — | 2 | Designing Access Methods: The RUM Conjecture | https://openproceedings.org/2016/conf/edbt/paper-12.pdf | 6 pages | It answers the indexing why-question properly, and it is short. Bound two of read, update and memory overhead, and the third is bounded from below | Where do the B-tree, the LSM tree and the Bloom filter sit in the conjecture? | |
+| — | 5 | Kora: A Cloud-Native Event Streaming Platform for Kafka | https://vldb.org/pvldb/vol16/p3822-povzner.pdf | 13 pages | The Kafka task, run as a multi-tenant service. Cells restrict each tenant to a few brokers: blast-radius thinking you will reuse in week 7 | A 24-broker cluster with 6-broker cells ran at 53% load against 73% without cells; the 99.99% multi-zone SLA | |
+
+### Alternates, if one does not grip you
+<!-- surface: library.papers -->
+
+Quit and switch: do not push through. These are on Arpit Bhayani's list, but his shelf links are private files, so search the title; most are on the authors' sites.
+
+| Instead of | Try | Because |
+| --- | --- | --- |
+| Spanner | Epoxy: ACID Transactions Across Diverse Data Stores | Your actual problem: one transaction across Postgres, Kafka and a provider |
+| Dynamo | Millions of Tiny Databases | The best paper on blast radius, and it pairs with the hot-shard task |
+| Chubby | Firecracker, or The Bloom Paradox | Firecracker is how you would run untrusted code, that week's LeetCode option |
+| IDF | Zanzibar | Permissions at commerce scale: the closest to your day job on the list |
+| Flajolet and Martin | Isolation Forest, or Gorilla | Isolation Forest is the algorithm behind the fraud-detection design you derive |
+| vLLM | Lost in the Middle (TACL 2023) | About your UCP agent: models do worst when the relevant fact sits in the middle of a long context |
+
+### One honest warning
+<!-- surface: library.papers -->
+
+Arpit reads a paper a week because it is his craft and he has done it for years. You have interviews in January and 15 hours a week. If a paper ever competes with a mock, a machine-coding problem or the capstone, the paper loses. The goal is not to match his shelf. It is that by January you have read nine papers properly, can hold Spanner, Dynamo and DSQL against each other, and have a decision card for each. Almost no SDE-2 candidate can say that.
+
+## Equation bank: derive it on paper
+<!-- surface: library.equations -->
+
+The Thursday equation is the part of this plan that fits how you learn best, so there are more of them, every one tied to a design, task or paper you are already doing that week. **Every derivation hides its answer** until you have tried. The routine is the same each time: write down the shape you expect before you calculate, derive it on paper, reveal the check value, and if you are off by more than 5%, find the error. That last step is the learning; do not skip it by copying the answer.
+
+- **Bonus equation** (+1, 15 minutes, any day, skippable): one in most weeks, always tied to what you are reading or designing. There are none in the light weeks (2, 3 and 5).
+- **The shelf** (optional, unscored): 12 more, each with its best week. Use one on a day you want a win. Tick it when you have done it.
+- **These are models, not measurements.** Three are simplified on purpose (balls in bins, two followers, independent failures). Say which assumption you are making out loud, because that is exactly what a good interviewer probes.
+
+### Bonus equations
+<!-- surface: library.equations -->
+
+| ID | Wk | Name | Equation | Setup and what to derive | Check (derive first) | Tied to | Task |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| eq-01 | 1 | Requests per second | $\text{rps} = \dfrac{\text{requests per day}}{86{,}400}$ | 1 billion requests a day, evenly spread, then with a 3x peak. Why is "about 10^5 seconds in a day" the most useful number in system design? | about 11,574 a second on average; about 34,700 at a 3x peak | Numbers to Know (w01-05) | w01-17 |
+| eq-04 | 4 | Zipf hit ratio | $\text{hit ratio} = \dfrac{H(m)}{H(N)}, \quad H(n) = \sum_{i=1}^{n} \dfrac{1}{i}$ | Keys follow a Zipf distribution (exponent 1) over N = 1,000,000. If you cache only the top 0.1%, 1% or 10% of the keys, what fraction of requests hit? | 52%, 68% and 84%. Use H(n) ≈ ln n + 0.577 to do it by hand | Caching (w04-02) and the SIEVE paper (w04-14) | w04-15 |
+| eq-06 | 6 | Spanner commit wait | $\text{commit wait} \ge 2\varepsilon$ | Spanner makes a transaction wait until its timestamp is guaranteed to be in the past. With ε = 4 ms, how long is the wait? If a row's lock is held through that wait, how many commits a second can one hot row take? Verify the lock claim in section 4.2.1 of the paper | a wait of about 8 ms, so a hot-row ceiling of about 125 commits a second. The paper confirms the 2ε wait; the lock part is for you to check | Spanner (w06-16) | w06-17 |
+| eq-07 | 7 | Shuffle-sharding combinations | $\text{shards} = \dbinom{n}{k}$ | Route 53 style shuffle sharding: 8 workers with shards of 2, then 2,048 workers with shards of 4. How many distinct shards? What is the chance two random customers share all their workers, and at least one? | C(8,2) = 28; C(2048,4) = 730,862,190,080 (the "730 billion"); two customers share all four with probability 1.4 × 10⁻¹² and at least one with probability 0.78% | Hot shards (w07-15) and AWS on shuffle sharding | w07-17 |
+| eq-08 | 8 | Raft split vote | $P(\text{split}) = 1 - \left(1 - \dfrac{\delta}{W}\right)^{2}$ | Raft followers pick election timeouts uniformly in a window of width W = 150 ms (the paper uses 150 to 300 ms). If two time out within δ = 10 ms of each other, the votes can split. What is the chance? Why does widening the window help? | about 12.9% for two followers, and 24.9% if δ = 20 ms. A simplified model of the paper's randomisation argument | Leader election (w08-15) and Chubby (w08-17) | w08-18 |
+| eq-09 | 9 | Hedged requests | $P(\text{both slow}) = p^{2}$ | Each request is slow with probability 1%. You send a second "hedge" request only after the first has been outstanding longer than the 95th percentile. What is the chance both are slow? How much extra load do you add? | 0.01² = 0.0001, and about 5% extra load. In the Tail at Scale benchmark, a hedge after 10 ms cut the 99.9th percentile of a 1,000-value read from 1,800 ms to 74 ms for 2% more requests | Tail latency (w09-06) and vLLM (w09-15) | w09-16 |
+| eq-10 | 10 | Kingman's formula | $E[W_q] \approx \dfrac{\rho}{1-\rho} \cdot \dfrac{c_a^{2} + c_s^{2}}{2} \cdot \tau$ | At ρ = 0.9 with Poisson arrivals (c_a² = 1), compare steady service times (c_s² = 0), exponential (c_s² = 1) and bursty (c_s² = 4). Express each in multiples of the mean service time τ | 4.5τ, 9τ and 22.5τ. Variance in service time matters as much as utilisation | Queueing (w10-06) | w10-18 |
+| eq-11 | 11 | HyperLogLog accuracy | $\text{standard error} \approx \dfrac{1.04}{\sqrt{m}}$ | HyperLogLog with m registers. What accuracy does m = 16,384 give, and how many bytes at 6 bits per register? The original paper uses m = 2,048 with 5-bit registers: what does that give? | m = 16,384: 0.81% in 12,288 bytes. m = 2,048: 2.3% in 1,280 bytes (the paper rounds to "about 2% in 1.5 kB") | Flajolet and Martin (w11-16) and the HyperLogLog paper | w11-17 |
+| eq-13 | 13 | Double-entry invariant | $\sum \text{debits} - \sum \text{credits} = 0$ | Prove that if every journal entry is balanced, then after any sequence of entries, in any order, the books balance. Then say which two failure modes would break it in a real system | Induction on the number of entries. The two breakers: a partial write (an entry half applied, so atomicity) and an unbalanced entry slipping past validation | The wallet ledger mock (w13-02) and the TigerBeetle report (w13-10) | w13-11 |
+| eq-20 | 12 | Snowflake ID ceiling | $\text{IDs per ms per node} = 2^{12}$ | A Snowflake-style ID has 41 bits of milliseconds, 10 bits of machine and 12 bits of sequence. Work out the per-node ceiling a second, the number of machines, and how long before the timestamp wraps | 4,096 a millisecond, so 4,096,000 a second per node; 1,024 machines; 2^41 ms is about 69.7 years | Distributed IDs, from Bitly (w01-11), and the storage-engines task (w12-04) | w12-17 |
+
+### The shelf
+<!-- surface: library.equations -->
+
+| ID | Best wk | Name | Equation | Setup and what to derive | Check (derive first) | Tied to |
+| --- | --- | --- | --- | --- | --- | --- |
+| eq-02 | 2 | LSM levels and read cost | $L = \left\lceil \log_T\!\left(\dfrac{\text{data}}{\text{memtable}}\right) \right\rceil$ | An LSM tree with size ratio T = 10, a 64 MB memtable and 1 TB of data: how many levels? Then, with a 1% Bloom-filter false-positive rate per level, how many wasted disk reads does a missing key cost on average, with and without the filters? | log10(10^12 / 64 × 10^6) is about 4.2, so 5 levels; wasted reads are about 5 × 0.01 = 0.05 with filters against about 5 without | The RUM paper (on the shelf) and the LSM derivation (w12-04) |
+| eq-03 | 3 | Virtual nodes and load spread | $\sigma_{\text{load}} \approx \dfrac{1}{\sqrt{V}}$ | With V virtual nodes per server, load is roughly balls in bins. How many virtual nodes get the load spread below 5%? Below 1%? | V = 400 for 5%; V = 10,000 for 1%. A model, not a guarantee: check it against a quick simulation | Consistent hashing (w03-03, w03-04) |
+| eq-05 | 5 | Kafka partitions | $\text{partitions} \ge \max\!\left(\dfrac{t}{p}, \dfrac{t}{c}\right)$ | A topic must carry t = 100 MB/s. One partition produces at most p = 10 MB/s and one consumer reads at most c = 5 MB/s. How many partitions? Why must you also think about future growth before you pick one? | max(10, 20) = 20 partitions | Kafka (w05-02) and the Kora paper (on the shelf) |
+| eq-12 | 7 | Durability: copies against erasure coding | $P(\text{loss}) = \sum_{k > m} \dbinom{n}{k}\, q^{k} (1-q)^{n-k}$ | An S3-like store: each shard fails at a 2% annual rate and is repaired in one day. Compare 3x replication (lost only if all 3 fail in a window) with erasure coding of 14 shards that tolerates 4 losses. Chance of loss per year? | 3x replication: about 6 × 10⁻¹¹ a year (roughly 10 nines). 14 shards, tolerating 4: about 3.6 × 10⁻¹⁶ (over 15 nines). Both assume independent failures, and correlated failures dominate real losses: that is the real answer to where 11 nines come from | The S3-like blob store design and replication (w07-14) |
+| eq-14 | 7 | Availability of replicas | $A_{2\text{ of }3} = 3a^{2}(1-a) + a^{3}$ | Three replicas, each 99.9% available and independent. Compare "any one is enough", "any two are needed", and three dependencies in a series | 99.9999999%; 99.9997%; 99.7%. "Any two" costs about three and a half nines against "any one" | Replication (w07-14) |
+| eq-15 | 8 | Heartbeat timeout | $T = \mu \ln\!\left(\dfrac{1}{P}\right)$ | Heartbeat delays are exponential with mean μ. What timeout T makes a false "node is dead" verdict happen with probability 10⁻⁶? 10⁻⁹? | T = 13.8μ and T = 20.7μ. Each extra nine of confidence costs about 2.3μ of waiting | Leader election (w08-15) and the online/offline indicator design |
+| eq-17 | 9 | One queue or many | $W_q = \dfrac{C(c, A)}{c\mu - \lambda}, \quad A = \dfrac{\lambda}{\mu}$ | At 80% utilisation and a mean service time of 1, compare one shared queue feeding c servers with c independent queues, for c = 2, 4 and 8. Why does least-connections beat round-robin? | Separate queues wait 4.0 each. A shared queue waits 1.78 (c = 2), 0.75 (c = 4) and 0.29 (c = 8): 2.2, 5.4 and 14 times better | Load balancers (w09-14) |
+| eq-16 | 10 | Universal scalability law | $C(N) = \dfrac{N}{1 + \alpha(N-1) + \beta N(N-1)}, \quad N^{*} = \sqrt{\dfrac{1-\alpha}{\beta}}$ | Derive N*, the point where more workers reduce throughput. With α = 0.05 and β = 0.001, find N*, C(16) and C(64), and compare Amdahl's ceiling (β = 0) | N* = 30.8 with C(N*) ≈ 9.04; C(16) ≈ 8.04; C(64) ≈ 7.82; Amdahl's ceiling is 1/α = 20. C(64) < C(16): you added 48 workers and got slower | Connection pools (w04-13) |
+| eq-18 | 4 | Busy connections | $\text{busy} = \lambda \cdot W_{\text{db}}$ | Postgres allows 100 connections. 20 pods each hold a pool of 20. Compute the overcommit. Then at 2,000 queries a second and 5 ms each, how many connections are truly busy, and how many do you provision at 70% utilisation? | 400 against 100, 4 times over; 10 busy; about 14 provisioned. Your 400 are almost all idle | Connection pools (w04-13) |
+| eq-19 | 3 | Token bucket against fixed window | $\text{most in any window of length } t = b + r\,t$ | A token bucket with a bucket of b = 100 and a refill of r = 10 a second. The most requests it can pass in 1 s, and in 60 s? Then a fixed window limit of 600 a minute: the most it can pass across a boundary in a 60 s span? | 110 and 700. The fixed window can pass 1,200 in a 60 s span straddling the boundary: nearly double. This is the design's own derive-it question | The rate limiter design (w03-05) |
+| eq-21 | 6 | Trying providers in turn | $P(\text{success}) = 1 - \prod_i (1 - p_i)$ | Your payment router tries three providers in turn, succeeding 92%, 90% and 85% of the time. What is the combined success rate? Which assumption makes this number lie during a bank-wide outage? | 99.88%. It assumes the providers fail independently; during a shared upstream outage they fail together, so the real figure is worse | The payment router and the Payment System design (w06-07) |
+| eq-22 | 13 | Loan EMI | $\text{EMI} = \dfrac{P\, r\,(1+r)^{n}}{(1+r)^{n} - 1}$ | A ₹1,00,000 loan at 12% a year, reducing balance, over 12 months (r = 1% a month). The EMI, the total paid and the interest. Why should money never be held in floating point? | ₹8,884.88 a month; ₹1,06,618.55 in total; ₹6,618.55 interest. Hold money as integer paise or fixed-point decimals, never floats | The lending side of Indian fintech, and the wallet ledger mock (w13-02) |
+
+## Gap check: what the plan was missing
+<!-- surface: library.gaps -->
+
+Checked on 6 Oct 2026 against both published outlines of Arpit Bhayani's courses, and against this plan. The plan already covers most of both syllabi, and the interview-facing parts better: his Beginners course is roughly 85% inside it, and his Masterclass design list roughly 80% inside the design library. What it missed was a cluster of **distributed-systems mechanics** that he teaches and Hello Interview has no pages for: circuit breakers, leader election and consensus, replication and recovery, connection pools, storage-engine internals, hot-shard handling, and load balancers that are not a single point of failure. Those are 10 concept gaps, about 6 hours in all. Each is now a task in weeks 2 to 12 that ends in a why-question (so it becomes a flashcard), with free sources, mostly his own blogs, and 5 designs were added to the library. You do not need to buy either course before January: see the end.
+
+### The ten gaps
+<!-- surface: library.gaps -->
+
+Each has a derive-it question in your usual style. Answer it before you read.
+
+| ID | Gap | Task | Sketch | Why it matters | Derive it | Free sources |
+| --- | --- | --- | --- | --- | --- | --- |
+| G1 | Circuit breakers and failure isolation | w06-15 | circuit-breaker | When Adyen slows down, your checkout must fail fast instead of holding every thread | Your payment provider starts taking 30 s instead of 200 ms. Trace exactly how your service dies, then show which of a timeout, a retry cap, a circuit breaker and a bulkhead would have saved it, and what each costs you | [Martin Fowler, Circuit Breaker](https://martinfowler.com/bliki/CircuitBreaker.html); AWS, [Timeouts, retries and backoff with jitter](https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/) |
+| G2 | Leader election, consensus and fencing | w08-15 | leader-fencing | Whoever runs the settlement job must be exactly one node, and a paused node must not keep acting as leader | Your reconciliation cron runs on 3 nodes and must run once. Design the election. Now your leader pauses for 40 s in GC, the others elect a new one, and the old leader wakes up and writes. What stops the double write? | [Raft visualised](https://thesecretlivesofdata.com/raft/); his [Why consensus](https://arpitbhayani.me/blogs/why-consensus) and [Heartbeats](https://arpitbhayani.me/blogs/heartbeats-in-distributed-systems); Kleppmann on [distributed locking and fencing tokens](https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html); Hello Interview's [ZooKeeper deep dive](https://www.hellointerview.com/learn/system-design/deep-dives/zookeeper) (Premium) |
+| G3 | Replication, redundancy and recovery | w07-14 | replication-rpo-rto | An interviewer will ask what happens when your primary database dies mid-settlement | Define your RPO and RTO for an order table and for an audit ledger. They differ. Pick the replication mode and backup strategy each needs, and say what you lose in a failover | His [master-replica](https://arpitbhayani.me/blogs/master-replica-replication), [MySQL replication internals](https://arpitbhayani.me/blogs/mysql-replication-internals), [multi-master](https://arpitbhayani.me/blogs/multi-master-replication) and [leaderless](https://arpitbhayani.me/blogs/leaderless-replication) posts |
+| G4 | Isolation levels, properly | w02-08 | write-skew | This is the single most common deep dive in Indian fintech interviews, and the Postgres task only grazes it | Name the anomaly each level allows: dirty read, non-repeatable read, phantom, write skew, lost update. Then build a write skew that SERIALIZABLE stops and snapshot isolation does not, using a wallet with a minimum-balance rule | His [Decoding isolation, the I in ACID](https://arpitbhayani.me/blogs/isolation) and [Why databases deadlock](https://arpitbhayani.me/blogs/database-deadlocks) |
+| G5 | Connection pools and database proxies | w04-13 | connection-pool | The most common real production outage in a Spring Boot or Go service, and it pairs with the Little's law maths you already have | Postgres allows 100 connections, you run 20 pods with a pool of 20 each. Compute the problem. Now add pgbouncer in transaction mode: what breaks that worked before? | [pgbouncer pooling modes](https://www.pgbouncer.org/features.html); the connection-pool exercise in his [Go exercises repo](https://github.com/addi-11/system-design-excercises) |
+| G6 | Storage engine internals, derived | w12-04 | lsm-tree | "Why does this database favour writes?" is answerable only from the engine | Build an LSM tree on paper from one rule, that writes must be sequential. Derive the memtable, the SSTable, the need for compaction and the read amplification it causes. Then say when a B-tree wins | His [Bitcask](https://arpitbhayani.me/blogs/bitcask); the LSM and B+ tree exercises in the repo above |
+| G7 | Picking the database, including columnar and graph | w11-15 | row-column | You will be asked why the ledger is not in ClickHouse and why analytics are not in Postgres | Write a one-page decision card choosing a store for four workloads: orders, audit ledger, merchant analytics, fraud graph. Give the force that decides each | ClickHouse's [columnar database FAQ](https://clickhouse.com/docs/faq/general/columnar-database); his [Local vs global indexes](https://arpitbhayani.me/blogs/how-indexes-work-on-partitioned-and-sharded-data) |
+| G8 | Scaling WebSockets | w08-16 | websocket-scale | The plan chooses between polling, SSE and WebSockets but never scales the chosen one | 1 million connected users, each node holds 50k sockets. Work out the node count, the memory, what happens on a deploy, and how a message for one user reaches the one node holding that socket | The SSE and broker exercises in the repo above |
+| G9 | Hot shards, three ways | w07-15 | hot-shards | In payments one merchant is always 40% of your traffic | One merchant ID is 40% of writes. Fix it three ways: split the key, isolate the tenant, and shuffle-shard. Say what each costs in query complexity | AWS, [Shuffle sharding](https://builder.aws.com/content/3F06NpJ8YeoIGP8VHTw4n81pFn8/workload-isolation-using-shuffle-sharding) |
+| G10 | Load balancers that are not a single point of failure | w09-14 | load-balancer | "And what balances the load balancer?" is a standard follow-up | Your ALB is the single point of failure. Remove it. Derive the layers from DNS down: anycast, a virtual IP with failover, health checks, then the balancing algorithm. Explain why least-connections beats round-robin for a payment API with variable latency | The load-balancer and consistent-hashing exercises in the repo above |
+
+### Beginners syllabus against your plan
+<!-- surface: library.gaps -->
+
+| His topic | Your plan | Status |
+| --- | --- | --- |
+| What is system design, how to approach it | The delivery framework (w01-03) | Covered |
+| Relational databases | Postgres (w02-02, w02-05) | Covered |
+| Database isolation levels | Postgres only touches it (w02-05) | **Partial gap → G4** |
+| Scaling databases | w07-02, w07-03 | Covered |
+| Sharding and partitioning | w03-03, w03-04 | Covered |
+| Non-relational databases | Cassandra or DynamoDB (w12-03) | Covered |
+| Picking the right database | Implied, never explicit | **Partial gap → G7** |
+| Understanding and populating caches | w04-02, w04-03 | Covered |
+| Caching at different architecture levels | Browser and CDN layers are thin | **Partial gap → G7** |
+| Message queues, Kafka | w05-02 | Covered |
+| Real-time PubSub | w08-02 | Covered |
+| Load balancers | L4 against L7 only (w01-07) | **Gap → G10** |
+| Circuit breakers | Not present | **Gap → G1** |
+| Data redundancy and recovery | Not present | **Gap → G3** |
+| Leader election for auto-recovery | Not present | **Gap → G2** |
+| Bloom filters | w08-06 | Covered |
+| Consistent hashing | w03-03 | Covered |
+| Communication protocols | w01-07, w08-02 | Covered |
+| Blob storage and S3 | w05-05 and Dropbox | Covered (S3 internals → `s3-like-blob-store`) |
+| Introduction to big data | w11-03 | Covered |
+| E-commerce product listing | Your day job plus the capstone | Covered |
+| Tinder feed | `tinder` | Covered |
+| Notifications | `notification-system` | Covered |
+| Twitter trends | `youtube-top-k` | Covered |
+| URL shortener | `bitly` | Covered |
+| API rate limiter | `rate-limiter` | Covered |
+| Realtime abuse masker | Not present | Skip: niche, low interview value |
+| Web crawler | `web-crawler` | Covered |
+| GitHub Gists | Not present | Skip: Dropbox teaches the same |
+| Fraud detection | `real-time-fraud-detection` | Covered |
+| Recommendation engine | Not present | **Gap → `recommendation-engine`** |
+
+### Masterclass syllabus against your plan
+<!-- surface: library.gaps -->
+
+| His topic | Your plan | Status |
+| --- | --- | --- |
+| Online/offline indicator | Not present | **Gap → `online-offline-indicator`** |
+| Connection pools and DB proxies | Little's law only (w04-06) | **Gap → G5** |
+| Caching issues at scale | w04-02, w04-03 | Covered (thundering herd → G1) |
+| Async processing, Kafka | w05-02 | Covered |
+| Communication paradigms, log streamer | w08-02 | Covered |
+| Pessimistic and optimistic locking | w04-05 | Covered |
+| Remote and distributed locks | Ticketmaster | Covered (fencing tokens → G2) |
+| Columnar, graph, wide-column stores | Wide-column only | **Partial gap → G7** |
+| Slack realtime text | WhatsApp | Covered |
+| Scaling WebSockets | w08-02 is about choice, not scale | **Gap → G8** |
+| Load balancers, not a SPoF | Not present | **Gap → G10** |
+| Leader election, consistent reads | Not present | **Gap → G2** |
+| CDN in live streaming | `youtube` only | **Partial gap → `live-stream-with-cdn`** |
+| Photos upload at scale, private photos | Dropbox, Instagram | Covered |
+| HashTag counter | `youtube-top-k` | Covered |
+| RAG over 10M docs | w09-02, w09-03 | Covered |
+| Deep research agent at scale | Not present | **Gap → `deep-research-agent`** |
+| Word dictionary without a DB | Not present | Skip, or use as a boss problem |
+| Designing S3 | Blobs covered, internals not | **Gap → `s3-like-blob-store`** |
+| Multi-tiered orders for Amazon | Your capstone | Covered |
+| LSM trees ground up | Named in w02-03, never derived | **Gap → G6** |
+| Event ingestion at scale | Ad Click Aggregator | Covered |
+| Distributed ID generators | Inside `bitly` | **Partial gap → G6** |
+| Three ways to handle hot shards | w07-03 names the problem | **Gap → G9** |
+| Cricbuzz text commentary | FB Live Comments | Covered |
+| Distributed task scheduler | `job-scheduler` and w08-08 | Covered |
+| Flash sale | `flash-sale` | Covered |
+| Impressions counting | Ad Click Aggregator | Covered |
+| Ride hailing | `uber` | Covered |
+
+### What you are still missing
+<!-- surface: library.gaps -->
+
+His courses are high-level design only. Three things matter more for your January target than any topic above:
+
+1. **Machine coding is the eliminator.** Your plan already has 8 real problems from Groww, PhonePe, CRED, Flipkart and Razorpay. No course teaches that. Do not trade a Saturday machine-coding slot for a concept task.
+2. **Mocks out loud.** You have 7 scheduled. They are the thinnest-looking and highest-yield part of the plan. Protect them.
+3. **Your own two systems.** The UCP middleware and the capstone are the only things on your CV that nobody else has. One hour spent making the UCP design doc sharper beats one hour on a 23rd design.
+
+If a week overflows because of the extra tasks, cut that week's second design, never the Saturday design or the DSA.
+
+### Should you buy a course?
+<!-- surface: library.gaps -->
+
+Facts, checked on 6 Oct 2026 on his own pages.
+
+| | System Design for Beginners | System Design Masterclass |
+| --- | --- | --- |
+| Price | ₹19,999 (about $299) | ₹49,999 (about $699), recordings ₹49,998 |
+| Format | Self-paced, 35 recorded sessions, bi-weekly doubt sessions | 6 weeks live, Sat and Sun 9 am to 12 pm IST, 40+ hours |
+| Stated audience | Students and under 2 years of experience | SDE-2, SDE-3 and above, 2+ years |
+| Next cohort | Self-paced, any time | Aug 2026 closed; Jan 2027 dates not announced |
+| Access | Lifetime | Lifetime |
+
+**Beginners: no.** It is aimed at under 2 years, and 85% of it is already in your plan at interview depth. You would be paying ₹20,000 to re-learn caching and Kafka.
+
+**Masterclass: not before January.** The design list overlaps about 80% with your library, so you would be paying mainly for his implementation angle. The January cohort dates are not announced, which puts it after your 4 Jan application date. And 40 hours of weekend sessions collide with your Saturday design and Sunday capstone slots, the highest-value hours in the plan. It would be worth it after you land the jump, as depth rather than interview prep: being walked through building each system in Go with someone answering your questions is the one thing free material does not give you.
+
+**The free substitute is the ten gaps above:** his [100+ blogs](https://arpitbhayani.me/blogs/) and 250+ YouTube videos cover the theory behind most of his syllabi, and the [exercises repo](https://github.com/addi-11/system-design-excercises) gives you the code. Reviews could not be checked properly (one forum blocked the check), so judge it from his free videos: if 10 of them do not grip you, a ₹50,000 version of them will not either.
 
 ---
 
@@ -1173,6 +1450,8 @@ Design every one for change: a new eviction policy should be a new class, not a 
 | DSA | LeetCode + your existing tracker |
 | Cloud cert (optional, after January) | [AWS Solutions Architect Associate, SAA-C03](https://www.learnersink.com/blog/aws-saa-vs-saa-c03-changes) |
 | Mocks | [Aced](https://www.tryexponent.com/practice), [Codemia](https://codemia.io/), [Practick](https://practick.io/) |
+| Distributed-systems code | [Go exercises from Arpit Bhayani's course](https://github.com/addi-11/system-design-excercises): runnable connection pools, LSM and B+ trees, Bitcask, two-phase commit, consistent hashing, ID generators, SSE brokers, a toy CDN and HLS streaming |
+| Papers | One a week from week 4: the schedule, the three-pass method and the shelf are in the Library, under Papers |
 
 Sources:
 
@@ -1234,6 +1513,11 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 2 | Thu | PostgreSQL | — | doc | free | Transaction isolation | PostgreSQL docs | https://www.postgresql.org/docs/current/transaction-iso.html | — |
 | 2 | Thu | PostgreSQL | — | video | free | you won't forget how postgres works after this | Hussein Nasser | https://www.youtube.com/watch?v=q9jixKv4h2I | 27 |
 | 2 | Thu | Maths: B-tree height | — | video | free | Understanding B-Trees | Spanning Tree | https://www.youtube.com/watch?v=K1a2Bk8NrYQ | 13 |
+| 2 | Thu | Isolation levels and write skew | — | video | free | Transaction Isolation Levels | Bharath Thippireddy | https://www.youtube.com/watch?v=CTCAo89fcQw | 5 |
+| 2 | Thu | Isolation levels and write skew | — | video | free | Snapshot Isolation | Jordan has no life | https://www.youtube.com/watch?v=Tgpa9TrxsfU | 7 |
+| 2 | Thu | Isolation levels and write skew | — | video | free | Serializable Snapshot Isolation | Jordan has no life | https://www.youtube.com/watch?v=4TAKYRzm_dA | 8 |
+| 2 | Thu | Isolation levels and write skew | — | doc | free | Decoding isolation, the I in ACID | Arpit Bhayani | https://arpitbhayani.me/blogs/isolation | — |
+| 2 | Thu | Isolation levels and write skew | — | doc | free | Why databases deadlock | Arpit Bhayani | https://arpitbhayani.me/blogs/database-deadlocks | — |
 | 2 | Week | DSA: arrays, two pointers, sliding window, prefix sums | — | video | free | Introduction to Sliding Window and 2 Pointers | take U forward (Striver) | https://www.youtube.com/watch?v=9kdHxplyl5I | 37 |
 | 2 | Week | DSA: arrays, two pointers, sliding window, prefix sums | — | video | free | Prefix Sum in 4 minutes | AlgoMaster | https://www.youtube.com/watch?v=yuws7YK0Yng | 4 |
 | 3 | Thu | Sharding | — | doc | free | Sharding | Hello Interview | https://www.hellointerview.com/learn/system-design/core-concepts/sharding | — |
@@ -1262,6 +1546,10 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 4 | Tue | Redis | — | video | free | Redis Deep Dive | Hello Interview | https://www.youtube.com/watch?v=fmT5nlEkl3U | 31 |
 | 4 | Wed | Docker Compose, small images | — | video | free | Docker Compose: running multiple services | TechWorld with Nana | https://www.youtube.com/watch?v=3c-iBn73dDE&t=5389s | 12 |
 | 4 | Wed | Docker Compose, small images | — | video | free | Dockerfile: building your own image | TechWorld with Nana | https://www.youtube.com/watch?v=3c-iBn73dDE&t=6122s | 22 |
+| 4 | Wed | Connection pools and pgbouncer | — | video | free | Connection Pooling in PostgreSQL with NodeJS (performance numbers) | Hussein Nasser | https://www.youtube.com/watch?v=GTeCtIoV2Tw | 12 |
+| 4 | Wed | Connection pools and pgbouncer | — | video | free | PgBouncer Tutorial | Code with Lucian | https://www.youtube.com/watch?v=ddKm7a7xOpk | 19 |
+| 4 | Wed | Connection pools and pgbouncer | — | doc | free | pgbouncer features: the three pooling modes | pgbouncer | https://www.pgbouncer.org/features.html | — |
+| 4 | Wed | Connection pools and pgbouncer | — | repo | free | System design exercises in Go: the connection-pool exercise | Arpit Bhayani's course | https://github.com/addi-11/system-design-excercises | — |
 | 4 | Thu | Dealing with contention | — | video | free | Optimistic locking clearly explained (Java and SQL) | ByteMonk | https://www.youtube.com/watch?v=d41JuPT_Wls | 7 |
 | 4 | Thu | Dealing with contention | — | doc | partial | Dealing with Contention | Hello Interview | https://www.hellointerview.com/learn/system-design/patterns/dealing-with-contention | — |
 | 4 | Thu | Dealing with contention | — | doc | free | Common Patterns summary | Hello Interview | https://www.hellointerview.com/learn/system-design/in-a-hurry/patterns | — |
@@ -1269,6 +1557,7 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 4 | Thu | Dealing with contention | — | video | free | Pessimistic vs optimistic concurrency control | Hussein Nasser | https://www.youtube.com/watch?v=I8IlO0hCSgY | 16 |
 | 4 | Thu | Maths: Little's law | — | video | free | Little's Law explained | Operations & Supply Chain | https://www.youtube.com/watch?v=r_T8veWYrEA | 6 |
 | 4 | Thu | Maths: Little's law | — | video | free | Little's Law at the Ice Cream Van (from Little himself) | Gary Little | https://www.youtube.com/watch?v=raRpbsWQBCo | 2 |
+| 4 | Fri | Paper: SIEVE | — | video | free | SIEVE is Simpler than LRU (the authors' talk) | USENIX NSDI 2024 | https://www.youtube.com/watch?v=IcnBckIhJnM | 18 |
 | 4 | Sat | Ticketmaster | ticketmaster | doc | free | Design a ticket booking site like Ticketmaster | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/ticketmaster | — |
 | 4 | Sat | Ticketmaster | ticketmaster | video | free | Design Ticketmaster | Hello Interview | https://www.youtube.com/watch?v=fhdPyoO6aXI | 59 |
 | 4 | Sat | LLD: cache with pluggable eviction | — | repo | free | LRU cache problem and Java solution | awesome-low-level-design | https://github.com/ashishps1/awesome-low-level-design/blob/main/problems/lru-cache.md | — |
@@ -1313,6 +1602,11 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 5 | Week | DSA: dynamic programming | — | video | free | Longest Increasing Subsequence | take U forward (Striver) | https://www.youtube.com/watch?v=ekcwMsSIzVc | 25 |
 | 6 | Mon | CAP and PACELC | — | doc | free | CAP Theorem | Hello Interview | https://www.hellointerview.com/learn/system-design/core-concepts/cap-theorem | — |
 | 6 | Mon | CAP and PACELC | — | video | free | CAP Theorem in System Design Interviews | Hello Interview | https://www.youtube.com/watch?v=VdrEq0cODu4 | 14 |
+| 6 | Mon | Circuit breakers and bulkheads | — | video | free | Circuit Breaker Pattern in Microservices | ByteMonk | https://www.youtube.com/watch?v=dJI2saoM5_k | 10 |
+| 6 | Mon | Circuit breakers and bulkheads | — | video | free | Bulkhead Pattern Explained: Resilience in Microservices Architecture | ByteMonk | https://www.youtube.com/watch?v=2I3-lbnMXec | 7 |
+| 6 | Mon | Circuit breakers and bulkheads | — | video | free | Top 5 Microservices Resilience Patterns | ByteMonk | https://www.youtube.com/watch?v=RfPNuaj5Ax0 | 7 |
+| 6 | Mon | Circuit breakers and bulkheads | — | doc | free | Circuit Breaker | Martin Fowler | https://martinfowler.com/bliki/CircuitBreaker.html | — |
+| 6 | Mon | Circuit breakers and bulkheads | — | doc | free | Timeouts, retries and backoff with jitter | AWS Builders' Library | https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/ | — |
 | 6 | Tue | Temporal | — | doc | free | Temporal deep dive | Hello Interview | https://www.hellointerview.com/learn/system-design/deep-dives/temporal | — |
 | 6 | Tue | Temporal | — | video | free | Temporal in 7 minutes | Temporal | https://www.youtube.com/watch?v=2HjnQlnA5eY | 7 |
 | 6 | Tue | Temporal | — | video | free | Maxim Fateev on Durable Execution with Temporal (SE Radio 596) | IEEE Computer Society | https://www.youtube.com/watch?v=fMh2ZYJST0E | 69 |
@@ -1326,6 +1620,7 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 6 | Thu | Maths: retries and jitter | — | video | free | Circuit breaker pattern in microservices | ByteMonk | https://www.youtube.com/watch?v=dJI2saoM5_k | 10 |
 | 6 | Thu | Maths: retries and jitter | — | video | free | Top 5 microservices resilience patterns | ByteMonk | https://www.youtube.com/watch?v=RfPNuaj5Ax0 | 7 |
 | 6 | Thu | Maths: retries and jitter | — | doc | free | Timeouts, retries and backoff with jitter | Amazon Builders' Library | https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/ | — |
+| 6 | Fri | Paper: Spanner | — | video | free | Distributed Systems 8.2: Google's Spanner | Martin Kleppmann | https://www.youtube.com/watch?v=oeycOVX70aE | 19 |
 | 6 | Sat | Payment System | payment-system | video | free | Payment gateway, payment processor and payment security explained | ByteMonk | https://www.youtube.com/watch?v=hWQCiO04CXk | 7 |
 | 6 | Sat | Payment System | payment-system | video | free | System design: global payment processing (PayPal) | ByteMonk | https://www.youtube.com/watch?v=7MXV7RfNtv0 | 22 |
 | 6 | Sat | Payment System | payment-system | doc | premium | Payment System (requirements and outline free) | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/payment-system | — |
@@ -1350,16 +1645,26 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 7 | Tue | Scaling writes | — | doc | partial | Scaling Writes | Hello Interview | https://www.hellointerview.com/learn/system-design/patterns/scaling-writes | — |
 | 7 | Tue | Scaling writes | — | doc | free | Sharding (free, covers partition keys and hot spots) | Hello Interview | https://www.hellointerview.com/learn/system-design/core-concepts/sharding | — |
 | 7 | Tue | Scaling writes | — | video | free | Database Sharding and Partitioning | Arpit Bhayani | https://www.youtube.com/watch?v=wXvljefXyEo | 24 |
+| 7 | Tue | Replication, RPO and RTO | — | video | free | Database Replication Explained (in 5 Minutes) | Aced (formerly Exponent) | https://www.youtube.com/watch?v=bI8Ry6GhMSE | 5 |
+| 7 | Tue | Replication, RPO and RTO | — | video | free | The Ultimate Guide to Disaster Recovery: RTO, RPO and Failover | ByteMonk | https://www.youtube.com/watch?v=OmASCUJEVy8 | 11 |
+| 7 | Tue | Replication, RPO and RTO | — | doc | free | Master-replica replication | Arpit Bhayani | https://arpitbhayani.me/blogs/master-replica-replication | — |
+| 7 | Tue | Replication, RPO and RTO | — | doc | free | MySQL replication internals | Arpit Bhayani | https://arpitbhayani.me/blogs/mysql-replication-internals | — |
+| 7 | Tue | Replication, RPO and RTO | — | doc | free | Multi-master replication | Arpit Bhayani | https://arpitbhayani.me/blogs/multi-master-replication | — |
+| 7 | Tue | Replication, RPO and RTO | — | doc | free | Leaderless replication | Arpit Bhayani | https://arpitbhayani.me/blogs/leaderless-replication | — |
 | 7 | Wed | AWS: RDS, S3, SQS, SNS, CloudWatch | — | video | free | AWS Cloud Practitioner course: Storage services (S3) | freeCodeCamp | https://www.youtube.com/watch?v=NhDYbskXRgc&t=21757s | 38 |
 | 7 | Wed | AWS: RDS, S3, SQS, SNS, CloudWatch | — | video | free | AWS Cloud Practitioner course: Databases (RDS) | freeCodeCamp | https://www.youtube.com/watch?v=NhDYbskXRgc&t=24015s | 30 |
 | 7 | Wed | AWS: RDS, S3, SQS, SNS, CloudWatch | — | video | free | AWS SQS vs SNS vs EventBridge: when to use what | Be A Better Dev | https://www.youtube.com/watch?v=RoKAEzdcr7k | 23 |
 | 7 | Wed | AWS: RDS, S3, SQS, SNS, CloudWatch | — | video | free | AWS Cloud Practitioner course: Logging (CloudWatch) | freeCodeCamp | https://www.youtube.com/watch?v=NhDYbskXRgc&t=39213s | 14 |
+| 7 | Wed | Hot shards and shuffle sharding | — | video | free | How Shopify avoids hot shards by moving data across databases without any downtime | Arpit Bhayani | https://www.youtube.com/watch?v=7v-wrJjcg4k | 21 |
+| 7 | Wed | Hot shards and shuffle sharding | — | video | free | Fault isolation using shuffle sharding | Conf42 SRE 2021 (Andrew Robinson) | https://www.youtube.com/watch?v=Ag0Yn7CzYSY | 15 |
+| 7 | Wed | Hot shards and shuffle sharding | — | doc | free | Workload isolation using shuffle sharding | AWS | https://builder.aws.com/content/3F06NpJ8YeoIGP8VHTw4n81pFn8/workload-isolation-using-shuffle-sharding | — |
 | 7 | Thu | Online Auction (option) | online-auction | doc | premium | Online Auction | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/online-auction | — |
 | 7 | Thu | Online Auction (option) | online-auction | video | free | Senior/Staff Mock Interview: Design Online Auction | Hello Interview | https://www.youtube.com/watch?v=o8nSXW-B7Rw | 63 |
 | 7 | Thu | Online Auction (option) | online-auction | video | free | Online Auction & Bidding Service | System Design Fight Club | https://www.youtube.com/watch?v=g8XqFuDkga0 | 29 |
 | 7 | Thu | Web Crawler (option) | web-crawler | doc | free | Design a web crawler | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/web-crawler | — |
 | 7 | Thu | Web Crawler (option) | web-crawler | video | free | Design a Web Crawler | Hello Interview | https://www.youtube.com/watch?v=krsuaUp__pM | 65 |
 | 7 | Thu | Maths: quorum | — | video | free | Distributed Systems 5.2: Quorums | Martin Kleppmann | https://www.youtube.com/watch?v=uNxl3BFcKSA | 10 |
+| 7 | Fri | Paper: Dynamo | — | video | free | Dynamo: Why Amazon Ditched SQL | Jordan has no life | https://www.youtube.com/watch?v=TtrmHQCGbb0 | 49 |
 | 7 | Sat | Flash Sale | flash-sale | doc | premium | Flash Sale | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/flash-sale | — |
 | 7 | Sat | Flash Sale | flash-sale | doc | free | Shopify inventory reservations | Hello Interview | https://www.hellointerview.com/learn/system-design/in-the-wild/shopify-inventory-reservations | — |
 | 7 | Sat | Flash Sale | flash-sale | video | free | Senior Mock Interview: Design an e-commerce platform | Hello Interview | https://www.youtube.com/watch?v=RuGY_1pap74 | 72 |
@@ -1378,10 +1683,20 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 8 | Tue | API gateway | — | video | free | API Gateways in System Design Interviews | Hello Interview | https://www.youtube.com/watch?v=7-6F3b14baA | 6 |
 | 8 | Tue | API gateway | — | video | free | API Gateway and microservices architecture (Hindi) | Concept && Coding | https://www.youtube.com/watch?v=dkgxvnk8cWw | 23 |
 | 8 | Tue | API gateway | — | video | free | API gateway vs load balancer | ByteMonk | https://www.youtube.com/watch?v=_ErhwTPSpws | 9 |
+| 8 | Tue | Scaling WebSockets | — | video | free | How to scale WebSockets to millions of connections | Ably Realtime | https://www.youtube.com/watch?v=vXJsJ52vwAA | 14 |
+| 8 | Tue | Scaling WebSockets | — | repo | free | System design exercises in Go: the SSE and broker exercises | Arpit Bhayani's course | https://github.com/addi-11/system-design-excercises | — |
 | 8 | Wed | Kubernetes basics | — | video | free | From zero to Kubernetes hero: pods, clusters, scaling (5 min) | ByteMonk | https://www.youtube.com/watch?v=Dwufy7QtZR0 | 6 |
 | 8 | Wed | Kubernetes basics | — | doc | free | Kubernetes concepts | Kubernetes docs | https://kubernetes.io/docs/concepts/ | — |
 | 8 | Wed | Kubernetes basics | — | video | free | Kubernetes course: main components and architecture | TechWorld with Nana | https://www.youtube.com/watch?v=X48VuDVv0do&t=320s | 29 |
 | 8 | Wed | Kubernetes basics | — | video | free | Kubernetes course: minikube, kubectl and YAML | TechWorld with Nana | https://www.youtube.com/watch?v=X48VuDVv0do&t=2087s | 41 |
+| 8 | Wed | Leader election and fencing | — | video | free | How Leader Election works in Distributed Systems | ByteMonk | https://www.youtube.com/watch?v=TzwiGTbUSHg | 4 |
+| 8 | Wed | Leader election and fencing | — | video | free | Understand Raft without breaking your brain | ankush | https://www.youtube.com/watch?v=IujMVjKvWP4 | 9 |
+| 8 | Wed | Leader election and fencing | — | video | free | How a distributed lock works, with Redis | ByteMonk | https://www.youtube.com/watch?v=qY4MfWv01pI | 10 |
+| 8 | Wed | Leader election and fencing | — | doc | free | Raft, visualised | The Secret Lives of Data | https://thesecretlivesofdata.com/raft/ | — |
+| 8 | Wed | Leader election and fencing | — | doc | free | Why consensus | Arpit Bhayani | https://arpitbhayani.me/blogs/why-consensus | — |
+| 8 | Wed | Leader election and fencing | — | doc | free | Heartbeats in distributed systems | Arpit Bhayani | https://arpitbhayani.me/blogs/heartbeats-in-distributed-systems | — |
+| 8 | Wed | Leader election and fencing | — | doc | free | How to do distributed locking (fencing tokens) | Martin Kleppmann | https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html | — |
+| 8 | Wed | Leader election and fencing | — | doc | premium | ZooKeeper deep dive | Hello Interview | https://www.hellointerview.com/learn/system-design/deep-dives/zookeeper | — |
 | 8 | Thu | FB Live Comments (option) | fb-live-comments | doc | free | Design FB Live Comments | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/fb-live-comments | — |
 | 8 | Thu | FB Live Comments (option) | fb-live-comments | video | free | Design Live Comments | Hello Interview | https://www.youtube.com/watch?v=LjLx0fCd1k8 | 56 |
 | 8 | Thu | LeetCode (option) | leetcode | doc | free | Design LeetCode | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/leetcode | — |
@@ -1389,6 +1704,7 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 8 | Thu | Maths: Bloom filter | — | video | free | Bloom Filters | ByteByteGo | https://www.youtube.com/watch?v=V3pzxngeLqw | 6 |
 | 8 | Thu | Maths: Bloom filter | — | video | free | Bloom Filters explained by example | Hussein Nasser | https://www.youtube.com/watch?v=gBygn3cVP80 | 9 |
 | 8 | Thu | Maths: Bloom filter | — | video | free | How big tech checks your username in milliseconds (Bloom filters, tries and Redis in one design) | ByteMonk | https://www.youtube.com/watch?v=_l5Q5kKHtR8 | 11 |
+| 8 | Fri | Paper: Chubby | — | video | free | Camille Fournier on the Chubby lock service | PapersWeLove | https://www.youtube.com/watch?v=kX9Z0F-eTt4 | 45 |
 | 8 | Sat | WhatsApp | whatsapp | video | free | Chat app: WhatsApp and Messenger system design | ByteMonk | https://www.youtube.com/watch?v=xyLO8ZAk2KE | 10 |
 | 8 | Sat | WhatsApp | whatsapp | doc | free | Design WhatsApp | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/whatsapp | — |
 | 8 | Sat | WhatsApp | whatsapp | video | free | Design WhatsApp | Hello Interview | https://www.youtube.com/watch?v=cr6p0n0N-VA | 58 |
@@ -1408,6 +1724,9 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 9 | Tue | LLM systems | — | video | free | How to build a scalable RAG system for AI apps (full architecture) | ByteMonk | https://www.youtube.com/watch?v=4KiiKQ9RVvA | 16 |
 | 9 | Wed | Ingress, config, probes, HPA | — | video | free | Kubernetes course: ConfigMap and Secret in the MongoDB demo | TechWorld with Nana | https://www.youtube.com/watch?v=X48VuDVv0do&t=4576s | 30 |
 | 9 | Wed | Ingress, config, probes, HPA | — | video | free | Kubernetes course: Ingress explained | TechWorld with Nana | https://www.youtube.com/watch?v=X48VuDVv0do&t=7312s | 22 |
+| 9 | Wed | Load balancers and single points of failure | — | video | free | How to avoid a single point of failure in distributed systems | Gaurav Sen | https://www.youtube.com/watch?v=-BOysyYErLY | 7 |
+| 9 | Wed | Load balancers and single points of failure | — | video | free | Top 6 Load Balancing Algorithms Every Developer Should Know | ByteByteGo | https://www.youtube.com/watch?v=dBmxNsS3BGE | 5 |
+| 9 | Wed | Load balancers and single points of failure | — | repo | free | System design exercises in Go: load balancers and consistent hashing | Arpit Bhayani's course | https://github.com/addi-11/system-design-excercises | — |
 | 9 | Thu | Notification System (option) | notification-system | doc | premium | Notification System | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/notification-system | — |
 | 9 | Thu | Notification System (option) | notification-system | doc | free | Design a scalable notification service | AlgoMaster | https://blog.algomaster.io/p/design-a-scalable-notification-service | — |
 | 9 | Thu | Notification System (option) | notification-system | doc | free | How Razorpay's notification service handles increasing load | Razorpay Engineering | https://engineering.razorpay.com/how-razorpays-notification-service-handles-increasing-load-f787623a490f | — |
@@ -1420,6 +1739,8 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 9 | Thu | Job Scheduler (option) | job-scheduler | video | free | Job Scheduler: System Design Interview | interviewing.io | https://www.youtube.com/watch?v=Bt6mVg5ivyQ | 64 |
 | 9 | Thu | Maths: tail latency | — | video | free | Percentile tail latency explained (95%, 99%) | Hussein Nasser | https://www.youtube.com/watch?v=3JdQOExKtUY | 6 |
 | 9 | Thu | Maths: tail latency | — | video | free | Achieving rapid response times in large online services (Jeff Dean) | O'Reilly | https://www.youtube.com/watch?v=1-3Ahy7Fxsc | 28 |
+| 9 | Fri | Paper: vLLM and PagedAttention | — | video | free | What is vLLM? Efficient AI inference for large language models | IBM Technology | https://www.youtube.com/watch?v=McLdlg5Gc9s | 5 |
+| 9 | Fri | Paper: vLLM and PagedAttention | — | video | free | Fast LLM Serving with vLLM and PagedAttention | Anyscale | https://www.youtube.com/watch?v=5ZlavKF_98U | 32 |
 | 9 | Sat | ChatGPT | chatgpt | doc | premium | ChatGPT | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/chatgpt | — |
 | 9 | Sat | ChatGPT | chatgpt | doc | free | Anatomy of a high-throughput LLM inference system | vLLM | https://vllm.ai/blog/2025-09-05-anatomy-of-vllm | — |
 | 9 | Sat | ChatGPT | chatgpt | video | free | Design ChatGPT, mock interview | Aced (formerly Exponent) | https://www.youtube.com/watch?v=I9-PUPYZyiw | 35 |
@@ -1441,6 +1762,7 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 10 | Thu | FB Post Search (option) | fb-post-search | video | free | Design FB Post Search | Hello Interview | https://www.youtube.com/watch?v=l38XL9914fs | 68 |
 | 10 | Thu | Maths: queues and utilisation | — | video | free | Queueing theory (simple) | Liz Thompson | https://www.youtube.com/watch?v=ch0MRQcZSUE | 9 |
 | 10 | Thu | Maths: queues and utilisation | — | doc | free | Using load shedding to avoid overload | Amazon Builders' Library | https://aws.amazon.com/builders-library/using-load-shedding-to-avoid-overload/ | — |
+| 10 | Fri | Paper: Understanding Inverse Document Frequency | — | video | free | Term Frequency Inverse Document Frequency (TF-IDF) explained | DataMListic | https://www.youtube.com/watch?v=zLMEnNbdh4Q | 9 |
 | 10 | Sat | FB News Feed | fb-news-feed | video | free | Twitter timeline architecture: fanout (the feed idea in 5 minutes) | ByteMonk | https://www.youtube.com/watch?v=FEkXjNFrL1o | 6 |
 | 10 | Sat | FB News Feed | fb-news-feed | doc | free | Design FB News Feed | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/fb-news-feed | — |
 | 10 | Sat | FB News Feed | fb-news-feed | video | free | Design FB News Feed | Hello Interview | https://www.youtube.com/watch?v=Qj4-GruzyDU | 26 |
@@ -1457,11 +1779,17 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 11 | Tue | Big-data data structures | — | doc | free | Count-min sketch: the art and science of estimating stuff | Redis | https://redis.io/blog/count-min-sketch-the-art-and-science-of-estimating-stuff/ | — |
 | 11 | Tue | Big-data data structures | — | video | free | Data Structures for Big Data: Bloom filters, count-min sketch, HyperLogLog | Hello Interview | https://www.youtube.com/watch?v=IgyU0iFIoqM | 26 |
 | 11 | Tue | Big-data data structures | — | video | free | HyperLogLog: Facebook's algorithm to count distinct elements | Gaurav Sen | https://www.youtube.com/watch?v=eV1haPUt0NU | 11 |
+| 11 | Tue | Picking the store: columnar and graph | — | video | free | How to choose the right database? | ByteByteGo | https://www.youtube.com/watch?v=kkeFE6iRfMM | 7 |
+| 11 | Tue | Picking the store: columnar and graph | — | video | free | What is a columnar database? (vs row-oriented) | Anton Putra | https://www.youtube.com/watch?v=1MnvuNg33pA | 8 |
+| 11 | Tue | Picking the store: columnar and graph | — | doc | free | What is a columnar database? | ClickHouse docs | https://clickhouse.com/docs/faq/general/columnar-database | — |
+| 11 | Tue | Picking the store: columnar and graph | — | doc | free | How indexes work on partitioned and sharded data | Arpit Bhayani | https://arpitbhayani.me/blogs/how-indexes-work-on-partitioned-and-sharded-data | — |
 | 11 | Wed | CI/CD with GitHub Actions | — | doc | free | GitHub Actions docs | GitHub | https://docs.github.com/en/actions | — |
 | 11 | Wed | CI/CD with GitHub Actions | — | video | free | GitHub Actions Tutorial: basic concepts and CI/CD with Docker | TechWorld with Nana | https://www.youtube.com/watch?v=R8_veQiYBjI | 32 |
 | 11 | Thu | YouTube Top K (option) | youtube-top-k | doc | free | Design YouTube's Top K videos | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/top-k | — |
 | 11 | Thu | YouTube Top K (option) | youtube-top-k | video | free | Top K Problem (Heavy Hitters) | System Design Interview | https://www.youtube.com/watch?v=kx-XDoPjoHw | 36 |
 | 11 | Thu | Maths: count-min sketch | — | video | free | Count-min sketch: counting a stream of data | Tech Dummies | https://www.youtube.com/watch?v=ibxXO-b14j4 | 20 |
+| 11 | Fri | Paper: Probabilistic Counting (Flajolet and Martin) | — | video | free | Hyperloglog and Cardinality Estimation | Arpit Bhayani | https://www.youtube.com/watch?v=tOsb-tFoPCg | 13 |
+| 11 | Fri | Paper: Probabilistic Counting (Flajolet and Martin) | — | video | free | HyperLogLog: Facebook's algorithm to count distinct elements | Gaurav Sen | https://www.youtube.com/watch?v=eV1haPUt0NU | 11 |
 | 11 | Sat | Ad Click Aggregator | ad-click-aggregator | doc | free | Design an ad click aggregator | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/ad-click-aggregator | — |
 | 11 | Sat | Ad Click Aggregator | ad-click-aggregator | video | free | Design an Ad Click Aggregator | Hello Interview | https://www.youtube.com/watch?v=Zcv_899yqhI | 62 |
 | 11 | Sat | Ad Click Aggregator | ad-click-aggregator | doc | free | How Razorpay built real-time anomaly detection with Amazon MSK | AWS Big Data Blog | https://aws.amazon.com/blogs/big-data/how-razorpay-built-real-time-anomaly-detection-with-amazon-msk/ | — |
@@ -1479,8 +1807,12 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 12 | Tue | Cassandra (pick one) | — | video | free | Cassandra Deep Dive | Hello Interview | https://www.youtube.com/watch?v=TD3-INhm60Q | 30 |
 | 12 | Tue | DynamoDB (pick one) | — | doc | free | DynamoDB deep dive | Hello Interview | https://www.hellointerview.com/learn/system-design/deep-dives/dynamodb | — |
 | 12 | Tue | DynamoDB (pick one) | — | video | free | DynamoDB Deep Dive | Hello Interview | https://www.youtube.com/watch?v=2X2SO3Y-af8 | 23 |
-| 12 | Wed | Terraform (optional) | — | doc | free | Terraform tutorials | HashiCorp | https://developer.hashicorp.com/terraform/tutorials | — |
-| 12 | Wed | Terraform (optional) | — | video | free | Terraform explained in 15 mins | TechWorld with Nana | https://www.youtube.com/watch?v=l5k1ai_GBDE | 18 |
+| 12 | Wed | Storage engines: LSM trees and B-trees | — | video | free | The Secret Sauce Behind NoSQL: LSM Tree | ByteByteGo | https://www.youtube.com/watch?v=I6jB0nM9SKU | 8 |
+| 12 | Wed | Storage engines: LSM trees and B-trees | — | video | free | How Databases Actually Store Your Data (B-Trees vs LSM Trees) | ByteMonk | https://www.youtube.com/watch?v=Q9xD4J3tezw | 11 |
+| 12 | Wed | Storage engines: LSM trees and B-trees | — | doc | free | Bitcask | Arpit Bhayani | https://arpitbhayani.me/blogs/bitcask | — |
+| 12 | Wed | Storage engines: LSM trees and B-trees | — | repo | free | System design exercises in Go: LSM tree, B+ tree and Bitcask | Arpit Bhayani's course | https://github.com/addi-11/system-design-excercises | — |
+| Extra | — | Terraform (optional) | — | doc | free | Terraform tutorials | HashiCorp | https://developer.hashicorp.com/terraform/tutorials | — |
+| Extra | — | Terraform (optional) | — | video | free | Terraform explained in 15 mins | TechWorld with Nana | https://www.youtube.com/watch?v=l5k1ai_GBDE | 18 |
 | 12 | Thu | Robinhood (option) | robinhood | video | free | What really happens when you buy a stock? | ByteMonk | https://www.youtube.com/watch?v=4wvIU0O1xro | 7 |
 | 12 | Thu | Robinhood (option) | robinhood | doc | premium | Robinhood | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/robinhood | — |
 | 12 | Thu | Robinhood (option) | robinhood | doc | free | Low-latency stock exchange | ByteByteGo | https://bytebytego.com/guides/guides/low-latency-stock-exchange/ | — |
@@ -1488,6 +1820,7 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 12 | Thu | Robinhood (option) | robinhood | video | free | Design Robinhood: System Design Interview | interviewing.io | https://www.youtube.com/watch?v=q3H4pHuMBBM | 65 |
 | 12 | Thu | Robinhood (option) | robinhood | video | free | Inside a real high-frequency trading system | ByteMonk | https://www.youtube.com/watch?v=iwRaNYa8yTw | 11 |
 | 12 | Thu | Maths: geohash precision | — | video | free | Geohash: deep intuitive understanding in under 7 minutes | Jim O'Flaherty | https://www.youtube.com/watch?v=UaMzra18TD8 | 7 |
+| 12 | Fri | Paper: MyRocks | — | video | free | MyRocks at Facebook and a Roadmap | Percona | https://www.youtube.com/watch?v=Hd-sT7DmzKM | 12 |
 | 12 | Sat | Uber | uber | doc | free | Design a ride-sharing service like Uber | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/uber | — |
 | 12 | Sat | Uber | uber | video | free | Design Uber | Hello Interview | https://www.youtube.com/watch?v=lsKU38RKQSo | 63 |
 | 12 | Sat | Uber | uber | video | free | Uber system design: WebSockets and event-driven architecture | ByteMonk | https://www.youtube.com/watch?v=2WYjtfRyHzQ | 19 |

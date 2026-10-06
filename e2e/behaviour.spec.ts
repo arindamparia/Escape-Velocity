@@ -7,7 +7,7 @@ test.describe('first run', () => {
     await openApp(page, '/')
     const welcome = page.getByRole('dialog', { name: 'Escape Velocity' })
     await expect(welcome).toBeVisible()
-    await expect(welcome.getByText('13 weeks. 37 designs. One jump.')).toBeVisible()
+    await expect(welcome.getByText('13 weeks. 42 designs. One jump.')).toBeVisible()
     await expect(welcome.getByLabel('Your why')).toBeVisible()
     await welcome.getByLabel('Your why').fill('Because I want to explain trade-offs out loud.')
     await welcome.getByRole('group', { name: 'Theme' }).getByRole('button', { name: /Light/ }).click()

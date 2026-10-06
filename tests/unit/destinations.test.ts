@@ -54,7 +54,7 @@ describe('where each kind of row goes', () => {
   it('lists every internal destination, with a week for every task', () => {
     const all = allInternalUrls({ search: searchList, termIds: GLOSSARY.flatMap((g) => g.terms.map((t) => t.id)), companies: lib.companies.map((c) => c.company), hasMachine: lib.machineCoding.length > 0 })
     expect(all.filter((u) => /^\/weeks\/\d+$/.test(u))).toHaveLength(13)
-    expect(all.filter((u) => /^\/weeks\/\d+#w\d\d-\d\d$/.test(u))).toHaveLength(163)
+    expect(all.filter((u) => /^\/weeks\/\d+#w\d\d-\d\d$/.test(u))).toHaveLength(192)
     expect(all.length).toBeGreaterThan(280)
     expect(new Set(all).size).toBe(all.length)
   })

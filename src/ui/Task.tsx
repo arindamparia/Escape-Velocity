@@ -12,14 +12,18 @@ import { PRESETS, startTimer } from '../tools/timer'
 export const TYPE_LABEL: Record<TaskType, string> = {
   dsa: 'DSA', boss: 'Boss problem', concept: 'Concept', infra: 'Infra', design: 'System design', design2: 'Second design', lld: 'Machine coding',
   maths: 'Maths', capstone: 'Capstone', redraw: 'Redraw', read: 'Reading', mock: 'Mock interview', story: 'Story', career: 'Career',
-  mindset: 'Mindset', review: 'Sunday review', rest: 'Rest', ai: 'AI practice', ready: 'Ready check',
+  mindset: 'Mindset', review: 'Sunday review', rest: 'Rest', ai: 'AI practice', ready: 'Ready check', paper: 'Paper',
 }
 
 /** Task type to the entry in the guide's glossary that explains it. */
 const TYPE_TERM: Partial<Record<TaskType, string>> = {
   dsa: 'dsa', boss: 'boss-problem', infra: 'infra', design: 'learning-loop', design2: 'learning-loop', lld: 'machine-coding',
-  maths: 'derivation', capstone: 'capstone', redraw: 'redraw', mock: 'mock-interview', story: 'star-story', ready: 'readiness',
+  maths: 'derivation', capstone: 'capstone', redraw: 'redraw', mock: 'mock-interview', story: 'star-story', ready: 'readiness', paper: 'paper-track',
 }
+
+/** A bonus equation is a maths task with its own name and its own glossary entry. */
+export const labelOf = (t: PlanTask): string => (t.eq ? 'Bonus equation' : TYPE_LABEL[t.type])
+const termOf = (t: PlanTask): string | undefined => (t.eq ? 'bonus-equation' : TYPE_TERM[t.type])
 
 export interface TaskAction { label: string; primary?: boolean; run: () => void }
 
@@ -63,6 +67,11 @@ export function actionsFor(task: PlanTask, chunk: WeekChunk | null): TaskAction[
       return [{ label: `Start ${PRESETS.lld}-min timer`, primary: true, run: () => startTimer('lld', PRESETS.lld, { refId: id }) }]
     case 'maths':
       return [{ label: 'Open equation card', primary: true, run: () => openOverlay({ kind: 'equation', taskId: id }) }]
+    case 'paper':
+      return [
+        { label: 'Open the paper page', primary: true, run: () => navigate(`/library?tab=papers#${id}`) },
+        { label: `Start ${PRESETS.paper}-min timer`, run: () => startTimer('paper', PRESETS.paper, { refId: id }) },
+      ]
     case 'redraw':
       return [{ label: 'Open redraw queue', primary: true, run: () => navigate('/study/redraws') }]
     case 'capstone':
@@ -123,7 +132,8 @@ export function TaskRow({ task, chunk, focused = false, actions = true, inWeek =
       <TaskCheck task={task} />
       <div>
         <div class="task__meta">
-          {TYPE_TERM[task.type] ? <a class="chip" href={`/guide#${TYPE_TERM[task.type]}`} title="What is this?">{TYPE_LABEL[task.type]}</a> : <span class="chip">{TYPE_LABEL[task.type]}</span>}
+          {termOf(task) ? <a class="chip" href={`/guide#${termOf(task)}`} title="What is this?">{labelOf(task)}</a> : <span class="chip">{labelOf(task)}</span>}
+          {task.optional ? <span class="chip" title="An extra: skip it freely. It never counts against the day or the week.">optional</span> : null}
           {task.company ? <span class="chip chip--accent">asked at {task.company}</span> : null}
           {inWeek && task.week ? <a class="small" href={`/weeks/${task.week}#${task.id}`} title="See this task in its week">{taskLabel(task.id)}</a> : <span class="muted small">{taskLabel(task.id)}</span>}
           <span class="task__pts" title="points">+{task.points}</span>

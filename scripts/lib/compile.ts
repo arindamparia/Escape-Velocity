@@ -3,10 +3,11 @@
 import katex from 'katex'
 import { Marked } from 'marked'
 import { parse as parseYaml } from 'yaml'
+import { SKETCH_IDS, type SketchId } from '../../shared/sketches'
 import { addDays, dayNum, formatRange, isRealDate, weekEnd, weekStart } from '../../src/lib/dates'
 import {
   DAYS, SURFACES, TASK_TYPES,
-  type DesignAccess, type DesignFull, type DesignRef, type LightDay, type PageChunks, type PlanConfig,
+  type DesignAccess, type DesignFull, type DesignRef, type EquationRow, type GapStatus, type LightDay, type PageChunks, type PaperRow, type PlanConfig,
   type PlanCore, type PlanDay, type PlanTask, type PlanWeek, type ResourceAccess, type ResourceKind, type ResourceRow, type SearchEntry, type Surface,
   type TaskType, type WeekChunk,
 } from '../../shared/plan-types'
@@ -74,8 +75,8 @@ const MATH_RULES: MathRule[] = [
   [/\b(\d+(?:\.\d+)?)\^(\d+)\b/g, (m) => `${m[1]}^{${m[2]}}`],
 ]
 
-function renderMath(tex: string): string {
-  const html = katex.renderToString(tex, { output: 'mathml', throwOnError: true, displayMode: false })
+function renderMath(tex: string, displayMode = false): string {
+  const html = katex.renderToString(tex, { output: 'mathml', throwOnError: true, displayMode })
   // The TeX source annotation is dead weight on the client; the MathML itself is what the browser draws.
   return html.replace(/<annotation[^>]*>[\s\S]*?<\/annotation>/g, '').replace(/<\/?semantics>/g, '')
 }
@@ -109,6 +110,14 @@ function renderBlock(src: string, math = false): string {
   if (!math) return (md.parse(src, { async: false }) as string).trim()
   const { text, tokens } = extractMath(src)
   return restoreMath(md.parse(text, { async: false }) as string, tokens).trim()
+}
+
+/** "w04-13" in a table cell becomes a link to that task, labelled "Week 4 · Task 13": a task id is a key, never shown. */
+function linkTaskIds(src: string, known: Set<string>, errors: string[], at: string): string {
+  return src.replace(/\bw(\d{2})-(\d{2})\b/g, (id, w, n) => {
+    if (!known.has(id)) { errors.push(`${at}: mentions task ${id}, which is not in the plan`); return id }
+    return `[Week ${Number(w)} · Task ${Number(n)}](/weeks/${Number(w)}#${id})`
+  })
 }
 
 // ---------------------------------------------------------------- tables
@@ -280,7 +289,10 @@ function buildSections(lines: { text: string; line: number }[], errors: string[]
 
 // ---------------------------------------------------------------- main
 
-interface ParsedTask extends PlanTask { text: string; line: number }
+interface ParsedTask extends PlanTask { text: string; line: number; check?: string }
+
+/** A derive-first maths task: "question ‖ check: the answer". The answer is kept apart so the site can hide it until you try. */
+const CHECK_SPLIT = ' ‖ check: '
 
 function bodyLines(s: RawSection): string[] {
   return s.body.map((b) => b.text)
@@ -364,7 +376,12 @@ export function compilePlan(source: string): CompileOutput {
         continue
       }
       taken.add(b.line)
-      const [, , id, type, points, day, text] = m
+      const [, , id, type, points, day, rawText] = m
+      const cut = type === 'maths' ? rawText.indexOf(CHECK_SPLIT) : -1
+      const text = cut === -1 ? rawText : rawText.slice(0, cut)
+      const check = cut === -1 ? undefined : rawText.slice(cut + CHECK_SPLIT.length).trim()
+      if (check === '') errors.push(`Line ${b.line}: ${id} has "‖ check:" with nothing after it`)
+      if (type !== 'maths' && rawText.includes('‖')) errors.push(`Line ${b.line}: ${id}: "‖ check:" is only for maths tasks`)
       if (!(TASK_TYPES as readonly string[]).includes(type)) errors.push(`Line ${b.line}: unknown task type "${type}" on ${id}`)
       const idWeek = id.startsWith('w') ? Number(id.slice(1, 3)) : null
       if (s.surface === 'weeks.tasks') {
@@ -377,7 +394,7 @@ export function compilePlan(source: string): CompileOutput {
         errors.push(`Line ${b.line}: task ${id} is in "${s.heading}", which is not a tasks section`)
       }
       tasks.push({
-        id, week: idWeek, type: type as TaskType, points: Number(points), day: day as PlanDay, text, line: b.line,
+        id, week: idWeek, type: type as TaskType, points: Number(points), day: day as PlanDay, text, line: b.line, ...(check ? { check } : {}),
       })
     }
   }
@@ -429,6 +446,8 @@ export function compilePlan(source: string): CompileOutput {
     seenDesign.add(d.id)
   }
   if (designs.length === 0) errors.push('The design library is empty')
+  const taglineCount = /(\d+) designs/.exec(config.tagline)
+  if (taglineCount && Number(taglineCount[1]) !== designs.length) errors.push(`The tagline says ${taglineCount[1]} designs but the library has ${designs.length}`)
   const designByLink = new Map(designs.filter((d) => d.link).map((d) => [d.link.replace(/\/$/, ''), d]))
   const derivedDesigns = designs.filter((d) => d.access === 'derive')
   const aliasOf = (d: DesignFull) => d.name.replace(/\s*\(.*?\)\s*/g, '').toLowerCase()
@@ -437,6 +456,114 @@ export function compilePlan(source: string): CompileOutput {
   const mcSection = sections.find((s) => s.surface === 'library.machine-coding' && s.level === 2)
   const mcTable = tableOf(mcSection, errors, 'machine coding', ['Problem', 'Company', 'Week'])
   const machineCoding = (mcTable?.rows ?? []).map((r) => ({ problem: r['Problem'], company: r['Company'], week: r['Week'] }))
+
+  // ---- equation bank: a bonus equation is carried by one maths task; a shelf equation has no task and is ticked under its own id
+  const taskIds = new Set(tasks.map((t) => t.id))
+  const equations: EquationRow[] = []
+  for (const s of sections.filter((x) => x.surface === 'library.equations' && x.level === 3)) {
+    const kind: 'bonus' | 'shelf' = /shelf/i.test(s.heading) ? 'shelf' : 'bonus'
+    const wk = kind === 'shelf' ? 'Best wk' : 'Wk'
+    const t = tableOf(s, errors, `equation bank (${s.heading})`, ['ID', wk, 'Name', 'Equation', 'Setup and what to derive', 'Check (derive first)', 'Tied to', ...(kind === 'bonus' ? ['Task'] : [])])
+    for (const r of t?.rows ?? []) {
+      const at = `Equation ${r['ID']}`
+      if (!/^eq-\d{2}$/.test(r['ID'])) errors.push(`${at}: the ID must look like eq-07`)
+      const week = Number(r[wk])
+      if (!Number.isInteger(week) || week < 1 || week > 13) errors.push(`${at}: ${wk} must be a week from 1 to 13`)
+      const tex = /^\$(.+)\$$/.exec(r['Equation'])
+      let formulaHtml = ''
+      if (!tex) errors.push(`${at}: the Equation cell must be TeX between dollar signs, like $L = \\lambda W$`)
+      else {
+        try { formulaHtml = renderMath(tex[1], true) } catch (e) { errors.push(`${at}: the formula does not convert to MathML: ${(e as Error).message.split('\n')[0]}`) }
+      }
+      if (!r['Name'] || !r['Setup and what to derive'] || !r['Check (derive first)']) errors.push(`${at}: Name, setup and check must all be filled in`)
+      equations.push({
+        id: r['ID'], kind, week, name: r['Name'], formulaHtml,
+        setupHtml: renderInline(linkTaskIds(r['Setup and what to derive'], taskIds, errors, at), true),
+        checkHtml: renderInline(r['Check (derive first)'], true),
+        tiedTo: renderInline(linkTaskIds(r['Tied to'], taskIds, errors, at)),
+        ...(kind === 'bonus' ? { taskId: r['Task'] } : {}),
+      })
+    }
+  }
+  {
+    const seenEq = new Set<string>(), seenCarrier = new Set<string>()
+    for (const e of equations) {
+      if (seenEq.has(e.id)) errors.push(`Equation bank: duplicate ID ${e.id}`)
+      seenEq.add(e.id)
+      if (e.kind !== 'bonus') continue
+      const carrier = tasks.find((x) => x.id === e.taskId)
+      if (!carrier) errors.push(`Equation ${e.id}: its task ${e.taskId} is not in the plan`)
+      else if (carrier.type !== 'maths') errors.push(`Equation ${e.id}: its task ${e.taskId} must be a maths task`)
+      else if (carrier.week !== e.week) errors.push(`Equation ${e.id}: task ${e.taskId} is in week ${carrier.week}, not week ${e.week}`)
+      if (e.taskId && seenCarrier.has(e.taskId)) errors.push(`Equation ${e.id}: task ${e.taskId} already carries another equation`)
+      if (e.taskId) seenCarrier.add(e.taskId)
+    }
+  }
+  const equationOfTask = new Map(equations.filter((e) => e.taskId).map((e) => [e.taskId!, e]))
+
+  // ---- papers: the schedule table, one row per paper task (a row without a task is on the shelf)
+  const paperRoot = sections.find((s) => s.surface === 'library.papers' && s.level === 2)
+  const paperKids = sections.filter((s) => s.surface === 'library.papers' && s.level === 3)
+  const paperKid = (re: RegExp) => paperKids.find((s) => re.test(s.heading))
+  const paperTable = tableOf(paperKid(/^The schedule/), errors, 'paper schedule', ['Task', 'Wk', 'Paper', 'Link', 'Length', 'Why this week', 'The number to find', 'Anchor'])
+  const altTable = tableOf(paperKid(/^Alternates/), errors, 'paper alternates', ['Instead of', 'Try', 'Because'])
+  if (!paperRoot) errors.push('Missing the papers section (surface library.papers)')
+  const paperRows: PaperRow[] = []
+  for (const r of paperTable?.rows ?? []) {
+    const at = `Paper "${r['Paper']}"`
+    const taskId = r['Task'] === '—' ? '' : r['Task']
+    const week = Number(r['Wk'])
+    if (!Number.isInteger(week) || week < 1 || week > 13) errors.push(`${at}: Wk must be a week from 1 to 13`)
+    if (taskId) {
+      const t = tasks.find((x) => x.id === taskId)
+      if (!t) errors.push(`${at}: its task ${taskId} is not in the plan`)
+      else if (t.type !== 'paper') errors.push(`${at}: its task ${taskId} must be a paper task`)
+      else if (t.week !== week) errors.push(`${at}: task ${taskId} is in week ${t.week}, not week ${week}`)
+    }
+    if (!/^https:\/\/\S+$/.test(r['Link'])) errors.push(`${at}: the link is not an https URL`)
+    if (!['★', ''].includes(r['Anchor'])) errors.push(`${at}: Anchor must be ★ or empty`)
+    paperRows.push({ taskId, week, title: r['Paper'], url: r['Link'], length: r['Length'], whyHtml: renderInline(linkTaskIds(r['Why this week'], taskIds, errors, at)), findHtml: renderInline(r['The number to find'], true), anchor: r['Anchor'] === '★' })
+  }
+  for (const t of tasks.filter((x) => x.type === 'paper')) {
+    const n = paperRows.filter((p) => p.taskId === t.id).length
+    if (n !== 1) errors.push(`Line ${t.line}: paper task ${t.id} needs exactly one row in the paper schedule (found ${n})`)
+  }
+  const paperAlternates = (altTable?.rows ?? []).map((r) => ({ instead: r['Instead of'], paper: r['Try'], because: r['Because'] }))
+
+  // ---- gap check: the ten gaps, and the plan set against the two Arpit Bhayani syllabi
+  const gapRoot = sections.find((s) => s.surface === 'library.gaps' && s.level === 2)
+  const gapKids = sections.filter((s) => s.surface === 'library.gaps' && s.level === 3)
+  if (!gapRoot) errors.push('Missing the gap check section (surface library.gaps)')
+  const gapTable = tableOf(gapKids.find((s) => /^The ten gaps/.test(s.heading)), errors, 'the ten gaps', ['ID', 'Gap', 'Task', 'Sketch', 'Why it matters', 'Derive it', 'Free sources'])
+  const designIdSet = new Set(designs.map((d) => d.id))
+  const gaps = (gapTable?.rows ?? []).map((r) => {
+    const at = `Gap ${r['ID']}`
+    if (!/^G\d+$/.test(r['ID'])) errors.push(`${at}: the ID must look like G4`)
+    const t = tasks.find((x) => x.id === r['Task'])
+    if (!t) errors.push(`${at}: its task ${r['Task']} is not in the plan`)
+    else if (t.type !== 'concept' && t.type !== 'infra') errors.push(`${at}: its task ${r['Task']} must be a concept or infra task`)
+    if (!(SKETCH_IDS as readonly string[]).includes(r['Sketch'])) errors.push(`${at}: sketch "${r['Sketch']}" is not one of ${SKETCH_IDS.join(', ')}`)
+    return { id: r['ID'], title: r['Gap'], taskId: r['Task'], sketch: r['Sketch'] as SketchId, whyHtml: renderInline(r['Why it matters']), deriveHtml: renderInline(r['Derive it']), sourcesHtml: renderInline(r['Free sources']) }
+  })
+  const gapIds = new Set(gaps.map((g) => g.id))
+  const coverage = gapKids.filter((s) => /syllabus/i.test(s.heading)).map((s) => {
+    const t = tableOf(s, errors, `coverage (${s.heading})`, ['His topic', 'Your plan', 'Status'])
+    const rows = (t?.rows ?? []).map((r) => {
+      const at = `${s.heading}: "${r['His topic']}"`
+      const cell = r['Status']
+      const status: GapStatus | null = /^Covered/i.test(cell) ? 'covered' : /^\**Partial gap/i.test(cell) ? 'partial' : /^\**Gap/i.test(cell) ? 'gap' : /^Skip/i.test(cell) ? 'skip' : null
+      if (!status) errors.push(`${at}: Status must start with Covered, Partial gap, Gap or Skip`)
+      const refs = [...cell.matchAll(/\bG\d+\b|`([a-z0-9-]+)`/g)].map((m) => m[1] ?? m[0])
+      for (const ref of refs) if (!gapIds.has(ref) && !designIdSet.has(ref)) errors.push(`${at}: "${ref}" is neither a gap nor a design in the library`)
+      if ((status === 'gap' || status === 'partial') && refs.length === 0) errors.push(`${at}: a gap must say where it is closed (a gap like G4, or a design in backticks)`)
+      return {
+        topic: r['His topic'], planHtml: renderInline(linkTaskIds(r['Your plan'], taskIds, errors, at)), status: status ?? 'covered', goTo: refs[0] ?? '',
+        statusHtml: renderInline(cell.replace(/`([a-z0-9-]+)`/g, (_, id) => (designIdSet.has(id) ? `[${designs.find((d) => d.id === id)!.name}](/library?design=${id})` : id)).replace(/\b(G\d+)\b/g, (id) => (gapIds.has(id) ? `[${id}](/library?tab=gaps#${id})` : id))),
+      }
+    })
+    return { title: s.heading, rows }
+  })
+  if (coverage.length < 2) errors.push('The gap check needs two coverage tables (headings that contain "syllabus")')
 
   // ---- tasks: designs, companies, why
   const parsed: PlanTask[] = []
@@ -461,6 +588,10 @@ export function compilePlan(source: string): CompileOutput {
       if (row) out.company = row.company
     }
     if (t.type === 'dsa') out.solve = dsaSolve(t.day, t.text)
+    if (equationOfTask.has(t.id)) out.eq = equationOfTask.get(t.id)!.id
+    if (t.type === 'paper' || equationOfTask.has(t.id)) out.optional = true
+    const gap = gaps.find((g) => g.taskId === t.id)
+    if (gap) out.sketch = gap.sketch
     if (t.type === 'concept' || t.type === 'infra') {
       const wm = /Why:\s*(.+)$/.exec(t.text)
       if (wm) {
@@ -526,13 +657,19 @@ export function compilePlan(source: string): CompileOutput {
     const key = String(n).padStart(2, '0')
     const chunk: WeekChunk = {
       n, introHtml: sectionHtml(s), dsaFocus: dsaFocus.get(n) ?? '',
-      reported: n >= reportedFrom && n <= reportedTo ? reported : [], tasks: {}, math: {}, designs: {}, resources: {},
+      reported: n >= reportedFrom && n <= reportedTo ? reported : [], tasks: {}, math: {}, checks: {}, designs: {}, resources: {},
     }
     for (const t of tasks.filter((x) => x.week === n)) {
       const isMaths = t.type === 'maths'
       const html = renderInline(t.text, isMaths)
       chunk.tasks[t.id] = { html, text: plain(t.text), ...(whyByTask.has(t.id) ? { why: whyByTask.get(t.id) } : {}) }
-      if (isMaths) chunk.math[t.id] = html
+      if (isMaths) {
+        const eq = equationOfTask.get(t.id)
+        // a bonus equation shows its formula and setup (never its check); a weekly derivation shows the question
+        chunk.math[t.id] = eq ? `${eq.formulaHtml}<p>${eq.setupHtml}</p>` : html
+        const check = eq ? eq.checkHtml : t.check ? renderInline(t.check, true) : ''
+        if (check) chunk.checks[t.id] = check
+      }
       const pt = parsed.find((p) => p.id === t.id)!
       for (const did of pt.designs ?? []) {
         const d = designs.find((x) => x.id === did)!
@@ -561,6 +698,7 @@ export function compilePlan(source: string): CompileOutput {
     tasks: parsed,
     designs: designs.map((d) => ({ id: d.id, name: d.name, access: d.access, week: d.week })),
     flashcardIds,
+    shelfIds: equations.filter((e) => e.kind === 'shelf').map((e) => e.id),
     counts: {
       tasks: parsed.length,
       weeklyTasks: parsed.filter((t) => t.week !== null).length,
@@ -595,9 +733,15 @@ export function compilePlan(source: string): CompileOutput {
   if (forces.length !== 6) errors.push(`The six forces must have 6 items, found ${forces.length}`)
 
   const mathsTasks = tasks.filter((t) => t.type === 'maths')
-  const formulas = mathsTasks.map((t) => ({
-    taskId: t.id, week: t.week!, html: weekChunks[String(t.week).padStart(2, '0')].math[t.id],
-  }))
+  const formulas = mathsTasks.map((t) => {
+    const chunk = weekChunks[String(t.week).padStart(2, '0')]
+    const eq = equationOfTask.get(t.id)
+    return {
+      taskId: t.id, week: t.week!, html: chunk.math[t.id],
+      ...(chunk.checks[t.id] ? { check: chunk.checks[t.id] } : {}),
+      ...(eq ? { bonus: true, name: eq.name } : {}),
+    }
+  })
 
   const flashcards = parsed.filter((t) => t.hasWhy).map((t) => {
     const raw = tasks.find((x) => x.id === t.id)!
@@ -650,7 +794,7 @@ export function compilePlan(source: string): CompileOutput {
   const studyRoot = studyTree[0]
   const resourceRows: ResourceRow[] = []
   const resTable = tableOf(studyTree.find((x) => x.heading === 'Resources by week'), errors, 'resources by week', ['Week', 'Day', 'Topic', 'Design ID', 'Kind', 'Access', 'Title', 'Source', 'Link'])
-  const TOPIC_TYPE: Record<string, TaskType> = { Maths: 'maths', Capstone: 'capstone', Mock: 'mock', Mocks: 'mock', Story: 'story', DSA: 'dsa' }
+  const TOPIC_TYPE: Record<string, TaskType> = { Maths: 'maths', Capstone: 'capstone', Mock: 'mock', Mocks: 'mock', Story: 'story', DSA: 'dsa', Paper: 'paper' }
   const channelTable = tableOf(studyTree.find((x) => /^Free channels/.test(x.heading)), errors, 'free channels', ['Channel', 'Use for', 'Weeks', 'Start with'])
   const designIds = new Set(designs.map((d) => d.id))
   const ACCESS_ORDER: ResourceAccess[] = ['free', 'partial', 'premium']
@@ -702,6 +846,13 @@ export function compilePlan(source: string): CompileOutput {
       const chunk = weekChunks[String(w).padStart(2, '0')]
       ;(chunk.resources[t.id] ??= []).push(out)
     }
+  }
+  // each paper on the schedule is a free doc on its Friday task (and in the study links); a video explainer comes from the resources table
+  for (const p of paperRows.filter((x) => x.taskId)) {
+    const t = parsed.find((x) => x.id === p.taskId)!
+    const out: ResourceRow = { week: String(p.week), day: t.day, topic: `Paper: ${p.title}`, kind: 'doc', access: 'free', title: p.title, source: 'The paper', url: p.url }
+    resourceRows.push(out)
+    ;(weekChunks[String(p.week).padStart(2, '0')].resources[p.taskId] ??= []).push(out)
   }
   // free before partial before premium; inside each, videos first (they are how this plan is best learned), then docs, then code
   const KIND_ORDER: ResourceKind[] = ['video', 'doc', 'repo']
@@ -765,6 +916,7 @@ export function compilePlan(source: string): CompileOutput {
       forces,
       formulasIntroHtml: htmlOf('study.formulas', true),
       formulas,
+      shelf: equations.filter((e) => e.kind === 'shelf').sort((a, b) => a.id.localeCompare(b.id)),
       flashcards,
     },
     library: {
@@ -782,6 +934,21 @@ export function compilePlan(source: string): CompileOutput {
       studyRuleHtml,
       resources: resourceRows,
       channels,
+      papers: {
+        introHtml: paperRoot ? sectionHtml(paperRoot) : '',
+        methodHtml: paperKid(/^How to read/) ? sectionHtml(paperKid(/^How to read/)!) : '',
+        schedule: paperRows.filter((p) => p.taskId).sort((a, b) => a.week - b.week),
+        shelf: paperRows.filter((p) => !p.taskId).sort((a, b) => a.week - b.week),
+        alternates: paperAlternates,
+        noteHtml: paperKid(/^One honest/) ? sectionHtml(paperKid(/^One honest/)!) : '',
+      },
+      gaps: {
+        introHtml: gapRoot ? sectionHtml(gapRoot) : '',
+        gaps,
+        coverage,
+        missingHtml: gapKids.find((s) => /^What you are still missing/.test(s.heading)) ? sectionHtml(gapKids.find((s) => /^What you are still missing/.test(s.heading))!) : '',
+        coursesHtml: gapKids.find((s) => /^Should you buy/.test(s.heading)) ? sectionHtml(gapKids.find((s) => /^Should you buy/.test(s.heading))!) : '',
+      },
     },
     progress: {
       pointsHtml: sectionHtml(pointsSection),

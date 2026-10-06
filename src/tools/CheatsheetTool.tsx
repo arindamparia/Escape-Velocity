@@ -10,6 +10,8 @@ export function CheatsheetTool() {
     .map((c) => ({ c, body: (notes.find((n) => n.kind === 'why' && n.refId === c.id)?.body ?? '').trim() }))
     .filter((r) => r.body)
   const missing = study.flashcards.length - rows.length
+  // one A4 page holds about 7,000 characters of notes (the questions take the rest), so the more notes there are, the shorter each is cut (420 at most)
+  const cut = Math.min(420, Math.floor(7000 / Math.max(1, rows.length)))
   return (
     <div class="stack">
       <div class="row row--between noprint">
@@ -22,7 +24,7 @@ export function CheatsheetTool() {
         {rows.map(({ c, body }) => (
           <section key={c.id} class="cheatsheet__item">
             <h2>{c.front}</h2>
-            <p>{body.length > 420 ? `${body.slice(0, 417)}…` : body}</p>
+            <p>{body.length > cut ? `${body.slice(0, cut - 3)}…` : body}</p>
           </section>
         ))}
       </article>

@@ -9,7 +9,7 @@ export interface RagChunk {
   id: string
   /** the palette entry this opens */
   entry: string
-  kind: 'week' | 'task' | 'design' | 'term' | 'link' | 'problem' | 'company' | 'rule' | 'help' | 'project' | 'ready'
+  kind: 'week' | 'task' | 'design' | 'term' | 'link' | 'problem' | 'company' | 'rule' | 'help' | 'project' | 'ready' | 'paper' | 'equation' | 'gap'
   title: string
   text: string
 }
@@ -60,6 +60,33 @@ export function buildChunks(out: CompileOutput): RagChunk[] {
         text: clip(`${d.name} (${g.title}; week ${d.week}; ${d.access}). Teaches: ${d.teaches} Derive it first: ${d.derive}`, 600),
       })
     }
+  }
+
+  // papers, equations and gaps: scheduled ones belong to their task (that is where you act), the rest to their part of a page
+  const lib = out.pages.library
+  for (const p of [...lib.papers.schedule, ...lib.papers.shelf]) {
+    chunks.push({
+      id: `paper:${p.taskId || p.title}`, entry: p.taskId ? `task:${p.taskId}` : 'section:papers-shelf', kind: 'paper', title: `Paper: ${p.title}`,
+      text: clip(`Paper: ${p.title} (${p.length}). ${p.taskId ? `Read in week ${p.week}${p.anchor ? ', a starred paper with a third pass' : ''}.` : `On the shelf, fits week ${p.week}.`} Why: ${plain(p.whyHtml)} The number to find: ${plain(p.findHtml)}`, 700),
+    })
+  }
+  for (const f of out.pages.study.formulas.filter((x) => x.bonus)) {
+    chunks.push({ id: `equation:${f.taskId}`, entry: `task:${f.taskId}`, kind: 'equation', title: `Bonus equation: ${f.name}`, text: clip(`Bonus equation, week ${f.week}: ${f.name}. ${plain(f.html)}`, 500) })
+  }
+  for (const e of out.pages.study.shelf) {
+    chunks.push({ id: `equation:${e.id}`, entry: 'section:equation-shelf', kind: 'equation', title: `Shelf equation: ${e.name}`, text: clip(`Shelf equation, best in week ${e.week}: ${e.name}. ${plain(e.setupHtml)} Tied to ${plain(e.tiedTo)}`, 500) })
+  }
+  for (const g of lib.gaps.gaps) {
+    chunks.push({
+      id: `gap:${g.id}`, entry: `task:${g.taskId}`, kind: 'gap', title: `${g.id}: ${g.title}`,
+      text: clip(`Gap ${g.id}, ${g.title}. Why it matters: ${plain(g.whyHtml)} Derive it: ${plain(g.deriveHtml)} Free sources: ${plain(g.sourcesHtml)}`, 700),
+    })
+  }
+  chunks.push({ id: 'gap:intro', entry: 'section:gap-ten', kind: 'gap', title: 'Gap check', text: clip(plain(lib.gaps.introHtml), 700) })
+  chunks.push({ id: 'gap:missing', entry: 'section:gap-missing', kind: 'gap', title: 'What you are still missing', text: clip(plain(lib.gaps.missingHtml), 700) })
+  chunks.push({ id: 'gap:courses', entry: 'section:gap-courses', kind: 'gap', title: 'Should you buy a course?', text: clip(plain(lib.gaps.coursesHtml), 700) })
+  for (const c of lib.gaps.coverage) {
+    chunks.push({ id: `gap:coverage:${c.title}`, entry: 'section:gap-coverage', kind: 'gap', title: c.title, text: clip(`${c.title}: ${c.rows.map((r) => `${r.topic} (${r.status})`).join('; ')}`, 900) })
   }
 
   for (const t of GLOSSARY.flatMap((g) => g.terms.map((x) => ({ ...x, group: g.title })))) {

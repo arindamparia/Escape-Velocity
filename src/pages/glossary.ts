@@ -52,6 +52,23 @@ export const GLOSSARY: TermGroup[] = [
     ],
   },
   {
+    title: 'Extras and gaps',
+    blurb: 'Optional work, and the concepts the plan added.',
+    terms: [
+      { id: 'paper-track', term: 'Paper', what: 'One research paper a week from week 4, on Friday night: 45 minutes, three passes, one decision card. It is optional and the first thing dropped. A starred paper gets a third pass (redraw it, explain it out loud).' },
+      { id: 'bonus-equation', term: 'Bonus equation', what: 'A 15-minute extra derivation (+1) tied to what you are doing that week. Skippable, and there are none in the light weeks. The answer stays hidden until you have tried.' },
+      { id: 'shelf', term: 'The shelf', what: 'Equations and papers with no task and no points, each with the week it fits best. Use one on a day you want a win.' },
+      { id: 'gap-concept', term: 'Gap concept', what: 'One of ten distributed-systems ideas the plan was missing, such as circuit breakers or leader election. Each is a night task that ends in a why-question, with a sketch to compare your answer with afterwards.' },
+      { id: 'sketch', term: 'Sketch', what: 'A small diagram of a gap concept. It stays closed until you have written your own answer, because comparing beats copying.' },
+      { id: 'rpo-rto', term: 'RPO and RTO', what: 'How much recent data you can lose after a failure (recovery point), and how long you can be down (recovery time). A ledger and an order table need different numbers.' },
+      { id: 'fencing-token', term: 'Fencing token', what: 'A number that only goes up, handed out with a lock or a lease. Storage refuses anything lower than the highest it has seen, so a paused old leader cannot overwrite a newer one.' },
+      { id: 'write-skew', term: 'Write skew', what: 'Two transactions read the same data, each change a different row, and together they break a rule that spans both rows. Snapshot isolation allows it; serializable does not.' },
+      { id: 'circuit-breaker', term: 'Circuit breaker', what: 'A switch that stops calling a failing service so callers fail fast instead of piling up. It opens after too many failures, then probes with a few calls before closing.' },
+      { id: 'lsm-tree', term: 'LSM tree', what: 'A storage layout built on one rule: writes are sequential. Writes go to a log and a sorted memory table, then to sorted files that are merged later (compaction). It favours writes and pays on reads.' },
+      { id: 'shuffle-sharding', term: 'Shuffle sharding', what: 'Give each customer a small random subset of the workers, so one customer’s overload harms only the few others who share all of them.' },
+    ],
+  },
+  {
     title: 'The capstone project',
     blurb: 'Words you will meet while building it.',
     terms: [

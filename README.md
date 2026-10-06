@@ -68,6 +68,10 @@ shared/      types and zod schemas             tests/       unit/ and worker/ (V
 src/         the app (lib, pages, tools, ui)   e2e/         Playwright specs
 ```
 
+## Papers, equations and the gap check
+
+The plan (Part 5) has a paper track, an equation bank and a gap check, blended in from `escape-velocity-gap-patch.md` (see the last section of `AUDIT.md` for what was changed and why). In the app: Library, Papers and Gap check; Study, Formula sheet (bonus equations and a shelf). Papers and bonus equations are optional extras. A derivation hides its answer until you have tried (`question ‖ check: answer` in the plan). Ten gap-concept sketches are drawn in `src/ui/Sketches.tsx`. After changing the plan, run `npm run compile`, then rebuild the AI index (`scripts/index-pinecone.ts`) so semantic search knows the new content.
+
 ## AI search (Ask in the search box)
 
 Type `?` and a question in the search box (⌘K), or press ⌘↵ on any search. The Worker (`worker/ask.ts`) finds the best chunks of your plan, asks OpenAI to answer from them only, checks every id in the reply, and the box shows the answer with its sources as rows. Actions it suggests (change theme, start a timer) are rows you confirm; nothing runs by itself.

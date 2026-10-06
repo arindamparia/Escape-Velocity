@@ -33,6 +33,8 @@ export function tasksOn(week: number, day: PlanDay): PlanTask[] {
 export function weeklyTasks(week: number): PlanTask[] {
   return plan.tasks.filter((t) => t.week === week && t.day === 'Week')
 }
+/** Counts of "n of m done" leave the extras out: skipping one never leaves a day or a week looking unfinished. */
+export const coreTasks = (list: readonly PlanTask[]): PlanTask[] => list.filter((t) => !t.optional)
 
 const morningish = (t: PlanTask) => t.type === 'dsa' || t.type === 'boss'
 
@@ -42,9 +44,10 @@ const morningish = (t: PlanTask) => t.type === 'dsa' || t.type === 'boss'
  */
 export function pickNextUp(week: number, dow: number, block: DayBlock, done: ReadonlySet<string>): PlanTask | undefined {
   const dayName = DOW_NAMES[dow]
-  const todays = tasksOn(week, dayName).filter((t) => !done.has(t.id) && t.type !== 'rest')
+  // An extra (a paper, a bonus equation) is on the list but is never the one next action.
+  const todays = tasksOn(week, dayName).filter((t) => !done.has(t.id) && t.type !== 'rest' && !t.optional)
   // A weekly DSA task ("Morning DSA, Mon to Fri") only leads on weekdays.
-  const weekly = weeklyTasks(week).filter((t) => !done.has(t.id) && t.type !== 'rest' && !(dow >= 5 && t.type === 'dsa'))
+  const weekly = weeklyTasks(week).filter((t) => !done.has(t.id) && t.type !== 'rest' && !t.optional && !(dow >= 5 && t.type === 'dsa'))
   const morningOrder = [...todays.filter(morningish), ...weekly.filter(morningish), ...todays.filter((t) => !morningish(t)), ...weekly.filter((t) => !morningish(t))]
   const nightOrder = [...todays.filter((t) => !morningish(t)), ...weekly.filter((t) => !morningish(t)), ...todays.filter(morningish), ...weekly.filter(morningish)]
   if (block === 'morning') return morningOrder[0]
@@ -105,7 +108,8 @@ export function streakWeeks(activity: ReadonlySet<string>, today: string, startD
 export interface Evidence { mediums: number; hards: number; designsOwned: number; cardsMastered: number; constellations: number }
 
 export function constellationLit(week: number, done: ReadonlySet<string>): boolean {
-  const tasks = plan.tasks.filter((t) => t.week === week && t.points > 0)
+  // a light week lights when everything it asks of you is ticked: the extras never gate the star
+  const tasks = plan.tasks.filter((t) => t.week === week && t.points > 0 && !t.optional)
   const target = weekTarget(week, plan.config)
   if (target === null) return tasks.length > 0 && tasks.every((t) => done.has(t.id))
   return weekPoints(plan.tasks, done, week) >= target

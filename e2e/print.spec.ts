@@ -7,7 +7,7 @@ const pageCount = (pdf: Buffer) => (pdf.toString('latin1').match(/\/Type\s*\/Pag
 
 test('the cheat sheet is one A4 page even when every why-note is written at full length', async ({ page, api }) => {
   await api.onboard()
-  // the longest a note can be on the sheet is 420 characters (it is cut there), for every one of the cards
+  // a note is cut to fit: at most 420 characters, fewer when there are many cards (37 now)
   const body = 'Because the log is the source of truth, and every other view is a projection that can be rebuilt. '.repeat(5).slice(0, 460)
   await api.send(plan.flashcardIds.map((id) => api.op('note.upsert', { id: randomUUID(), kind: 'why', refId: id, body })))
   await openApp(page, '/study/cheatsheet', { theme: 'dark' })

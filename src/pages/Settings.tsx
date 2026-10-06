@@ -105,7 +105,7 @@ export default function Settings() {
           <div><button type="button" class="btn btn--small" onClick={() => openOverlay({ kind: 'shortcuts' })}>All shortcuts</button></div>
         </section>
         <section class="card stack"><h2>About</h2>
-          <p class="small muted" style="margin:0">Escape Velocity: 13 weeks. 37 designs. One jump. Install it from Safari (File, Add to Dock) or Chrome (Install). <a href="/guide">How this works</a> · <a href="/library?tab=resources">Resources and sources</a> · <a href="/mindset">Mindset</a></p>
+          <p class="small muted" style="margin:0">Escape Velocity: 13 weeks. 42 designs. One jump. Install it from Safari (File, Add to Dock) or Chrome (Install). <a href="/guide">How this works</a> · <a href="/library?tab=resources">Resources and sources</a> · <a href="/mindset">Mindset</a></p>
         </section>
       </div>
     </div>

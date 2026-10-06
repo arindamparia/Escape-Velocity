@@ -8,7 +8,7 @@ import { focusId, focusList } from '../lib/focus'
 import { plan } from '../lib/plan'
 import { algotracker } from '../lib/solved'
 import { weekPoints, weekTarget } from '../lib/points'
-import { activityDates, dayInfo, dueSummary, missedDays, pickNextUp, streakWeeks, tasksOn, weeklyTasks } from '../lib/today'
+import { activityDates, coreTasks, dayInfo, dueSummary, missedDays, pickNextUp, streakWeeks, tasksOn, weeklyTasks } from '../lib/today'
 import { navigate } from '../lib/nav'
 import { PRESETS, startTimer } from '../tools/timer'
 import { lazyPage } from '../ui/lazyPage'
@@ -228,7 +228,7 @@ export default function Today() {
         {info.phase === 'during' ? (
           <section aria-label="Today's tasks">
             <div class="row row--between" style="margin-bottom:0.6rem">
-              <h2 style="margin:0">Today’s tasks <span class="muted small" style="font-weight:400">{dayList.filter((t) => done.has(t.id)).length} of {dayList.length} done</span></h2>
+              <h2 style="margin:0">Today’s tasks {coreTasks(dayList).length ? <span class="muted small" style="font-weight:400">{coreTasks(dayList).filter((t) => done.has(t.id)).length} of {coreTasks(dayList).length} done</span> : null}</h2>
               {!light && !welcomeBack ? (
                 <button type="button" class="btn btn--small btn--ghost" onClick={() => openOverlay({ kind: 'log', difficulty: 'medium', minimum: true })}>Bad day? Minimum day</button>
               ) : null}
@@ -244,7 +244,7 @@ export default function Today() {
             )}
             {!welcomeBack && weekly.length ? (
               <details style="margin-top:1rem" open={dayList.length === 0}>
-                <summary>This week, any day ({weekly.filter((t) => done.has(t.id)).length} of {weekly.length} done)</summary>
+                <summary>This week, any day ({coreTasks(weekly).filter((t) => done.has(t.id)).length} of {coreTasks(weekly).length} done)</summary>
                 <ul class="tasks" style="margin-top:0.6rem">
                   {weekly.map((t) => <TaskRow key={t.id} task={t} chunk={chunk} focused={focusId.value === t.id} inWeek />)}
                 </ul>

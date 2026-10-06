@@ -82,7 +82,7 @@ test.describe('every task type opens its inline tool', () => {
 
   test('maths: "Open equation card" shows the derivation as MathML, with a "derived it" tick', async ({ page, api }) => {
     await api.onboard()
-    const task = firstTask('maths')
+    const task = firstTask('maths', (t) => t.id === 'w04-06') // Little's law: its question is a formula (w01-12's question is words, its check holds the maths)
     await openTask(page, task.id)
     await primary(page, task.id).click()
     const dialog = page.getByRole('dialog')

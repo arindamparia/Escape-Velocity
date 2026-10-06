@@ -16,7 +16,7 @@ test.describe('axe: pages', () => {
   test('the sub-pages: every study tool, the capstone, the review, a design sheet', async ({ page, api }) => {
     await api.seedTypical()
     const out: string[] = []
-    for (const path of ['/study/redraws', '/study/flashcards', '/study/timer', '/study/mock', '/study/envelope', '/study/formulas', '/study/notes', '/study/cheatsheet', '/weeks/capstone', '/progress/review', '/sources', '/library?design=ticketmaster']) {
+    for (const path of ['/study/redraws', '/study/flashcards', '/study/timer', '/study/mock', '/study/envelope', '/study/formulas', '/study/notes', '/study/cheatsheet', '/weeks/capstone', '/progress/review', '/sources', '/library?design=ticketmaster', '/library?tab=papers', '/library?tab=gaps']) {
       await openApp(page, path)
       out.push(...(await axeSeriousViolations(page, path)))
     }
@@ -47,7 +47,7 @@ test.describe('axe: dialogs', () => {
       await openApp(page, '/weeks/1', { theme })
       await page.getByRole('button', { name: 'Open note' }).first().click(); await expect(page.getByRole('dialog')).toBeVisible(); await scan('why-note')
       await closeDialog(page)
-      await page.getByRole('button', { name: 'Open equation card' }).click(); await expect(page.getByRole('dialog')).toBeVisible(); await scan('equation')
+      await page.getByRole('button', { name: 'Open equation card' }).first().click(); await expect(page.getByRole('dialog')).toBeVisible(); await scan('equation')
       await closeDialog(page)
       await openApp(page, '/library', { theme })
       await page.getByRole('button', { name: /Ticketmaster/ }).first().click(); await expect(page.getByRole('dialog')).toBeVisible(); await scan('design sheet')

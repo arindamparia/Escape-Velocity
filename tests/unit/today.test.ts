@@ -48,6 +48,13 @@ describe('the one next action', () => {
   it('on Saturday the weekly DSA task does not lead', () => {
     expect(pickNextUp(4, 5, 'morning', none)?.id).toBe('w04-07')
   })
+  it('an extra (a paper, a bonus equation) is never the next action, even when it is all that is left', () => {
+    // week 1's only any-day extra is the bonus equation: with Monday's tasks done there is nothing to lead with
+    expect(plan.tasks.find((t) => t.id === 'w01-17')!.optional).toBe(true)
+    expect(pickNextUp(1, 0, 'night', new Set(['w01-01', 'w01-02', 'w01-03']))).toBeUndefined()
+    // Friday night of week 4 has a paper: Today still lists it, but does not lead with it
+    expect(pickNextUp(4, 4, 'night', new Set(['w04-01']))).toBeUndefined()
+  })
   it('skips rest tasks, and returns nothing when the day is done', () => {
     // Fri of week 2 is Puja: its only dated task is a rest task, so the weekly DSA task is all that is left
     // (the Today view checks for a light day first and shows "Puja mode" instead of any task)

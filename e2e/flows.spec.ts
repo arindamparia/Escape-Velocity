@@ -219,7 +219,7 @@ test.describe('notes, cheat sheet, formulas, envelope', () => {
     await api.onboard()
     await openApp(page, '/study/formulas')
     const maths = plan.tasks.filter((t) => t.type === 'maths')
-    await expect(page.locator('main li.card')).toHaveCount(maths.length)
+    await expect(page.locator('main li.card')).toHaveCount(maths.length + 12) // the weekly and bonus derivations, then the shelf
     await expect(page.locator('main li.card math').first()).toBeVisible()
     await page.getByRole('button', { name: 'Derived it' }).first().click()
     await expect.poll(async () => (await api.doneIds())[0]).toBe(maths[0].id)
@@ -239,15 +239,15 @@ test.describe('notes, cheat sheet, formulas, envelope', () => {
 })
 
 test.describe('library', () => {
-  test('filters narrow the 37 designs, and a design opens with status, decision cards and notes', async ({ page, api }) => {
+  test('filters narrow the 42 designs, and a design opens with status, decision cards and notes', async ({ page, api }) => {
     await api.onboard()
     await openApp(page, '/library')
-    await expect(page.getByText('37 of 37 designs')).toBeVisible()
+    await expect(page.getByText('42 of 42 designs')).toBeVisible()
     await page.getByRole('button', { name: 'Premium', exact: true }).click()
-    await expect(page.getByText(/^\d+ of 37 designs$/)).not.toHaveText('37 of 37 designs')
+    await expect(page.getByText(/^\d+ of 42 designs$/)).not.toHaveText('42 of 42 designs')
     await page.getByRole('button', { name: 'Premium', exact: true }).click() // toggle the filter off again
     await page.getByPlaceholder('idempotency, geo, fan-out…').fill('ticketmaster')
-    await expect(page.getByText(/^\d+ of 37 designs$/)).not.toHaveText('37 of 37 designs')
+    await expect(page.getByText(/^\d+ of 42 designs$/)).not.toHaveText('42 of 42 designs')
     await page.getByRole('button', { name: /^Ticketmaster/ }).click()
     const sheet = page.getByRole('dialog')
     await expect(sheet.getByText('Derive it first')).toBeVisible()

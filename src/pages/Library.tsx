@@ -9,9 +9,11 @@ import { Html } from '../ui/Html'
 import { usePage, useTitle } from '../ui/hooks'
 import { StudyLinks } from '../ui/StudyLinks'
 import { DesignDetail } from './DesignSheet'
+import { GapsTab } from './LibraryGaps'
+import { PapersTab } from './LibraryPapers'
 
-type Tab = 'designs' | 'machine' | 'companies' | 'systems' | 'resources'
-const TABS: [Tab, string][] = [['designs', 'Designs'], ['machine', 'Machine coding'], ['companies', 'What companies ask'], ['systems', 'Real systems'], ['resources', 'Resources']]
+type Tab = 'designs' | 'machine' | 'companies' | 'systems' | 'papers' | 'gaps' | 'resources'
+const TABS: [Tab, string][] = [['designs', 'Designs'], ['machine', 'Machine coding'], ['companies', 'What companies ask'], ['systems', 'Real systems'], ['papers', 'Papers'], ['gaps', 'Gap check'], ['resources', 'Resources']]
 const STATUS_LABEL: Record<string, string> = { 'not-started': 'Not started', attempted: 'Attempted', 'redrawn-1': 'Redrawn once', 'redrawn-2': 'Owned' }
 
 function Chips<T extends string>({ label, options, value, onChange }: { label: string; options: [T, string][]; value: T | ''; onChange: (v: T | '') => void }) {
@@ -155,6 +157,10 @@ export default function Library() {
             </ul>
             <Html html={page.readingNoteHtml} class="prose" />
           </div>
+        ) : tab === 'papers' ? (
+          <PapersTab lib={page} />
+        ) : tab === 'gaps' ? (
+          <GapsTab lib={page} />
         ) : (
           <StudyLinks />
         )}

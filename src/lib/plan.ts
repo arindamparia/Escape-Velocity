@@ -29,6 +29,10 @@ export function refLabel(ref: string): string {
   const step = /^[0-9a-z]+:([1-5])$/.exec(ref)
   if (step) return `Learning loop · step ${step[1]}`
   if (ref.startsWith('mock:')) return 'Mock mode'
+  const paper = /^paper:(w\d{2}-\d{2})$/.exec(ref)
+  if (paper) return `Paper · ${taskLabel(paper[1])}`
+  const eq = /^eq:(w\d{2}-\d{2}|eq-\d{2})$/.exec(ref)
+  if (eq) return `Equation · ${taskLabel(eq[1])}`
   return designName.get(ref) ?? ref
 }
 

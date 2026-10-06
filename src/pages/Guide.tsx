@@ -1,12 +1,13 @@
 import { useTitle } from '../ui/hooks'
 import { GLOSSARY } from './glossary'
 import { Icon } from '../ui/Icon'
+import { LoopRingLazy, WeekRhythmLazy } from '../ui/SketchView'
 
 const PAGES: { href: string; name: string; what: string; when: string }[] = [
   { href: '/', name: 'Today', what: 'The one next thing to do, and everything planned for today.', when: 'Open this first, every day.' },
   { href: '/weeks', name: 'Weeks', what: 'The 13-week plan: every task by day, the weekly focus, and the DSA, capstone and interview-prep tracks.', when: 'To see where you are, or look ahead.' },
   { href: '/study', name: 'Study', what: 'The tools: learning loop, redraws, flashcards, timer, mock interview, notes and more.', when: 'Today opens the right tool for each task, so you rarely come here directly.' },
-  { href: '/library', name: 'Library', what: 'The 37 system designs, what companies ask, machine-coding problems and what to read.', when: 'To choose a design, or look one up.' },
+  { href: '/library', name: 'Library', what: 'The 42 system designs, the papers, what companies ask, machine-coding problems, the gap check and what to read.', when: 'To choose a design, or look one up.' },
   { href: '/progress', name: 'Progress', what: 'Charts, the scorecard, the readiness check and the Sunday review.', when: 'On Sundays, or when you doubt yourself.' },
 ]
 
@@ -33,6 +34,18 @@ export default function Guide() {
             {DAY.map(([a, b]) => <li key={a}><strong>{a}</strong> {b}</li>)}
           </ol>
           <div><a class="btn btn--primary" href="/"><Icon name="play" /> Go to Today</a></div>
+        </section>
+
+        <section class="stack" aria-label="A normal week">
+          <h2 style="margin:0">A normal week</h2>
+          <p class="muted" style="margin:0">Mornings are DSA. Nights are one concept or infra task. Friday night is off, or one optional paper. Saturday is the big design, Sunday the capstone and the review.</p>
+          <div class="sketch__scroll" tabIndex={0} role="group" aria-label="A normal week, as a diagram" style="min-height:11rem"><WeekRhythmLazy /></div>
+        </section>
+
+        <section class="stack" aria-label="The learning loop">
+          <h2 style="margin:0">Every design goes round the same loop</h2>
+          <p class="muted" style="margin:0">You never memorise a design. You rebuild each decision from the constraint that forced it. <a href="/study/loop">Open the learning loop</a>.</p>
+          <div class="sketch__scroll" tabIndex={0} role="group" aria-label="The learning loop, as a diagram" style="min-height:16rem"><LoopRingLazy /></div>
         </section>
 
         <section class="stack" aria-label="The five pages">

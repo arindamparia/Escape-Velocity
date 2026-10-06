@@ -9,7 +9,7 @@ export { DESIGN_STATUSES, DIFFICULTIES, GRADES, MAX_OPS_PER_REQUEST, NOTE_KINDS,
 const text = (max: number) => z.string().check(z.maxLength(max))
 const nonEmpty = (max: number) => z.string().check(z.minLength(1), z.maxLength(max))
 const id = z.uuid()
-const taskId = z.string().check(z.regex(/^(w\d{2}-\d{2}|r-\d{2})$/))
+const taskId = z.string().check(z.regex(/^(w\d{2}-\d{2}|r-\d{2}|eq-\d{2})$/))
 const designId = z.string().check(z.regex(/^[a-z0-9]+(-[a-z0-9]+)*$/), z.maxLength(80))
 /** A real calendar date as YYYY-MM-DD (Asia/Kolkata on the client). */
 const ymd = z.string().check(z.regex(/^\d{4}-\d{2}-\d{2}$/), z.refine(isRealDate, 'Not a real date'))

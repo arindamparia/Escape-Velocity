@@ -6,8 +6,9 @@ import type { OpsResult } from '../shared/state'
 import { nextCardState } from '../src/lib/srs'
 import type { Env } from './env'
 
-const taskIds = new Set<string>(planCore.tasks.map((t) => t.id))
-const designIds = new Set<string>(planCore.designs.map((d) => d.id))
+const taskIds = new Set<string>([...planCore.tasks.map((t) => t.id), ...planCore.shelfIds])
+// a paper's decision cards live under paper-<task id>, beside the designs'
+const designIds = new Set<string>([...planCore.designs.map((d) => d.id), ...planCore.tasks.filter((t) => t.type === 'paper').map((t) => `paper-${t.id}`)])
 const flashcardIds = new Set<string>(planCore.flashcardIds)
 
 export class OpError extends Error {

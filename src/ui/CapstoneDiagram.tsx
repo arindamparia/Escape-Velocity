@@ -2,6 +2,7 @@
 // Postgres with the outbox table, outbox relay, Kafka, Payment service, Mock PSP, webhooks, reconciliation); the numbers
 // match the steps listed under it. Shapes differ as well as colours (service, store, queue, outside party), so it reads
 // in greyscale too.
+import { Arrow, Node } from './diagram'
 
 export const FLOW_STEPS: [string, string][] = [
   ['An order request arrives', 'with an idempotency key, so a retry can never create a second order.'],
@@ -14,36 +15,6 @@ export const FLOW_STEPS: [string, string][] = [
   ['The webhook sender tells the store', 'with signed webhooks, retried until they are acknowledged.'],
   ['A reconciliation job compares', 'orders, payments, stock and the provider’s own records, and flags any mismatch.'],
 ]
-
-function Node({ x, y, w, h, title, sub, kind }: { x: number; y: number; w: number; h: number; title: string; sub?: string; kind: 'code' | 'store' | 'queue' | 'outside' | 'job' }) {
-  return (
-    <g class={`dg-node dg-${kind}`}>
-      {kind === 'store' ? (
-        <>
-          <rect x={x} y={y} width={w} height={h} rx="10" />
-          <line x1={x} x2={x + w} y1={y + 14} y2={y + 14} />
-        </>
-      ) : kind === 'queue' ? (
-        <>
-          <rect x={x} y={y} width={w} height={h} rx="4" />
-          <line x1={x + 12} x2={x + 12} y1={y} y2={y + h} />
-          <line x1={x + w - 12} x2={x + w - 12} y1={y} y2={y + h} />
-        </>
-      ) : <rect x={x} y={y} width={w} height={h} rx={kind === 'job' ? 18 : 8} stroke-dasharray={kind === 'outside' ? '6 4' : undefined} />}
-      <text x={x + w / 2} y={y + (sub ? h / 2 - 2 : h / 2 + 5) + (kind === 'store' ? 6 : 0)} text-anchor="middle" class="dg-title">{title}</text>
-      {sub ? <text x={x + w / 2} y={y + h / 2 + 14 + (kind === 'store' ? 6 : 0)} text-anchor="middle" class="dg-sub">{sub}</text> : null}
-    </g>
-  )
-}
-
-function Arrow({ d, dashed, n, at }: { d: string; dashed?: boolean; n?: number; at?: [number, number] }) {
-  return (
-    <g class="dg-arrow">
-      <path d={d} stroke-dasharray={dashed ? '5 4' : undefined} marker-end="url(#dg-head)" />
-      {n && at ? <><circle cx={at[0]} cy={at[1]} r="10" /><text x={at[0]} y={at[1] + 4} text-anchor="middle">{n}</text></> : null}
-    </g>
-  )
-}
 
 export function CapstoneDiagram() {
   return (

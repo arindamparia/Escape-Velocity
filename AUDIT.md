@@ -50,7 +50,7 @@ Totals at the time of writing: 157 unit and Worker/D1 tests (Vitest) and the Pla
 | 19 Tests | Done | Every row of the table has a suite. |
 | 20 Build steps 1 to 9 | Done | |
 | 20 Build steps 10 to 12 | Owner | Remote migration, `wrangler deploy`, Cloudflare Access, Add to Dock: runbook in `README.md`. |
-| 22 Content format | Done | The compiler reads exactly this; 171 tasks (163 + 8), 37 designs (counted from the 9 ID tables), 27 flashcards, 13 weeks. |
+| 22 Content format | Done | The compiler reads exactly this; 200 tasks (192 + 8), 42 designs (counted from the 9 ID tables), 37 flashcards, 13 weeks. |
 
 ## Parts 2 to 6 (content)
 
@@ -99,4 +99,37 @@ Method: the plan's own time slots ("The routine": about 15.5 h a week) against e
 
 Night videos: six night tasks have a first video over 30 min (Docker 67, Temporal talk 69, AWS IAM 46, EC2 52, S3 38, Networking 68). The panels list a short primer first where one exists (Temporal 7 min, Docker 13 min). For the rest, split it over two nights or watch at 1.25x. The plan's slot is 45 min including the why-note.
 
-Fine as it is: 37 designs are a library, not a syllabus (11 Saturday designs plus 7 Thursday ones are scheduled); the AI practice tasks exist in weeks 6 to 10; DSA is one hour every weekday plus a boss problem.
+Fine as it is: 42 designs are a library, not a syllabus (11 Saturday designs plus 7 Thursday ones are scheduled); the AI practice tasks exist in weeks 6 to 10; DSA is one hour every weekday plus a boss problem.
+
+
+## The gap patch, blended in (6 Oct 2026)
+
+`escape-velocity-gap-patch.md` (Arpit Bhayani's syllabi against this plan, a paper track, 22 more equations) was checked line by line, then blended in with changes. All its check values were recomputed (they hold), all 50 links were opened (all live; the Meta page's real address and the ZooKeeper deep dive's Premium status were found on Hello Interview), and Aurora DSQL's arXiv page is real.
+
+**Taken as written:** the ten gap concepts (nine new night tasks, and Terraform's optional Wednesday becomes the storage-engines task); the five new designs (library 37 to 42); the reading-list additions; the equation bank (derive-first answers behind a button); the paper track's papers, order and "numbers to find"; the verdict, both coverage tables and the course decision (as the Library's Gap check tab).
+
+**Changed, and why:**
+
+| Patch said | Done instead | Why |
+| --- | --- | --- |
+| Papers on Friday night from week 1 | From week 4, optional, first thing dropped | Week 1's Friday night is off in the plan; week 2's Friday is Durga Puja (the patch put RUM there, and called week 3 the Puja week); weeks 3 and 5 are light. Their papers (RUM, Kora, Google cluster) are on a shelf |
+| 13 bonus equations, one a week | 10, none in the light weeks 2, 3, 5; 12 on the shelf | A light week's star needs every task with points ticked, so an extra there would turn a rest week into homework |
+| Bonus equation and paper count like any task | `optional`: never the next action, not in "n of m done", not needed for a star | One next action is the plan's first principle; an extra must never nag |
+| Two review tasks (`w05-12`, `w10-17`) | Skipped | One landed on Diwali Sunday, and "check the changelog" is a habit, not a study task; the library already has the new Hello Interview pages |
+| G8 and G9 on Thursday | Tuesday and Wednesday | Thursday already has a second design and the maths: the heaviest night |
+| S3-like blob store a Thursday option in week 5 | An option in week 7 (with replication and erasure coding) | Week 5 has no second design |
+| Live stream with a CDN a Thursday option | Library only | Low fintech yield, and week 12's options are already three |
+| Concept tasks with a derive question in their own words | Each ends in a `Why:` | They become flashcards and why-notes like every other concept task |
+| Raw task ids in the tables (`w02-05`) | Links labelled "Week 2 · Task 5" | Task ids are never shown |
+| Equation formulas as plain text | TeX in the table, converted to MathML at build time | Fails the build if a formula is broken |
+
+**Added to the app:** a `paper` task type; "derive-first" maths (`question ‖ check: answer`, the answer hidden until you try); the equation card (your answer is saved as a note, then "Reveal the check value"), the formula sheet's bonus and shelf equations (shelf ticks are stored as `eq-NN`); Library tabs Papers and Gap check; ten small teaching diagrams (shown after you have written your answer on a task, open on the Gap check tab), and two for the guide (a normal week, the learning loop); glossary terms; search, AI answers and the destination tests know about all of it.
+
+**What it costs, per week** (45 minutes for a gap task or a paper, 15 for a bonus equation, +30 for a starred paper's third pass):
+
+| Week | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Core (gap tasks), min | 0 | 45 | 0 | 45 | 0 | 45 | 90 | 90 | 45 | 0 | 45 | 45 | 0 |
+| Extras (paper, equation), min | 15 | 0 | 0 | 60 | 0 | 90 | 90 | 90 | 60 | 60 | 60 | 60 | 120 |
+
+Weeks 7 and 8 are the heaviest (about 3 hours over the 15). Order of dropping, when a week overflows: the paper, the bonus equation, that week's second design, and only then slide a gap task into the next week (they are not tied to a day). Never the Saturday design, the DSA or a mock.

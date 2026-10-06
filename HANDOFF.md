@@ -2,6 +2,10 @@
 
 Status at the end of the third session. Read `CLAUDE.md` first, then `AUDIT.md` (the build checked against every section of the plan), then the plan itself (`plan/escape-velocity-plan.md`, Part 1).
 
+## Gap patch (6 Oct 2026)
+
+The Arpit Bhayani gap patch is blended into the plan and the app: see the last section of `AUDIT.md` for what was taken, changed and skipped. New: 10 gap-concept tasks with sketches, 10 optional Friday papers, 10 optional bonus equations plus a shelf of 12, 5 designs, Library tabs Papers and Gap check. `escape-velocity-gap-patch.md` is kept for reference; the plan is the source. Not yet done: rebuild the Pinecone index (`scripts/index-pinecone.ts`) and deploy.
+
 ## Third session: what changed
 
 - **Simpler on purpose.** No PWA, service worker, manifest, offline cache, "Update ready" banner, performance budgets, Lighthouse or cron. A change shows as soon as you reload. (An old worker in a browser removes itself: `public/sw.js` and `main.tsx`.) Local-first data stays.

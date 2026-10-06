@@ -51,6 +51,11 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 2 | Thu | PostgreSQL | — | doc | free | Transaction isolation | PostgreSQL docs | https://www.postgresql.org/docs/current/transaction-iso.html | — |
 | 2 | Thu | PostgreSQL | — | video | free | you won't forget how postgres works after this | Hussein Nasser | https://www.youtube.com/watch?v=q9jixKv4h2I | 27 |
 | 2 | Thu | Maths: B-tree height | — | video | free | Understanding B-Trees | Spanning Tree | https://www.youtube.com/watch?v=K1a2Bk8NrYQ | 13 |
+| 2 | Thu | Isolation levels and write skew | — | video | free | Transaction Isolation Levels | Bharath Thippireddy | https://www.youtube.com/watch?v=CTCAo89fcQw | 5 |
+| 2 | Thu | Isolation levels and write skew | — | video | free | Snapshot Isolation | Jordan has no life | https://www.youtube.com/watch?v=Tgpa9TrxsfU | 7 |
+| 2 | Thu | Isolation levels and write skew | — | video | free | Serializable Snapshot Isolation | Jordan has no life | https://www.youtube.com/watch?v=4TAKYRzm_dA | 8 |
+| 2 | Thu | Isolation levels and write skew | — | doc | free | Decoding isolation, the I in ACID | Arpit Bhayani | https://arpitbhayani.me/blogs/isolation | — |
+| 2 | Thu | Isolation levels and write skew | — | doc | free | Why databases deadlock | Arpit Bhayani | https://arpitbhayani.me/blogs/database-deadlocks | — |
 | 2 | Week | DSA: arrays, two pointers, sliding window, prefix sums | — | video | free | Introduction to Sliding Window and 2 Pointers | take U forward (Striver) | https://www.youtube.com/watch?v=9kdHxplyl5I | 37 |
 | 2 | Week | DSA: arrays, two pointers, sliding window, prefix sums | — | video | free | Prefix Sum in 4 minutes | AlgoMaster | https://www.youtube.com/watch?v=yuws7YK0Yng | 4 |
 | 3 | Thu | Sharding | — | doc | free | Sharding | Hello Interview | https://www.hellointerview.com/learn/system-design/core-concepts/sharding | — |
@@ -79,6 +84,10 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 4 | Tue | Redis | — | video | free | Redis Deep Dive | Hello Interview | https://www.youtube.com/watch?v=fmT5nlEkl3U | 31 |
 | 4 | Wed | Docker Compose, small images | — | video | free | Docker Compose: running multiple services | TechWorld with Nana | https://www.youtube.com/watch?v=3c-iBn73dDE&t=5389s | 12 |
 | 4 | Wed | Docker Compose, small images | — | video | free | Dockerfile: building your own image | TechWorld with Nana | https://www.youtube.com/watch?v=3c-iBn73dDE&t=6122s | 22 |
+| 4 | Wed | Connection pools and pgbouncer | — | video | free | Connection Pooling in PostgreSQL with NodeJS (performance numbers) | Hussein Nasser | https://www.youtube.com/watch?v=GTeCtIoV2Tw | 12 |
+| 4 | Wed | Connection pools and pgbouncer | — | video | free | PgBouncer Tutorial | Code with Lucian | https://www.youtube.com/watch?v=ddKm7a7xOpk | 19 |
+| 4 | Wed | Connection pools and pgbouncer | — | doc | free | pgbouncer features: the three pooling modes | pgbouncer | https://www.pgbouncer.org/features.html | — |
+| 4 | Wed | Connection pools and pgbouncer | — | repo | free | System design exercises in Go: the connection-pool exercise | Arpit Bhayani's course | https://github.com/addi-11/system-design-excercises | — |
 | 4 | Thu | Dealing with contention | — | video | free | Optimistic locking clearly explained (Java and SQL) | ByteMonk | https://www.youtube.com/watch?v=d41JuPT_Wls | 7 |
 | 4 | Thu | Dealing with contention | — | doc | partial | Dealing with Contention | Hello Interview | https://www.hellointerview.com/learn/system-design/patterns/dealing-with-contention | — |
 | 4 | Thu | Dealing with contention | — | doc | free | Common Patterns summary | Hello Interview | https://www.hellointerview.com/learn/system-design/in-a-hurry/patterns | — |
@@ -86,6 +95,7 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 4 | Thu | Dealing with contention | — | video | free | Pessimistic vs optimistic concurrency control | Hussein Nasser | https://www.youtube.com/watch?v=I8IlO0hCSgY | 16 |
 | 4 | Thu | Maths: Little's law | — | video | free | Little's Law explained | Operations & Supply Chain | https://www.youtube.com/watch?v=r_T8veWYrEA | 6 |
 | 4 | Thu | Maths: Little's law | — | video | free | Little's Law at the Ice Cream Van (from Little himself) | Gary Little | https://www.youtube.com/watch?v=raRpbsWQBCo | 2 |
+| 4 | Fri | Paper: SIEVE | — | video | free | SIEVE is Simpler than LRU (the authors' talk) | USENIX NSDI 2024 | https://www.youtube.com/watch?v=IcnBckIhJnM | 18 |
 | 4 | Sat | Ticketmaster | ticketmaster | doc | free | Design a ticket booking site like Ticketmaster | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/ticketmaster | — |
 | 4 | Sat | Ticketmaster | ticketmaster | video | free | Design Ticketmaster | Hello Interview | https://www.youtube.com/watch?v=fhdPyoO6aXI | 59 |
 | 4 | Sat | LLD: cache with pluggable eviction | — | repo | free | LRU cache problem and Java solution | awesome-low-level-design | https://github.com/ashishps1/awesome-low-level-design/blob/main/problems/lru-cache.md | — |
@@ -130,6 +140,11 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 5 | Week | DSA: dynamic programming | — | video | free | Longest Increasing Subsequence | take U forward (Striver) | https://www.youtube.com/watch?v=ekcwMsSIzVc | 25 |
 | 6 | Mon | CAP and PACELC | — | doc | free | CAP Theorem | Hello Interview | https://www.hellointerview.com/learn/system-design/core-concepts/cap-theorem | — |
 | 6 | Mon | CAP and PACELC | — | video | free | CAP Theorem in System Design Interviews | Hello Interview | https://www.youtube.com/watch?v=VdrEq0cODu4 | 14 |
+| 6 | Mon | Circuit breakers and bulkheads | — | video | free | Circuit Breaker Pattern in Microservices | ByteMonk | https://www.youtube.com/watch?v=dJI2saoM5_k | 10 |
+| 6 | Mon | Circuit breakers and bulkheads | — | video | free | Bulkhead Pattern Explained: Resilience in Microservices Architecture | ByteMonk | https://www.youtube.com/watch?v=2I3-lbnMXec | 7 |
+| 6 | Mon | Circuit breakers and bulkheads | — | video | free | Top 5 Microservices Resilience Patterns | ByteMonk | https://www.youtube.com/watch?v=RfPNuaj5Ax0 | 7 |
+| 6 | Mon | Circuit breakers and bulkheads | — | doc | free | Circuit Breaker | Martin Fowler | https://martinfowler.com/bliki/CircuitBreaker.html | — |
+| 6 | Mon | Circuit breakers and bulkheads | — | doc | free | Timeouts, retries and backoff with jitter | AWS Builders' Library | https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/ | — |
 | 6 | Tue | Temporal | — | doc | free | Temporal deep dive | Hello Interview | https://www.hellointerview.com/learn/system-design/deep-dives/temporal | — |
 | 6 | Tue | Temporal | — | video | free | Temporal in 7 minutes | Temporal | https://www.youtube.com/watch?v=2HjnQlnA5eY | 7 |
 | 6 | Tue | Temporal | — | video | free | Maxim Fateev on Durable Execution with Temporal (SE Radio 596) | IEEE Computer Society | https://www.youtube.com/watch?v=fMh2ZYJST0E | 69 |
@@ -143,6 +158,7 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 6 | Thu | Maths: retries and jitter | — | video | free | Circuit breaker pattern in microservices | ByteMonk | https://www.youtube.com/watch?v=dJI2saoM5_k | 10 |
 | 6 | Thu | Maths: retries and jitter | — | video | free | Top 5 microservices resilience patterns | ByteMonk | https://www.youtube.com/watch?v=RfPNuaj5Ax0 | 7 |
 | 6 | Thu | Maths: retries and jitter | — | doc | free | Timeouts, retries and backoff with jitter | Amazon Builders' Library | https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/ | — |
+| 6 | Fri | Paper: Spanner | — | video | free | Distributed Systems 8.2: Google's Spanner | Martin Kleppmann | https://www.youtube.com/watch?v=oeycOVX70aE | 19 |
 | 6 | Sat | Payment System | payment-system | video | free | Payment gateway, payment processor and payment security explained | ByteMonk | https://www.youtube.com/watch?v=hWQCiO04CXk | 7 |
 | 6 | Sat | Payment System | payment-system | video | free | System design: global payment processing (PayPal) | ByteMonk | https://www.youtube.com/watch?v=7MXV7RfNtv0 | 22 |
 | 6 | Sat | Payment System | payment-system | doc | premium | Payment System (requirements and outline free) | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/payment-system | — |
@@ -167,16 +183,26 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 7 | Tue | Scaling writes | — | doc | partial | Scaling Writes | Hello Interview | https://www.hellointerview.com/learn/system-design/patterns/scaling-writes | — |
 | 7 | Tue | Scaling writes | — | doc | free | Sharding (free, covers partition keys and hot spots) | Hello Interview | https://www.hellointerview.com/learn/system-design/core-concepts/sharding | — |
 | 7 | Tue | Scaling writes | — | video | free | Database Sharding and Partitioning | Arpit Bhayani | https://www.youtube.com/watch?v=wXvljefXyEo | 24 |
+| 7 | Tue | Replication, RPO and RTO | — | video | free | Database Replication Explained (in 5 Minutes) | Aced (formerly Exponent) | https://www.youtube.com/watch?v=bI8Ry6GhMSE | 5 |
+| 7 | Tue | Replication, RPO and RTO | — | video | free | The Ultimate Guide to Disaster Recovery: RTO, RPO and Failover | ByteMonk | https://www.youtube.com/watch?v=OmASCUJEVy8 | 11 |
+| 7 | Tue | Replication, RPO and RTO | — | doc | free | Master-replica replication | Arpit Bhayani | https://arpitbhayani.me/blogs/master-replica-replication | — |
+| 7 | Tue | Replication, RPO and RTO | — | doc | free | MySQL replication internals | Arpit Bhayani | https://arpitbhayani.me/blogs/mysql-replication-internals | — |
+| 7 | Tue | Replication, RPO and RTO | — | doc | free | Multi-master replication | Arpit Bhayani | https://arpitbhayani.me/blogs/multi-master-replication | — |
+| 7 | Tue | Replication, RPO and RTO | — | doc | free | Leaderless replication | Arpit Bhayani | https://arpitbhayani.me/blogs/leaderless-replication | — |
 | 7 | Wed | AWS: RDS, S3, SQS, SNS, CloudWatch | — | video | free | AWS Cloud Practitioner course: Storage services (S3) | freeCodeCamp | https://www.youtube.com/watch?v=NhDYbskXRgc&t=21757s | 38 |
 | 7 | Wed | AWS: RDS, S3, SQS, SNS, CloudWatch | — | video | free | AWS Cloud Practitioner course: Databases (RDS) | freeCodeCamp | https://www.youtube.com/watch?v=NhDYbskXRgc&t=24015s | 30 |
 | 7 | Wed | AWS: RDS, S3, SQS, SNS, CloudWatch | — | video | free | AWS SQS vs SNS vs EventBridge: when to use what | Be A Better Dev | https://www.youtube.com/watch?v=RoKAEzdcr7k | 23 |
 | 7 | Wed | AWS: RDS, S3, SQS, SNS, CloudWatch | — | video | free | AWS Cloud Practitioner course: Logging (CloudWatch) | freeCodeCamp | https://www.youtube.com/watch?v=NhDYbskXRgc&t=39213s | 14 |
+| 7 | Wed | Hot shards and shuffle sharding | — | video | free | How Shopify avoids hot shards by moving data across databases without any downtime | Arpit Bhayani | https://www.youtube.com/watch?v=7v-wrJjcg4k | 21 |
+| 7 | Wed | Hot shards and shuffle sharding | — | video | free | Fault isolation using shuffle sharding | Conf42 SRE 2021 (Andrew Robinson) | https://www.youtube.com/watch?v=Ag0Yn7CzYSY | 15 |
+| 7 | Wed | Hot shards and shuffle sharding | — | doc | free | Workload isolation using shuffle sharding | AWS | https://builder.aws.com/content/3F06NpJ8YeoIGP8VHTw4n81pFn8/workload-isolation-using-shuffle-sharding | — |
 | 7 | Thu | Online Auction (option) | online-auction | doc | premium | Online Auction | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/online-auction | — |
 | 7 | Thu | Online Auction (option) | online-auction | video | free | Senior/Staff Mock Interview: Design Online Auction | Hello Interview | https://www.youtube.com/watch?v=o8nSXW-B7Rw | 63 |
 | 7 | Thu | Online Auction (option) | online-auction | video | free | Online Auction & Bidding Service | System Design Fight Club | https://www.youtube.com/watch?v=g8XqFuDkga0 | 29 |
 | 7 | Thu | Web Crawler (option) | web-crawler | doc | free | Design a web crawler | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/web-crawler | — |
 | 7 | Thu | Web Crawler (option) | web-crawler | video | free | Design a Web Crawler | Hello Interview | https://www.youtube.com/watch?v=krsuaUp__pM | 65 |
 | 7 | Thu | Maths: quorum | — | video | free | Distributed Systems 5.2: Quorums | Martin Kleppmann | https://www.youtube.com/watch?v=uNxl3BFcKSA | 10 |
+| 7 | Fri | Paper: Dynamo | — | video | free | Dynamo: Why Amazon Ditched SQL | Jordan has no life | https://www.youtube.com/watch?v=TtrmHQCGbb0 | 49 |
 | 7 | Sat | Flash Sale | flash-sale | doc | premium | Flash Sale | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/flash-sale | — |
 | 7 | Sat | Flash Sale | flash-sale | doc | free | Shopify inventory reservations | Hello Interview | https://www.hellointerview.com/learn/system-design/in-the-wild/shopify-inventory-reservations | — |
 | 7 | Sat | Flash Sale | flash-sale | video | free | Senior Mock Interview: Design an e-commerce platform | Hello Interview | https://www.youtube.com/watch?v=RuGY_1pap74 | 72 |
@@ -195,10 +221,20 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 8 | Tue | API gateway | — | video | free | API Gateways in System Design Interviews | Hello Interview | https://www.youtube.com/watch?v=7-6F3b14baA | 6 |
 | 8 | Tue | API gateway | — | video | free | API Gateway and microservices architecture (Hindi) | Concept && Coding | https://www.youtube.com/watch?v=dkgxvnk8cWw | 23 |
 | 8 | Tue | API gateway | — | video | free | API gateway vs load balancer | ByteMonk | https://www.youtube.com/watch?v=_ErhwTPSpws | 9 |
+| 8 | Tue | Scaling WebSockets | — | video | free | How to scale WebSockets to millions of connections | Ably Realtime | https://www.youtube.com/watch?v=vXJsJ52vwAA | 14 |
+| 8 | Tue | Scaling WebSockets | — | repo | free | System design exercises in Go: the SSE and broker exercises | Arpit Bhayani's course | https://github.com/addi-11/system-design-excercises | — |
 | 8 | Wed | Kubernetes basics | — | video | free | From zero to Kubernetes hero: pods, clusters, scaling (5 min) | ByteMonk | https://www.youtube.com/watch?v=Dwufy7QtZR0 | 6 |
 | 8 | Wed | Kubernetes basics | — | doc | free | Kubernetes concepts | Kubernetes docs | https://kubernetes.io/docs/concepts/ | — |
 | 8 | Wed | Kubernetes basics | — | video | free | Kubernetes course: main components and architecture | TechWorld with Nana | https://www.youtube.com/watch?v=X48VuDVv0do&t=320s | 29 |
 | 8 | Wed | Kubernetes basics | — | video | free | Kubernetes course: minikube, kubectl and YAML | TechWorld with Nana | https://www.youtube.com/watch?v=X48VuDVv0do&t=2087s | 41 |
+| 8 | Wed | Leader election and fencing | — | video | free | How Leader Election works in Distributed Systems | ByteMonk | https://www.youtube.com/watch?v=TzwiGTbUSHg | 4 |
+| 8 | Wed | Leader election and fencing | — | video | free | Understand Raft without breaking your brain | ankush | https://www.youtube.com/watch?v=IujMVjKvWP4 | 9 |
+| 8 | Wed | Leader election and fencing | — | video | free | How a distributed lock works, with Redis | ByteMonk | https://www.youtube.com/watch?v=qY4MfWv01pI | 10 |
+| 8 | Wed | Leader election and fencing | — | doc | free | Raft, visualised | The Secret Lives of Data | https://thesecretlivesofdata.com/raft/ | — |
+| 8 | Wed | Leader election and fencing | — | doc | free | Why consensus | Arpit Bhayani | https://arpitbhayani.me/blogs/why-consensus | — |
+| 8 | Wed | Leader election and fencing | — | doc | free | Heartbeats in distributed systems | Arpit Bhayani | https://arpitbhayani.me/blogs/heartbeats-in-distributed-systems | — |
+| 8 | Wed | Leader election and fencing | — | doc | free | How to do distributed locking (fencing tokens) | Martin Kleppmann | https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html | — |
+| 8 | Wed | Leader election and fencing | — | doc | premium | ZooKeeper deep dive | Hello Interview | https://www.hellointerview.com/learn/system-design/deep-dives/zookeeper | — |
 | 8 | Thu | FB Live Comments (option) | fb-live-comments | doc | free | Design FB Live Comments | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/fb-live-comments | — |
 | 8 | Thu | FB Live Comments (option) | fb-live-comments | video | free | Design Live Comments | Hello Interview | https://www.youtube.com/watch?v=LjLx0fCd1k8 | 56 |
 | 8 | Thu | LeetCode (option) | leetcode | doc | free | Design LeetCode | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/leetcode | — |
@@ -206,6 +242,7 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 8 | Thu | Maths: Bloom filter | — | video | free | Bloom Filters | ByteByteGo | https://www.youtube.com/watch?v=V3pzxngeLqw | 6 |
 | 8 | Thu | Maths: Bloom filter | — | video | free | Bloom Filters explained by example | Hussein Nasser | https://www.youtube.com/watch?v=gBygn3cVP80 | 9 |
 | 8 | Thu | Maths: Bloom filter | — | video | free | How big tech checks your username in milliseconds (Bloom filters, tries and Redis in one design) | ByteMonk | https://www.youtube.com/watch?v=_l5Q5kKHtR8 | 11 |
+| 8 | Fri | Paper: Chubby | — | video | free | Camille Fournier on the Chubby lock service | PapersWeLove | https://www.youtube.com/watch?v=kX9Z0F-eTt4 | 45 |
 | 8 | Sat | WhatsApp | whatsapp | video | free | Chat app: WhatsApp and Messenger system design | ByteMonk | https://www.youtube.com/watch?v=xyLO8ZAk2KE | 10 |
 | 8 | Sat | WhatsApp | whatsapp | doc | free | Design WhatsApp | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/whatsapp | — |
 | 8 | Sat | WhatsApp | whatsapp | video | free | Design WhatsApp | Hello Interview | https://www.youtube.com/watch?v=cr6p0n0N-VA | 58 |
@@ -225,6 +262,9 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 9 | Tue | LLM systems | — | video | free | How to build a scalable RAG system for AI apps (full architecture) | ByteMonk | https://www.youtube.com/watch?v=4KiiKQ9RVvA | 16 |
 | 9 | Wed | Ingress, config, probes, HPA | — | video | free | Kubernetes course: ConfigMap and Secret in the MongoDB demo | TechWorld with Nana | https://www.youtube.com/watch?v=X48VuDVv0do&t=4576s | 30 |
 | 9 | Wed | Ingress, config, probes, HPA | — | video | free | Kubernetes course: Ingress explained | TechWorld with Nana | https://www.youtube.com/watch?v=X48VuDVv0do&t=7312s | 22 |
+| 9 | Wed | Load balancers and single points of failure | — | video | free | How to avoid a single point of failure in distributed systems | Gaurav Sen | https://www.youtube.com/watch?v=-BOysyYErLY | 7 |
+| 9 | Wed | Load balancers and single points of failure | — | video | free | Top 6 Load Balancing Algorithms Every Developer Should Know | ByteByteGo | https://www.youtube.com/watch?v=dBmxNsS3BGE | 5 |
+| 9 | Wed | Load balancers and single points of failure | — | repo | free | System design exercises in Go: load balancers and consistent hashing | Arpit Bhayani's course | https://github.com/addi-11/system-design-excercises | — |
 | 9 | Thu | Notification System (option) | notification-system | doc | premium | Notification System | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/notification-system | — |
 | 9 | Thu | Notification System (option) | notification-system | doc | free | Design a scalable notification service | AlgoMaster | https://blog.algomaster.io/p/design-a-scalable-notification-service | — |
 | 9 | Thu | Notification System (option) | notification-system | doc | free | How Razorpay's notification service handles increasing load | Razorpay Engineering | https://engineering.razorpay.com/how-razorpays-notification-service-handles-increasing-load-f787623a490f | — |
@@ -237,6 +277,8 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 9 | Thu | Job Scheduler (option) | job-scheduler | video | free | Job Scheduler: System Design Interview | interviewing.io | https://www.youtube.com/watch?v=Bt6mVg5ivyQ | 64 |
 | 9 | Thu | Maths: tail latency | — | video | free | Percentile tail latency explained (95%, 99%) | Hussein Nasser | https://www.youtube.com/watch?v=3JdQOExKtUY | 6 |
 | 9 | Thu | Maths: tail latency | — | video | free | Achieving rapid response times in large online services (Jeff Dean) | O'Reilly | https://www.youtube.com/watch?v=1-3Ahy7Fxsc | 28 |
+| 9 | Fri | Paper: vLLM and PagedAttention | — | video | free | What is vLLM? Efficient AI inference for large language models | IBM Technology | https://www.youtube.com/watch?v=McLdlg5Gc9s | 5 |
+| 9 | Fri | Paper: vLLM and PagedAttention | — | video | free | Fast LLM Serving with vLLM and PagedAttention | Anyscale | https://www.youtube.com/watch?v=5ZlavKF_98U | 32 |
 | 9 | Sat | ChatGPT | chatgpt | doc | premium | ChatGPT | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/chatgpt | — |
 | 9 | Sat | ChatGPT | chatgpt | doc | free | Anatomy of a high-throughput LLM inference system | vLLM | https://vllm.ai/blog/2025-09-05-anatomy-of-vllm | — |
 | 9 | Sat | ChatGPT | chatgpt | video | free | Design ChatGPT, mock interview | Aced (formerly Exponent) | https://www.youtube.com/watch?v=I9-PUPYZyiw | 35 |
@@ -258,6 +300,7 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 10 | Thu | FB Post Search (option) | fb-post-search | video | free | Design FB Post Search | Hello Interview | https://www.youtube.com/watch?v=l38XL9914fs | 68 |
 | 10 | Thu | Maths: queues and utilisation | — | video | free | Queueing theory (simple) | Liz Thompson | https://www.youtube.com/watch?v=ch0MRQcZSUE | 9 |
 | 10 | Thu | Maths: queues and utilisation | — | doc | free | Using load shedding to avoid overload | Amazon Builders' Library | https://aws.amazon.com/builders-library/using-load-shedding-to-avoid-overload/ | — |
+| 10 | Fri | Paper: Understanding Inverse Document Frequency | — | video | free | Term Frequency Inverse Document Frequency (TF-IDF) explained | DataMListic | https://www.youtube.com/watch?v=zLMEnNbdh4Q | 9 |
 | 10 | Sat | FB News Feed | fb-news-feed | video | free | Twitter timeline architecture: fanout (the feed idea in 5 minutes) | ByteMonk | https://www.youtube.com/watch?v=FEkXjNFrL1o | 6 |
 | 10 | Sat | FB News Feed | fb-news-feed | doc | free | Design FB News Feed | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/fb-news-feed | — |
 | 10 | Sat | FB News Feed | fb-news-feed | video | free | Design FB News Feed | Hello Interview | https://www.youtube.com/watch?v=Qj4-GruzyDU | 26 |
@@ -274,11 +317,17 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 11 | Tue | Big-data data structures | — | doc | free | Count-min sketch: the art and science of estimating stuff | Redis | https://redis.io/blog/count-min-sketch-the-art-and-science-of-estimating-stuff/ | — |
 | 11 | Tue | Big-data data structures | — | video | free | Data Structures for Big Data: Bloom filters, count-min sketch, HyperLogLog | Hello Interview | https://www.youtube.com/watch?v=IgyU0iFIoqM | 26 |
 | 11 | Tue | Big-data data structures | — | video | free | HyperLogLog: Facebook's algorithm to count distinct elements | Gaurav Sen | https://www.youtube.com/watch?v=eV1haPUt0NU | 11 |
+| 11 | Tue | Picking the store: columnar and graph | — | video | free | How to choose the right database? | ByteByteGo | https://www.youtube.com/watch?v=kkeFE6iRfMM | 7 |
+| 11 | Tue | Picking the store: columnar and graph | — | video | free | What is a columnar database? (vs row-oriented) | Anton Putra | https://www.youtube.com/watch?v=1MnvuNg33pA | 8 |
+| 11 | Tue | Picking the store: columnar and graph | — | doc | free | What is a columnar database? | ClickHouse docs | https://clickhouse.com/docs/faq/general/columnar-database | — |
+| 11 | Tue | Picking the store: columnar and graph | — | doc | free | How indexes work on partitioned and sharded data | Arpit Bhayani | https://arpitbhayani.me/blogs/how-indexes-work-on-partitioned-and-sharded-data | — |
 | 11 | Wed | CI/CD with GitHub Actions | — | doc | free | GitHub Actions docs | GitHub | https://docs.github.com/en/actions | — |
 | 11 | Wed | CI/CD with GitHub Actions | — | video | free | GitHub Actions Tutorial: basic concepts and CI/CD with Docker | TechWorld with Nana | https://www.youtube.com/watch?v=R8_veQiYBjI | 32 |
 | 11 | Thu | YouTube Top K (option) | youtube-top-k | doc | free | Design YouTube's Top K videos | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/top-k | — |
 | 11 | Thu | YouTube Top K (option) | youtube-top-k | video | free | Top K Problem (Heavy Hitters) | System Design Interview | https://www.youtube.com/watch?v=kx-XDoPjoHw | 36 |
 | 11 | Thu | Maths: count-min sketch | — | video | free | Count-min sketch: counting a stream of data | Tech Dummies | https://www.youtube.com/watch?v=ibxXO-b14j4 | 20 |
+| 11 | Fri | Paper: Probabilistic Counting (Flajolet and Martin) | — | video | free | Hyperloglog and Cardinality Estimation | Arpit Bhayani | https://www.youtube.com/watch?v=tOsb-tFoPCg | 13 |
+| 11 | Fri | Paper: Probabilistic Counting (Flajolet and Martin) | — | video | free | HyperLogLog: Facebook's algorithm to count distinct elements | Gaurav Sen | https://www.youtube.com/watch?v=eV1haPUt0NU | 11 |
 | 11 | Sat | Ad Click Aggregator | ad-click-aggregator | doc | free | Design an ad click aggregator | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/ad-click-aggregator | — |
 | 11 | Sat | Ad Click Aggregator | ad-click-aggregator | video | free | Design an Ad Click Aggregator | Hello Interview | https://www.youtube.com/watch?v=Zcv_899yqhI | 62 |
 | 11 | Sat | Ad Click Aggregator | ad-click-aggregator | doc | free | How Razorpay built real-time anomaly detection with Amazon MSK | AWS Big Data Blog | https://aws.amazon.com/blogs/big-data/how-razorpay-built-real-time-anomaly-detection-with-amazon-msk/ | — |
@@ -296,8 +345,12 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 12 | Tue | Cassandra (pick one) | — | video | free | Cassandra Deep Dive | Hello Interview | https://www.youtube.com/watch?v=TD3-INhm60Q | 30 |
 | 12 | Tue | DynamoDB (pick one) | — | doc | free | DynamoDB deep dive | Hello Interview | https://www.hellointerview.com/learn/system-design/deep-dives/dynamodb | — |
 | 12 | Tue | DynamoDB (pick one) | — | video | free | DynamoDB Deep Dive | Hello Interview | https://www.youtube.com/watch?v=2X2SO3Y-af8 | 23 |
-| 12 | Wed | Terraform (optional) | — | doc | free | Terraform tutorials | HashiCorp | https://developer.hashicorp.com/terraform/tutorials | — |
-| 12 | Wed | Terraform (optional) | — | video | free | Terraform explained in 15 mins | TechWorld with Nana | https://www.youtube.com/watch?v=l5k1ai_GBDE | 18 |
+| 12 | Wed | Storage engines: LSM trees and B-trees | — | video | free | The Secret Sauce Behind NoSQL: LSM Tree | ByteByteGo | https://www.youtube.com/watch?v=I6jB0nM9SKU | 8 |
+| 12 | Wed | Storage engines: LSM trees and B-trees | — | video | free | How Databases Actually Store Your Data (B-Trees vs LSM Trees) | ByteMonk | https://www.youtube.com/watch?v=Q9xD4J3tezw | 11 |
+| 12 | Wed | Storage engines: LSM trees and B-trees | — | doc | free | Bitcask | Arpit Bhayani | https://arpitbhayani.me/blogs/bitcask | — |
+| 12 | Wed | Storage engines: LSM trees and B-trees | — | repo | free | System design exercises in Go: LSM tree, B+ tree and Bitcask | Arpit Bhayani's course | https://github.com/addi-11/system-design-excercises | — |
+| Extra | — | Terraform (optional) | — | doc | free | Terraform tutorials | HashiCorp | https://developer.hashicorp.com/terraform/tutorials | — |
+| Extra | — | Terraform (optional) | — | video | free | Terraform explained in 15 mins | TechWorld with Nana | https://www.youtube.com/watch?v=l5k1ai_GBDE | 18 |
 | 12 | Thu | Robinhood (option) | robinhood | video | free | What really happens when you buy a stock? | ByteMonk | https://www.youtube.com/watch?v=4wvIU0O1xro | 7 |
 | 12 | Thu | Robinhood (option) | robinhood | doc | premium | Robinhood | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/robinhood | — |
 | 12 | Thu | Robinhood (option) | robinhood | doc | free | Low-latency stock exchange | ByteByteGo | https://bytebytego.com/guides/guides/low-latency-stock-exchange/ | — |
@@ -305,6 +358,7 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 12 | Thu | Robinhood (option) | robinhood | video | free | Design Robinhood: System Design Interview | interviewing.io | https://www.youtube.com/watch?v=q3H4pHuMBBM | 65 |
 | 12 | Thu | Robinhood (option) | robinhood | video | free | Inside a real high-frequency trading system | ByteMonk | https://www.youtube.com/watch?v=iwRaNYa8yTw | 11 |
 | 12 | Thu | Maths: geohash precision | — | video | free | Geohash: deep intuitive understanding in under 7 minutes | Jim O'Flaherty | https://www.youtube.com/watch?v=UaMzra18TD8 | 7 |
+| 12 | Fri | Paper: MyRocks | — | video | free | MyRocks at Facebook and a Roadmap | Percona | https://www.youtube.com/watch?v=Hd-sT7DmzKM | 12 |
 | 12 | Sat | Uber | uber | doc | free | Design a ride-sharing service like Uber | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/uber | — |
 | 12 | Sat | Uber | uber | video | free | Design Uber | Hello Interview | https://www.youtube.com/watch?v=lsKU38RKQSo | 63 |
 | 12 | Sat | Uber | uber | video | free | Uber system design: WebSockets and event-driven architecture | ByteMonk | https://www.youtube.com/watch?v=2WYjtfRyHzQ | 19 |

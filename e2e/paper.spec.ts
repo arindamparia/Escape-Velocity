@@ -42,7 +42,7 @@ async function offenders(page: Page): Promise<string[]> {
 const PATHS = [
   ...PAGES.map((p) => p.path),
   '/study/redraws', '/study/flashcards', '/study/timer', '/study/mock', '/study/envelope', '/study/formulas', '/study/notes', '/study/cheatsheet',
-  '/weeks/capstone', '/weeks/interview', '/library?design=ticketmaster', '/progress/review', '/sources',
+  '/weeks/capstone', '/weeks/interview', '/library?design=ticketmaster', '/progress/review', '/sources', '/library?tab=papers', '/library?tab=gaps',
 ]
 
 test.describe('Paper: nothing moves, nothing is raised, nothing fades', () => {

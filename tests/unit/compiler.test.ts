@@ -30,7 +30,7 @@ describe('compiler: the real plan', () => {
   const out = compilePlan(source)
 
   it('compiles to exactly the expected counts', () => {
-    expect(out.core.counts).toEqual({ tasks: 171, weeklyTasks: 163, readiness: 8, designs: 37, flashcards: 27 })
+    expect(out.core.counts).toEqual({ tasks: 200, weeklyTasks: 192, readiness: 8, designs: 42, flashcards: 37 })
     expect(out.core.weeks).toHaveLength(13)
     expect(Object.keys(out.weekChunks)).toHaveLength(13)
   })
@@ -82,10 +82,13 @@ describe('compiler: the real plan', () => {
   })
 
   it('renders maths to MathML at build time', () => {
-    expect(out.weekChunks['01'].math['w01-12']).toContain('<math')
     expect(out.weekChunks['04'].math['w04-06']).toContain('<math')
-    // The plan says "13 derivations" but Week 13 has no maths task: weeks 1 to 12 carry one each.
-    expect(out.pages.study.formulas.map((f) => f.week)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+    // the answer to a derivation is kept apart from its question (and is maths too)
+    expect(out.weekChunks['01'].checks['w01-12']).toContain('<math')
+    // Week 13 has no weekly derivation: weeks 1 to 12 carry one each, and most weeks add a bonus equation
+    const weekly = out.pages.study.formulas.filter((f) => !f.bonus)
+    expect(weekly.map((f) => f.week)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+    expect(out.pages.study.formulas.filter((f) => f.bonus).map((f) => f.week)).toEqual([1, 4, 6, 7, 8, 9, 10, 11, 12, 13])
     expect(out.pages.study.formulasIntroHtml).toContain('<math')
     expect(out.pages.study.formulasIntroHtml).not.toContain('^')
   })
@@ -111,7 +114,7 @@ describe('compiler: the real plan', () => {
     expect(out.pages.weeks.capstoneIntroHtml).toContain('cloud, Docker, Kubernetes')
     expect(out.pages.weeks.stories).toHaveLength(6)
     expect(out.pages.progress.reviewQuestions).toHaveLength(3)
-    expect(out.pages.today.rules.length).toBe(12)
+    expect(out.pages.today.rules.length).toBe(13)
   })
 
   it('reads the reported interview problems for weeks 3 to 9', () => {
@@ -129,7 +132,7 @@ describe('compiler: the real plan', () => {
     expect(out.pages.library.companiesLessonsHtml).toHaveLength(7)
     expect(out.pages.library.companiesIntroHtml).toContain('machine coding was underweighted')
     const r = out.pages.library.reading
-    expect(r).toHaveLength(6)
+    expect(r).toHaveLength(9)
     expect(r[0].designIds).toEqual(['bitly', 'payment-system'])
     expect(r.find((x) => x.html.includes('Shopify'))!.designIds).toEqual(['flash-sale'])
     expect(r.find((x) => x.html.includes('Hyperswitch'))!.designIds).toEqual(['payment-system', 'payment-router-or-switch'])
@@ -224,7 +227,9 @@ describe('compiler: every failure rule fails the build', () => {
     const out = compilePlan(source)
     for (const w of Object.values(out.weekChunks)) {
       for (const [id, list] of Object.entries(w.resources)) {
-        expect(list.some((r) => r.kind === 'video'), `${id} has no video`).toBe(true)
+        // a paper's own link is the point of its task (a video is added where a good one exists)
+        const paper = out.core.tasks.find((t) => t.id === id)?.type === 'paper'
+        expect(list.some((r) => r.kind === (paper ? 'doc' : 'video')), `${id} has no ${paper ? 'doc' : 'video'}`).toBe(true)
         const free = list.filter((r) => r.access === 'free').map((r) => r.kind)
         expect(free, id).toEqual([...free].sort((a, b) => ['video', 'doc', 'repo'].indexOf(a) - ['video', 'doc', 'repo'].indexOf(b)))
       }
@@ -249,5 +254,85 @@ describe('compiler: every failure rule fails the build', () => {
   it('reports every problem at once, not just the first', () => {
     const src = mutate('`w01-01` `dsa`', '`w01-01` `dsax`').replace('<!-- surface: weeks.dsa -->\n', '')
     expect(errorsOf(src).length).toBeGreaterThanOrEqual(2)
+  })
+})
+
+describe('compiler: the extras (papers, equations, gaps)', () => {
+  const out = compilePlan(source)
+
+  it('hides the answer: a derivation task shows its question, and the check is kept apart', () => {
+    for (const id of ['w01-12', 'w02-06', 'w09-06']) {
+      const html = out.weekChunks[id.slice(1, 3)].tasks[id].html
+      expect(html).not.toMatch(/check:/)
+      expect(out.weekChunks[id.slice(1, 3)].checks[id], id).toBeTruthy()
+    }
+    expect(out.weekChunks['01'].tasks['w01-12'].text).not.toContain('916')
+    expect(out.weekChunks['01'].checks['w01-12']).toContain('916')
+    // every weekly derivation has one; so does every bonus equation
+    for (const f of out.pages.study.formulas) expect(f.check, f.taskId).toBeTruthy()
+  })
+
+  it('reads the equation bank: 10 bonus equations carried by a task, 12 on the shelf, all as MathML', () => {
+    const bonus = out.core.tasks.filter((t) => t.eq)
+    expect(bonus).toHaveLength(10)
+    expect(bonus.every((t) => t.type === 'maths' && t.optional && t.day === 'Week' && t.points === 1)).toBe(true)
+    expect(out.pages.study.shelf).toHaveLength(12)
+    for (const e of out.pages.study.shelf) {
+      expect(e.formulaHtml, e.id).toContain('<math')
+      expect(e.checkHtml, e.id).toBeTruthy()
+    }
+    expect(out.core.shelfIds).toHaveLength(12)
+    // no bonus equation in a light week
+    expect(bonus.map((t) => t.week).filter((w) => [2, 3, 5].includes(w!))).toEqual([])
+  })
+
+  it('every paper task has one row in the schedule, and every row points at a paper task in its week', () => {
+    const papers = out.core.tasks.filter((t) => t.type === 'paper')
+    expect(papers).toHaveLength(10)
+    expect(papers.every((t) => t.optional && t.day !== 'Sat')).toBe(true)
+    expect(out.pages.library.papers.schedule.map((p) => p.taskId).sort()).toEqual(papers.map((t) => t.id).sort())
+    expect(out.pages.library.papers.shelf.length).toBe(3)
+    expect(out.pages.library.papers.schedule.filter((p) => p.anchor).map((p) => p.week)).toEqual([6, 7, 8, 13])
+    // no paper on a light week, or in week 1, where Friday night is off
+    expect(papers.map((t) => t.week).filter((w) => [1, 2, 3, 5].includes(w!))).toEqual([])
+    // each paper is a free doc on its task
+    for (const t of papers) expect(out.weekChunks[String(t.week).padStart(2, '0')].resources[t.id].some((r) => r.kind === 'doc' && r.access === 'free'), t.id).toBe(true)
+  })
+
+  it('the ten gaps each have a task with a why-question (a flashcard), a sketch, and a place in both syllabi', () => {
+    const { gaps, coverage } = out.pages.library.gaps
+    expect(gaps.map((g) => g.id)).toEqual(['G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7', 'G8', 'G9', 'G10'])
+    for (const g of gaps) {
+      expect(out.core.flashcardIds, g.id).toContain(g.taskId)
+      expect(out.core.tasks.find((t) => t.id === g.taskId)!.sketch, g.id).toBe(g.sketch)
+    }
+    const gapRefs = coverage.flatMap((c) => c.rows).map((r) => r.goTo).filter((x) => /^G\d+$/.test(x))
+    for (const g of gaps) expect(gapRefs, `${g.id} is cited by a syllabus row`).toContain(g.id)
+    expect(coverage).toHaveLength(2)
+  })
+
+  it('task IDs in the gap tables become labelled links, never shown raw', () => {
+    const html = JSON.stringify(out.pages.library.gaps.coverage)
+    expect(html).not.toMatch(/>w\d\d-\d\d</)
+    expect(html).toContain('Week 2 · Task 5')
+  })
+
+  it('the five new designs are in the library and offered as second designs', () => {
+    const ids = ['s3-like-blob-store', 'online-offline-indicator', 'deep-research-agent', 'recommendation-engine', 'live-stream-with-cdn']
+    const all = out.pages.library.groups.flatMap((g) => g.designs.map((d) => d.id))
+    for (const id of ids) expect(all).toContain(id)
+    expect(out.core.tasks.find((t) => t.id === 'w08-05')!.designs).toContain('online-offline-indicator')
+    expect(out.core.tasks.find((t) => t.id === 'w10-05')!.designs).toContain('recommendation-engine')
+  })
+
+  it('fails the build on a broken extra', () => {
+    expect(errorsOf(mutate('`w01-17` `maths` `+1` Week', '`w01-17` `read` `+1` Week')).join('\n')).toMatch(/Equation eq-01: its task w01-17 must be a maths task/)
+    expect(errorsOf(mutate('| w04-14 | 4 | SIEVE', '| w04-99 | 4 | SIEVE')).join('\n')).toMatch(/its task w04-99 is not in the plan/)
+    expect(errorsOf(mutate('| w06-16 | 6 | Spanner |', '| — | 6 | Spanner |')).join('\n')).toMatch(/paper task w06-16 needs exactly one row/)
+    expect(errorsOf(mutate('| G4 | Isolation levels, properly | w02-08 | write-skew |', '| G4 | Isolation levels, properly | w02-08 | nope |')).join('\n')).toMatch(/sketch "nope"/)
+    expect(errorsOf(mutate('| eq-04 | 4 | Zipf hit ratio | $', '| eq-04 | 4 | Zipf hit ratio | no tex $')).join('\n')).toMatch(/must be TeX between dollar signs/)
+    expect(errorsOf(mutate('| **Partial gap → G4** |', '| **Partial gap → G99** |')).join('\n')).toMatch(/"G99" is neither a gap nor a design/)
+    expect(errorsOf(source.replace('tagline: 13 weeks. 42 designs.', 'tagline: 13 weeks. 37 designs.')).join('\n')).toMatch(/tagline says 37 designs but the library has 42/)
+    expect(errorsOf(mutate('‖ check: 62^5 is about 916 million (too few) and 62^6 about 56.8 billion, so 6 characters. The birthday bound is about the square root of 62^7, around 1.9 million codes, so random codes need a collision check', '‖ check: ')).join('\n')).toMatch(/nothing after it/)
   })
 })

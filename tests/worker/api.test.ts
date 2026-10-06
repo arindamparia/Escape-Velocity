@@ -125,6 +125,23 @@ describe('POST /api/ops: validation and rejection', () => {
     expect((await env.DB.prepare('SELECT COUNT(*) AS n FROM applied_op').first<{ n: number }>())!.n).toBe(0)
   })
 
+  it('a shelf equation is ticked under its own id, a paper keeps its decision cards, and anything else unknown is refused', async () => {
+    const shelf = planCore.shelfIds[0]
+    const paper = planCore.tasks.find((t) => t.type === 'paper')!.id
+    const res = await post([
+      op('task.set', { taskId: shelf, done: true }),
+      op('decision.upsert', { id: uuid(), designId: `paper-${paper}`, decision: 'Commit wait', forcedBy: 'External consistency' }),
+    ])
+    expect(res.status).toBe(200)
+    const s = await state()
+    expect(s.taskProgress).toMatchObject([{ taskId: shelf, done: true }])
+    expect(s.decisionCards).toMatchObject([{ designId: `paper-${paper}` }])
+    const bad = await post([op('task.set', { taskId: 'eq-99', done: true })])
+    expect(bad.status).toBe(422)
+    const bad2 = await post([op('decision.upsert', { id: uuid(), designId: 'paper-w99-99', decision: 'x', forcedBy: 'y' })])
+    expect(bad2.status).toBe(422)
+  })
+
   it('rejects unknown design IDs, unknown flashcard IDs and why-notes for unknown tasks', async () => {
     for (const bad of [
       op('design.set', { designId: 'not-a-design', status: 'attempted' }),

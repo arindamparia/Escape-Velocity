@@ -1,9 +1,10 @@
 // Types for the compiled plan. Pure types and constants: no runtime dependencies,
 // so the compiler, the client and the Worker can all import this file.
+import type { SketchId } from './sketches'
 
 export const TASK_TYPES = [
   'dsa', 'boss', 'concept', 'infra', 'design', 'design2', 'lld', 'maths', 'capstone', 'redraw',
-  'read', 'mock', 'story', 'career', 'mindset', 'review', 'rest', 'ai', 'ready',
+  'read', 'mock', 'story', 'career', 'mindset', 'review', 'rest', 'ai', 'ready', 'paper',
 ] as const
 export type TaskType = (typeof TASK_TYPES)[number]
 
@@ -13,6 +14,7 @@ export type PlanDay = (typeof DAYS)[number]
 export const SURFACES = [
   'mindset.why-plan', 'mindset.main',
   'library.companies', 'library.designs', 'library.machine-coding', 'library.reading', 'library.resources',
+  'library.papers', 'library.equations', 'library.gaps',
   'study.loop-guide', 'study.loop-steps', 'study.decision-card', 'study.six-forces', 'study.formulas',
   'today.rules', 'today.routine',
   'progress.points-help', 'progress.readiness', 'progress.scorecard',
@@ -51,6 +53,12 @@ export interface PlanTask {
   hasWhy?: boolean
   /** dsa tasks: done by itself when each of these weekdays (0 = Mon) has at least `perDay` solved problems */
   solve?: { days: number[]; perDay: number }
+  /** maths tasks that are a bonus equation: its id in the equation bank (eq-01) */
+  eq?: string
+  /** an extra (a paper, a bonus equation): never the next action, never needed for a light week's star */
+  optional?: true
+  /** gap concepts: the sketch you compare your answer with (see shared/sketches.ts) */
+  sketch?: SketchId
 }
 
 export interface PlanWeek {
@@ -75,6 +83,8 @@ export interface PlanCore {
   designs: PlanDesignLite[]
   /** Flashcard IDs = the concept/infra task IDs that have a Why: question */
   flashcardIds: string[]
+  /** Shelf equations (eq-14 ...): no task, ticked under their own id */
+  shelfIds: string[]
   counts: { tasks: number; weeklyTasks: number; readiness: number; designs: number; flashcards: number }
 }
 
@@ -115,12 +125,49 @@ export interface WeekChunk {
   /** Reported interview problems to solve this week (weeks 3 to 9), one suggested per day on Today */
   reported: string[]
   tasks: Record<string, { html: string; text: string; why?: string }>
-  /** Maths tasks: MathML-rendered html of the derivation */
+  /** Maths tasks: MathML-rendered html of the derivation (the question, never the answer) */
   math: Record<string, string>
+  /** Maths tasks: the check value, hidden until you have tried ("‖ check:" in the plan, or the equation bank's check column) */
+  checks: Record<string, string>
   designs: Record<string, DesignRef>
   /** Study links for each task (docs, videos, repos), free first */
   resources: Record<string, ResourceRow[]>
 }
+
+/** One row of the equation bank: a bonus equation tied to a week's task, or a shelf equation you can do any time. */
+export interface EquationRow {
+  /** eq-01 ... : a permanent key. Shelf equations are ticked under this id */
+  id: string
+  kind: 'bonus' | 'shelf'
+  /** the week it is tied to (bonus) or best done in (shelf) */
+  week: number
+  name: string
+  /** the formula, as MathML */
+  formulaHtml: string
+  setupHtml: string
+  /** the check value: shown only after you have tried */
+  checkHtml: string
+  tiedTo: string
+  /** bonus equations: the weekly task that carries it */
+  taskId?: string
+}
+
+/** One paper in the paper track. A row with a task is read on that Friday; a row without one is on the shelf. */
+export interface PaperRow {
+  /** the paper task that reads it, or empty on the shelf */
+  taskId: string
+  week: number
+  title: string
+  url: string
+  length: string
+  whyHtml: string
+  /** "the number to find": what to put on the decision card */
+  findHtml: string
+  /** a starred paper gets the third pass: redraw it from memory and explain it out loud */
+  anchor: boolean
+}
+
+export type GapStatus = 'covered' | 'partial' | 'gap' | 'skip'
 
 export interface DesignFull extends DesignRef {
   group: string
@@ -155,7 +202,10 @@ export interface PageChunks {
     decisionCard: { field: string; example: string }[]
     forces: { name: string; text: string }[]
     formulasIntroHtml: string
-    formulas: { taskId: string; week: number; html: string }[]
+    /** One derivation a week, then the bonus equations, in week order */
+    formulas: { taskId: string; week: number; html: string; check?: string; bonus?: boolean; name?: string }[]
+    /** Equations with no task: tick them off when you do them */
+    shelf: EquationRow[]
     flashcards: { id: string; week: number; day: PlanDay; front: string; taskText: string }[]
   }
   library: {
@@ -176,6 +226,21 @@ export interface PageChunks {
     /** Every study link, free first: the Sources page lists them by week, a design's page picks its own by designId */
     resources: ResourceRow[]
     channels: { channel: string; use: string; weeks: string; url: string }[]
+    papers: {
+      introHtml: string
+      methodHtml: string
+      schedule: PaperRow[]
+      shelf: PaperRow[]
+      alternates: { instead: string; paper: string; because: string }[]
+      noteHtml: string
+    }
+    gaps: {
+      introHtml: string
+      gaps: { id: string; title: string; taskId: string; sketch: SketchId; whyHtml: string; deriveHtml: string; sourcesHtml: string }[]
+      coverage: { title: string; rows: { topic: string; planHtml: string; status: GapStatus; goTo: string; statusHtml: string }[] }[]
+      missingHtml: string
+      coursesHtml: string
+    }
   }
   progress: {
     pointsHtml: string

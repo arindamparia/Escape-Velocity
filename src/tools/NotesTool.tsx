@@ -70,7 +70,7 @@ function Stories({ initial }: { initial?: number }) {
 
 function FreeNotes() {
   const [open, setOpen] = useState<string | null>(null)
-  const notes = engine.state.value.notes.filter((n) => n.kind === 'free' && !(n.refId ?? '').startsWith('pick:')).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+  const notes = engine.state.value.notes.filter((n) => n.kind === 'free' && !/^(pick|eq|paper):/.test(n.refId ?? '')).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
   return (
     <div class="stack">
       <div><button type="button" class="btn" onClick={() => setOpen(`free-${crypto.randomUUID().slice(0, 8)}`)}>New note</button></div>

@@ -1,7 +1,7 @@
 import { lazy } from 'preact-iso'
 import { useEffect, useRef, useState } from 'preact/hooks'
 import { canonicalProblemUrl, titleFromProblemUrl } from '../../shared/constants'
-import { closeOverlay, engine, logProblem, needsOnboarding, overlay, say, whyNote } from '../lib/app'
+import { closeOverlay, engine, findNote, logProblem, needsOnboarding, overlay, say, whyNote } from '../lib/app'
 import { today } from '../lib/clock'
 import { taskById, taskLabel } from '../lib/plan'
 import { Dialog } from './Dialog'
@@ -10,6 +10,7 @@ import { EquationCard } from './Equation'
 import { useWeekChunk, usePage } from './hooks'
 import { Html } from './Html'
 import { NoteEditor } from './NoteEditor'
+import { SketchPeek } from './SketchView'
 import { ThemePicker } from './ThemePicker'
 
 const DesignSheet = lazy(() => import('../pages/DesignSheet'))
@@ -41,6 +42,7 @@ function WhyNote({ taskId }: { taskId: string }) {
         {why ? <p><strong>{why}</strong></p> : null}
         <p class="small muted">Answer in your own words, half a page at most. Saving it creates a flashcard: the front is this question, the back is your note.</p>
         <NoteEditor kind="why" refId={taskId} rows={9} placeholder="In my own words…" />
+        {task?.sketch ? <SketchPeek id={task.sketch} tried={!!(findNote('why', taskId)?.body ?? '').trim()} /> : null}
         <div class="row"><button type="button" class="btn btn--primary" onClick={closeOverlay}>Done</button></div>
       </div>
     </Dialog>
@@ -158,7 +160,7 @@ function Onboarding() {
   return (
     <Dialog title="Escape Velocity" onClose={() => engine.dispatch('setting.set', { key: 'onboarded', value: '1' })} wide>
       <div class="stack">
-        <p class="eyebrow">13 weeks. 37 designs. One jump.</p>
+        <p class="eyebrow">13 weeks. 42 designs. One jump.</p>
         {page ? <Html html={page.whyPlanHtml} /> : <div class="skeleton" />}
         <div>
           <h3>Your why <span class="muted small">(skippable; you’ll be asked again on Monday night)</span></h3>
