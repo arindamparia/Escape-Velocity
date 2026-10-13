@@ -338,6 +338,16 @@ describe('compiler: the extras (papers, equations, gaps)', () => {
     expect(out.weekChunks['07'].resources['w07-16'][0].url).toContain('LnqKfLcszEg') // his DynamoDB paper explainer leads
   })
 
+  it('Hello Interview\'s Top K and Tinder videos are on their tasks and design pages, Top K first and the older video kept second', () => {
+    const topK = out.weekChunks['11'].resources['w11-05'].filter((r) => r.kind === 'video').map((r) => r.url)
+    expect(topK).toEqual(['https://www.youtube.com/watch?v=y-tA2NW4LNY', 'https://www.youtube.com/watch?v=kx-XDoPjoHw'])
+    const forDesign = (id: string) => out.pages.library.resources.filter((r) => r.designId === id && r.kind === 'video').map((r) => r.url)
+    expect(forDesign('youtube-top-k')).toEqual(topK)
+    expect(forDesign('tinder')).toEqual(['https://www.youtube.com/watch?v=18Fg5Akhkqw'])
+    // each new video is in the table exactly once
+    for (const id of ['y-tA2NW4LNY', '18Fg5Akhkqw']) expect(out.pages.library.resources.filter((r) => r.url.includes(id))).toHaveLength(1)
+  })
+
   it('the five new designs are in the library and offered as second designs', () => {
     const ids = ['s3-like-blob-store', 'online-offline-indicator', 'deep-research-agent', 'recommendation-engine', 'live-stream-with-cdn']
     const all = out.pages.library.groups.flatMap((g) => g.designs.map((d) => d.id))

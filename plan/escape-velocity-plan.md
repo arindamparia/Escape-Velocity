@@ -1802,6 +1802,7 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 11 | Wed | CI/CD with GitHub Actions | — | doc | free | GitHub Actions docs | GitHub | https://docs.github.com/en/actions | — |
 | 11 | Wed | CI/CD with GitHub Actions | — | video | free | GitHub Actions Tutorial: basic concepts and CI/CD with Docker | TechWorld with Nana | https://www.youtube.com/watch?v=R8_veQiYBjI | 32 |
 | 11 | Thu | YouTube Top K (option) | youtube-top-k | doc | free | Design YouTube's Top K videos | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/top-k | — |
+| 11 | Thu | YouTube Top K (option) | youtube-top-k | video | free | Top-K System Design Interview Breakdown | Hello Interview | https://www.youtube.com/watch?v=y-tA2NW4LNY | 92 |
 | 11 | Thu | YouTube Top K (option) | youtube-top-k | video | free | Top K Problem (Heavy Hitters) | System Design Interview | https://www.youtube.com/watch?v=kx-XDoPjoHw | 36 |
 | 11 | Thu | Maths: count-min sketch | — | video | free | Count-min sketch: counting a stream of data | Tech Dummies | https://www.youtube.com/watch?v=ibxXO-b14j4 | 20 |
 | 11 | Fri | Paper: Probabilistic Counting (Flajolet and Martin) | — | video | free | Hyperloglog and Cardinality Estimation | Arpit Bhayani | https://www.youtube.com/watch?v=tOsb-tFoPCg | 13 |
@@ -1855,6 +1856,7 @@ Use them in this order: watch the video for the idea, answer the why-question yo
 | 4–11 | Sat | LLD in Java | — | video | free | Concept && Coding LLD playlists (Hindi) | Concept && Coding | https://www.youtube.com/@ConceptAndCodingByShrayansh/playlists | — |
 | Extra | — | YouTube | youtube | doc | free | Design YouTube | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/youtube | — |
 | Extra | — | YouTube | youtube | video | free | Design YouTube | Hello Interview | https://www.youtube.com/watch?v=IUrQ5_g3XKs | 43 |
+| Extra | — | Tinder | tinder | video | free | Design Tinder | Hello Interview | https://www.youtube.com/watch?v=18Fg5Akhkqw | 73 |
 | Extra | — | Instagram | instagram | doc | premium | Instagram | Hello Interview | https://www.hellointerview.com/learn/system-design/problem-breakdowns/instagram | — |
 | Extra | — | Instagram | instagram | doc | free | Design Instagram | AlgoMaster | https://algomaster.io/learn/system-design-interviews/design-instagram | — |
 | Extra | — | Instagram | instagram | video | free | Designing INSTAGRAM: System Design of News Feed | Gaurav Sen | https://www.youtube.com/watch?v=QmX2NPkJTKg | 24 |
