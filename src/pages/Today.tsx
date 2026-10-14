@@ -17,6 +17,8 @@ import { Html } from '../ui/Html'
 import { Icon } from '../ui/Icon'
 import { BossHow } from '../ui/BossHow'
 import { CapstoneLinks } from '../ui/CapstoneLinks'
+import { HourBox, PlanLine, RestNote, RhythmLine, WeekStart } from '../ui/Rhythm'
+import { momentum } from '../lib/rhythm'
 import { StudyPanel } from '../ui/Resources'
 import { actionsFor, labelOf, TaskRow, TYPE_LABEL } from '../ui/Task'
 
@@ -111,6 +113,7 @@ export default function Today() {
   const activity = useMemo(() => activityDates(state, algotracker.value.solved), [state, algotracker.value.solved])
   const missed = useMemo(() => missedDays(activity, date, plan.config.startDate, plan.config.lightDays), [activity, date])
   const streak = useMemo(() => streakWeeks(activity, date, plan.config.startDate), [activity, date])
+  const rhythm = useMemo(() => momentum(activity, date, plan.config.startDate), [activity, date])
   const hasActivityToday = activity.has(date)
   const week = plan.weeks[info.week - 1]
 
@@ -269,12 +272,17 @@ export default function Today() {
               {streak > 0 ? <>{streak}-week streak.</> : null}
             </p>
           ) : null}
+          {info.phase === 'during' ? <RhythmLine date={date} week={info.week} dow={info.dow} done={done} light={!!info.light} welcomeBack={welcomeBack} /> : null}
+          {info.phase === 'during' ? <PlanLine week={info.week} dow={info.dow} /> : null}
+          {info.phase === 'during' ? <RestNote m={rhythm} /> : null}
           {info.phase === 'during' && target ? <div class="bar weekbar" role="progressbar" aria-label={`Week ${info.week} points`} aria-valuemin={0} aria-valuemax={target} aria-valuenow={Math.min(points, target)}><i style={{ width: `${Math.min(100, (points / target) * 100)}%` }} /></div> : null}
         </header>
 
         {info.phase === 'before' && !whyNote.value.trim() ? null : <WhyStrip />}
         {hero}
         {info.phase === 'during' && !light ? <DueToday /> : null}
+        {info.phase === 'during' && !welcomeBack ? <WeekStart week={info.week} dow={info.dow} done={done} /> : null}
+        {info.phase === 'during' && !light && !welcomeBack ? <HourBox week={info.week} dow={info.dow} done={done} /> : null}
 
         {info.phase === 'during' ? (
           <section aria-label="Today's tasks">

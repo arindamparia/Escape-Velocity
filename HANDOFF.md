@@ -2,6 +2,14 @@
 
 Status at the end of the third session. Read `CLAUDE.md` first, then `AUDIT.md` (the build checked against every section of the plan), then the plan itself (`plan/escape-velocity-plan.md`, Part 1).
 
+## Time, topics and motivation (14 Oct 2026)
+
+Researched in the session (sources in the reply that proposed it; the evidence is thin and mostly general, so every line is plain and testable):
+
+- **Topics that matter first** (`src/lib/priority.ts`): ten Core designs (Bitly, Rate Limiter, Ticketmaster, Payment System, WhatsApp, Notification System, News Feed, Dropbox, Job Scheduler, Wallet with a ledger), twelve Fintech-edge ones, the rest More practice. It is a judgement from candidate reports of SDE-2 loops and the plan's company table, written down so you can change it. Used for a Priority filter and tag in the Library, a small tie-break in search, and to order "Only have a little time?".
+- **Today** now has (all in `src/ui/Rhythm.tsx`, logic in `src/lib/rhythm.ts`): the chapter you are in (Foundations 1 to 4, Depth 5 to 8, Systems 9 to 11, Launch 12 to 13) with the days left in it; "About 1 h 15 min left today" or "That is enough for today" (task times are estimates from the plan's routine, `TYPE_MINUTES`); "Only have a little time?" (30 to 120 minutes: the open work that fits, most valuable first, including what is waiting); on Monday and Tuesday a fresh-week card (last week in a line and your best moment, and a box for two "If … then I …" plans, kept as a free note `plan:wNN`, which comes back as a quiet line from Wednesday); a rest note after six active days in a row. Progress has a Momentum card (active days this week and last, your best week, longest gap, focus hours and the next marker), always against your own weeks.
+- No streak that breaks on one missed day (the app counts weeks), no confetti (Paper has no animation), no guilt copy.
+
 ## Search you can measure (14 Oct 2026)
 
 - **Golden questions** (`tests/golden/`): 129 questions with the rows that answer them, a scorer (recall@1/3/10, MRR, bootstrap intervals, paired comparison) and a committed baseline. `npm run eval:search` prints the report and every miss. Run it before and after any change to `src/lib/search.ts`, the palette's keywords, `scripts/lib/rag.ts` or the prompt, and keep a change only if the number moves the right way.

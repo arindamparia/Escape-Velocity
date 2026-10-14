@@ -158,4 +158,20 @@ test.describe('how many server calls does each thing cost', () => {
     expect(w.count('GET /api/state')).toBe(0)
     expect(w.count('POST /api/ops')).toBeLessThanOrEqual(2)
   })
+
+  test('writing your plan for the week is one note: one request to save it, nothing read back', async ({ page, api }) => {
+    await api.onboard()
+    await api.activeOn('2026-10-25')
+    await openApp(page, '/', { at: new Date('2026-10-26T04:30:00Z') }) // Monday of week 3
+    await page.waitForTimeout(500)
+    const w = watch(page)
+    const box = page.getByTestId('week-start').locator('textarea')
+    await box.fill('If it is 7 pm on Tuesday, then I open the Kafka task.')
+    await box.blur()
+    await expect.poll(async () => (await api.state()).notes.find((n) => n.refId === 'plan:w03')?.body).toContain('Kafka')
+    await page.waitForTimeout(1000)
+    expect(w.count('POST /api/ops')).toBe(1)
+    expect(w.count('GET /api/state')).toBe(0)
+    expect(w.count('GET /api/solved')).toBe(0)
+  })
 })

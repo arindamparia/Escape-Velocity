@@ -11,6 +11,7 @@ import { Html } from '../ui/Html'
 import { Icon } from '../ui/Icon'
 import { LineChart, ProblemsChart, Ring, ScoreSheet } from '../ui/charts'
 import { usePage, useTitle } from '../ui/hooks'
+import { MomentumCard } from '../ui/Rhythm'
 import { Review } from './Review'
 import { SolvedProblems } from './SolvedProblems'
 import { WeekForm } from './WeekForm'
@@ -128,6 +129,7 @@ export default function Progress({ view }: { view?: string }) {
       </div>
       <div class="slot-aside">
         <Readiness />
+        {info.phase === 'during' || info.phase === 'after' ? <MomentumCard date={today.value} /> : null}
         <details class="card" id="points"><summary>How points work</summary><div style="margin-top:0.8rem">{progress ? <Html html={progress.pointsHtml} class="prose small" /> : <div class="skeleton" />}</div></details>
         {info.phase === 'after' ? <div class="card"><p style="margin:0"><Icon name="star" /> 13 constellations. Go collect offers.</p></div> : null}
         <p class="small muted">Weekly target: {weekTarget(info.week, plan.config) ?? 'none this week'}.</p>

@@ -5,6 +5,7 @@ import { engine, overlay, selectedDesign, showDesign } from '../lib/app'
 import { today } from '../lib/clock'
 import { dayInfo } from '../lib/today'
 import { navigate } from '../lib/nav'
+import { TIER_LABEL, tierOf, type Tier } from '../lib/priority'
 import { Html } from '../ui/Html'
 import { usePage, useTitle } from '../ui/hooks'
 import { StudyLinks } from '../ui/StudyLinks'
@@ -20,7 +21,7 @@ function Chips<T extends string>({ label, options, value, onChange }: { label: s
   return (
     <div>
       <p class="eyebrow">{label}</p>
-      <div class="row">
+      <div class="row" role="group" aria-label={label}>
         <button type="button" class="chip" aria-pressed={value === ''} onClick={() => onChange('')}>All</button>
         {options.map(([v, l]) => <button key={v} type="button" class="chip" aria-pressed={value === v} onClick={() => onChange(value === v ? '' : v)}>{l}</button>)}
       </div>
@@ -28,7 +29,7 @@ function Chips<T extends string>({ label, options, value, onChange }: { label: s
   )
 }
 
-interface Filters { group: string; access: string; st: string; q: string }
+interface Filters { group: string; access: string; st: string; q: string; tier: string }
 
 function FilterPanel({ groups, f, set }: { groups: { title: string; designs: DesignFull[] }[]; f: Filters; set: (p: Partial<Filters>) => void }) {
   // open beside the list on a wide screen; closed on a phone, where it would fill the first screen and push the list away
@@ -39,6 +40,7 @@ function FilterPanel({ groups, f, set }: { groups: { title: string; designs: Des
       <div class="filters" style="margin-top:0.8rem">
         <label>Search<input type="search" value={f.q} placeholder="idempotency, geo, fan-out…" onInput={(e) => set({ q: (e.target as HTMLInputElement).value })} /></label>
         <Chips label="Lesson" options={groups.map((g) => [g.title, g.title.split(':')[0]] as [string, string])} value={f.group} onChange={(v) => set({ group: v })} />
+        <Chips label="Priority" options={(Object.keys(TIER_LABEL) as Tier[]).map((t) => [t, TIER_LABEL[t]] as [Tier, string])} value={f.tier as Tier | ''} onChange={(v) => set({ tier: v })} />
         <Chips label="Access" options={[['free', 'Free'], ['premium', 'Premium'], ['derive', 'Derive yourself']]} value={f.access} onChange={(v) => set({ access: v })} />
         <Chips label="Status" options={Object.entries(STATUS_LABEL) as [string, string][]} value={f.st} onChange={(v) => set({ st: v })} />
       </div>
@@ -52,7 +54,7 @@ function Designs({ groups, f }: { groups: { title: string; designs: DesignFull[]
   const terms = f.q.toLowerCase().split(/\s+/).filter(Boolean)
   const shown = groups.map((g) => ({
     ...g,
-    designs: g.designs.filter((d) => (!f.group || g.title === f.group) && (!f.access || d.access === f.access) && (!f.st || (status.get(d.id) ?? 'not-started') === f.st) && terms.every((t) => `${d.name} ${d.teaches} ${d.derive}`.toLowerCase().includes(t))),
+    designs: g.designs.filter((d) => (!f.group || g.title === f.group) && (!f.access || d.access === f.access) && (!f.tier || tierOf(d.id) === f.tier) && (!f.st || (status.get(d.id) ?? 'not-started') === f.st) && terms.every((t) => `${d.name} ${d.teaches} ${d.derive}`.toLowerCase().includes(t))),
   })).filter((g) => g.designs.length)
   const total = shown.reduce((n, g) => n + g.designs.length, 0)
   return (
@@ -70,6 +72,7 @@ function Designs({ groups, f }: { groups: { title: string; designs: DesignFull[]
                   <button type="button" class="library-item" aria-current={selectedDesign.value === d.id ? 'true' : undefined} style={selectedDesign.value === d.id ? 'border-color:var(--accent);border-width:2px' : undefined} onClick={() => { navigate(`/library?design=${d.id}`, { replace: true }); showDesign(d.id) }}>
                     <span><strong>{d.name}</strong><br /><span class="small muted">{d.teaches}</span></span>
                     <span class="row" style="justify-content:flex-end;align-content:start">
+                      {tierOf(d.id) !== 'more' ? <span class="chip" title="How much this design matters for an SDE-2 backend loop at an Indian fintech: Core is asked almost everywhere, Fintech edge sets a fintech candidate apart">{TIER_LABEL[tierOf(d.id)]}</span> : null}
                       <span class={`chip${d.access === 'premium' ? ' chip--accent' : ''}`} title="Whether a breakdown of this design is free, behind Premium, or does not exist (you derive it yourself)">{d.access === 'derive' ? 'no breakdown' : `${d.access} breakdown`}</span>
                       <span class="chip">{/^\d+$/.test(d.week) ? `Wk ${d.week}` : d.week}</span>
                       {s !== 'not-started' ? <span class="chip chip--accent">{STATUS_LABEL[s]}</span> : null}
@@ -101,7 +104,7 @@ export default function Library() {
     selectedDesign.value = (all.find((d) => d.week === week) ?? all[0])?.id ?? null
   }, [page, query.design, tab])
   const company = query.company
-  const [f, setF] = useState<Filters>({ group: '', access: '', st: '', q: '' })
+  const [f, setF] = useState<Filters>({ group: '', access: '', st: '', q: '', tier: '' })
   const set = (p: Partial<Filters>) => setF((x) => ({ ...x, ...p }))
   return (
     <div class="page page--rail-left page--rail-first page--detail-wide">

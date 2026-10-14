@@ -34,7 +34,7 @@ function Related() {
   const state = engine.state.value
   const date = today.value
   const { cards: dueNow, redraws } = useMemo(() => dueSummary(state, date), [state, date])
-  const recent = state.notes.filter((n) => n.kind !== 'free' || !(n.refId ?? '').startsWith('pick:')).slice().sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).slice(0, 3)
+  const recent = state.notes.filter((n) => n.kind !== 'free' || !/^(pick|plan):/.test(n.refId ?? '')).slice().sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).slice(0, 3)
   return (
     <>
       <section class="card">
