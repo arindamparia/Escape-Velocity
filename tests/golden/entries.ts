@@ -29,5 +29,6 @@ export function context(q: string, extra: string[] = []): string[] {
   if (!tokenize(q).length) return []
   const candidates = ranked(q).slice(0, 10)
   const chunks = gather({ q, candidates }, extra)
-  return [...new Set(chunks.map((c) => c.entry))]
+  // actions are not chunks: the palette always sends its whole catalogue as ACTIONS, so any action is in front of the model
+  return [...new Set([...chunks.map((c) => c.entry), ...ENTRIES.filter((e) => e.kind === 'action').map((e) => e.id)])]
 }

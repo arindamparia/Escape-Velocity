@@ -131,11 +131,24 @@ export function tokenize(query: string): string[] {
   return wordsOf(fold(query)).map((w) => w.text)
 }
 
+// Words that carry no topic when someone types a sentence ("where do I change the theme"). Left in, every one of them has
+// to match something, and the loose matching (scattered letters, typos) then pairs them with random titles. They are
+// dropped only when at least two other words remain, so a title made of them ("How this works") is still found by name.
+const FILLER = new Set(['a', 'an', 'the', 'i', 'me', 'my', 'we', 'you', 'am', 'is', 'are', 'was', 'do', 'does', 'did', 'how', 'what', 'where', 'when', 'why', 'which', 'who', 'can', 'could', 'should', 'would', 'will', 'to', 'of', 'in', 'on', 'at', 'for', 'and', 'or', 'with', 'about', 'from', 'this', 'that', 'it', 'there', 'show', 'tell', 'explain', 'find', 'want', 'need', 'get', 'like', 'please'])
+
+/** The words of a query that say what it is about (see FILLER). */
+export function topicWords(query: string): string[] {
+  const all = tokenize(query)
+  const topic = all.filter((t) => !FILLER.has(t))
+  return topic.length >= 2 ? topic : all
+}
+
 /** Rank `docs` for `query`. An empty query returns nothing: the caller shows suggestions instead. */
 export function search<T extends Doc>(docs: readonly T[], query: string, opts: SearchOptions = {}): Hit<T>[] {
-  const tokens = tokenize(query)
-  if (!tokens.length) return []
-  const whole = tokens.join(' ')
+  const spoken = tokenize(query)
+  if (!spoken.length) return []
+  const tokens = topicWords(query)
+  const whole = spoken.join(' ') // a title typed in full still gets its exact-match bonus, filler words and all
   const run = (need: number): Hit<T>[] => {
     const hits: Hit<T>[] = []
     for (const item of docs) {

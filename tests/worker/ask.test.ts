@@ -3,7 +3,7 @@ import { applyD1Migrations } from 'cloudflare:test'
 import { env } from 'cloudflare:workers'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AiStatus, AskResponse } from '../../shared/ask'
-import { corpus, gather, sanitize } from '../../worker/ask'
+import { corpus, DECLINED, gather, sanitize } from '../../worker/ask'
 import type { Env } from '../../worker/env'
 import { app } from '../../worker/index'
 
@@ -62,7 +62,7 @@ describe('checking the question', () => {
 })
 
 describe('what goes to OpenAI', () => {
-  it('sends the question, snippets of the plan and the action catalogue, and nothing personal', async () => {
+  it('sends the question and snippets of the plan, and nothing personal; a plain question does not carry the action catalogue', async () => {
     await ask(q({ q: 'what is idempotency', context: { week: 6, today: '2026-11-10', next: 'Week 6 · Task 3' } }))
     const b = sentBody()
     expect(sent.bodies[0].url).toBe('https://api.openai.com/v1/chat/completions')
@@ -76,11 +76,21 @@ describe('what goes to OpenAI', () => {
     expect(b.messages[0].content).toMatch(/cannot change anything yourself/) // it may suggest an action, never claim to have done one
     const u = userPayload()
     expect(rf.json_schema.schema.properties.results.items.properties.id.enum).toEqual(u.CONTEXT.map((c) => c.id))
-    expect(rf.json_schema.schema.properties.actions.items.enum).toEqual(ACTIONS.map((a) => a.id))
+    expect(rf.json_schema.schema.properties.actions.items.enum).toEqual(['none']) // nothing was asked to be done, so no action can be named
     expect(Object.keys(u).sort()).toEqual(['ACTIONS', 'CONTEXT', 'question', 'today', 'where'])
     expect(u.CONTEXT.length).toBeGreaterThan(0)
     expect(u.CONTEXT.some((c) => /idempotency/i.test(c.title))).toBe(true) // found from the words alone, the box sent no candidates (a paraphrase is what Vectorize is for)
-    expect(u.ACTIONS).toEqual(ACTIONS)
+    expect(u.ACTIONS).toEqual([])
+    expect(Object.keys(u.CONTEXT[0]).sort()).toEqual(['id', 'text', 'title']) // nothing the model does not need
+    expect(u.CONTEXT.length).toBeLessThanOrEqual(8)
+    expect((sentBody() as unknown as { max_completion_tokens: number }).max_completion_tokens).toBeLessThanOrEqual(400)
+  })
+
+  it('sends the action catalogue only when the question asks for something to be done', async () => {
+    await ask(q({ q: 'change the theme to dark' }))
+    const rf = sentBody().response_format as { json_schema: { schema: { properties: { actions: { items: { enum: string[] } } } } } }
+    expect(userPayload().ACTIONS).toEqual(ACTIONS)
+    expect(rf.json_schema.schema.properties.actions.items.enum).toEqual(ACTIONS.map((a) => a.id))
   })
 
   it('puts the box\'s own matches first, whether it names a chunk or an entry', async () => {
@@ -99,6 +109,45 @@ describe('what goes to OpenAI', () => {
   })
 })
 
+describe('only questions about the plan and the app get an answer', () => {
+  const usage = async () => (await env.DB.prepare('SELECT COALESCE(SUM(calls), 0) AS n FROM ai_usage').first<{ n: number }>())!.n
+  const WITH: Env = { ...BASE, PINECONE_API_KEY: 'pcsk_x', PINECONE_INDEX_HOST: 'h.example.pinecone.io' }
+
+  it('a plainly foreign question is declined without OpenAI, Pinecone or the database being touched', async () => {
+    for (const text of ['who won the world cup', 'write me a poem about autumn', 'how do I cook pasta']) {
+      const body = (await (await ask(q({ q: text }), WITH)).json()) as AskResponse
+      expect(body).toMatchObject({ answer: DECLINED, results: [], actions: [], mode: 'declined', usedToday: 0 })
+    }
+    expect(sent.bodies).toHaveLength(0)
+    expect(sent.pinecone).toHaveLength(0)
+    expect(await usage()).toBe(0)
+  })
+
+  it('a question about the plan is not declined', async () => {
+    const body = (await (await ask(q({ q: 'explain the outbox pattern' }))).json()) as AskResponse
+    expect(body.mode).toBe('local')
+    expect(sent.bodies).toHaveLength(1)
+  })
+
+  it('what the model says is thrown away when it says the question is out of scope, and the question is counted', async () => {
+    reply = () => completion({ in_scope: false, answer: 'Paris is the capital of France, and here is a poem...', results: [{ id: 'term:idempotency', why: 'x' }], actions: ['action:theme:dark'] })
+    const body = (await (await ask(q({ q: 'kafka for the sleep rules of the weather' }))).json()) as AskResponse
+    expect(body).toMatchObject({ answer: DECLINED, results: [], actions: [], mode: 'declined', usedToday: 1 })
+    expect(JSON.stringify(body)).not.toMatch(/Paris|poem/)
+    expect(await usage()).toBe(1)
+  })
+
+  it('the instructions say what is in scope, ask for nothing from outside the context, and keep it short', async () => {
+    await ask(q())
+    const sys = sentBody().messages[0].content
+    expect(sys).toMatch(/"in_scope"/)
+    expect(sys).toMatch(/out of scope/)
+    expect(sys).toMatch(/no outside knowledge/)
+    expect(sys).toMatch(/at most 3 short sentences/)
+    expect(sys).not.toMatch(/General knowledge/)
+  })
+})
+
 describe('what comes back is checked', () => {
   it('keeps only ids it offered, as the entry they open; keeps only catalogue actions; bounds the text', async () => {
     reply = () => completion({
@@ -111,10 +160,10 @@ describe('what comes back is checked', () => {
       ],
       actions: ['action:theme:dark', 'action:format:disk', 42],
     })
-    const body = (await (await ask(q({ candidates: ['term:idempotency'] }))).json()) as AskResponse
+    const body = (await (await ask(q({ q: 'change the theme to dark', candidates: ['term:idempotency'] }))).json()) as AskResponse
     expect(body.results).toEqual([{ id: 'term:idempotency', why: 'the idea' }])
     expect(body.actions).toEqual(['action:theme:dark'])
-    expect(body.answer.length).toBeLessThanOrEqual(900)
+    expect(body.answer.length).toBeLessThanOrEqual(500)
     expect(body.answer.startsWith('Use idempotency keys.')).toBe(true)
     expect(body.mode).toBe('local')
   })

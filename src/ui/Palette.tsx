@@ -201,7 +201,7 @@ export function Palette() {
           {ask.status === 'ok' && ask.data ? (
             <>
               <p class="pal__answer">{ask.data.answer}</p>
-              <p class="small muted" style="margin:0.4rem 0 0">AI can be wrong: the rows below are the sources. {ask.data.mode === 'hybrid' ? 'Searched by meaning too.' : 'Searched by keywords.'} {ask.data.usedToday} of {ask.data.limit} questions used today.</p>
+              <p class="small muted" style="margin:0.4rem 0 0">{ask.data.mode === 'declined' ? (ask.data.usedToday ? `Counted: ${ask.data.usedToday} of ${ask.data.limit} questions used today.` : 'Not counted.') : `AI can be wrong: the rows below are the sources. ${ask.data.mode === 'hybrid' ? 'Searched by meaning too.' : 'Searched by keywords.'} ${ask.data.usedToday} of ${ask.data.limit} questions used today.`}</p>
             </>
           ) : null}
           {ask.status === 'error' && ask.error ? (

@@ -9,10 +9,10 @@ export const ASK_LIMITS = {
   /** actions the model may suggest from */
   actions: 40,
   /** most results and actions in an answer */
-  results: 6,
+  results: 5,
   suggestedActions: 3,
-  /** characters in the answer text */
-  answer: 900,
+  /** characters in the answer text (three short sentences) */
+  answer: 500,
 } as const
 
 export interface AskRequest {
@@ -37,8 +37,12 @@ export interface AskResponse {
   results: AskResult[]
   /** ids from the catalogue sent with the request; shown as rows you confirm, never run for you */
   actions: string[]
-  /** local: the box's own candidates plus the bundled plan. hybrid: plus Pinecone's search by meaning */
-  mode: 'local' | 'hybrid'
+  /**
+   * local: the box's own candidates plus the bundled plan. hybrid: plus Pinecone's search by meaning.
+   * declined: the question is not about the plan or the app; no answer was written (and, when the Worker could tell
+   * without asking, nothing was spent: usedToday is then 0 and should not be shown)
+   */
+  mode: 'local' | 'hybrid' | 'declined'
   usedToday: number
   limit: number
 }

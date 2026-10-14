@@ -218,3 +218,18 @@ test.describe('Enter asks the AI when you typed a question or a phrase', () => {
     expect(calls).toBe(1)
   })
 })
+
+test('a question that is not about the plan is declined in one fixed line: no sources, no count, and the box still searches', async ({ page, api }) => {
+  await api.onboard()
+  await openApp(page, '/')
+  await page.route('**/api/ask', (route) => reply(route, { answer: 'That does not look like something in your plan or this app, so I have not answered it. Try other words, or type it in the search box to look it up.', results: [], actions: [], mode: 'declined', usedToday: 0, limit: 100 }))
+  const p = await open(page)
+  await p.getByRole('combobox').fill('? who won the world cup')
+  await page.keyboard.press('Enter')
+  const box = p.getByRole('region', { name: 'AI answer' })
+  await expect(box).toContainText('does not look like something in your plan')
+  await expect(box).toContainText('Not counted.')
+  await expect(box).not.toContainText('questions used today')
+  await expect(box).not.toContainText('AI can be wrong')
+  await expect(p.getByText('From your plan')).toHaveCount(0)
+})
