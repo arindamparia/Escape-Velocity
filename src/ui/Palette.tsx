@@ -152,6 +152,12 @@ export function Palette() {
   }, [ask, searching, smart, hits, active, entries, byId, live, recent, askEntry, looksLikeQuestion, commandsOnly])
 
   const flat = useMemo(() => blocks.flatMap((b) => b.rows), [blocks])
+  // an answer that suggests an action puts the cursor on it, so "press Enter to confirm" confirms that action and not a source row
+  useEffect(() => {
+    if (ask?.status !== 'ok') return
+    let at = 0
+    for (const b of blocks) { if (b.key === 'do') { setIndex(at); moved.current = true; return } at += b.rows.length }
+  }, [ask?.status, ask?.q])
   useEffect(() => { document.getElementById(`palette-opt-${index}`)?.scrollIntoView({ block: 'nearest' }) }, [index])
 
   const choose = (row: Row | undefined) => {

@@ -48,6 +48,7 @@ export const PAGES: Place[] = ([
  */
 export const SECTIONS: Place[] = ([
   ['routine', 'Your daily routine', '/#routine', 'Today · how my day works', 'schedule morning night saturday sunday time hours slots day plan', 'Mornings, nights, Saturday and Sunday: what you do and for how long'],
+  ['boss', 'The boss problem: how it works', '/weeks/dsa#boss', 'Weeks · DSA track · boss problem', 'hard problem sunday no hints hour hint editorial redo two weeks leetcode stretch', 'The five steps: choose, no hints for an hour, one hint at a time, write three lines, redo'],
   ['rules', 'Rules for your head', '/mindset#rules', 'Mindset · rules', 'plan rules minimum day missed day timeboxes sleep festivals produce first split days', 'Produce first, minimum day, timeboxes, festivals and the other rules'],
   ['why-plan', 'Why this plan', '/mindset#why-plan', 'Mindset · why this plan', 'method jee interviews what loops test', 'Why 13 weeks, and what the interview loops test'],
   ['points', 'How points work', '/progress#points', 'Progress · how points work', 'scoring target 50 weekly points table', 'What each kind of work earns, and the weekly target'],
@@ -75,6 +76,8 @@ const enc = encodeURIComponent
 export const urls = {
   week: (n: number | string) => `/weeks/${n}`,
   task: (id: string, week: number) => `/weeks/${week}#${id}`,
+  /** A readiness item (r-03) is not in a week: it is on Progress, in the ready check. */
+  readiness: (id: string) => `/progress#${id}`,
   term: (id: string) => `/guide#${id}`,
   design: (id: string) => `/library?design=${id}`,
   machine: () => '/library?tab=machine',
@@ -97,7 +100,7 @@ export function allInternalUrls(opts: {
   for (const e of opts.search) {
     if (e.k === 'w') out.add(urls.week(e.id))
     else if (e.k === 'd') out.add(urls.design(e.id))
-    else { const w = weekOfTask(e.id); if (w) out.add(urls.task(e.id, w)) }
+    else { const w = weekOfTask(e.id); if (w) out.add(urls.task(e.id, w)); else if (/^r-\d\d$/.test(e.id)) out.add(urls.readiness(e.id)) }
   }
   for (const id of opts.termIds) out.add(urls.term(id))
   for (const c of opts.companies) out.add(urls.company(c))

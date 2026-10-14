@@ -21,6 +21,14 @@ export interface Entry extends Doc {
 }
 
 const go = (url: string) => () => { closeOverlay(); navigate(url) }
+/** A link that leaves the site, in a new tab. A click on a real link is allowed where window.open can be blocked. */
+function openOutside(url: string): void {
+  const a = document.createElement('a')
+  a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer'
+  document.body.append(a)
+  a.click()
+  a.remove()
+}
 const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1).trimEnd()}…` : s)
 
 const THEME_SUB: Record<ThemePref, string> = {
@@ -101,7 +109,7 @@ export function planEntries(list: readonly SearchEntry[]): Entry[] {
     if (e.k === 'w') return { id: `week:${e.id}`, kind: 'week', title: e.t, keys: e.x, hint: 'week', run: go(urls.week(e.id)) }
     if (e.k === 'd') return { id: `design:${e.id}`, kind: 'design', title: e.t, sub: e.x, hint: 'design', run: () => { closeOverlay(); navigate(urls.design(e.id)); showDesign(e.id) } }
     const task = taskById.get(e.id)
-    return { id: `task:${e.id}`, kind: 'task', title: clip(e.t, 110), sub: taskLabel(e.id), keys: e.x, hint: task?.week ? `Week ${task.week}` : 'task', boost: 0, run: go(urls.task(e.id, task?.week ?? weekOfTask(e.id) ?? plan.weeks[0].n)) }
+    return { id: `task:${e.id}`, kind: 'task', title: clip(e.t, 110), sub: taskLabel(e.id), keys: e.x, hint: task?.week ? `Week ${task.week}` : 'ready check', boost: 0, run: go(/^r-\d\d$/.test(e.id) ? urls.readiness(e.id) : urls.task(e.id, task?.week ?? weekOfTask(e.id) ?? plan.weeks[0].n)) }
   })
 }
 
@@ -117,7 +125,7 @@ export function libraryEntries(lib: PageChunks['library']): Entry[] {
     out.push({
       id: `link:${r.url}`, kind: r.kind === 'video' ? 'video' : 'doc', title: r.title, sub: `${r.source}${r.minutes ? ` · ${r.minutes} min` : ''} · ${topics.slice(0, 2).join(', ')}${topics.length > 2 ? '…' : ''}`,
       keys: `${topics.join(' ')} ${r.source} ${r.access === 'free' ? 'free' : r.access}`, hint: '↗', external: true,
-      run: () => { closeOverlay(); window.open(r.url, '_blank', 'noopener,noreferrer') },
+      run: () => { closeOverlay(); openOutside(r.url) },
     })
   }
   for (const p of lib.machineCoding) out.push({ id: `problem:${p.problem}`, kind: 'problem', title: p.problem, sub: `Machine coding · ${p.company} · week ${p.week}`, keys: `lld ${p.company}`, hint: 'LLD', run: go(urls.machine()) })

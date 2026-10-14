@@ -50,7 +50,7 @@ function Readiness() {
       {readinessTasks.map((t) => {
         const isDone = done.has(t.id)
         return (
-          <label key={t.id} class="check">
+          <label key={t.id} id={t.id} class="check">
             <input type="checkbox" checked={isDone} onChange={() => toggleTask(t.id)} />
             <span>{page ? <Html html={page.readiness[t.id] ?? taskLabel(t.id)} inline class="" /> : taskLabel(t.id)}{hints[t.id] ? <><br /><span class="small muted">{hints[t.id]}</span></> : null}{READINESS_LINK[t.id] ? <><br /><a class="small" href={READINESS_LINK[t.id][0]}>{READINESS_LINK[t.id][1]}</a></> : null}</span>
           </label>
