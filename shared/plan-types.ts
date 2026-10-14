@@ -57,8 +57,12 @@ export interface PlanTask {
   eq?: string
   /** an extra (a paper, a bonus equation): never the next action, never needed for a light week's star */
   optional?: true
+  /** has a light version for a light day (the text after "‖ light:" in the plan) */
+  hasLight?: true
   /** gap concepts: the sketch you compare your answer with (see shared/sketches.ts) */
   sketch?: SketchId
+  /** gap concepts: its id in the gap check (G4) */
+  gap?: string
 }
 
 export interface PlanWeek {
@@ -124,7 +128,7 @@ export interface WeekChunk {
   dsaFocus: string
   /** Reported interview problems to solve this week (weeks 3 to 9), one suggested per day on Today */
   reported: string[]
-  tasks: Record<string, { html: string; text: string; why?: string }>
+  tasks: Record<string, { html: string; text: string; why?: string; /** the small version for a light day */ light?: string }>
   /** Maths tasks: MathML-rendered html of the derivation (the question, never the answer) */
   math: Record<string, string>
   /** Maths tasks: the check value, hidden until you have tried ("‖ check:" in the plan, or the equation bank's check column) */
@@ -255,6 +259,8 @@ export interface PageChunks {
   weeks: {
     timeline: { week: string; dates: string; theme: string; design: string }[]
     dsaHtml: string
+    /** How a boss problem works, step by step (the plan's "The boss problem") */
+    bossHtml: string
     dsaTable: { weeks: string; focus: string }[]
     capstoneHtml: string
     capstoneFlow: string[]

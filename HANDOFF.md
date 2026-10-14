@@ -2,6 +2,15 @@
 
 Status at the end of the third session. Read `CLAUDE.md` first, then `AUDIT.md` (the build checked against every section of the plan), then the plan itself (`plan/escape-velocity-plan.md`, Part 1).
 
+## The plan moved one week (14 Oct 2026)
+
+The plan now runs **Mon 12 Oct 2026 to Sun 10 Jan 2027** (applications from Mon 11 Jan). The first week (5 to 11 Oct) had only Monday done, so the whole calendar moved forward by a week. Task IDs and week numbers are unchanged. What that meant:
+
+- **Festivals.** Durga Puja is 17 to 21 Oct (Sat 17 and Sun 18 of week 1, Mon to Wed of week 2) and Diwali is Sun 8 Nov (week 4); Fri 16 Oct is an ordinary day. They are **light, not stopped**: no points target, and every task on those days has a `‖ light:` small version. The state holiday list also has Lakshmi Puja Sun 25 Oct, the extra Puja days 22 to 24 Oct, Kali Puja 9 to 10 Nov, Bhai Phota 11 Nov, Chhath 15 to 16 Nov and Christmas Fri 25 Dec; they are not light days here (your employer may not follow them), add them to `light_days` if you want them.
+- **Light weeks are now 1, 2 and 4** (they were 2, 3, 5). Week 3 starts with three quiet evenings (its rest note now says to use them for what is waiting), week 5 lost its "Diwali" wording. The RUM paper and a bonus equation moved to week 3 and Kora and its bonus equation to week 5, because weeks 3 and 5 are ordinary weeks now; the week 1 bonus equation went to the shelf.
+- **Your progress.** The first week's dates in the live database were moved forward 7 days (`scripts/shift-first-week.sql`, run once on 14 Oct; a backup is in `backups/remote-20261014-before-shift.sql`). Ticks were never tied to a date.
+- **Tests** use the new calendar (fixtures moved a week).
+
 ## Gap patch (6 Oct 2026)
 
 The Arpit Bhayani gap patch is blended into the plan and the app: see the last section of `AUDIT.md` for what was taken, changed and skipped. New: 10 gap-concept tasks with sketches, 10 optional Friday papers, 10 optional bonus equations plus a shelf of 12, 5 designs, Library tabs Papers and Gap check. `escape-velocity-gap-patch.md` is kept for reference; the plan is the source. Not yet done: rebuild the Pinecone index (`scripts/index-pinecone.ts`) and deploy.

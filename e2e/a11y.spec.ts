@@ -74,7 +74,9 @@ const ratio = (a: string, b: string) => { const [x, y] = [lum(a), lum(b)].sort((
 
 test.describe('contrast', () => {
   for (const theme of THEMES) {
-    test(`${theme}: text at least 14:1, muted text at least 6.4:1, accent at least 5.5:1`, async ({ page, api }) => {
+    // Paper and Paper night are softer on purpose (soft ink on a cream or warm off-black ground), for long reading
+    const min = theme.startsWith('paper') ? { text: 11, muted: 7, accent: 11 } : { text: 14, muted: 6.4, accent: 5.5 }
+    test(`${theme}: text at least ${min.text}:1, muted text at least ${min.muted}:1, accent at least ${min.accent}:1`, async ({ page, api }) => {
       await api.onboard()
       await openApp(page, '/', { theme })
       const t = await page.evaluate(() => {
@@ -83,9 +85,9 @@ test.describe('contrast', () => {
         return { bg: v('--bg'), surface: v('--surface'), text: v('--text'), muted: v('--text-muted'), accent: v('--accent') }
       })
       for (const bg of [t.bg, t.surface]) {
-        expect(ratio(t.text, bg), `text on ${bg}`).toBeGreaterThanOrEqual(14)
-        expect(ratio(t.muted, bg), `muted on ${bg}`).toBeGreaterThanOrEqual(6.4)
-        expect(ratio(t.accent, bg), `accent on ${bg}`).toBeGreaterThanOrEqual(5.5)
+        expect(ratio(t.text, bg), `text on ${bg}`).toBeGreaterThanOrEqual(min.text)
+        expect(ratio(t.muted, bg), `muted on ${bg}`).toBeGreaterThanOrEqual(min.muted)
+        expect(ratio(t.accent, bg), `accent on ${bg}`).toBeGreaterThanOrEqual(min.accent)
       }
     })
   }
@@ -140,5 +142,6 @@ test('every theme keeps text at the specified sizes and line height (readable, n
     await p.close()
   }
   for (const theme of THEMES) expect(results[theme].size).toBeGreaterThanOrEqual(16)
-  expect(results.paper.lh).toBeCloseTo(1.65, 2) // plan 16: Paper line height 1.65
+  expect(results.paper.lh).toBeCloseTo(1.68, 2) // plan 16: Paper line height 1.68
+  expect(results['paper-night'].lh).toBeCloseTo(1.76, 2) // light on dark gets more air
 })

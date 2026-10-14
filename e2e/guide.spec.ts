@@ -46,7 +46,7 @@ test.describe('help and links', () => {
 test.describe('Today links to what is due and to the rest of the site', () => {
   test('flashcards and redraws that are due appear on Today, with links; nothing is shown when nothing is due', async ({ page, api }) => {
     await api.onboard()
-    await api.activeOn('2026-10-06')
+    await api.activeOn('2026-10-13')
     await openApp(page, '/')
     await expect(page.getByRole('region', { name: 'Also due today' })).toHaveCount(0)
     const id = plan.flashcardIds[0]
@@ -62,7 +62,7 @@ test.describe('Today links to what is due and to the rest of the site', () => {
 
   test('a task label on Today opens that task in its week', async ({ page, api }) => {
     await api.onboard()
-    await api.activeOn('2026-10-06')
+    await api.activeOn('2026-10-13')
     await openApp(page, '/')
     const t = firstTask('infra', (x) => x.week === 1)
     await taskRow(page, t.id).getByRole('link', { name: /Week 1 · Task/ }).click()

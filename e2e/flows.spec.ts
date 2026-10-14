@@ -10,8 +10,8 @@ const design = designTask.designs![0]
 test.describe('learning loop', () => {
   test('step 2 is locked until the step-1 timer has run its full time; finishing ticks the task and schedules the redraws', async ({ page, api }) => {
     await api.onboard()
-    await api.activeOn('2026-10-09')
-    await openApp(page, `/study/loop?design=${design}&task=${designTask.id}`, { at: kolkata('2026-10-10T10:00:00'), ticking: true })
+    await api.activeOn('2026-10-16')
+    await openApp(page, `/study/loop?design=${design}&task=${designTask.id}`, { at: kolkata('2026-10-17T10:00:00'), ticking: true })
     await page.getByRole('button', { name: 'Start the loop' }).click()
 
     // step 1: the six forces and the cold-attempt timer; the breakdown cannot be opened yet
@@ -57,20 +57,20 @@ test.describe('learning loop', () => {
     await expect(page.getByText('Loop complete')).toBeVisible()
     await expect(page.getByText('(+7 days)')).toBeVisible()
     await expect(page.getByText('(+21 days)')).toBeVisible()
-    await expect.poll(async () => (await api.state()).designStatus.map((d) => [d.designId, d.status, d.attemptedOn])).toEqual([[design, 'attempted', '2026-10-10']])
+    await expect.poll(async () => (await api.state()).designStatus.map((d) => [d.designId, d.status, d.attemptedOn])).toEqual([[design, 'attempted', '2026-10-17']])
     expect(await api.doneIds()).toContain(designTask.id)
     expect((await api.state()).decisionCards).toHaveLength(3)
     // the queue shows each design's next redraw: +7 days is 17 Oct for an attempt on 10 Oct (the +21-day one follows it)
     await page.getByRole('link', { name: 'Redraw queue' }).first().click()
     await expect(page.locator('.tasks .task')).toHaveCount(1)
     await expect(page.locator('.tasks')).toContainText('Redraw +7 days')
-    await expect(page.locator('.tasks')).toContainText('due 2026-10-17')
+    await expect(page.locator('.tasks')).toContainText('due 2026-10-24')
   })
 
   test('the short loop (a Thursday second design) is 20 minutes, a read, and one card', async ({ page, api }) => {
     await api.onboard()
     const t = firstTask('design2')
-    await openApp(page, `/study/loop?design=${t.designs![0]}&task=${t.id}&short=1`, { at: kolkata('2026-11-12T10:00:00'), ticking: true })
+    await openApp(page, `/study/loop?design=${t.designs![0]}&task=${t.id}&short=1`, { at: kolkata('2026-11-19T10:00:00'), ticking: true })
     await page.getByRole('button', { name: 'Start the loop' }).click()
     await page.getByRole('button', { name: /Start 20-min timer/ }).click()
     await page.clock.fastForward('21:00')
@@ -104,12 +104,12 @@ test.describe('learning loop', () => {
 test.describe('redraw queue', () => {
   test('a design attempted on 10 Oct is due on 17 Oct and 31 Oct; checking the redraw advances it and records misses', async ({ page, api }) => {
     await api.onboard()
-    await api.activeOn('2026-10-16')
+    await api.activeOn('2026-10-23')
     await api.send([
-      api.op('design.set', { designId: design, status: 'attempted', attemptedOn: '2026-10-10' }),
+      api.op('design.set', { designId: design, status: 'attempted', attemptedOn: '2026-10-17' }),
       api.op('decision.upsert', { id: randomUUID(), designId: design, decision: 'Redis TTL lock', forcedBy: 'Payment takes minutes', rejectedAlternative: 'Postgres row lock' }),
     ])
-    await openApp(page, '/study/redraws', { at: kolkata('2026-10-17T10:00:00') })
+    await openApp(page, '/study/redraws', { at: kolkata('2026-10-24T10:00:00') })
     await expect(page.locator('.tasks .task').first()).toContainText('due today')
     await page.getByRole('button', { name: 'I redrew it' }).click()
     await expect(page.getByText('Answer key: your own decision cards')).toBeVisible()
@@ -120,7 +120,7 @@ test.describe('redraw queue', () => {
     await expect.poll(async () => (await api.state()).designStatus[0].status).toBe('redrawn-1')
     expect((await api.state()).weekLog[0].redrawMisses).toContain('the hot-partition fix')
     // the second redraw is not due yet
-    await expect(page.locator('.tasks .task').first()).toContainText('due 2026-10-31')
+    await expect(page.locator('.tasks .task').first()).toContainText('due 2026-11-07')
   })
 
   test('nothing is due: the queue says so instead of showing an empty list', async ({ page, api }) => {
@@ -135,7 +135,7 @@ test.describe('flashcards', () => {
     await api.onboard()
     const ids = plan.flashcardIds.slice(0, 12)
     await api.send(ids.map((id) => api.op('note.upsert', { id: randomUUID(), kind: 'why', refId: id, body: `My answer for ${id}` })))
-    await openApp(page, '/study/flashcards', { at: kolkata('2026-10-14T10:00:00') })
+    await openApp(page, '/study/flashcards', { at: kolkata('2026-10-21T10:00:00') })
     await expect(page.getByText('12 in your deck')).toBeVisible()
     // 12 cards are in the deck, but never more than ten are due in one day
     await expect(page.getByText('10 due now')).toBeVisible()
@@ -165,8 +165,8 @@ test.describe('mock mode', () => {
   test('a random unseen design, follow-ups at 20 and 35 minutes, a six-part score that goes to the scorecard and ticks the mock task', async ({ page, api }) => {
     await api.onboard()
     const mock = firstTask('mock')
-    await api.activeOn('2026-11-22')
-    await openApp(page, '/study/mock', { at: kolkata(`2026-11-23T10:00:00`), ticking: true }) // week 8, which has a mock task
+    await api.activeOn('2026-11-29')
+    await openApp(page, '/study/mock', { at: kolkata(`2026-11-30T10:00:00`), ticking: true }) // week 8, which has a mock task
     await page.getByRole('button', { name: 'Pick a design and start' }).click()
     await expect(page.getByText('Mock in progress')).toBeVisible()
     await expect(page.getByText(/^Design: /)).toBeVisible()
@@ -219,7 +219,7 @@ test.describe('notes, cheat sheet, formulas, envelope', () => {
     await api.onboard()
     await openApp(page, '/study/formulas')
     const maths = plan.tasks.filter((t) => t.type === 'maths')
-    await expect(page.locator('main li.card')).toHaveCount(maths.length + 12) // the weekly and bonus derivations, then the shelf
+    await expect(page.locator('main li.card')).toHaveCount(maths.length + 11) // the weekly and bonus derivations, then the shelf
     await expect(page.locator('main li.card math').first()).toBeVisible()
     await page.getByRole('button', { name: 'Derived it' }).first().click()
     await expect.poll(async () => (await api.doneIds())[0]).toBe(maths[0].id)
@@ -274,8 +274,8 @@ test.describe('library', () => {
 test.describe('Sunday review', () => {
   test('five steps: log the week, redraws, points, one fix, backup; it ticks the review task and previews next week', async ({ page, api }) => {
     await api.onboard()
-    await api.send([api.op('problem.add', { id: randomUUID(), loggedOn: '2026-10-11', difficulty: 'medium', minutes: 24, noAi: true })])
-    await openApp(page, '/progress/review', { at: kolkata('2026-10-11T20:00:00') })
+    await api.send([api.op('problem.add', { id: randomUUID(), loggedOn: '2026-10-18', difficulty: 'medium', minutes: 24, noAi: true })])
+    await openApp(page, '/progress/review', { at: kolkata('2026-10-18T20:00:00') })
     await expect(page.getByRole('heading', { name: 'Redraw time. Let’s see what stuck.' })).toBeVisible()
     await expect(page.getByText('This week you logged')).toContainText('1 problems')
     await page.getByLabel(/Design self-score/).fill('7')

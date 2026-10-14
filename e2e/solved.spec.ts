@@ -7,7 +7,7 @@ const TWO_SUM = 'https://leetcode.com/problems/two-sum/'
 test.describe('logging a problem with its link', () => {
   test('the link is asked for and the name is guessed from it; something that is not a link is refused', async ({ page, api }) => {
     await api.onboard()
-    await api.activeOn('2026-10-06')
+    await api.activeOn('2026-10-13')
     await openApp(page, '/')
     await page.getByRole('button', { name: 'Bad day? Minimum day' }).click()
     const dialog = page.getByRole('dialog')
@@ -56,7 +56,7 @@ test.describe('Solved problems, inside Progress', () => {
       { n: 3, name: 'Trapping Rain Water', difficulty: 'Hard', at: '2026-05-19T20:00:00.000Z' },
     ])
     // the same Two Sum logged here as well: still counted once
-    await api.send([api.op('problem.add', { id: crypto.randomUUID(), loggedOn: '2026-10-06', difficulty: 'medium', noAi: true, url: 'https://leetcode.com/problems/two-sum/description/' })])
+    await api.send([api.op('problem.add', { id: crypto.randomUUID(), loggedOn: '2026-10-13', difficulty: 'medium', noAi: true, url: 'https://leetcode.com/problems/two-sum/description/' })])
     await openApp(page, '/')
     const tiles = page.getByRole('region', { name: 'Evidence' })
     await expect(tiles.getByRole('link', { name: /medium problems/ })).toContainText('2')
@@ -91,8 +91,8 @@ test.describe('Solved problems, inside Progress', () => {
     await api.onboard()
     await api.solved([{ n: 1, name: 'Two Sum', slug: 'two-sum', at: '2026-05-17T20:18:45.523Z' }])
     await api.send([
-      api.op('problem.add', { id: crypto.randomUUID(), loggedOn: '2026-10-06', difficulty: 'medium', minutes: 20, noAi: true, title: 'Two Sum again', url: 'https://leetcode.com/problems/two-sum/description/' }),
-      api.op('problem.add', { id: crypto.randomUUID(), loggedOn: '2026-10-07', difficulty: 'hard', noAi: true, title: 'From a book', url: 'https://example.com/book/12' }),
+      api.op('problem.add', { id: crypto.randomUUID(), loggedOn: '2026-10-13', difficulty: 'medium', minutes: 20, noAi: true, title: 'Two Sum again', url: 'https://leetcode.com/problems/two-sum/description/' }),
+      api.op('problem.add', { id: crypto.randomUUID(), loggedOn: '2026-10-14', difficulty: 'hard', noAi: true, title: 'From a book', url: 'https://example.com/book/12' }),
     ])
     await openApp(page, '/progress/problems')
     await expect(page.getByText('2 solved')).toBeVisible() // Two Sum once, plus the one from the book
@@ -118,7 +118,7 @@ test.describe('Solved problems, inside Progress', () => {
 
   test('says what is missing when AlgoTracker is not connected, and still shows what was logged here', async ({ page, api }) => {
     await api.onboard()
-    await api.send([api.op('problem.add', { id: crypto.randomUUID(), loggedOn: '2026-10-06', difficulty: 'easy', noAi: true, title: 'Mine' })])
+    await api.send([api.op('problem.add', { id: crypto.randomUUID(), loggedOn: '2026-10-13', difficulty: 'easy', noAi: true, title: 'Mine' })])
     await openApp(page, '/progress/problems')
     await expect(page.getByRole('alert')).toContainText('AlgoTracker is not connected yet')
     await expect(page.getByRole('region', { name: 'Logged here' }).locator('.prow')).toHaveCount(1)
@@ -133,7 +133,7 @@ test.describe('Solved problems, inside Progress', () => {
 
 test('AlgoTracker is read on page load and on Refresh, never on a timer or when the tab comes back', async ({ page, api }) => {
   await api.onboard()
-  await api.solved([{ n: 1, name: 'Two Sum', at: '2026-10-07T03:00:00Z' }])
+  await api.solved([{ n: 1, name: 'Two Sum', at: '2026-10-14T03:00:00Z' }])
   let reads = 0
   await page.route('**/api/solved', (route) => { reads++; return route.continue() })
   await openApp(page, '/')

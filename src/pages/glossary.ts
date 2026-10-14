@@ -12,7 +12,8 @@ export const GLOSSARY: TermGroup[] = [
       { id: 'task', term: 'Task', what: 'One line of the plan, with points. “Week 4 · Task 7” is the 7th line of week 4. Tick it when it is done.' },
       { id: 'points', term: 'Points', what: 'The points of every task you ticked. A normal week aims for 50. Points measure output, never your worth.' },
       { id: 'constellation', term: 'Constellation', what: 'A picture of one week. Each ticked task lights a star; when the week reaches its target the shape glows.' },
-      { id: 'light-day', term: 'Light day', what: 'A festival day (Durga Puja, Diwali) with no target. Rest is part of the plan.' },
+      { id: 'light-day', term: 'Light day', what: 'A festival day (Durga Puja 17 to 21 Oct, Diwali 8 Nov) with no points target. You do not stop: each task shows a small version, and one problem is plenty. Anything left waits for you.' },
+      { id: 'waiting', term: 'Waiting for you', what: 'Tasks from earlier days that are still open, shown quietly on Today (a few at a time, the most valuable first). A missed day never loses a task. Take one when there is room, never all of it.' },
       { id: 'minimum-day', term: 'Minimum day', what: 'On a bad day, do one problem and stop. It still counts as an active day.' },
       { id: 'readiness', term: 'Readiness check', what: 'Eight signs you are ready to apply. Worth no points; they fill a ring on Progress.' },
       { id: 'sde2', term: 'SDE-2', what: 'The job level you are aiming for: a mid-level backend engineer.' },
@@ -23,7 +24,7 @@ export const GLOSSARY: TermGroup[] = [
     blurb: 'The kinds of work in a week.',
     terms: [
       { id: 'dsa', term: 'DSA', what: 'Data structures and algorithms: coding problems like LeetCode. About 6 a week, timed, without AI. Medium 25 minutes, hard 40.' },
-      { id: 'boss-problem', term: 'Boss problem', what: 'The week’s one hard coding problem, on Sunday. No hints for the first hour.' },
+      { id: 'boss-problem', term: 'Boss problem', what: 'The week’s one hard LeetCode problem, on Sunday. The first hour has no hints, then one hint at a time; afterwards you write three lines (the pattern, the trick, what you missed) and redo it in two weeks if a hint was needed. It earns +5. The steps are on the DSA track.' },
       { id: 'hld', term: 'System design (HLD)', what: 'High-level design: boxes and arrows for a big system, like ticket booking or a payment gateway. At SDE-2 this decides your level.' },
       { id: 'machine-coding', term: 'Machine coding (LLD)', what: 'Low-level design: write clean, working code for a small system (a parking lot, a cache) in about 90 minutes. Flipkart, Groww, PhonePe and CRED use it as an elimination round. Saturdays from week 4.' },
       { id: 'infra', term: 'Infra', what: 'Wednesday nights: Docker first, then AWS, then Kubernetes. You use them in the capstone.' },

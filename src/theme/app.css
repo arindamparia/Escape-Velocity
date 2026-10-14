@@ -413,7 +413,7 @@ dialog {
 }
 dialog::backdrop { background: rgb(5 8 20 / 0.6); }
 [data-theme='paper'] dialog { border-width: 2px; border-radius: 2px; }
-[data-theme='paper']:not([data-tone='night']) dialog::backdrop { background: rgb(242 239 230 / 0.85); }
+[data-theme='paper']:not([data-tone='night']) dialog::backdrop { background: rgb(236 227 205 / 0.88); }
 .dialog__head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.9rem 1.15rem; border-bottom: 1px solid var(--line); }
 .dialog__head h2 { margin: 0; font-size: 1.1rem; }
 .dialog__body { padding: 1.15rem; overflow: auto; max-height: calc(100vh - 9rem); }
@@ -590,7 +590,7 @@ label.check > span { flex: 1; min-width: 0; }
 /* Paper night: light ink on warm black. A little air between letters and a lighter touch on bold, so glyphs do not bleed. */
 [data-theme='paper'][data-tone='night'] body { letter-spacing: 0.012em; }
 [data-theme='paper'][data-tone='night'] h1, [data-theme='paper'][data-tone='night'] h2, [data-theme='paper'][data-tone='night'] h3 { font-weight: 700; letter-spacing: -0.01em; }
-[data-theme='paper'][data-tone='night'] dialog::backdrop { background: rgb(21 19 15 / 0.88); }
+[data-theme='paper'][data-tone='night'] dialog::backdrop { background: rgb(20 18 14 / 0.9); }
 [data-theme='paper'][data-tone='night'] .btn--primary { border-color: var(--text); }
 
 /* ---------- the timer in the top bar ---------- */
@@ -648,3 +648,24 @@ label.check > span { flex: 1; min-width: 0; }
 .flowsteps li[data-lit='true'] { box-shadow: inset 4px 0 0 var(--accent); padding-left: 0.6rem; font-weight: 600; }
 .milestones li[data-focus='true'] { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: var(--radius); }
 .capstone-links { margin: 0.25rem 0 0; }
+/* light days: a small version, never nothing */
+.hero--light { border-left: 5px solid var(--accent); }
+.hero__lead { margin: 0.2rem 0 0; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+.task__light { display: grid; gap: 0.3rem; margin: 0.2rem 0 0.3rem; }
+.task__full { margin: 0.2rem 0 0.3rem; }
+.related { margin: 0.25rem 0 0; color: var(--text-muted); }
+.waiting { border-left: 5px solid var(--line); }
+
+/* Paper reading comfort: a reading typeface with an optical size axis, a little more size and air, soft ink, quiet selection. */
+html[data-theme='paper'] { font-size: 17px; }
+@media (min-width: 2200px) { html[data-theme='paper'] { font-size: 18px; } }
+[data-theme='paper'] body { font-optical-sizing: auto; font-kerning: normal; font-variant-ligatures: common-ligatures; text-rendering: optimizeLegibility; font-synthesis: none; }
+[data-theme='paper'] h1, [data-theme='paper'] h2, [data-theme='paper'] h3, [data-theme='paper'] h4 { font-weight: 640; letter-spacing: -0.012em; line-height: 1.2; }
+[data-theme='paper'] h1 { letter-spacing: -0.02em; }
+[data-theme='paper'] .small, [data-theme='paper'] small { font-size: 0.9rem; }
+[data-theme='paper'] .muted { color: var(--text-muted); }
+[data-theme='paper'] ::selection { background: var(--text); color: var(--bg); }
+[data-theme='paper'] .card, [data-theme='paper'] .hero, [data-theme='paper'] dialog, [data-theme='paper'] input, [data-theme='paper'] textarea, [data-theme='paper'] select { background: var(--surface); }
+[data-theme='paper'] .task { background: var(--surface); }
+[data-theme='paper'] .task[data-done='true'] { background: var(--surface-2); }
+[data-theme='paper'][data-tone='night'] body { font-weight: 420; }

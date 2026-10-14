@@ -1,4 +1,19 @@
 /* Themes: Dark (night sky), Light (day sky), Paper (e-paper). System follows prefers-color-scheme (see themes.ts). */
+/* Literata: drawn for long reading on screens (Google Play Books' own face), open licence. Used by Paper and Paper night. */
+@font-face {
+  font-family: 'Literata';
+  src: url('./literata.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: optional; /* preloaded; never swapped in late, so nothing shifts */
+}
+@font-face {
+  font-family: 'Literata';
+  src: url('./literata-italic.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: italic;
+  font-display: swap;
+}
 @font-face {
   font-family: 'JBM';
   src: url('./jbm.woff2') format('woff2');
@@ -47,21 +62,24 @@
 
 [data-theme='paper'] {
   color-scheme: light;
-  --bg: #f2efe6;
-  --surface: #f2efe6;
-  --surface-2: #f2efe6;
-  --text: #1a1a1a;
-  --text-muted: #3d3d3d;
-  --accent: #1a1a1a;
-  --accent-ink: #f2efe6;
-  --line: #1a1a1a;
-  --done: #1a1a1a;
-  --warn: #1a1a1a;
+  /* Paper: a sheet on a desk. The page is the warm desk, cards and dialogs are the lighter sheet, ink is a soft near-black
+     (about 12 to 14 : 1, not the harsh 20 : 1 of black on white), and muted text still clears 7 : 1. Chosen from what the
+     reading research agrees on: off-white and cream grounds, dark text on light, no pure black or white. */
+  --bg: #ece3cd;
+  --surface: #f6efdc;
+  --surface-2: #e7dcc2;
+  --text: #26221d;
+  --text-muted: #4b4338;
+  --accent: #26221d;
+  --accent-ink: #f6efdc;
+  --line: #26221d;
+  --done: #26221d;
+  --warn: #26221d;
   --radius: 2px;
   --shadow: none;
-  --hero-tint: #f2efe6;
-  --font-body: 'Iowan Old Style', Georgia, 'Times New Roman', serif;
-  --lh: 1.65;
+  --hero-tint: #f6efdc;
+  --font-body: 'Literata', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+  --lh: 1.68;
 }
 
 /* Paper night: Paper in a dark tone (data-theme stays "paper", so every Paper rule below and in app.css still applies).
@@ -69,18 +87,18 @@
    line so bright borders do not glare or bleed on a dark panel, a little more leading for light-on-dark text. */
 [data-theme='paper'][data-tone='night'] {
   color-scheme: dark;
-  --bg: #15130f;
-  --surface: #15130f;
-  --surface-2: #15130f;
-  --text: #efe9d9;
-  --text-muted: #cdc6b3;
-  --accent: #efe9d9;
-  --accent-ink: #15130f;
-  --line: #b4ad9b;
-  --done: #efe9d9;
-  --warn: #efe9d9;
-  --hero-tint: #15130f;
-  --lh: 1.72;
+  --bg: #14120e;
+  --surface: #1b1913;
+  --surface-2: #23201a;
+  --text: #e6decb;
+  --text-muted: #c0b7a1;
+  --accent: #e6decb;
+  --accent-ink: #14120e;
+  --line: #a39b88;
+  --done: #e6decb;
+  --warn: #e6decb;
+  --hero-tint: #1b1913;
+  --lh: 1.76;
 }
 
 /* Paper: no motion, no shadows, no gradients, no blur. */

@@ -3,7 +3,7 @@
 import type { Page } from '@playwright/test'
 import { axeSeriousViolations, expect, kolkata, openApp, test } from './support'
 
-const MON = kolkata('2026-10-05T10:00:00')
+const MON = kolkata('2026-10-12T10:00:00')
 
 const STUB = `
 window.__yt = { created: [], calls: [], vols: [], block: !!window.__blockAutoplay, error: 0 };

@@ -2,7 +2,7 @@
 // never off-screen however far the page is scrolled.
 import { expect, kolkata, openApp, test } from './support'
 
-const MON = kolkata('2026-10-05T10:00:00')
+const MON = kolkata('2026-10-12T10:00:00')
 
 test('start from the top bar, keep it in view on a long page, stop from the bar', async ({ page, api }) => {
   await api.onboard()

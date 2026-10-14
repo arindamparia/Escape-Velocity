@@ -1,6 +1,6 @@
 # Escape Velocity
 
-A private study app for a 13-week plan (5 Oct 2026 to 3 Jan 2027): one next action, a timer, your own notes and the evidence that you are getting better. Preact on Cloudflare Workers with D1, local-first data, showing your AlgoTracker problems, with Dark, Light and Paper (e-paper) themes. No service worker and no offline cache: a change shows as soon as you reload.
+A private study app for a 13-week plan (12 Oct 2026 to 10 Jan 2027): one next action, a timer, your own notes and the evidence that you are getting better. Preact on Cloudflare Workers with D1, local-first data, showing your AlgoTracker problems, with Dark, Light and Paper (e-paper) themes. No service worker and no offline cache: a change shows as soon as you reload.
 
 The only content source is [`plan/escape-velocity-plan.md`](plan/escape-velocity-plan.md). Part 1 is the build guide; Parts 2 to 6 are what the app shows. [`CLAUDE.md`](CLAUDE.md) lists the rules that are easy to break, [`HANDOFF.md`](HANDOFF.md) says what is done and what is left, and [`AUDIT.md`](AUDIT.md) checks the build against every section of the plan.
 

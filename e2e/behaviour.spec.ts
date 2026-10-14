@@ -36,7 +36,7 @@ test.describe('themes', () => {
     await page.route('**/assets/*.js', (route) => route.abort()) // no app code at all: only the inline head script can have set it
     await page.goto('/')
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'paper')
-    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe('rgb(242, 239, 230)') // #F2EFE6
+    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe('rgb(236, 227, 205)') // #ECE3CD
   })
 
   test('the look is this device\'s own: it is remembered here and never sent to the server', async ({ page, api }) => {
@@ -89,9 +89,9 @@ test.describe('themes', () => {
     await api.onboard()
     await openApp(page, '/')
     await page.keyboard.press('1')
-    await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#F2EFE6')
+    await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#ECE3CD')
     await page.keyboard.press('2')
-    await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#15130F')
+    await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#14120E')
     await page.keyboard.press('4')
     await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#0A0E1A')
   })
@@ -100,8 +100,8 @@ test.describe('themes', () => {
 test.describe('the timer', () => {
   test('stores a start time: it survives a reload and a long sleep, then runs out, offers to log the problem, and records the session', async ({ page, api }) => {
     await api.onboard()
-    await api.activeOn('2026-10-06')
-    await openApp(page, '/', { at: kolkata('2026-10-07T10:00:00'), ticking: true })
+    await api.activeOn('2026-10-13')
+    await openApp(page, '/', { at: kolkata('2026-10-14T10:00:00'), ticking: true })
     await page.getByRole('button', { name: /Start 25-min timer/ }).first().click()
     const card = page.locator('header.topbar').getByRole('group', { name: 'Timer in the top bar' })
     await expect(card.getByRole('timer')).toHaveText(/^2[45]:\d\d$/)
@@ -121,7 +121,7 @@ test.describe('the timer', () => {
     await expect(dialog.getByRole('button', { name: 'medium' })).toHaveAttribute('aria-pressed', 'true')
     await dialog.getByRole('button', { name: 'Log it', exact: true }).click()
     // the problem seeded for 6 Oct, and the one just logged: 25 minutes, dated 7 Oct in Kolkata
-    await expect.poll(async () => (await api.state()).problemLog.map((p) => [p.difficulty, p.minutes, p.loggedOn])).toEqual([['medium', 20, '2026-10-06'], ['medium', 25, '2026-10-07']])
+    await expect.poll(async () => (await api.state()).problemLog.map((p) => [p.difficulty, p.minutes, p.loggedOn])).toEqual([['medium', 20, '2026-10-13'], ['medium', 25, '2026-10-14']])
     expect((await api.state()).sessions).toHaveLength(1)
     expect((await api.state()).sessions[0]).toMatchObject({ kind: 'dsa', plannedMin: 25 })
   })
@@ -129,7 +129,7 @@ test.describe('the timer', () => {
   test('a boss problem runs 40 minutes and then keeps counting up, with no guilt', async ({ page, api }) => {
     await api.onboard()
     const boss = firstTask('boss')
-    await openApp(page, `/weeks/${boss.week}`, { at: kolkata('2026-10-11T10:00:00'), ticking: true })
+    await openApp(page, `/weeks/${boss.week}`, { at: kolkata('2026-10-18T10:00:00'), ticking: true })
     await taskRow(page, boss.id).getByRole('button', { name: /Start 40-min timer/ }).click()
     const card = page.locator('header.topbar').getByRole('group', { name: 'Timer in the top bar' })
     await page.clock.fastForward('45:00')
@@ -171,8 +171,8 @@ test.describe('small celebrations', () => {
 
   test('a week with a target lights its constellation when the points reach it', async ({ page, api }) => {
     await api.onboard()
-    const week = 4
-    const tasks = plan.tasks.filter((t) => t.week === week && t.points > 0).sort((a, b) => b.points - a.points)
+    const week = 6 // a normal week: it has a target (weeks 1, 2 and 4 are light)
+    const tasks = plan.tasks.filter((t) => t.week === week && t.points > 0 && !t.optional).sort((a, b) => b.points - a.points)
     let sum = 0
     const first: string[] = []
     for (const t of tasks) { if (sum + t.points >= 50) break; first.push(t.id); sum += t.points }

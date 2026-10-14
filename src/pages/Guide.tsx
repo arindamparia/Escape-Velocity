@@ -1,6 +1,7 @@
 import { useTitle } from '../ui/hooks'
 import { GLOSSARY } from './glossary'
 import { Icon } from '../ui/Icon'
+import { BossHow } from '../ui/BossHow'
 import { LoopRingLazy, WeekRhythmLazy } from '../ui/SketchView'
 
 const PAGES: { href: string; name: string; what: string; when: string }[] = [
@@ -15,6 +16,7 @@ const DAY: [string, string][] = [
   ['Open Today.', 'The big card is the next thing to do. One button starts the right tool and timer.'],
   ['Do it, then tick it.', 'Ticks save on this device straight away and sync in the background, even offline.'],
   ['Sunday: review.', 'Five short steps on Progress: log the week, redraws, points, one fix, a backup.'],
+  ['Missed something?', 'It waits under “Waiting for you” on Today. Nothing is lost; take one when there is room.'],
 ]
 
 export default function Guide() {
@@ -40,6 +42,12 @@ export default function Guide() {
           <h2 style="margin:0">A normal week</h2>
           <p class="muted" style="margin:0">Mornings are DSA. Nights are one concept or infra task. Friday night is off, or one optional paper. Saturday is the big design, Sunday the capstone and the review.</p>
           <div class="sketch__scroll" tabIndex={0} role="group" aria-label="A normal week, as a diagram" style="min-height:11rem"><WeekRhythmLazy /></div>
+        </section>
+
+        <section class="stack" aria-label="The boss problem" id="boss">
+          <h2 style="margin:0">The boss problem, in five steps</h2>
+          <p class="muted" style="margin:0">One hard problem each Sunday. The full steps, so you never wonder what to do next. <a href="/weeks/dsa#boss">On the DSA track</a>.</p>
+          <BossHow open />
         </section>
 
         <section class="stack" aria-label="The learning loop">

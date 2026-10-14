@@ -30,17 +30,17 @@ describe('compiler: the real plan', () => {
   const out = compilePlan(source)
 
   it('compiles to exactly the expected counts', () => {
-    expect(out.core.counts).toEqual({ tasks: 200, weeklyTasks: 192, readiness: 8, designs: 42, flashcards: 37 })
+    expect(out.core.counts).toEqual({ tasks: 203, weeklyTasks: 195, readiness: 8, designs: 42, flashcards: 37 })
     expect(out.core.weeks).toHaveLength(13)
     expect(Object.keys(out.weekChunks)).toHaveLength(13)
   })
 
   it('reads the front matter', () => {
-    expect(out.core.config.startDate).toBe('2026-10-05')
-    expect(out.core.config.endDate).toBe('2027-01-03')
+    expect(out.core.config.startDate).toBe('2026-10-12')
+    expect(out.core.config.endDate).toBe('2027-01-10')
     expect(out.core.config.weeklyPointsTarget).toBe(50)
     expect(out.core.config.lightDays).toEqual([
-      { from: '2026-10-16', to: '2026-10-21', label: 'Durga Puja' },
+      { from: '2026-10-17', to: '2026-10-21', label: 'Durga Puja' },
       { from: '2026-11-08', to: '2026-11-08', label: 'Kali Puja / Diwali' },
     ])
   })
@@ -88,7 +88,7 @@ describe('compiler: the real plan', () => {
     // Week 13 has no weekly derivation: weeks 1 to 12 carry one each, and most weeks add a bonus equation
     const weekly = out.pages.study.formulas.filter((f) => !f.bonus)
     expect(weekly.map((f) => f.week)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
-    expect(out.pages.study.formulas.filter((f) => f.bonus).map((f) => f.week)).toEqual([1, 4, 6, 7, 8, 9, 10, 11, 12, 13])
+    expect(out.pages.study.formulas.filter((f) => f.bonus).map((f) => f.week)).toEqual([3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13])
     expect(out.pages.study.formulasIntroHtml).toContain('<math')
     expect(out.pages.study.formulasIntroHtml).not.toContain('^')
   })
@@ -165,7 +165,7 @@ describe('compiler: every failure rule fails the build', () => {
   })
 
   it('a week heading out of order', () => {
-    expect(errorsOf(mutate('### Week 03 · 19 to 25 Oct', '### Week 04 · 19 to 25 Oct')).join('\n')).toMatch(/out of order/)
+    expect(errorsOf(mutate('### Week 03 · 26 Oct to 1 Nov', '### Week 04 · 26 Oct to 1 Nov')).join('\n')).toMatch(/out of order/)
   })
 
   it('a task whose week prefix does not match its heading', () => {
@@ -190,7 +190,7 @@ describe('compiler: every failure rule fails the build', () => {
   })
 
   it('week dates that disagree with the start date', () => {
-    expect(errorsOf(mutate('### Week 02 · 12 to 18 Oct', '### Week 02 · 13 to 19 Oct')).join('\n')).toMatch(/Week 02 says "13 to 19 Oct"/)
+    expect(errorsOf(mutate('### Week 02 · 19 to 25 Oct', '### Week 02 · 20 to 26 Oct')).join('\n')).toMatch(/Week 02 says "20 to 26 Oct"/)
   })
 
   it('a task outside the tasks sections', () => {
@@ -272,29 +272,29 @@ describe('compiler: the extras (papers, equations, gaps)', () => {
     for (const f of out.pages.study.formulas) expect(f.check, f.taskId).toBeTruthy()
   })
 
-  it('reads the equation bank: 10 bonus equations carried by a task, 12 on the shelf, all as MathML', () => {
+  it('reads the equation bank: 11 bonus equations carried by a task, 11 on the shelf, all as MathML', () => {
     const bonus = out.core.tasks.filter((t) => t.eq)
-    expect(bonus).toHaveLength(10)
+    expect(bonus).toHaveLength(11)
     expect(bonus.every((t) => t.type === 'maths' && t.optional && t.day === 'Week' && t.points === 1)).toBe(true)
-    expect(out.pages.study.shelf).toHaveLength(12)
+    expect(out.pages.study.shelf).toHaveLength(11)
     for (const e of out.pages.study.shelf) {
       expect(e.formulaHtml, e.id).toContain('<math')
       expect(e.checkHtml, e.id).toBeTruthy()
     }
-    expect(out.core.shelfIds).toHaveLength(12)
-    // no bonus equation in a light week
-    expect(bonus.map((t) => t.week).filter((w) => [2, 3, 5].includes(w!))).toEqual([])
+    expect(out.core.shelfIds).toHaveLength(11)
+    // no bonus equation in a Puja week
+    expect(bonus.map((t) => t.week).filter((w) => [1, 2].includes(w!))).toEqual([])
   })
 
   it('every paper task has one row in the schedule, and every row points at a paper task in its week', () => {
     const papers = out.core.tasks.filter((t) => t.type === 'paper')
-    expect(papers).toHaveLength(10)
+    expect(papers).toHaveLength(12)
     expect(papers.every((t) => t.optional && t.day !== 'Sat')).toBe(true)
     expect(out.pages.library.papers.schedule.map((p) => p.taskId).sort()).toEqual(papers.map((t) => t.id).sort())
-    expect(out.pages.library.papers.shelf.length).toBe(3)
+    expect(out.pages.library.papers.shelf.length).toBe(1)
     expect(out.pages.library.papers.schedule.filter((p) => p.anchor).map((p) => p.week)).toEqual([6, 7, 8, 13])
-    // no paper on a light week, or in week 1, where Friday night is off
-    expect(papers.map((t) => t.week).filter((w) => [1, 2, 3, 5].includes(w!))).toEqual([])
+    // no paper in the Puja weeks, or in week 1, where Friday night is off
+    expect(papers.map((t) => t.week).filter((w) => [1, 2].includes(w!))).toEqual([])
     // each paper is a free doc on its task
     for (const t of papers) expect(out.weekChunks[String(t.week).padStart(2, '0')].resources[t.id].some((r) => r.kind === 'doc' && r.access === 'free'), t.id).toBe(true)
   })
@@ -357,7 +357,7 @@ describe('compiler: the extras (papers, equations, gaps)', () => {
   })
 
   it('fails the build on a broken extra', () => {
-    expect(errorsOf(mutate('`w01-17` `maths` `+1` Week', '`w01-17` `read` `+1` Week')).join('\n')).toMatch(/Equation eq-01: its task w01-17 must be a maths task/)
+    expect(errorsOf(mutate('`w03-12` `maths` `+1` Week', '`w03-12` `read` `+1` Week')).join('\n')).toMatch(/Equation eq-03: its task w03-12 must be a maths task/)
     expect(errorsOf(mutate('| w04-14 | 4 | SIEVE', '| w04-99 | 4 | SIEVE')).join('\n')).toMatch(/its task w04-99 is not in the plan/)
     expect(errorsOf(mutate('| w06-16 | 6 | Spanner |', '| — | 6 | Spanner |')).join('\n')).toMatch(/paper task w06-16 needs exactly one row/)
     expect(errorsOf(mutate('| G4 | Isolation levels, properly | w02-08 | write-skew |', '| G4 | Isolation levels, properly | w02-08 | nope |')).join('\n')).toMatch(/sketch "nope"/)

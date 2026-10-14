@@ -5,16 +5,17 @@ import { engine, openOverlay, toggleTask, whyNote } from '../lib/app'
 import { today } from '../lib/clock'
 import { addDays, DAY_STARTS_HOUR, daysUntil, formatShort, isLateNight } from '../lib/dates'
 import { focusId, focusList } from '../lib/focus'
-import { plan } from '../lib/plan'
+import { plan, taskLabel } from '../lib/plan'
 import { algotracker } from '../lib/solved'
 import { weekPoints, weekTarget } from '../lib/points'
-import { activityDates, coreTasks, dayInfo, dueSummary, missedDays, pickNextUp, streakWeeks, tasksOn, weeklyTasks } from '../lib/today'
+import { activityDates, coreTasks, dayInfo, dueSummary, missedDays, pickLight, pickNextUp, streakWeeks, tasksOn, waitingFor, weeklyTasks } from '../lib/today'
 import { navigate } from '../lib/nav'
 import { PRESETS, startTimer } from '../tools/timer'
 import { lazyPage } from '../ui/lazyPage'
 import { useNow, useTitle, useWeekChunk } from '../ui/hooks'
 import { Html } from '../ui/Html'
 import { Icon } from '../ui/Icon'
+import { BossHow } from '../ui/BossHow'
 import { CapstoneLinks } from '../ui/CapstoneLinks'
 import { StudyPanel } from '../ui/Resources'
 import { actionsFor, labelOf, TaskRow, TYPE_LABEL } from '../ui/Task'
@@ -78,6 +79,23 @@ function Tomorrow({ info }: { info: ReturnType<typeof dayInfo> }) {
   )
 }
 
+/** Tasks from earlier days that are still open. Quiet by design: a few, the most valuable first, and "take one". */
+function Waiting({ week, dow, done }: { week: number; dow: number; done: ReadonlySet<string> }) {
+  const list = waitingFor(week, dow, done)
+  const current = useWeekChunk(week)
+  const previous = useWeekChunk(Math.max(1, week - 1))
+  if (!list.length) return null
+  const shown = list.slice(0, 3)
+  return (
+    <section class="card waiting" aria-label="Waiting for you">
+      <div class="row row--between"><p class="eyebrow" style="margin:0">Waiting for you</p><span class="small muted">{list.length} in all</span></div>
+      <p class="small muted" style="margin:0.3rem 0 0.7rem">Nothing is lost. Take one when there is room, never all of it.</p>
+      <ul class="tasks">{shown.map((t) => <TaskRow key={t.id} task={t} chunk={t.week === week ? current : previous} inWeek />)}</ul>
+      {list.length > shown.length ? <p class="small" style="margin:0.6rem 0 0"><a href={`/weeks/${week}`}>{list.length - shown.length} more, in the weeks</a></p> : null}
+    </section>
+  )
+}
+
 function Skeleton({ h = '9rem' }: { h?: string }) {
   return <div class="skeleton" style={`min-height:${h}`} />
 }
@@ -105,6 +123,7 @@ export default function Today() {
   const todays = tasksOn(info.week, info.dayName)
   const weekly = weeklyTasks(info.week)
   const next = pickNextUp(info.week, info.dow, info.block, done)
+  const waitingNow = info.phase === 'during' ? waitingFor(info.week, info.dow, done) : []
   const welcomeBack = info.phase === 'during' && missed >= 2 && !hasActivityToday && !info.light
 
   // keyboard focus order: next-up first, then today's list, then this week's
@@ -149,13 +168,25 @@ export default function Today() {
       </section>
     )
   } else if (light) {
+    const pick = pickLight(info.week, info.dow, done)
+    const pe = pick ? chunk?.tasks[pick.id] : undefined
+    const pa = pick ? actionsFor(pick, chunk) : []
+    const pp = pa.find((x) => x.primary) ?? pa[0]
     hero = (
-      <section class="card hero" style="border-style:dashed">
-        <p class="eyebrow"><Icon name="moon" /> {light.label}</p>
-        <h2>Puja mode. The stars will wait.</h2>
-        <p class="hero__text">A light day by design: no target, no catching up. If you feel like it, one problem is plenty.</p>
+      <section class="card hero hero--light" aria-label="Light day">
+        <p class="eyebrow"><Icon name="moon" /> {light.label} · a light day</p>
+        <h2>Keep it light. Do not stop.</h2>
+        {pick ? (
+          <>
+            <p class="hero__lead">The small version of today</p>
+            {pe?.light ? <Html html={pe.light} class="hero__text" /> : <Skeleton h="3rem" />}
+            <p class="small muted">{TYPE_LABEL[pick.type]} · <a href={`/weeks/${pick.week}#${pick.id}`}>{taskLabel(pick.id)}</a>. The full task is in the list below if you feel like it.</p>
+          </>
+        ) : <p class="hero__text">Nothing is planned for today. One problem is plenty.</p>}
         <div class="hero__actions">
-          <button type="button" class="btn btn--big" onClick={() => openOverlay({ kind: 'log', difficulty: 'medium', minimum: true })}>I feel like one problem</button>
+          {pick ? <button type="button" class="btn btn--primary btn--big" onClick={() => toggleTask(pick.id)}><Icon name="check" /> Done, the small version</button> : null}
+          {pick && pp && pick.type !== 'review' ? <button type="button" class="btn btn--big" onClick={pp.run}>{pp.label}</button> : null}
+          <button type="button" class="btn btn--big btn--ghost" onClick={() => openOverlay({ kind: 'log', difficulty: 'medium', minimum: true })}>I did one problem</button>
         </div>
       </section>
     )
@@ -186,7 +217,7 @@ export default function Today() {
         {next.type === 'dsa' && chunk ? (
           <p class="small muted">This week’s focus: <strong>{chunk.dsaFocus}</strong>{suggestion ? <> · try one reported problem: <strong>{suggestion}</strong></> : null}</p>
         ) : null}
-        {next.type === 'boss' ? <p class="small muted">No hints for the first hour.</p> : null}
+        {next.type === 'boss' ? <><p class="small muted">The first hour has no hints.</p><BossHow /></> : null}
         {design && next.type === 'design' ? <p class="small"><strong>Derive it first:</strong> {design.derive}</p> : null}
         {next.type === 'capstone' && entry ? <CapstoneLinks taskId={next.id} text={entry.text} /> : null}
         <StudyPanel items={chunk?.resources?.[next.id]} design={next.type === 'design' || next.type === 'design2'} />
@@ -211,7 +242,7 @@ export default function Today() {
       <section class="card hero">
         <p class="eyebrow">{info.block === 'morning' ? 'Morning' : info.block === 'night' ? 'Night' : 'Today'}</p>
         <h2>That’s today.</h2>
-        <p class="hero__text">Rest is training. Anything left on the week can wait; nothing carries over as a debt.</p>
+        <p class="hero__text">Rest is training. {waitingNow.length ? 'If you still have energy, one thing is waiting below.' : 'Nothing is waiting.'}</p>
         <div class="hero__actions"><a class="btn btn--big" href={`/weeks/${info.week}`}>See week {info.week}</a></div>
       </section>
     )
@@ -272,6 +303,7 @@ export default function Today() {
             ) : null}
           </section>
         ) : null}
+        {info.phase === 'during' && !light && !welcomeBack ? <Waiting week={info.week} dow={info.dow} done={done} /> : null}
         {tomorrow && tomorrow.phase === 'during' ? <Tomorrow info={tomorrow} /> : null}
       </div>
 

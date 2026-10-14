@@ -4,8 +4,10 @@ import { engine, findNote, openOverlay, saveNote, toggleTask } from '../lib/app'
 import { navigate } from '../lib/nav'
 import { plan, taskLabel } from '../lib/plan'
 import { dsaProgress } from '../lib/problems'
+import { onLightDay } from '../lib/today'
 import { Html } from './Html'
 import { Icon } from './Icon'
+import { BossHow } from './BossHow'
 import { CapstoneLinks } from './CapstoneLinks'
 import { StudyPanel } from './Resources'
 import { PRESETS, startTimer } from '../tools/timer'
@@ -123,11 +125,27 @@ function DsaProgress({ task, locked }: { task: PlanTask; locked: boolean }) {
   return <div class="small muted">{locked ? 'Done from your solved problems · ' : ''}<a href="/progress/problems" title="See everything you solved">{p.have} of {p.need} {p.unit === 'days' ? 'days done' : p.need === 1 ? 'problem solved' : 'problems solved'}</a></div>
 }
 
+/** Where this task connects to the rest of the site: the pages that know more about it. */
+function Related({ task }: { task: PlanTask }) {
+  const links: [string, string][] = []
+  if (task.gap) links.push([`Gap check ${task.gap}`, `/library?tab=gaps#${task.gap}`])
+  if (task.type === 'lld') links.push(['Machine-coding list', '/library?tab=machine'])
+  if (task.type === 'boss') links.push(['Solved problems', '/progress/problems'])
+  if (task.type === 'maths') links.push(['Formula sheet', '/study/formulas'])
+  if (task.type === 'paper') links.push(['All papers', '/library?tab=papers'])
+  if (task.type === 'mock') links.push(['Interview prep', '/weeks/interview'])
+  if (task.type === 'story') links.push(['STAR stories', '/study/notes?tab=stories'])
+  if (task.hasWhy) links.push(['My why-notes', '/study/notes'])
+  if (!links.length) return null
+  return <p class="small related" aria-label="Related">{links.map(([label, href], i) => <>{i ? ' · ' : ''}<a key={href} href={href}>{label}</a></>)}</p>
+}
+
 export function TaskRow({ task, chunk, focused = false, actions = true, inWeek = false }: { task: PlanTask; chunk: WeekChunk | null; focused?: boolean; actions?: boolean; /** link the label to the task in its week (on Today; the week page is already there) */ inWeek?: boolean }) {
   const done = engine.doneSet.value.has(task.id)
   const entry = chunk?.tasks[task.id]
   const list = actions && !done ? actionsFor(task, chunk) : []
   const pick = task.type === 'design2' ? pickedDesign(task.id) : undefined
+  const lightHere = !!task.hasLight && onLightDay(task)
   return (
     <li class={`task${task.type === 'rest' ? ' task--rest' : ''}`} data-done={done} data-focus={focused} data-task={task.id}>
       <TaskCheck task={task} />
@@ -139,7 +157,14 @@ export function TaskRow({ task, chunk, focused = false, actions = true, inWeek =
           {inWeek && task.week ? <a class="small" href={`/weeks/${task.week}#${task.id}`} title="See this task in its week">{taskLabel(task.id)}</a> : <span class="muted small">{taskLabel(task.id)}</span>}
           <span class="task__pts" title="points">+{task.points}</span>
         </div>
-        {entry ? <Html class="task__text" html={entry.html} inline /> : <span class="task__text muted">…</span>}
+        {entry && lightHere && entry.light ? (
+          <>
+            <div class="task__light"><span class="chip chip--accent"><Icon name="moon" /> Light version</span> <Html class="task__text" html={entry.light} inline /></div>
+            <details class="task__full"><summary class="small">Full version</summary><Html class="task__text small" html={entry.html} inline /></details>
+          </>
+        ) : entry ? <Html class="task__text" html={entry.html} inline /> : <span class="task__text muted">…</span>}
+        {task.type === 'boss' ? <BossHow /> : null}
+        <Related task={task} />
         {task.type === 'capstone' && entry ? <CapstoneLinks taskId={task.id} text={entry.text} /> : null}
         <StudyPanel items={chunk?.resources?.[task.id]} design={task.type === 'design' || task.type === 'design2'} />
         <DsaProgress task={task} locked={engine.autoDoneSet.value.has(task.id)} />

@@ -1,16 +1,15 @@
 import preact from '@preact/preset-vite'
 import { defineConfig, type Plugin } from 'vite'
 
-/** Preloads the one web font, so the browser asks for it while the CSS is still being read (plan 6: layout shift 0). */
+/** Preloads the web fonts that must never swap in late (plan 6: layout shift 0): the reading face and the mono face, not the italic. */
 function preloadFont(): Plugin {
   return {
     name: 'ev-preload-font',
     transformIndexHtml: {
       order: 'post',
       handler(_html, ctx) {
-        const font = Object.keys(ctx.bundle ?? {}).find((f) => f.endsWith('.woff2'))
-        if (!font) return []
-        return [{ tag: 'link', attrs: { rel: 'preload', as: 'font', type: 'font/woff2', crossorigin: '', href: `/${font}` }, injectTo: 'head' }]
+        const fonts = Object.keys(ctx.bundle ?? {}).filter((f) => f.endsWith('.woff2') && !/italic/i.test(f))
+        return fonts.map((font) => ({ tag: 'link' as const, attrs: { rel: 'preload', as: 'font', type: 'font/woff2', crossorigin: '', href: `/${font}` }, injectTo: 'head' as const }))
       },
     },
   }

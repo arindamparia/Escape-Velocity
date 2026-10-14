@@ -2,7 +2,7 @@
 import type { PlanDay, PlanTask } from '../../shared/plan-types'
 import { canonicalProblemUrl } from '../../shared/constants'
 import type { AppState, SolvedProblem } from '../../shared/state'
-import { blockOf, dayNum, DOW_NAMES, kolkataToday, lightDayOn, planDow, planPhase, weekEnd, weekNumber, weekStart, type DayBlock, type LightDayRange, type PlanPhase } from './dates'
+import { addDays, blockOf, dayNum, DOW_NAMES, kolkataToday, lightDayOn, planDow, planPhase, weekEnd, weekNumber, weekStart, type DayBlock, type LightDayRange, type PlanPhase } from './dates'
 import { plan } from './plan'
 import { mergeProblems } from './problems'
 import { weekPoints, weekTarget } from './points'
@@ -55,6 +55,41 @@ export function pickNextUp(week: number, dow: number, block: DayBlock, done: Rea
   return todays.some(morningish) ? morningOrder[0] : nightOrder[0]
 }
 
+/** The calendar date a task is planned for (a Mon to Sun task; an any-day task has none). */
+export function taskDate(t: PlanTask): string | null {
+  const i = (DOW_NAMES as readonly string[]).indexOf(t.day)
+  return t.week && i >= 0 ? addDays(weekStart(t.week, plan.config.startDate), i) : null
+}
+/** Is this task planned for a light day (a festival)? Then its small version is the one to do. */
+export function onLightDay(t: PlanTask): boolean {
+  const d = taskDate(t)
+  return !!d && !!lightDayOn(d, plan.config.lightDays)
+}
+
+/** How heavy a kind of task is, lightest first: what a light day offers before anything else. */
+const LIGHT_RANK: Partial<Record<PlanTask['type'], number>> = { mindset: 0, read: 1, concept: 1, infra: 2, maths: 2, redraw: 2, review: 3, dsa: 3, boss: 4, lld: 5, capstone: 5, story: 5, design: 6, design2: 6, mock: 7 }
+/** The one thing a light day offers: the lightest undone task that has a small version (never an extra). */
+export function pickLight(week: number, dow: number, done: ReadonlySet<string>): PlanTask | undefined {
+  const list = tasksOn(week, DOW_NAMES[dow]).filter((t) => !done.has(t.id) && t.type !== 'rest' && !t.optional && t.hasLight)
+  return list.sort((a, b) => (LIGHT_RANK[a.type] ?? 5) - (LIGHT_RANK[b.type] ?? 5) || b.points - a.points)[0]
+}
+
+/**
+ * What is still open from before today, so a missed day never means a lost task: the undone core tasks of earlier days
+ * this week and of last week, most valuable first. Never extras, never the daily DSA (the morning handles it), never a
+ * rest note. It is a quiet list, not a debt: Today shows a few and says to take one.
+ */
+export function waitingFor(week: number, dow: number, done: ReadonlySet<string>): PlanTask[] {
+  const out = plan.tasks.filter((t) => {
+    if (t.week === null || t.week > week || t.week < week - 1) return false
+    if (done.has(t.id) || t.optional || t.type === 'rest' || t.type === 'dsa') return false
+    if (t.week < week) return true
+    const i = (DOW_NAMES as readonly string[]).indexOf(t.day)
+    return i >= 0 && i < dow // an earlier day of this week; any-day tasks are already in the week's own list
+  })
+  return out.sort((a, b) => b.points - a.points || (a.week ?? 0) - (b.week ?? 0) || a.id.localeCompare(b.id))
+}
+
 const toDay = (iso: string): string | null => {
   const t = Date.parse(iso)
   return Number.isNaN(t) ? null : kolkataToday(t)
@@ -80,8 +115,8 @@ export function missedDays(activity: ReadonlySet<string>, today: string, startDa
   let missed = 0
   for (let d = dayNum(today) - 1; d >= start && missed < 14; d--) {
     const ymd = new Date(d * 86_400_000).toISOString().slice(0, 10)
+    if (activity.has(ymd)) break // work on a light day counts, and ends the run of missed days
     if (lightDayOn(ymd, lightDays)) continue
-    if (activity.has(ymd)) break
     missed++
   }
   // Nothing ever done yet: the first days of the plan are not "missed".

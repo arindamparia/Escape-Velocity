@@ -63,8 +63,8 @@ test.describe('Paper: nothing moves, nothing is raised, nothing fades', () => {
     await api.onboard()
     await openApp(page, '/', { theme: 'paper-night' })
     const c = await page.evaluate(() => { const cs = getComputedStyle(document.body); return { bg: cs.backgroundColor, ink: cs.color } })
-    expect(c.bg).toBe('rgb(21, 19, 15)')
-    expect(c.ink).toBe('rgb(239, 233, 217)')
+    expect(c.bg).toBe('rgb(20, 18, 14)')
+    expect(c.ink).toBe('rgb(230, 222, 203)')
   })
 
   test('Paper is the default: a browser that has never picked a theme gets it', async ({ page, api }) => {
@@ -72,7 +72,7 @@ test.describe('Paper: nothing moves, nothing is raised, nothing fades', () => {
     await openApp(page, '/', { theme: undefined })
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'paper')
     await expect(page.locator('html')).not.toHaveAttribute('data-tone', 'night')
-    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe('rgb(242, 239, 230)')
+    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe('rgb(236, 227, 205)')
   })
 
   test('with the timer running, a toast showing, and each dialog open', async ({ page, api }) => {

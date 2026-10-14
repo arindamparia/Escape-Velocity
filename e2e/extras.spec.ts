@@ -10,8 +10,8 @@ test.describe('papers', () => {
     await api.onboard()
     await openApp(page, '/library?tab=papers')
     await expect(page.getByRole('heading', { level: 1, name: 'Papers' })).toBeVisible()
-    await expect(page.locator('section#schedule section.card')).toHaveCount(10)
-    await expect(page.locator('section#shelf section.card')).toHaveCount(3)
+    await expect(page.locator('section#schedule section.card')).toHaveCount(12)
+    await expect(page.locator('section#shelf section.card')).toHaveCount(1)
     const card = page.locator(`section[id="${paper.id}"]`)
     await expect(card).toContainText('Spanner')
     await expect(card).not.toContainText('TrueTime ε is about 4 ms')
@@ -37,9 +37,9 @@ test.describe('papers', () => {
   test('on Friday night a paper is listed, marked optional, and never the next action', async ({ page, api }) => {
     await api.onboard()
     await api.tick('w04-01') // the week's DSA, so nothing core is left
-    await api.activeOn('2026-10-29') // not a "welcome back" day
-    await api.activeOn('2026-10-30')
-    await openApp(page, '/', { at: kolkata('2026-10-30T21:00:00') })
+    await api.activeOn('2026-11-05') // not a "welcome back" day
+    await api.activeOn('2026-11-06')
+    await openApp(page, '/', { at: kolkata('2026-11-06T21:00:00') })
     await expect(page.getByRole('region', { name: 'Next up' })).toHaveCount(0)
     const row = taskRow(page, 'w04-14')
     await expect(row).toBeVisible()
@@ -57,9 +57,9 @@ test.describe('equations', () => {
     const dialog = page.getByRole('dialog')
     await expect(dialog.locator('math').first()).toBeVisible()
     await expect(dialog).toContainText('Bonus equation')
-    await expect(dialog).not.toContainText('11,574')
+    await expect(dialog).not.toContainText('V = 400')
     await dialog.getByRole('button', { name: 'Show it anyway' }).click()
-    await expect(dialog).toContainText('11,574')
+    await expect(dialog).toContainText('V = 400')
   })
 
   test('once you have written an answer the button says Reveal, and the answer is kept as a note', async ({ page, api }) => {
@@ -67,18 +67,18 @@ test.describe('equations', () => {
     await openApp(page, `/weeks/${bonus.week}`)
     await taskRow(page, bonus.id).getByRole('button', { name: 'Open equation card' }).click()
     const dialog = page.getByRole('dialog')
-    await dialog.getByLabel('Note').fill('About 1e9 / 1e5 = 10,000 a second, 3x for the peak.')
+    await dialog.getByLabel('Note').fill('About 1 / sqrt(V): V = 400 for 5%.')
     await expect(dialog.getByRole('button', { name: 'Reveal the check value' })).toBeVisible()
     await expect.poll(async () => (await api.state()).notes.map((n) => n.refId)).toEqual([`eq:${bonus.id}`])
     await dialog.getByRole('button', { name: 'Reveal the check value' }).click()
-    await expect(dialog).toContainText('34,700')
+    await expect(dialog).toContainText('V = 10,000')
   })
 
   test('the shelf is on the formula sheet: tick one off, and its check waits behind a button', async ({ page, api }) => {
     await api.onboard()
     await openApp(page, '/study/formulas#shelf')
     const shelf = page.locator('section#shelf li.card')
-    await expect(shelf).toHaveCount(12)
+    await expect(shelf).toHaveCount(11)
     await expect(shelf.first().locator('math').first()).toBeVisible()
     await shelf.first().getByRole('button', { name: 'Derived it' }).click()
     await expect.poll(async () => (await api.doneIds())[0]).toMatch(/^eq-\d\d$/)
@@ -86,7 +86,7 @@ test.describe('equations', () => {
 
   test('Today shows the week\'s equation and the bonus one as a panel of its own', async ({ page, api }) => {
     await api.onboard()
-    await openApp(page, '/', { at: kolkata('2026-10-28T10:00:00') }) // week 4 has a Thursday derivation and a bonus equation
+    await openApp(page, '/', { at: kolkata('2026-11-04T10:00:00') }) // week 4 has a Thursday derivation and a bonus equation
     await expect(page.getByRole('region', { name: 'Equation of the week' })).toBeVisible()
     const bonus = page.getByRole('region', { name: 'Bonus equation' })
     await expect(bonus).toContainText('Zipf hit ratio')

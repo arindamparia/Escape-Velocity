@@ -88,7 +88,16 @@ function WeekDetail({ n, current }: { n: number; current: number }) {
 
 function DsaTab() {
   const page = usePage('weeks')
-  return page ? <Html html={page.dsaHtml} class="prose small" /> : <div class="skeleton" />
+  if (!page) return <div class="skeleton" />
+  return (
+    <div class="stack">
+      <Html html={page.dsaHtml} class="prose small" />
+      <section id="boss" class="card stack" aria-label="The boss problem">
+        <h2 style="margin:0">The boss problem</h2>
+        <Html html={page.bossHtml} class="prose" />
+      </section>
+    </div>
+  )
 }
 
 function InterviewTab() {

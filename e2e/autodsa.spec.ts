@@ -2,12 +2,12 @@
 // stay locked while the count holds, and let go when a problem is un-solved.
 import { expect, kolkata, openApp, test, WED } from './support'
 
-const MON = kolkata('2026-10-05T10:00:00')
+const MON = kolkata('2026-10-12T10:00:00')
 
 test('Monday asks for 2: one solved is progress, two completes it and locks the tick, un-solving one frees it', async ({ page, api }) => {
   await api.onboard()
-  const one = { n: 1, name: 'Two Sum', difficulty: 'Easy' as const, at: '2026-10-05T03:30:00Z' }
-  const two = { n: 2, name: 'Jump Game', difficulty: 'Hard' as const, at: '2026-10-05T04:30:00Z' }
+  const one = { n: 1, name: 'Two Sum', difficulty: 'Easy' as const, at: '2026-10-12T03:30:00Z' }
+  const two = { n: 2, name: 'Jump Game', difficulty: 'Hard' as const, at: '2026-10-12T04:30:00Z' }
   await api.solved([one])
   await openApp(page, '/weeks/1', { at: MON })
   const row = page.locator('[data-task="w01-01"]')
@@ -33,15 +33,15 @@ test('Monday asks for 2: one solved is progress, two completes it and locks the 
 
 test('a problem logged here counts with the ones from AlgoTracker', async ({ page, api }) => {
   await api.onboard()
-  await api.solved([{ n: 3, name: 'Valid Anagram', difficulty: 'Easy', at: '2026-10-07T03:00:00Z' }])
-  await api.send([api.op('problem.add', { id: crypto.randomUUID(), loggedOn: '2026-10-07', difficulty: 'hard', noAi: true, title: 'Mine' })])
+  await api.solved([{ n: 3, name: 'Valid Anagram', difficulty: 'Easy', at: '2026-10-14T03:00:00Z' }])
+  await api.send([api.op('problem.add', { id: crypto.randomUUID(), loggedOn: '2026-10-14', difficulty: 'hard', noAi: true, title: 'Mine' })])
   await openApp(page, '/weeks/1', { at: WED })
   await expect(page.locator('[data-task="w01-06"]')).toHaveAttribute('data-done', 'true') // Wed asks for 1; two are there
 })
 
 test('Progress counts AlgoTracker problems in the scorecard', async ({ page, api }) => {
   await api.onboard()
-  await api.solved([{ n: 3, name: 'Valid Anagram', difficulty: 'Easy', at: '2026-10-07T03:00:00Z' }, { n: 4, name: 'Group Anagrams', at: '2026-10-07T04:00:00Z' }])
+  await api.solved([{ n: 3, name: 'Valid Anagram', difficulty: 'Easy', at: '2026-10-14T03:00:00Z' }, { n: 4, name: 'Group Anagrams', at: '2026-10-14T04:00:00Z' }])
   await openApp(page, '/progress', { at: WED })
   const row = page.getByRole('table').locator('tbody tr').first()
   await expect(row.locator('td').nth(2)).toHaveText('2') // "DSA, no AI"

@@ -289,10 +289,12 @@ function buildSections(lines: { text: string; line: number }[], errors: string[]
 
 // ---------------------------------------------------------------- main
 
-interface ParsedTask extends PlanTask { text: string; line: number; check?: string }
+interface ParsedTask extends PlanTask { text: string; line: number; check?: string; light?: string }
 
 /** A derive-first maths task: "question ‖ check: the answer". The answer is kept apart so the site can hide it until you try. */
 const CHECK_SPLIT = ' ‖ check: '
+/** A light day keeps a small version of the day's work, never nothing: "text ‖ light: the small version". It comes last. */
+const LIGHT_SPLIT = ' ‖ light: '
 
 function bodyLines(s: RawSection): string[] {
   return s.body.map((b) => b.text)
@@ -376,12 +378,18 @@ export function compilePlan(source: string): CompileOutput {
         continue
       }
       taken.add(b.line)
-      const [, , id, type, points, day, rawText] = m
+      const [, , id, type, points, day, wholeText] = m
+      const lightAt = wholeText.indexOf(LIGHT_SPLIT)
+      const light = lightAt === -1 ? undefined : wholeText.slice(lightAt + LIGHT_SPLIT.length).trim()
+      const rawText = lightAt === -1 ? wholeText : wholeText.slice(0, lightAt)
+      if (light === '') errors.push(`Line ${b.line}: ${id} has "‖ light:" with nothing after it`)
+      if (light && (type === 'rest' || type === 'ready')) errors.push(`Line ${b.line}: ${id}: a ${type} task has no light version`)
       const cut = type === 'maths' ? rawText.indexOf(CHECK_SPLIT) : -1
       const text = cut === -1 ? rawText : rawText.slice(0, cut)
       const check = cut === -1 ? undefined : rawText.slice(cut + CHECK_SPLIT.length).trim()
       if (check === '') errors.push(`Line ${b.line}: ${id} has "‖ check:" with nothing after it`)
       if (type !== 'maths' && rawText.includes('‖')) errors.push(`Line ${b.line}: ${id}: "‖ check:" is only for maths tasks`)
+      if (light?.includes('‖')) errors.push(`Line ${b.line}: ${id}: "‖ light:" must be the last part of the line`)
       if (!(TASK_TYPES as readonly string[]).includes(type)) errors.push(`Line ${b.line}: unknown task type "${type}" on ${id}`)
       const idWeek = id.startsWith('w') ? Number(id.slice(1, 3)) : null
       if (s.surface === 'weeks.tasks') {
@@ -394,7 +402,7 @@ export function compilePlan(source: string): CompileOutput {
         errors.push(`Line ${b.line}: task ${id} is in "${s.heading}", which is not a tasks section`)
       }
       tasks.push({
-        id, week: idWeek, type: type as TaskType, points: Number(points), day: day as PlanDay, text, line: b.line, ...(check ? { check } : {}),
+        id, week: idWeek, type: type as TaskType, points: Number(points), day: day as PlanDay, text, line: b.line, ...(check ? { check } : {}), ...(light ? { light } : {}),
       })
     }
   }
@@ -590,8 +598,9 @@ export function compilePlan(source: string): CompileOutput {
     if (t.type === 'dsa') out.solve = dsaSolve(t.day, t.text)
     if (equationOfTask.has(t.id)) out.eq = equationOfTask.get(t.id)!.id
     if (t.type === 'paper' || equationOfTask.has(t.id)) out.optional = true
+    if (t.light) out.hasLight = true
     const gap = gaps.find((g) => g.taskId === t.id)
-    if (gap) out.sketch = gap.sketch
+    if (gap) { out.sketch = gap.sketch; out.gap = gap.id }
     if (t.type === 'concept' || t.type === 'infra') {
       const wm = /Why:\s*(.+)$/.exec(t.text)
       if (wm) {
@@ -648,6 +657,7 @@ export function compilePlan(source: string): CompileOutput {
   const reportedTo = reportedMatch ? Number(reportedMatch[2]) : 0
   const reported = reportedMatch ? reportedMatch[3].split(/,\s+(?![^(]*\))/).map(plain) : []
   if (reported.length < 3) errors.push('Could not read the reported problems from the DSA track')
+  if (!sections.some((x) => x.surface === 'weeks.dsa' && /^The boss problem/.test(x.heading))) errors.push('The DSA track has no "The boss problem" section')
   if (errors.length) throw new PlanCompileError(errors)
 
   // ---------------------------------------------------------------- week chunks
@@ -662,7 +672,7 @@ export function compilePlan(source: string): CompileOutput {
     for (const t of tasks.filter((x) => x.week === n)) {
       const isMaths = t.type === 'maths'
       const html = renderInline(t.text, isMaths)
-      chunk.tasks[t.id] = { html, text: plain(t.text), ...(whyByTask.has(t.id) ? { why: whyByTask.get(t.id) } : {}) }
+      chunk.tasks[t.id] = { html, text: plain(t.text), ...(whyByTask.has(t.id) ? { why: whyByTask.get(t.id) } : {}), ...(t.light ? { light: renderInline(t.light, isMaths) } : {}) }
       if (isMaths) {
         const eq = equationOfTask.get(t.id)
         // a bonus equation shows its formula and setup (never its check); a weekly derivation shows the question
@@ -964,6 +974,7 @@ export function compilePlan(source: string): CompileOutput {
     weeks: {
       timeline: (timelineTable?.rows ?? []).map((r) => ({ week: r['Week'], dates: r['Dates'], theme: r['Theme'], design: r['Saturday design'] })),
       dsaHtml: sectionHtml(dsaSection!),
+      bossHtml: sectionHtml(sections.find((x) => x.surface === 'weeks.dsa' && /^The boss problem/.test(x.heading))!),
       dsaTable: (dsaTable?.rows ?? []).map((r) => ({ weeks: r['Weeks'], focus: r['Focus'] })),
       capstoneHtml: sectionHtml(capSection),
       capstoneFlow,
