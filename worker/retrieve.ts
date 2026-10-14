@@ -1,7 +1,7 @@
 // Retrieval for the AI search: which chunks of the plan to put in front of the model for a question. Pure functions over
 // the bundled corpus, with nothing from the Worker's environment, so the offline scorer (tests/golden) runs exactly this.
 import ragData from '../src/generated/rag.json'
-import { topicWords, within } from '../src/lib/search'
+import { LINK_WORDS, tokenize, topicWords, within } from '../src/lib/search'
 
 export interface Chunk { id: string; entry: string; kind: string; title: string; text: string }
 export const CHUNKS = (ragData as { chunks: Chunk[] }).chunks
@@ -132,3 +132,20 @@ export function inScope(q: string): Scope {
  * it matches on its own either way.
  */
 export const wantsAction = (q: string): boolean => /\b(start|stop|begin|log|record|add|switch|change|set|use|turn|toggle|mute|unmute|enable|disable|refresh|reload|sync|print|open|edit|write|run|show|go)\b/i.test(q)
+
+/**
+ * The order of the sources under an answer. The model lists them "best first", but a model is easily pulled by the last
+ * thing it read, and the first source is the one Enter opens. So its order is combined with how the retrieval ranked the
+ * same rows (reciprocal rank, the same fusion as gather), and videos and docs go after the plan's own rows unless the
+ * question asked for one. At most two links ride along.
+ */
+export function rankSources<R extends { id: string }>(results: readonly R[], chunks: readonly Chunk[], q: string): R[] {
+  const inContext = new Map<string, number>()
+  chunks.forEach((c, i) => { if (!inContext.has(c.entry)) inContext.set(c.entry, i) })
+  const asked = tokenize(q).some((t) => LINK_WORDS.has(t))
+  const score = (r: R, i: number) => 1 / (RRF_K + i + 1) + 1 / (RRF_K + (inContext.get(r.id) ?? chunks.length) + 1)
+  const isLink = (r: R) => r.id.startsWith('link:')
+  const ranked = results.map((r, i) => ({ r, s: score(r, i), i })).sort((a, b) => b.s - a.s || a.i - b.i).map((x) => x.r)
+  if (asked) return ranked
+  return [...ranked.filter((r) => !isLink(r)), ...ranked.filter(isLink).slice(0, 2)]
+}

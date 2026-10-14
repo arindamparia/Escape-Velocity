@@ -4,6 +4,7 @@ import { canonicalProblemUrl, titleFromProblemUrl } from '../../shared/constants
 import { closeOverlay, engine, logProblem, openOverlay, say, setTheme, showDesign, toggleTask } from './app'
 import { today } from './clock'
 import { PAGES, SECTIONS, urls, weekOfTask } from './destinations'
+import { TIER_BOOST, tierOf } from './priority'
 import { navigate } from './nav'
 import { plan, taskById, taskLabel, weekLoaded } from './plan'
 import { loadSolved } from './solved'
@@ -105,11 +106,13 @@ export function termEntries(): Entry[] {
 
 /** Weeks, tasks and designs come from the compiled search list. */
 export function planEntries(list: readonly SearchEntry[]): Entry[] {
+  const done = engine.doneSet.peek()
   return list.map((e): Entry => {
     if (e.k === 'w') return { id: `week:${e.id}`, kind: 'week', title: e.t, keys: e.x, hint: 'week', run: go(urls.week(e.id)) }
-    if (e.k === 'd') return { id: `design:${e.id}`, kind: 'design', title: e.t, sub: e.x, hint: 'design', run: () => { closeOverlay(); navigate(urls.design(e.id)); showDesign(e.id) } }
+    if (e.k === 'd') return { id: `design:${e.id}`, kind: 'design', title: e.t, sub: e.x, hint: 'design', boost: TIER_BOOST[tierOf(e.id)], run: () => { closeOverlay(); navigate(urls.design(e.id)); showDesign(e.id) } }
     const task = taskById.get(e.id)
-    return { id: `task:${e.id}`, kind: 'task', title: clip(e.t, 110), sub: taskLabel(e.id), keys: e.x, hint: task?.week ? `Week ${task.week}` : 'ready check', boost: 0, run: go(/^r-\d\d$/.test(e.id) ? urls.readiness(e.id) : urls.task(e.id, task?.week ?? weekOfTask(e.id) ?? plan.weeks[0].n)) }
+    return { id: `task:${e.id}`, kind: 'task', title: clip(e.t, 110), sub: taskLabel(e.id), keys: e.x, hint: task?.week ? `Week ${task.week}` : 'ready check', boost: done.has(e.id) ? -6 : 0, // what is still to do comes before what is finished
+       run: go(/^r-\d\d$/.test(e.id) ? urls.readiness(e.id) : urls.task(e.id, task?.week ?? weekOfTask(e.id) ?? plan.weeks[0].n)) }
   })
 }
 

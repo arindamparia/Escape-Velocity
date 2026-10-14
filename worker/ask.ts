@@ -9,7 +9,7 @@ import { ASK_LIMITS, type AiStatus, type AskResponse } from '../shared/ask'
 import { kolkataToday } from '../src/lib/dates'
 import type { Env } from './env'
 import { namespaceCounts, namespaceFor, rebuild, searchPlan, type PineconeConfig } from './pinecone'
-import { CHUNKS, gather, HASH, inScope, wantsAction, type Chunk } from './retrieve'
+import { CHUNKS, gather, HASH, inScope, rankSources, wantsAction, type Chunk } from './retrieve'
 
 export { gather }
 
@@ -91,7 +91,9 @@ export function replySchema(chunkIds: readonly string[], actionIds: readonly str
   }
 }
 
-async function callOpenAI(env: Env, user: unknown, schema?: ReturnType<typeof replySchema>, thinkingOff = true): Promise<string> {
+export interface Usage { prompt_tokens?: number; completion_tokens?: number; prompt_tokens_details?: { cached_tokens?: number } }
+
+async function callOpenAI(env: Env, user: unknown, schema?: ReturnType<typeof replySchema>, thinkingOff = true): Promise<{ content: string; usage?: Usage }> {
   let res: Response
   const effort = thinkingOff ? effortFor(modelOf(env)) : undefined
   try {
@@ -122,10 +124,10 @@ async function callOpenAI(env: Env, user: unknown, schema?: ReturnType<typeof re
     throw new AskError('upstream', `OpenAI rejected the request${message ? `: ${message.slice(0, 160)}` : ''}. If it names the model, set OPENAI_MODEL.`, 502)
   }
   if (!res.ok) throw new AskError('upstream', `OpenAI answered ${res.status}.`, 502)
-  const data = (await res.json().catch(() => null)) as { choices?: { message?: { content?: string } }[] } | null
+  const data = (await res.json().catch(() => null)) as { choices?: { message?: { content?: string } }[]; usage?: Usage } | null
   const content = data?.choices?.[0]?.message?.content
   if (!content) throw new AskError('invalid_answer', 'OpenAI sent an empty answer.', 502)
-  return content
+  return { content, usage: data?.usage }
 }
 
 /** Keep only what is real: results whose id was offered, actions from the catalogue, text within bounds. */
@@ -156,9 +158,23 @@ export async function ask(env: Env, body: unknown): Promise<AskResponse> {
   if (!inScope(req.q).ok) return declined(env, 0)
   const used = await spend(env)
   const sem = await semantic(env, req.q)
-  const chunks = gather(req, sem)
+  const r = await converse(env, req, sem)
+  // the model's own call on scope is final: whatever else it wrote is discarded, so nothing off-topic can reach the screen
+  if (!r) return declined(env, used)
+  return { ...r.clean, mode: sem.length ? 'hybrid' : 'local', usedToday: used, limit: limitOf(env) }
+}
+
+type Request = z.infer<typeof AskSchema>
+
+/**
+ * Everything between "the question is in scope" and "here is the answer": gather the context, ask the model, check the
+ * reply, order the sources. Returns null when the model says the question is out of scope. Separate from ask() so the
+ * offline evaluation (tests/unit/ask.eval.test.ts) runs exactly this against a real model, without a database.
+ */
+export async function converse(env: Pick<Env, 'OPENAI_API_KEY' | 'OPENAI_MODEL'>, req: Request, semanticIds: readonly string[]): Promise<{ clean: Pick<AskResponse, 'answer' | 'results' | 'actions'>; chunks: Chunk[]; usage?: Usage } | null> {
+  const chunks = gather(req, semanticIds)
   const actions = wantsAction(req.q) ? req.actions : []
-  const content = await callOpenAI(env, {
+  const { content, usage } = await callOpenAI(env as Env, {
     question: req.q,
     today: req.context?.today,
     where: { week: req.context?.week, next_up: req.context?.next },
@@ -167,11 +183,10 @@ export async function ask(env: Env, body: unknown): Promise<AskResponse> {
   }, replySchema(chunks.map((c) => c.id), actions.map((a) => a.id)))
   let parsedAnswer: unknown
   try { parsedAnswer = JSON.parse(content) } catch { throw new AskError('invalid_answer', 'OpenAI sent an answer that was not JSON. Ask again.', 502) }
-  // the model's own call on scope is final: whatever else it wrote is discarded, so nothing off-topic can reach the screen
-  if ((parsedAnswer as { in_scope?: unknown } | null)?.in_scope === false) return declined(env, used)
+  if ((parsedAnswer as { in_scope?: unknown } | null)?.in_scope === false) return null
   const clean = sanitize(parsedAnswer, chunks, new Set(actions.map((a) => a.id)))
   if (!clean.answer) throw new AskError('invalid_answer', 'OpenAI sent no answer. Ask again.', 502)
-  return { ...clean, mode: sem.length ? 'hybrid' : 'local', usedToday: used, limit: limitOf(env) }
+  return { clean: { ...clean, results: rankSources(clean.results, chunks, req.q) }, chunks, usage }
 }
 
 /** The one reply to a question that is not about the plan or the app: fixed text, never anything the model wrote. */

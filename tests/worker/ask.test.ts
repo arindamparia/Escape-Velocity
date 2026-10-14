@@ -187,6 +187,12 @@ describe('what comes back is checked', () => {
     expect(body.mode).toBe('local')
   })
 
+  it('orders the sources by the model and the retrieval together, with links after the plan\'s own rows', async () => {
+    reply = () => completion({ in_scope: true, answer: 'See below.', results: [{ id: 'link:https://www.youtube.com/watch?v=kx-XDoPjoHw', why: 'a video' }, { id: 'term:idempotency', why: 'the idea' }], actions: [] })
+    const body = (await (await ask(q({ q: 'what is idempotency', candidates: ['term:idempotency', 'link:https://www.youtube.com/watch?v=kx-XDoPjoHw'] }))).json()) as AskResponse
+    expect(body.results.map((r) => r.id)).toEqual(['term:idempotency', 'link:https://www.youtube.com/watch?v=kx-XDoPjoHw'])
+  })
+
   it('maps a rule or capstone chunk to the section it belongs to', () => {
     const chunks = gather({ q: 'what is the capstone', candidates: ['section:capstone-flow'] }, [])
     const clean = sanitize({ answer: 'a', results: [{ id: chunks[0].id, why: 'w' }] }, chunks, new Set())

@@ -195,7 +195,7 @@ function tokenWeight(t: string, prepared: readonly Prepared[]): number {
 }
 
 // Words that say the person wants a video or a doc: only then do links compete with the plan's own rows.
-const LINK_WORDS = new Set(['video', 'videos', 'watch', 'youtube', 'doc', 'docs', 'documentation', 'read', 'article', 'articles', 'blog', 'blogs', 'link', 'links', 'tutorial', 'tutorials', 'course', 'lecture', 'talk', 'resource', 'resources'])
+export const LINK_WORDS = new Set(['video', 'videos', 'watch', 'youtube', 'doc', 'docs', 'documentation', 'read', 'article', 'articles', 'blog', 'blogs', 'link', 'links', 'tutorial', 'tutorials', 'course', 'lecture', 'talk', 'resource', 'resources'])
 /** Videos and docs are reference material for a task, not the answer to "design a url shortener". */
 const LINK_PENALTY = 0.45
 
