@@ -71,7 +71,7 @@ function Designs({ groups, f }: { groups: { title: string; designs: DesignFull[]
                 <li key={d.id}>
                   <button type="button" class="library-item" aria-current={selectedDesign.value === d.id ? 'true' : undefined} style={selectedDesign.value === d.id ? 'border-color:var(--accent);border-width:2px' : undefined} onClick={() => { navigate(`/library?design=${d.id}`, { replace: true }); showDesign(d.id) }}>
                     <span><strong>{d.name}</strong><br /><span class="small muted">{d.teaches}</span></span>
-                    <span class="row" style="justify-content:flex-end;align-content:start">
+                    <span class="row library-item__tags">
                       {tierOf(d.id) !== 'more' ? <span class="chip" title="How much this design matters for an SDE-2 backend loop at an Indian fintech: Core is asked almost everywhere, Fintech edge sets a fintech candidate apart">{TIER_LABEL[tierOf(d.id)]}</span> : null}
                       <span class={`chip${d.access === 'premium' ? ' chip--accent' : ''}`} title="Whether a breakdown of this design is free, behind Premium, or does not exist (you derive it yourself)">{d.access === 'derive' ? 'no breakdown' : `${d.access} breakdown`}</span>
                       <span class="chip">{/^\d+$/.test(d.week) ? `Wk ${d.week}` : d.week}</span>

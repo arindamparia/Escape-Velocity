@@ -469,6 +469,9 @@ dialog::backdrop { background: rgb(5 8 20 / 0.6); }
 .library-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.5rem; padding: 0.7rem 0.85rem; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); width: 100%; text-align: left; }
 .library-list > li:nth-child(n + 9) .library-item { content-visibility: auto; contain-intrinsic-size: auto 4.6rem; }
 .library-item:hover { border-color: var(--accent); }
+.library-item__tags { justify-content: flex-end; align-content: flex-start; }
+/* on a phone the tags go under the text: beside it they leave the description a column one word wide */
+@media (max-width: 599px) { .library-item { grid-template-columns: minmax(0, 1fr); } .library-item__tags { justify-content: flex-start; } }
 .filters { display: grid; gap: 0.9rem; }
 .filters .row { gap: 0.4rem; }
 .filters .chip { white-space: normal; text-align: left; }

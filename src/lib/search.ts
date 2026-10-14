@@ -199,6 +199,10 @@ export const LINK_WORDS = new Set(['video', 'videos', 'watch', 'youtube', 'doc',
 /** Videos and docs are reference material for a task, not the answer to "design a url shortener". */
 const LINK_PENALTY = 0.45
 
+// A word that names a KIND of row ("design youtube", "uber design", "term idempotency") is a hint about what is wanted, not a
+// word every row must contain: the YouTube design is called "YouTube", not "design YouTube". Only with other words beside it.
+const KIND_WORDS: Record<string, Kind> = { design: 'design', designs: 'design', term: 'term', terms: 'term', task: 'task', tasks: 'task', page: 'page', pages: 'page', company: 'company', companies: 'company', problem: 'problem', problems: 'problem' }
+
 type Intent = 'find' | 'learn' | 'do' | null
 /** What the question is for, from how it starts: a place to go, an idea to read about, or something to do. */
 function intentOf(spoken: readonly string[]): Intent {
@@ -229,6 +233,7 @@ export function search<T extends Doc>(docs: readonly T[], query: string, opts: S
   const whole = spoken.join(' ') // a title typed in full still gets its exact-match bonus, filler words and all
   const prepared = docs.map(prepare)
   const weights = tokens.map((t) => tokenWeight(t, prepared))
+  const kindHints = tokens.map((t) => (tokens.length >= 2 ? KIND_WORDS[t] : undefined))
   const intent = intentOf(spoken)
   const asksForLinks = !!opts.kinds || spoken.some((t) => LINK_WORDS.has(t))
   const spokenStems = new Set(spoken.flatMap((t) => [t, stemOf(t)]))
@@ -246,6 +251,7 @@ export function search<T extends Doc>(docs: readonly T[], query: string, opts: S
       let inTitle = 0
       const marks: [number, number][] = []
       tokens.forEach((t, ti) => {
+        if (kindHints[ti] === item.kind) { matched++; solid++; score += 70 * weights[ti]; return } // "design" beside other words, on a design
         let best: Match | null = null
         let bestField = -1
         fields.forEach((f, i) => { const m = matchToken(t, f, i === 0); if (m && (!best || m.score > best.score)) { best = m; bestField = i } })

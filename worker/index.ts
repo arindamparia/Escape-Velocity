@@ -10,11 +10,11 @@ import { applyOps, checkAgainstPlan, OpError } from './ops'
 import { readExport, readState } from './state'
 
 function err(code: string, message: string, status: number, opId?: string): Response {
-  return Response.json({ error: { code, message, ...(opId ? { opId } : {}) } }, { status, headers: { 'Cache-Control': 'no-store' } })
+  return Response.json({ error: { code, message, ...(opId ? { opId } : {}) } }, { status, headers: { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' } })
 }
 
 function json(body: unknown): Response {
-  return Response.json(body, { headers: { 'Cache-Control': 'no-store' } })
+  return Response.json(body, { headers: { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' } })
 }
 
 export const app = new Hono<{ Bindings: Env }>().basePath('/api')
