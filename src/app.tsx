@@ -1,5 +1,6 @@
 import { ErrorBoundary, LocationProvider, Route, Router, lazy, useLocation } from 'preact-iso'
 import { useEffect } from 'preact/hooks'
+import { BRAND, soundActive, soundState, toggleFocusSound } from './tools/focusSound'
 import { closeOverlay, engine, needsOnboarding, openOverlay, overlay, say, setTheme, sync, toast, toastAction, toggleTask } from './lib/app'
 import { focusId, focusList } from './lib/focus'
 import { followHash, watchHash } from './lib/anchor'
@@ -129,6 +130,12 @@ function useShortcuts() {
           break
         }
         case 't': navigate('/'); break
+        case 'm': {
+          if (!soundActive()) return
+          toggleFocusSound()
+          say(soundState.peek() === 'muted' ? `${BRAND} muted.` : `${BRAND} on.`, 1600)
+          break
+        }
         case '?': openOverlay({ kind: 'shortcuts' }); break
         case '1': case '2': case '3': case '4': case '5': {
           const p = THEME_PREFS[Number(e.key) - 1]

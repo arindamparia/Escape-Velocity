@@ -16,7 +16,7 @@ export interface SoundSource {
   dispose(): void
 }
 
-export type SourceKind = 'brown' | 'pink' | 'rain' | 'wind'
+export type SourceKind = 'brown' | 'pink' | 'rain' | 'wind' | 'ocean'
 
 export class SoundUnavailable extends Error {
   constructor(message: string) { super(message) }

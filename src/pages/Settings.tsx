@@ -3,40 +3,42 @@ import { Restore } from '../ui/Restore'
 import { useEffect, useState } from 'preact/hooks'
 import type { AiStatus } from '../../shared/ask'
 import { chimeOn, engine, openOverlay, say, sync } from '../lib/app'
-import { FOCUS_SOURCES, focusSettings, previewFocusSound, setFocusSettings, soundNotice, soundState } from '../tools/focusSound'
+import { BRAND, DEFAULT_CUSTOM_NAME, focusSettings, setFocusSettings, soundNameOf, soundNotice, SOUNDS } from '../tools/focusSound'
 import { parseStreamLink } from '../tools/sound/stream'
 import { NOTIFY_KEY, notifyWanted } from '../tools/timer'
+import { SoundCards } from '../ui/SoundPicker'
 import { ThemePicker } from '../ui/ThemePicker'
 import { useTitle } from '../ui/hooks'
 
-/** What plays while a timer runs. Kept on this device; a sound that cannot play says why and falls back to brown noise. */
+/** Cabin: what plays while a timer runs. Kept on this device; a sound that cannot play says why and falls back to Engine hum. */
 function FocusSound() {
   const f = focusSettings.value
-  const playing = soundState.value !== 'idle'
   const bad = f.source === 'custom' && f.custom.trim() !== '' && !parseStreamLink(f.custom)
+  const chosen = SOUNDS.find((o) => o.id === f.source)
   return (
-    <section class="card stack" id="focus-sound"><h2>Focus sound</h2>
-      <div class="row" role="group" aria-label="Focus sound">
-        {FOCUS_SOURCES.map((o) => <button key={o.id} type="button" class="chip" aria-pressed={f.source === o.id} onClick={() => setFocusSettings({ source: o.id })} title={o.hint}>{o.label}</button>)}
-      </div>
-      <p class="small muted m0">{FOCUS_SOURCES.find((o) => o.id === f.source)?.hint}</p>
+    <section class="card stack" id="focus-sound"><h2>{BRAND} sound</h2>
+      <p class="small muted m0">The quiet of a cabin before launch. It plays while a timer runs, crossfades when you change it, and fades out when the timer stops. You can switch it from the timer itself, with <kbd>m</kbd> to mute, or from the search box.</p>
+      <SoundCards />
+      <p class="small m0" role="status"><strong>{soundNameOf(f.source, f.customName)}</strong>{chosen && f.source !== 'off' ? <span class="muted"> · {chosen.hint}</span> : null}</p>
       {f.source === 'custom' ? (
-        <label>Link to a video or playlist
-          <input type="url" value={f.custom} placeholder="Paste a link" maxLength={300} onChange={(e) => setFocusSettings({ custom: (e.target as HTMLInputElement).value })} aria-invalid={bad} />
-        </label>
+        <div class="stack" style="gap:0.6rem">
+          <label>Name your sound
+            <input type="text" value={f.customName} maxLength={40} placeholder={DEFAULT_CUSTOM_NAME} onInput={(e) => setFocusSettings({ customName: (e.target as HTMLInputElement).value })} />
+          </label>
+          <label>Link to a video or playlist
+            <input type="url" value={f.custom} placeholder="Paste a link" maxLength={300} onChange={(e) => setFocusSettings({ custom: (e.target as HTMLInputElement).value })} aria-invalid={bad} />
+          </label>
+        </div>
       ) : null}
       {bad ? <p class="small m0" role="alert">That is not a video or playlist link.</p> : null}
       {f.source !== 'off' ? (
-        <>
-          <label class="row" style="align-items:center;gap:0.8rem">Volume
-            <input type="range" min={0} max={100} step={1} value={f.volume} aria-label="Focus sound volume" style="flex:1;max-width:18rem" onInput={(e) => setFocusSettings({ volume: Number((e.target as HTMLInputElement).value) })} />
-            <span class="mono small" style="min-width:3ch">{f.volume}</span>
-          </label>
-          <div class="row"><button type="button" class="btn" disabled={bad} onClick={previewFocusSound}>{playing ? 'Stop' : 'Hear it (20 seconds)'}</button></div>
-        </>
+        <label class="row" style="align-items:center;gap:0.8rem">Volume
+          <input type="range" min={0} max={100} step={1} value={f.volume} aria-label="Cabin sound volume" style="flex:1;max-width:18rem" onInput={(e) => setFocusSettings({ volume: Number((e.target as HTMLInputElement).value) })} />
+          <span class="mono small" style="min-width:3ch">{f.volume}</span>
+        </label>
       ) : null}
       {soundNotice.value ? <p class="small m0" role="status">{soundNotice.value}</p> : null}
-      <p class="small muted m0">Plays while a timer runs and fades out when it stops. The speaker button in the top bar mutes it. Saved on this device.</p>
+      <p class="small muted m0">Saved on this device only. Start a timer from <a href="/study/timer">the timer page</a>, the top bar or the search box to hear it with your work.</p>
     </section>
   )
 }
@@ -128,7 +130,7 @@ export default function Settings() {
         <CalendarExport />
         <AiSearch />
         <section class="card stack" id="keyboard"><h2>Keyboard</h2>
-          <p class="small muted m0"><kbd>j</kbd> <kbd>k</kbd> move, <kbd>x</kbd> tick, <kbd>s</kbd> start, <kbd>t</kbd> Today, <kbd>⌘K</kbd> palette, <kbd>1</kbd> to <kbd>5</kbd> themes.</p>
+          <p class="small muted m0"><kbd>j</kbd> <kbd>k</kbd> move, <kbd>x</kbd> tick, <kbd>s</kbd> start, <kbd>t</kbd> Today, <kbd>m</kbd> mute sound, <kbd>⌘K</kbd> palette, <kbd>1</kbd> to <kbd>5</kbd> themes.</p>
           <div><button type="button" class="btn btn--small" onClick={() => openOverlay({ kind: 'shortcuts' })}>All shortcuts</button></div>
         </section>
         <section class="card stack"><h2>About</h2>

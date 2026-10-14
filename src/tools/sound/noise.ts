@@ -1,4 +1,4 @@
-// Generated focus sounds with the Web Audio API: brown and pink noise, rain and wind. Nothing is downloaded, it works
+// Generated focus sounds with the Web Audio API: brown and pink noise, rain, wind and waves. Nothing is downloaded, it works
 // offline, and it costs next to no CPU (a looped noise buffer through a couple of filters).
 import { SoundUnavailable, type SoundSource, type SourceKind } from './types'
 
@@ -52,7 +52,7 @@ export function noiseSource(kind: SourceKind): SoundSource {
     master.gain.value = 0
     master.connect(c.destination)
     const src = c.createBufferSource()
-    src.buffer = noiseBuffer(c, kind === 'pink' || kind === 'rain' ? 'pink' : 'brown')
+    src.buffer = noiseBuffer(c, kind === 'pink' || kind === 'rain' ? 'pink' : 'brown') // brown: engine hum, wind and waves
     src.loop = true
     sources.push(src)
     if (kind === 'brown' || kind === 'pink') {
@@ -68,6 +68,19 @@ export function noiseSource(kind: SourceKind): SoundSource {
       src.connect(hp).connect(lp).connect(swell).connect(master)
       sources.push(lfo)
       nodes.push(hp, lp, swell, depth)
+    } else if (kind === 'ocean') {
+      // brown noise through a low filter, its level rising and falling over about eleven seconds: a wave coming in and going out
+      const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 900; lp.Q.value = 0.5
+      const swell = c.createGain(); swell.gain.value = 0.55
+      const lfo = c.createOscillator(); lfo.frequency.value = 0.09
+      const depth = c.createGain(); depth.gain.value = 0.45
+      const lfo2 = c.createOscillator(); lfo2.frequency.value = 0.037 // a second, slower drift so no two waves are alike
+      const depth2 = c.createGain(); depth2.gain.value = 140
+      lfo.connect(depth).connect(swell.gain)
+      lfo2.connect(depth2).connect(lp.frequency)
+      src.connect(lp).connect(swell).connect(master)
+      sources.push(lfo, lfo2)
+      nodes.push(lp, swell, depth, depth2)
     } else {
       // brown noise through a low filter whose cutoff and level drift slowly, like wind in trees
       const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 500; lp.Q.value = 0.7

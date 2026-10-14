@@ -42,7 +42,7 @@ export const GOLDEN: Golden[] = [
   w('where', 'what did the plan miss from arpit bhayani', 'section:gap-coverage', 'page:/library?tab=gaps'),
   w('where', 'should I buy arpit bhayani’s course', 'section:gap-courses'),
   w('where', 'mute the chime', 'action:chime', 'section:settings-sound'),
-  w('where', 'play rain sounds while I study', 'section:settings-focus-sound'),
+  w('where', 'play rain sounds while I study', 'section:settings-focus-sound', 'action:sound:*'),
   w('where', 'download a backup of my data', 'section:settings-sync'),
   w('where', 'is the AI search turned on', 'section:settings-ai'),
   w('where', 'keyboard shortcuts', 'action:shortcuts', 'section:settings-keyboard'),

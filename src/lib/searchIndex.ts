@@ -11,6 +11,7 @@ import { loadSolved } from './solved'
 import { dayInfo, pickNextUp } from './today'
 import { GLOSSARY } from '../pages/glossary'
 import { THEME_LABEL, THEME_PREFS, type ThemePref } from '../theme/themes'
+import { BRAND, chooseSound, focusSettings, soundActive, soundNameOf, soundState, SOUNDS, startFocusSound, toggleFocusSound } from '../tools/focusSound'
 import { startTimer, stopTimer, TIMER_CHOICES, timer } from '../tools/timer'
 import type { Doc } from './search'
 
@@ -56,6 +57,21 @@ export function actionEntries(): Entry[] {
       hint: String(i + 1), run: () => { closeOverlay(); setTheme(pref) },
     })
   })
+  // Cabin: every sound is a row of its own, so "rain", "monsoon" or "tide" in the box can switch it (or start it, with a timer running)
+  for (const o of SOUNDS) {
+    const name = soundNameOf(o.id, focusSettings.peek().customName)
+    out.push({
+      id: `action:sound:${o.id}`, kind: 'action', title: o.id === 'off' ? 'Sound: silence' : `Sound: ${name}`, sub: `${BRAND} · ${o.kind}. ${o.hint}`,
+      keys: `focus cabin music noise ambient background audio study concentrate playlist ${o.kind} ${o.name} sounds switch change`,
+      run: () => {
+        closeOverlay()
+        chooseSound(o.id)
+        const t = timer.peek()
+        if (o.id !== 'off' && t && !t.finishedAt) startFocusSound()
+        say(o.id === 'off' ? `${BRAND}: silence.` : `${BRAND}: ${name}.`)
+      },
+    })
+  }
   for (const [label, kind, min] of TIMER_CHOICES) {
     out.push({
       id: `action:timer:${kind}`, kind: 'action', title: `Start timer: ${label}, ${min} min`, sub: kind === 'boss' ? 'Open-ended: it keeps counting after the box' : 'Counts down; a chime when time is up',
@@ -84,6 +100,10 @@ export function liveActions(): Entry[] {
   const out: Entry[] = []
   const t = timer.peek()
   if (t) out.push({ id: 'action:timer:stop', kind: 'action', title: t.finishedAt ? 'Close the finished timer' : 'Stop the timer', sub: 'It is running in the top bar', keys: 'end finish cancel', boost: 40, run: () => { closeOverlay(); stopTimer() } })
+  if (soundActive()) {
+    const muted = soundState.peek() === 'muted'
+    out.push({ id: 'action:sound:toggle', kind: 'action', title: muted ? `Unmute ${BRAND}` : `Mute ${BRAND}`, sub: 'The focus sound, without losing your place', keys: 'sound audio volume quiet silence pause resume m', boost: 30, run: () => { closeOverlay(); toggleFocusSound() } })
+  }
   const info = dayInfo(today.peek())
   if (info.phase === 'during') {
     const next = pickNextUp(info.week, info.dow, info.block, engine.doneSet.peek())

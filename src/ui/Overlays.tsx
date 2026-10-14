@@ -141,7 +141,7 @@ function EquationOverlay({ taskId }: { taskId: string }) {
 
 const SHORTCUTS: [string, string][] = [
   ['j / k', 'Move down / up the task list'], ['x', 'Tick or untick the focused task'], ['s', 'Start the focused task’s tool'],
-  ['t', 'Jump to Today'], ['⌘K', 'Command palette'], ['1 2 3 4 5', 'Theme: Paper, Paper night, Light, Dark, System'], ['?', 'This list'],
+  ['t', 'Jump to Today'], ['m', 'Mute or unmute the Cabin sound'], ['⌘K', 'Command palette'], ['1 2 3 4 5', 'Theme: Paper, Paper night, Light, Dark, System'], ['?', 'This list'],
 ]
 
 function Shortcuts() {

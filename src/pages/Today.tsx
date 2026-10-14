@@ -10,7 +10,7 @@ import { algotracker } from '../lib/solved'
 import { weekPoints, weekTarget } from '../lib/points'
 import { activityDates, coreTasks, dayInfo, dueSummary, missedDays, pickLight, pickNextUp, streakWeeks, tasksOn, waitingFor, weeklyTasks } from '../lib/today'
 import { navigate } from '../lib/nav'
-import { PRESETS, startTimer } from '../tools/timer'
+import { PRESETS, startTimer, timer } from '../tools/timer'
 import { lazyPage } from '../ui/lazyPage'
 import { useNow, useTitle, useWeekChunk } from '../ui/hooks'
 import { Html } from '../ui/Html'
@@ -18,6 +18,7 @@ import { Icon } from '../ui/Icon'
 import { BossHow } from '../ui/BossHow'
 import { CapstoneLinks } from '../ui/CapstoneLinks'
 import { HourBox, PlanLine, RestNote, RhythmLine, WeekStart } from '../ui/Rhythm'
+import { SoundLine } from '../ui/SoundLine'
 import { momentum } from '../lib/rhythm'
 import { StudyPanel } from '../ui/Resources'
 import { actionsFor, labelOf, TaskRow, TYPE_LABEL } from '../ui/Task'
@@ -237,6 +238,7 @@ export default function Today() {
           ))}
           <button type="button" class="btn btn--big btn--ghost" onClick={() => toggleTask(next.id)}><Icon name="check" /> Mark done</button>
         </div>
+        {primary && /timer/i.test(primary.label) && !timer.value ? <SoundLine /> : null}
         {info.dow === 6 ? <p class="small muted" style="margin-top:0.9rem">Redraw time. Let’s see what stuck.</p> : null}
       </section>
     )

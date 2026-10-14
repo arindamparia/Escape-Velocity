@@ -2,6 +2,16 @@
 
 Status at the end of the third session. Read `CLAUDE.md` first, then `AUDIT.md` (the build checked against every section of the plan), then the plan itself (`plan/escape-velocity-plan.md`, Part 1).
 
+## Cabin: the focus sound reworked (15 Oct 2026)
+
+The focus sound is now **Cabin**, and every sound has a proper name: Engine hum, Cabin air, Monsoon, Ridge wind, Tide (new: generated waves), Forest, and **My sound** (a pasted link you can rename). The names are in one file (`src/tools/sound/catalog.ts`, the `BRAND` constant and `SOUNDS`), so renaming any of them is one edit; the saved ids did not change, so your choice survived.
+
+- **Smooth**: switching crossfades (1.4 s) instead of cutting, a mute survives a switch, the volume ramps, the media controls show the sound's own name.
+- **Integrated**: pick it in the Start menu before a timer, in a sound menu inside the running timer chip (now playing, volume, switch, link to all), with `m` to mute, from the search box (`Sound: Monsoon`, `Mute Cabin`, which the AI can suggest too), or in Settings (a card per sound with a Hear button). Today's hero and the timer page say "with Monsoon · change".
+- **Modern**: a glyph per sound (shape as well as name, so it reads in greyscale), cards in Settings, bars that move while it plays (still in Paper and with reduced motion); on a phone the sound menu is a sheet under the top bar.
+- The chip no longer clips its menu (the progress line has its own clipped track).
+- Not done: a different sound per kind of task (DSA vs design), and a "Hear it" for a recorded sound without a timer beyond the 20-second preview.
+
 ## The audit and what it changed (15 Oct 2026)
 
 A full read of the code plus real screenshots. Done:

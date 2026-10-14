@@ -2,6 +2,7 @@ import { engine } from '../lib/app'
 import { today } from '../lib/clock'
 import { kolkataToday } from '../lib/dates'
 import { refLabel } from '../lib/plan'
+import { SoundLine } from '../ui/SoundLine'
 import { startTimer, TIMER_CHOICES, timer } from './timer'
 
 const KIND_LABEL: Record<string, string> = { dsa: 'DSA', boss: 'Boss problem', hard: 'Hard problem', concept: 'Concept', infra: 'Infra', lld: 'LLD', loop: 'Learning loop', restart: 'Restart', mock: 'Mock mode', free: 'Focus' }
@@ -22,6 +23,7 @@ export function TimerTool() {
             <label style="flex:1;max-width:12rem">Custom (minutes)<input name="m" type="number" min="1" max="600" inputMode="numeric" /></label>
             <button type="submit" class="btn btn--primary" style="align-self:end">Start</button>
           </form>
+          <SoundLine />
         </div>
       )}
       <div class="card">
