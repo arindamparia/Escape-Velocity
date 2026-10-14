@@ -93,7 +93,7 @@ export function NotesTool({ query }: { query: Record<string, string> }) {
       <div class="tabs" role="tablist">
         {TABS.map(([id, label]) => <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => navigate(`/study/notes?tab=${id}`, { replace: true })}>{label}</button>)}
       </div>
-      <p class="small muted" style="margin:0">Plain text, saved on this device first and synced in the background.</p>
+      <p class="small muted m0">Plain text, saved on this device first and synced in the background.</p>
       {tab === 'why' ? <WhyNotes /> : tab === 'design' ? <DesignNotes /> : tab === 'stories' ? <Stories initial={Number(query.story) || undefined} /> : <FreeNotes />}
     </div>
   )

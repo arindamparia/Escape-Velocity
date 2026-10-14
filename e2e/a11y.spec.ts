@@ -103,7 +103,7 @@ async function unreachable(page: Page): Promise<string[]> {
     return els.length
   })
   const seen = new Set<string>()
-  for (let i = 0; i < total + 8; i++) {
+  for (let i = 0; i < total + 24; i++) { // a time field has several stops of its own (hour, minute, period)
     await page.keyboard.press('Tab')
     const id = await page.evaluate(() => document.activeElement?.getAttribute('data-kb') ?? null)
     if (id) seen.add(id)

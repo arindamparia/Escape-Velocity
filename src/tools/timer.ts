@@ -55,6 +55,18 @@ export function startTimer(kind: string, plannedMin: number, opts: { refId?: str
   save({ startedAt: Date.now(), plannedMin, kind, ...opts })
   document.title = 'Timer running · Escape Velocity'
   startFocusSound() // from the click that started the timer, so the browser allows sound
+  // a hidden tab slows its ticks down: one check at the due time makes sure the finish (and its notification) is not left waiting for you to come back
+  if (!opts.openEnded) setTimeout(() => checkTimer(), plannedMin * 60_000 + 400)
+}
+
+/** Settings > Sound: tell me when a timer ends while this tab is hidden. Device-local; the browser asks permission when it is switched on. */
+export const NOTIFY_KEY = 'ev:notify'
+export function notifyWanted(): boolean {
+  try { return localStorage.getItem(NOTIFY_KEY) === '1' && 'Notification' in window && Notification.permission === 'granted' } catch { return false }
+}
+function notifyDone(t: TimerState): void {
+  if (!document.hidden || !notifyWanted()) return
+  try { new Notification('Time is up', { body: `${t.label ?? t.kind} · ${t.plannedMin} min. Log it, or take a break.`, tag: 'ev-timer' }) } catch { /* the browser refused: the chime and the tab title still say it */ }
 }
 
 export function elapsedMs(t: TimerState, now = Date.now()): number {
@@ -118,6 +130,7 @@ export function checkTimer(now = Date.now()): void {
     document.title = 'Time is up · Escape Velocity'
     stopFocusSound()
     chime()
+    notifyDone(t)
     say('Time is up.')
   }
 }

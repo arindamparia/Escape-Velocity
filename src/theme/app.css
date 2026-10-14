@@ -40,6 +40,9 @@ small, .small { font-size: 0.85rem; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+/* a button made from a label around a visually hidden file input: the label shows the focus */
+label.btn:has(input[type='file']:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+[data-theme='paper'] label.btn:has(input[type='file']:focus-visible) { outline: 3px solid var(--text); }
 [data-theme='paper'] :focus-visible { outline: 3px solid var(--text); }
 
 button, input, select, textarea { font: inherit; color: inherit; }
@@ -286,7 +289,7 @@ button.chip:hover { color: var(--text); border-color: var(--text-muted); }
 button.chip[aria-pressed='true'] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 button.chip { padding: 0.25rem 0.8rem; font-size: 0.82rem; }
 
-input[type='text'], input[type='number'], input[type='url'], input[type='search'], input[type='date'], select, textarea {
+input[type='text'], input[type='number'], input[type='url'], input[type='search'], input[type='date'], input[type='time'], select, textarea {
   width: 100%; padding: 0.55rem 0.7rem; border: 1px solid var(--line); border-radius: 8px; background: var(--bg);
   min-height: 2.5rem;
 }
@@ -333,6 +336,15 @@ kbd {
 .task__check[data-locked] { cursor: not-allowed; }
 .task__check[data-locked]:hover { border-color: var(--done); }
 .task[data-done='true'] .task__text { color: var(--text-muted); text-decoration: line-through; text-decoration-thickness: 1px; }
+/* a finished task is one crossed-out line, not a paragraph: the full text is a click away */
+.task[data-done='true'] .task__text { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; line-clamp: 1; overflow: hidden; }
+.evidence a[data-zero='true'] strong { color: var(--text-muted); }
+/* on a phone the next action comes straight after the heading; the why waits below it and shows two lines */
+@media (max-width: 899px) {
+  .page--rail-hide > .slot-main > header { order: -2; }
+  .page--rail-hide > .slot-main > .hero { order: -1; }
+  .why p { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+}
 .task__meta { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; margin-bottom: 0.3rem; }
 .task__text { overflow-wrap: anywhere; }
 .task__text a { overflow-wrap: anywhere; }
@@ -463,12 +475,14 @@ dialog::backdrop { background: rgb(5 8 20 / 0.6); }
   position: fixed; left: 50%; bottom: 5.5rem; transform: translateX(-50%); z-index: 60;
   background: var(--text); color: var(--bg); padding: 0.6rem 1rem; border-radius: 10px; font-weight: 600; max-width: calc(100vw - 2rem);
 }
+.toast__action { margin-left: 0.9rem; min-height: 2rem; padding: 0 0.2rem; background: none; border: 0; color: inherit; font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
 [data-theme='paper'] .toast { border: 2px solid var(--text); background: var(--bg); color: var(--text); }
 
 .library-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; }
 .library-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.5rem; padding: 0.7rem 0.85rem; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); width: 100%; text-align: left; }
 .library-list > li:nth-child(n + 9) .library-item { content-visibility: auto; contain-intrinsic-size: auto 4.6rem; }
 .library-item:hover { border-color: var(--accent); }
+.m0 { margin: 0 !important; } /* what style="margin:0" used to say, as a class */
 .library-item__tags { justify-content: flex-end; align-content: flex-start; }
 /* on a phone the tags go under the text: beside it they leave the description a column one word wide */
 @media (max-width: 599px) { .library-item { grid-template-columns: minmax(0, 1fr); } .library-item__tags { justify-content: flex-start; } }

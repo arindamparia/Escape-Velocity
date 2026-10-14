@@ -144,7 +144,7 @@ export default function Library() {
                 <section key={c.company} class="card" id={c.company} style={company === c.company ? 'border-width:2px;border-color:var(--accent)' : undefined} aria-current={company === c.company ? 'true' : undefined}>
                   <h2>{c.company}</h2>
                   <p><span class="eyebrow" style="display:inline">Rounds reported</span><br />{c.rounds}</p>
-                  <p style="margin:0"><span class="eyebrow" style="display:inline">Real questions</span><br />{c.questions}</p>
+                  <p class="m0"><span class="eyebrow" style="display:inline">Real questions</span><br />{c.questions}</p>
                 </section>
               ))}
             </div>

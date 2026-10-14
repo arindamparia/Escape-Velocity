@@ -15,8 +15,8 @@ export default function Mindset() {
       <div class="slot-main stack">
         <h1>Mindset</h1>
         <section class="card stack" id="why" aria-label="Your why">
-          <h2 style="margin:0">Your why</h2>
-          <p class="muted" style="margin:0">In five lines, in your own words. Not your parents’ reasons, not LinkedIn’s.</p>
+          <h2 class="m0">Your why</h2>
+          <p class="muted m0">In five lines, in your own words. Not your parents’ reasons, not LinkedIn’s.</p>
           <WhyField rows={6} />
           {info.week >= 5 ? <p class="small"><strong>Week 5 checkpoint:</strong> reread it and, if you want, rewrite it.</p> : null}
         </section>

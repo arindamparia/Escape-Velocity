@@ -18,7 +18,7 @@ describe('how long things take', () => {
   })
   it('a weekly DSA task is per day, and times read plainly', () => {
     const weekly = plan.tasks.find((t) => t.type === 'dsa' && t.day === 'Week' && t.solve)!
-    expect(taskMinutes(weekly)).toBe(30 * weekly.solve!.days.length)
+    expect(taskMinutes(weekly)).toBe(60 * weekly.solve!.days.length)
     expect(formatMinutes(20)).toBe('20 min')
     expect(formatMinutes(60)).toBe('1 h')
     expect(formatMinutes(95)).toBe('1 h 35 min')
@@ -124,5 +124,25 @@ describe('a fresh start each week', () => {
   it('keeps the if-then plans in one note per week', () => {
     expect(intentionRef(5)).toBe('plan:w05')
     expect(intentionRef(12)).toBe('plan:w12')
+  })
+})
+
+describe('the calendar file', () => {
+  it('has one valid event per block, in Kolkata time written as UTC, with a reminder and a link back', async () => {
+    const { blocks, buildIcs, utcStamp, DEFAULT_STARTS } = await import('../../src/lib/calendar')
+    expect(utcStamp('2026-10-12', 6 * 60 + 30)).toBe('20261012T010000Z') // 06:30 in Kolkata is 01:00 UTC
+    const ics = buildIcs('https://example.test', DEFAULT_STARTS, new Date('2026-10-14T00:00:00Z'))
+    const n = blocks().length
+    expect(n).toBeGreaterThan(150)
+    expect(ics.match(/BEGIN:VEVENT/g)).toHaveLength(n)
+    expect(ics.match(/END:VEVENT/g)).toHaveLength(n)
+    expect(ics.startsWith('BEGIN:VCALENDAR\r\n')).toBe(true)
+    expect(ics.endsWith('END:VCALENDAR\r\n')).toBe(true)
+    expect(ics).toContain('https://example.test/weeks/1#w01-01')
+    expect(ics.split('\r\n').every((l) => new TextEncoder().encode(l).length <= 75)).toBe(true)
+    // the first Monday morning is the week's DSA, at the morning start; a Puja day is a short "light" block
+    expect(blocks()[0]).toMatchObject({ date: '2026-10-12', start: 6 * 60 + 30, minutes: 60 })
+    expect(blocks().some((b) => b.date === '2026-10-19' && b.minutes <= 20)).toBe(true)
+    expect(new Set(ics.match(/UID:[^\r]+/g)).size).toBe(n) // every event has its own id
   })
 })

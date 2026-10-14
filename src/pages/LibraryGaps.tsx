@@ -26,23 +26,23 @@ export function GapsTab({ lib }: { lib: Lib }) {
     <div class="stack">
       <Html html={g.introHtml} class="prose" />
       <section class="stack" aria-label="The ten gaps" id="gaps">
-        <h2 style="margin:0">The ten gaps</h2>
-        <p class="muted" style="margin:0">Answer each question on paper before you read. The sketch is for comparing afterwards.</p>
+        <h2 class="m0">The ten gaps</h2>
+        <p class="muted m0">Answer each question on paper before you read. The sketch is for comparing afterwards.</p>
         {g.gaps.map((x) => (
           <section class="card stack" key={x.id} id={x.id} style="gap:0.6rem" aria-label={`${x.id} ${x.title}`}>
             <div class="row row--between">
               <h3 style="margin:0;font-size:1.05rem"><span class="chip mono">{x.id}</span> {x.title}</h3>
               <a class="small" href={`/weeks/${Number(x.taskId.slice(1, 3))}#${x.taskId}`}>{taskLabel(x.taskId)}</a>
             </div>
-            <p style="margin:0"><span class="eyebrow" style="display:inline">Why it matters</span><br /><Html html={x.whyHtml} inline class="" /></p>
-            <p style="margin:0"><span class="eyebrow" style="display:inline">Derive it</span><br /><strong><Html html={x.deriveHtml} inline class="" /></strong></p>
-            <p class="small" style="margin:0"><span class="eyebrow" style="display:inline">Free sources, after your answer</span><br /><Html html={x.sourcesHtml} inline class="" /></p>
+            <p class="m0"><span class="eyebrow" style="display:inline">Why it matters</span><br /><Html html={x.whyHtml} inline class="" /></p>
+            <p class="m0"><span class="eyebrow" style="display:inline">Derive it</span><br /><strong><Html html={x.deriveHtml} inline class="" /></strong></p>
+            <p class="small m0"><span class="eyebrow" style="display:inline">Free sources, after your answer</span><br /><Html html={x.sourcesHtml} inline class="" /></p>
             <GapSketch id={x.sketch} />
           </section>
         ))}
       </section>
       <section class="stack" aria-label="Against his syllabi" id="coverage">
-        <h2 style="margin:0">Against his two syllabi</h2>
+        <h2 class="m0">Against his two syllabi</h2>
         {g.coverage.map((c) => (
           <details class="card" key={c.title}>
             <summary>{c.title} <span class="muted small">· {c.rows.filter((r) => r.status === 'covered').length} of {c.rows.length} covered</span></summary>
@@ -60,7 +60,7 @@ export function GapsTab({ lib }: { lib: Lib }) {
         ))}
       </section>
       <section class="stack" aria-label="What you are still missing" id="missing">
-        <h2 style="margin:0">What you are still missing</h2>
+        <h2 class="m0">What you are still missing</h2>
         <Html html={g.missingHtml} class="prose" />
       </section>
       <details class="card" id="courses">

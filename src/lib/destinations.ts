@@ -78,6 +78,7 @@ export const SECTIONS: Place[] = ([
   ['settings-focus-sound', 'Settings: focus sound', '/settings#focus-sound', 'Settings · focus sound', 'music noise rain brown pink wind nature ambient background audio concentrate study playlist volume', 'The sound that plays while a timer runs'],
   ['settings-sound', 'Settings: sound', '/settings#sound', 'Settings · sound', 'chime timer audio mute', 'The soft chime when a timer ends'],
   ['settings-sync', 'Settings: sync and backup', '/settings#sync', 'Settings · sync', 'backup export download json offline status', 'Sync status and the JSON backup'],
+  ['settings-calendar', 'Settings: calendar', '/settings#calendar', 'Settings · calendar', 'ics ical google calendar outlook apple export blocks schedule reminders add plan to calendar time blocks', 'Download the 13 weeks as calendar blocks'],
   ['settings-ai', 'Settings: AI search', '/settings#ai', 'Settings · AI search', 'openai pinecone index rebuild key model limit questions', 'Is the AI search on, and is its index current'],
   ['settings-keyboard', 'Settings: keyboard', '/settings#keyboard', 'Settings · keyboard', 'shortcuts keys hotkeys', 'The keyboard shortcuts'],
 ] as const).map(([slug, title, url, hint, keys, sub]) => ({ id: `section:${slug}`, title, sub, keys, url, hint }))

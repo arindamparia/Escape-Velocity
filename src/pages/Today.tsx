@@ -90,7 +90,7 @@ function Waiting({ week, dow, done }: { week: number; dow: number; done: Readonl
   const shown = list.slice(0, 3)
   return (
     <section class="card waiting" aria-label="Waiting for you">
-      <div class="row row--between"><p class="eyebrow" style="margin:0">Waiting for you</p><span class="small muted">{list.length} in all</span></div>
+      <div class="row row--between"><p class="eyebrow m0">Waiting for you</p><span class="small muted">{list.length} in all</span></div>
       <p class="small muted" style="margin:0.3rem 0 0.7rem">Nothing is lost. Take one when there is room, never all of it.</p>
       <ul class="tasks">{shown.map((t) => <TaskRow key={t.id} task={t} chunk={t.week === week ? current : previous} inWeek />)}</ul>
       {list.length > shown.length ? <p class="small" style="margin:0.6rem 0 0"><a href={`/weeks/${week}`}>{list.length - shown.length} more, in the weeks</a></p> : null}
@@ -166,7 +166,7 @@ export default function Today() {
       <section class="card hero">
         <p class="eyebrow">Plan complete</p>
         <h2>13 constellations. Go collect offers.</h2>
-        <p class="hero__text">Target applications go out from Mon 4 Jan. Check the readiness list, then go.</p>
+        <p class="hero__text">Target applications go out from {longDate(addDays(plan.config.endDate, 1))}. Check the readiness list, then go.</p>
         <div class="hero__actions"><a class="btn btn--primary btn--big" href="/progress">Open readiness check</a></div>
       </section>
     )
@@ -287,7 +287,7 @@ export default function Today() {
         {info.phase === 'during' ? (
           <section aria-label="Today's tasks">
             <div class="row row--between" style="margin-bottom:0.6rem">
-              <h2 style="margin:0">Today’s tasks {coreTasks(dayList).length ? <span class="muted small" style="font-weight:400">{coreTasks(dayList).filter((t) => done.has(t.id)).length} of {coreTasks(dayList).length} done</span> : null}</h2>
+              <h2 class="m0">Today’s tasks {coreTasks(dayList).length ? <span class="muted small" style="font-weight:400">{coreTasks(dayList).filter((t) => done.has(t.id)).length} of {coreTasks(dayList).length} done</span> : null}</h2>
               {!light && !welcomeBack ? (
                 <button type="button" class="btn btn--small btn--ghost" onClick={() => openOverlay({ kind: 'log', difficulty: 'medium', minimum: true })}>Bad day? Minimum day</button>
               ) : null}

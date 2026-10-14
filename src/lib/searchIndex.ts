@@ -1,7 +1,7 @@
 // Everything the palette can find or do. Each entry is a search document plus what happens when it is chosen.
 import type { PageChunks, SearchEntry } from '../../shared/plan-types'
 import { canonicalProblemUrl, titleFromProblemUrl } from '../../shared/constants'
-import { closeOverlay, engine, logProblem, openOverlay, say, setTheme, showDesign, toggleTask } from './app'
+import { closeOverlay, engine, logProblem, openOverlay, say, sayLogged, setTheme, showDesign, toggleTask } from './app'
 import { today } from './clock'
 import { PAGES, SECTIONS, urls, weekOfTask } from './destinations'
 import { TIER_BOOST, tierOf } from './priority'
@@ -147,7 +147,7 @@ export function smartEntries(q: string): Entry[] {
     const url = m[3]
     out.push({
       id: 'smart:log', kind: 'action', title: `Log ${d}${mins ? ` · ${mins} min` : ''}${url ? ' with its link' : ''}`, sub: url ? canonicalProblemUrl(url) ?? url : 'Solved without AI, logged for today', boost: 200, hint: '↵',
-      run: () => { closeOverlay(); if (logProblem(d, mins, true, titleFromProblemUrl(url) ?? undefined, today.value, url)) say(`Logged: ${d}${mins ? `, ${mins} min` : ''}.`) },
+      run: () => { closeOverlay(); const id = logProblem(d, mins, true, titleFromProblemUrl(url) ?? undefined, today.value, url); if (id) sayLogged(`Logged: ${d}${mins ? `, ${mins} min` : ''}.`, id) },
     })
   }
   m = /^timer\s+(\d{1,3})$/i.exec(s)

@@ -58,7 +58,7 @@ function BonusPanel({ task, chunk }: { task: { id: string; points: number }; chu
     <section class="bonus" data-done={done} aria-label="Bonus equation">
       <div class="bonus__head">
         <span class="bonus__mark" aria-hidden="true"><Icon name="star" /></span>
-        <p class="eyebrow" style="margin:0">Bonus equation</p>
+        <p class="eyebrow m0">Bonus equation</p>
         <span class="chip">+{task.points}</span>
         <span class="chip">15 min</span>
       </div>

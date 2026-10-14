@@ -55,7 +55,7 @@ export function SolvedProblems() {
         <div>
           <p class="eyebrow">From AlgoTracker, latest first</p>
           <h1>Solved problems</h1>
-          <p class="muted" style="margin:0">{pending ? 'Loading…' : `${total} solved · ${count('easy')} easy · ${count('medium')} medium · ${count('hard')} hard`}</p>
+          <p class="muted m0">{pending ? 'Loading…' : `${total} solved · ${count('easy')} easy · ${count('medium')} medium · ${count('hard')} hard`}</p>
         </div>
         <button type="button" class="btn btn--small" disabled={pending} onClick={() => void loadSolved(true)}>Refresh</button>
       </header>

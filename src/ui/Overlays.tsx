@@ -1,7 +1,7 @@
 import { lazy } from 'preact-iso'
 import { useEffect, useRef, useState } from 'preact/hooks'
 import { canonicalProblemUrl, titleFromProblemUrl } from '../../shared/constants'
-import { closeOverlay, engine, findNote, logProblem, needsOnboarding, overlay, say, whyNote } from '../lib/app'
+import { closeOverlay, engine, findNote, logProblem, needsOnboarding, overlay, say, sayLogged, whyNote } from '../lib/app'
 import { today } from '../lib/clock'
 import { taskById, taskLabel } from '../lib/plan'
 import { Dialog } from './Dialog'
@@ -100,9 +100,9 @@ function LogProblem({ difficulty, minutes, minimum }: { difficulty?: 'medium' | 
           e.preventDefault()
           if (linkBad) { say('That does not look like a link (it should start with https://).'); return }
           const m = Number(mins)
-          const ok = logProblem(d, Number.isInteger(m) && m > 0 ? m : undefined, noAi, title.trim() || guess || undefined, date, link.trim() || undefined)
-          if (ok) {
-            say(minimum ? 'One problem. Still counts. Tomorrow’s you says thanks.' : `Logged: ${d}${m ? `, ${m} min` : ''}.`, 3600)
+          const id = logProblem(d, Number.isInteger(m) && m > 0 ? m : undefined, noAi, title.trim() || guess || undefined, date, link.trim() || undefined)
+          if (id) {
+            sayLogged(minimum ? 'One problem. Still counts. Tomorrow’s you says thanks.' : `Logged: ${d}${m ? `, ${m} min` : ''}.`, id)
             closeOverlay()
           }
         }}
@@ -118,7 +118,7 @@ function LogProblem({ difficulty, minutes, minimum }: { difficulty?: 'medium' | 
           <label>Date<input type="date" value={date} onInput={(e) => setDate((e.target as HTMLInputElement).value)} /></label>
         </div>
         <label>Problem link<input type="url" value={link} maxLength={500} onInput={(e) => setLink((e.target as HTMLInputElement).value)} placeholder="https://leetcode.com/problems/course-schedule-ii/" aria-invalid={linkBad} /></label>
-        {linkBad ? <p class="small" role="alert" style="margin:0">That does not look like a link: it should start with https://</p> : null}
+        {linkBad ? <p class="small m0" role="alert">That does not look like a link: it should start with https://</p> : null}
         <label>Name (optional)<input type="text" value={title} maxLength={200} onInput={(e) => setTitle((e.target as HTMLInputElement).value)} placeholder={guess ?? 'Course Schedule II'} /></label>
         <label class="check">
           <input type="checkbox" checked={noAi} onChange={(e) => setNoAi((e.target as HTMLInputElement).checked)} /> <span>Solved without AI</span>
@@ -157,18 +157,41 @@ function Shortcuts() {
 
 function Onboarding() {
   const page = usePage('mindset')
+  const [step, setStep] = useState(0)
+  const finish = () => { engine.dispatch('setting.set', { key: 'onboarded', value: '1' }); closeOverlay() }
   return (
     <Dialog title="Escape Velocity" onClose={() => engine.dispatch('setting.set', { key: 'onboarded', value: '1' })} wide>
       <div class="stack">
         <p class="eyebrow">13 weeks. 42 designs. One jump.</p>
-        {page ? <Html html={page.whyPlanHtml} /> : <div class="skeleton" />}
-        <div>
-          <h3>Your why <span class="muted small">(skippable; you’ll be asked again on Monday night)</span></h3>
-          <WhyField rows={5} />
+        <p class="small muted m0" aria-live="polite">Step {step + 1} of 3</p>
+        {step === 0 ? (
+          <>
+            <p>Thirteen weeks, about 15 hours a week, ending with you sitting SDE-2 backend interviews at Indian fintech companies. Each day, Today shows one next action; the rest of the app is there when you want it.</p>
+            <details>
+              <summary>Why this plan, and what the interview loops test</summary>
+              <div style="margin-top:0.7rem">{page ? <Html html={page.whyPlanHtml} /> : <div class="skeleton" />}</div>
+            </details>
+          </>
+        ) : null}
+        {step === 1 ? (
+          <div>
+            <h3>Your why <span class="muted small">(skippable; you’ll be asked again on Monday night)</span></h3>
+            <WhyField rows={5} />
+          </div>
+        ) : null}
+        {step === 2 ? (
+          <>
+            <div><h3>Theme</h3><ThemePicker /></div>
+            <p class="small muted m0">Not sure how it works? <a href="/guide" onClick={finish}>Read the one-page guide</a> any time; it is also linked at the bottom of every page.</p>
+          </>
+        ) : null}
+        <div class="row">
+          {step > 0 ? <button type="button" class="btn" onClick={() => setStep(step - 1)}>Back</button> : null}
+          {step < 2
+            ? <button type="button" class="btn btn--primary btn--big" onClick={() => setStep(step + 1)}>Next</button>
+            : <button type="button" class="btn btn--primary btn--big" onClick={finish}>Start</button>}
+          {step < 2 ? <button type="button" class="btn btn--link small" onClick={finish}>Skip the tour</button> : null}
         </div>
-        <div><h3>Theme</h3><ThemePicker /></div>
-        <p class="small muted" style="margin:0">Not sure how it works? <a href="/guide" onClick={() => { engine.dispatch('setting.set', { key: 'onboarded', value: '1' }); closeOverlay() }}>Read the one-page guide</a> any time; it is also linked at the bottom of every page.</p>
-        <div class="row"><button type="button" class="btn btn--primary btn--big" onClick={() => { engine.dispatch('setting.set', { key: 'onboarded', value: '1' }); closeOverlay() }}>Start</button></div>
       </div>
     </Dialog>
   )

@@ -18,7 +18,7 @@ export const FLOW_STEPS: [string, string][] = [
 
 export function CapstoneDiagram({ lit = [] }: { lit?: number[] }) {
   return (
-    <figure style="margin:0">
+    <figure class="m0">
       <svg class="dg" viewBox="0 0 780 430" role="img" aria-label="Architecture: a client calls the Order API, which checks the cart and idempotency keys in Redis, asks the Inventory service to reserve stock, and saves the order and an outbox table in Postgres. An outbox relay publishes events to Kafka and sends signed webhooks to the store. The Payment service consumes the events, charges a mock payment provider, receives its webhooks, writes the status back to Postgres and tells Inventory to commit or release the stock. A reconciliation job compares the provider with the payment records.">
         <defs>
           <marker id="dg-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="dg-head" /></marker>

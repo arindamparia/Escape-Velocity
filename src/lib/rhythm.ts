@@ -15,13 +15,13 @@ import { tasksOn, waitingFor, weeklyTasks } from './today'
 
 /* ---- how long things take ---- */
 
-/** Honest estimates in minutes, from the plan's own routine (about 15 hours a week). A weekly DSA task is per day, see below. */
+/** Estimates in minutes from the plan's own routine table (a morning DSA block is 60, a night 45, Saturday about 3.5 h): a week comes to the promised 15 hours. A weekly DSA task is per day, see below. */
 export const TYPE_MINUTES: Record<TaskType, number> = {
-  dsa: 30, boss: 60, concept: 45, infra: 45, design: 120, design2: 60, lld: 90, maths: 20, capstone: 120, redraw: 20,
+  dsa: 60, boss: 60, concept: 45, infra: 45, design: 120, design2: 60, lld: 90, maths: 20, capstone: 120, redraw: 20,
   read: 30, mock: 45, story: 45, career: 30, mindset: 10, review: 30, rest: 0, ai: 30, ready: 15, paper: 45,
 }
 export function taskMinutes(t: PlanTask): number {
-  return t.type === 'dsa' && t.day === 'Week' ? 30 * (t.solve?.days.length || 5) : TYPE_MINUTES[t.type]
+  return t.type === 'dsa' && t.day === 'Week' ? 60 * (t.solve?.days.length || 5) : TYPE_MINUTES[t.type]
 }
 export function formatMinutes(m: number): string {
   const r = Math.round(m / 5) * 5
@@ -141,3 +141,18 @@ export function recap(week: number, done: ReadonlySet<string>): { week: number; 
 
 /** The note that holds this week's "if … then …" plans (a free note, kept out of the Free notes list). */
 export const intentionRef = (week: number): string => `plan:w${String(week).padStart(2, '0')}`
+
+/**
+ * One-line suggestions for "One fix for next week", from the week's own numbers: the thing the data points at, in the words you
+ * would write. Tap one to use it, or write your own. At most three; the order is what the numbers make most urgent.
+ */
+export function fixSuggestions(w: { avgMedium: number | null; designScore: number | null; redrawsDue: number; waiting: number; week: number; mocks: number }): string[] {
+  const out: string[] = []
+  if (w.avgMedium !== null && w.avgMedium > 25) out.push(`Mediums took ${Math.round(w.avgMedium)} min on average: time the first 25 minutes, and read the idea (not the code) after.`)
+  if (w.redrawsDue > 0) out.push(`Redraw the ${w.redrawsDue === 1 ? 'design that is' : `${w.redrawsDue} designs that are`} due before starting anything new.`)
+  if (w.designScore !== null && w.designScore <= 6) out.push('Say the numbers out loud before I draw anything.')
+  if (w.waiting > 3) out.push('Take one waiting task on Tuesday night, before the new ones.')
+  if (w.week >= 8 && w.mocks === 0) out.push('Book one mock interview this week, with a person.')
+  if (!out.length) out.push('Keep the same week: the rhythm is working. Add nothing.')
+  return out.slice(0, 3)
+}

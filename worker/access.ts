@@ -5,6 +5,8 @@ import type { Env } from './env'
 interface Jwk { kid: string; kty: string; n: string; e: string; alg?: string }
 
 const KEY_TTL_MS = 60 * 60 * 1000
+/** An unknown key id may mean the keys rotated, but anyone can send one: look again at most once a minute. */
+const REFETCH_MIN_MS = 60 * 1000
 let keyCache: { domain: string; at: number; keys: Map<string, CryptoKey> } | null = null
 
 function b64urlToBytes(s: string): Uint8Array<ArrayBuffer> {
@@ -39,6 +41,7 @@ async function keyFor(domain: string, kid: string): Promise<CryptoKey | undefine
   if (keyCache && keyCache.domain === domain && Date.now() - keyCache.at < KEY_TTL_MS) {
     const hit = keyCache.keys.get(kid)
     if (hit) return hit
+    if (Date.now() - keyCache.at < REFETCH_MIN_MS) return undefined
   }
   // Unknown kid or stale cache: refetch once (keys rotate).
   return (await loadKeys(domain)).get(kid)

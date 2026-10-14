@@ -18,11 +18,11 @@ function PaperCard({ p, lib }: { p: PaperRow; lib: Lib }) {
   return (
     <section class="card stack" id={p.taskId || undefined} aria-label={p.title} style="gap:0.7rem">
       <div class="row row--between">
-        <p class="eyebrow" style="margin:0">{p.taskId ? <>Week {p.week} · {task?.day === 'Sun' ? 'Sunday' : 'Friday night'}</> : <>On the shelf · fits week {p.week}</>}{p.anchor ? <> · <span class="chip chip--accent" title="A starred paper gets the third pass: redraw it from memory and explain it out loud in 5 minutes">★ third pass</span></> : null}</p>
+        <p class="eyebrow m0">{p.taskId ? <>Week {p.week} · {task?.day === 'Sun' ? 'Sunday' : 'Friday night'}</> : <>On the shelf · fits week {p.week}</>}{p.anchor ? <> · <span class="chip chip--accent" title="A starred paper gets the third pass: redraw it from memory and explain it out loud in 5 minutes">★ third pass</span></> : null}</p>
         {p.taskId ? <button type="button" class={`btn btn--small${done ? ' btn--primary' : ''}`} aria-pressed={done} onClick={() => toggleTask(p.taskId)}><Icon name={done ? 'check' : 'circle'} /> {done ? 'Read' : 'I read it'}</button> : null}
       </div>
       <h2 style="margin:0;font-size:1.15rem"><a href={p.url} target="_blank" rel="noopener noreferrer">{p.title}</a></h2>
-      <p class="small muted" style="margin:0">{p.length}{p.taskId ? <> · <a href={`/weeks/${p.week}#${p.taskId}`}>{taskLabel(p.taskId)}</a></> : null}</p>
+      <p class="small muted m0">{p.length}{p.taskId ? <> · <a href={`/weeks/${p.week}#${p.taskId}`}>{taskLabel(p.taskId)}</a></> : null}</p>
       <Html html={p.whyHtml} class="prose small" />
       {videos.length ? <div><p class="eyebrow" style="margin:0 0 0.2rem">Watch first, if you prefer</p><ResourceList items={videos} /></div> : null}
       <Peek label="Show the number to find" tried={hasCard || done} why="Look for it as you read. Finding it is the exercise.">
@@ -52,16 +52,16 @@ export function PapersTab({ lib }: { lib: Lib }) {
         <Html html={p.methodHtml} class="prose small" />
       </details>
       <section class="stack" aria-label="The schedule" id="schedule">
-        <h2 style="margin:0">The schedule</h2>
+        <h2 class="m0">The schedule</h2>
         {p.schedule.map((x) => <PaperCard key={x.taskId} p={x} lib={lib} />)}
       </section>
       <section class="stack" aria-label="On the shelf" id="shelf">
-        <h2 style="margin:0">On the shelf</h2>
-        <p class="muted" style="margin:0">For a light week, or a week you want a gentle start. No task, no points.</p>
+        <h2 class="m0">On the shelf</h2>
+        <p class="muted m0">For a light week, or a week you want a gentle start. No task, no points.</p>
         {p.shelf.map((x) => <PaperCard key={x.title} p={x} lib={lib} />)}
       </section>
       <section class="stack" aria-label="Alternates">
-        <h2 style="margin:0">If one does not grip you</h2>
+        <h2 class="m0">If one does not grip you</h2>
         <div class="tblwrap"><table class="tbl"><thead><tr><th>Instead of</th><th>Try</th><th>Because</th></tr></thead>
           <tbody>{p.alternates.map((a) => <tr key={a.instead}><td>{a.instead}</td><td>{a.paper}</td><td>{a.because}</td></tr>)}</tbody></table></div>
       </section>

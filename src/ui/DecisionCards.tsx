@@ -32,7 +32,7 @@ export function DecisionCards({ designId, min = 0 }: { designId: string; min?: n
       {min ? <p class="small muted"><strong>{Math.min(cards.length, min)} of {min}</strong> decision card{min === 1 ? '' : 's'} written.</p> : null}
       {cards.map((c) => (
         <div class="card" key={c.id}>
-          <dl class="kv small" style="margin:0">
+          <dl class="kv small m0">
             <dt>Decision</dt><dd>{c.decision}</dd>
             <dt>Forced by</dt><dd>{c.forcedBy}</dd>
             {c.rejectedAlternative ? <><dt>Rejected</dt><dd>{c.rejectedAlternative}</dd></> : null}

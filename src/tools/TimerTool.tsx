@@ -14,7 +14,7 @@ export function TimerTool() {
   return (
     <div class="stack">
       <p class="muted">The timer stores when you started, not a ticking counter, so sleep, reloads and background tabs can’t make it drift.</p>
-      {timer.value ? <p class="card muted" style="margin:0">A timer is running: it is in the top bar, with its Stop button.</p> : (
+      {timer.value ? <p class="card muted m0">A timer is running: it is in the top bar, with its Stop button.</p> : (
         <div class="card stack">
           <p class="eyebrow">Start a timer</p>
           <div class="row">{TIMER_CHOICES.map(([label, kind, min]) => <button key={kind} type="button" class="btn" onClick={() => startTimer(kind === 'boss' ? 'boss' : kind, min, { openEnded: kind === 'boss' })}>{label} · {min} min</button>)}</div>
@@ -26,7 +26,7 @@ export function TimerTool() {
       )}
       <div class="card">
         <p class="eyebrow">Today: {todayMin} focused minutes</p>
-        {recent.length ? <ul class="small" style="margin:0;padding-left:1.1rem">{recent.map((s) => <li key={s.id}><span class="mono">{s.endedAt.slice(0, 16).replace('T', ' ')}</span> · {s.refId ? refLabel(s.refId) : KIND_LABEL[s.kind] ?? s.kind} · {s.plannedMin} min</li>)}</ul> : <p class="muted small" style="margin:0">No sessions yet.</p>}
+        {recent.length ? <ul class="small" style="margin:0;padding-left:1.1rem">{recent.map((s) => <li key={s.id}><span class="mono">{s.endedAt.slice(0, 16).replace('T', ' ')}</span> · {s.refId ? refLabel(s.refId) : KIND_LABEL[s.kind] ?? s.kind} · {s.plannedMin} min</li>)}</ul> : <p class="muted small m0">No sessions yet.</p>}
       </div>
     </div>
   )

@@ -39,13 +39,13 @@ function Related() {
     <>
       <section class="card">
         <p class="eyebrow">Due now</p>
-        <p style="margin:0"><a href="/study/flashcards"><strong>{dueNow}</strong> flashcard{dueNow === 1 ? '' : 's'}</a> (never more than {MAX_CARDS_PER_DAY} a day) · <a href="/study/redraws"><strong>{redraws}</strong> redraw{redraws === 1 ? '' : 's'}</a></p>
+        <p class="m0"><a href="/study/flashcards"><strong>{dueNow}</strong> flashcard{dueNow === 1 ? '' : 's'}</a> (never more than {MAX_CARDS_PER_DAY} a day) · <a href="/study/redraws"><strong>{redraws}</strong> redraw{redraws === 1 ? '' : 's'}</a></p>
       </section>
       <section class="card">
         <p class="eyebrow">Recent notes</p>
         {recent.length ? recent.map((n) => (
           <div key={n.id} style="margin-bottom:0.6rem"><span class="chip">{n.kind}</span> <span class="small muted">{n.refId ? refLabel(n.refId) : ''}</span><div class="small" style="max-height:3.2em;overflow:hidden"><TextBlock text={n.body} /></div></div>
-        )) : <p class="small muted" style="margin:0">Nothing yet.</p>}
+        )) : <p class="small muted m0">Nothing yet.</p>}
         <a class="small" href="/study/notes">All notes</a>
       </section>
     </>

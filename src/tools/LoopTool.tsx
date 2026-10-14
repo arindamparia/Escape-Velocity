@@ -81,7 +81,7 @@ function Step1({ run, designId }: { run: LoopRun; designId: string }) {
   return (
     <div class="stack">
       <p>Timed, out loud, on Excalidraw, using the delivery framework: <strong>requirements, entities, API, high-level design, deep dives</strong>. No breakdown yet.</p>
-      {d ? <div class="card"><p class="eyebrow">Derive it</p><p style="margin:0"><strong>{d.derive}</strong></p></div> : null}
+      {d ? <div class="card"><p class="eyebrow">Derive it</p><p class="m0"><strong>{d.derive}</strong></p></div> : null}
       <div>
         <p class="eyebrow">The six forces: answer these before drawing a single box</p>
         <ul class="stack" style="list-style:none;padding:0;margin:0;gap:0.35rem">
@@ -117,7 +117,7 @@ function Step2({ run, designId }: { run: LoopRun; designId: string }) {
       {d?.link ? (
         <div class="row"><a class="btn btn--primary" href={d.link} target="_blank" rel="noopener noreferrer"><Icon name="link" /> Open the breakdown</a><span class="small muted">{d.access === 'premium' ? 'Premium. ' : ''}Opens in a new tab.</span></div>
       ) : (
-        <div class="card"><p style="margin:0">There is no breakdown for this one: you derive it. Compare your design with an AI interviewer or a peer, and look for the constraint behind each difference.</p></div>
+        <div class="card"><p class="m0">There is no breakdown for this one: you derive it. Compare your design with an AI interviewer or a peer, and look for the constraint behind each difference.</p></div>
       )}
       {related.length ? <div><p class="eyebrow">Real systems to read</p><ul>{related.map((r, i) => <li key={i}><Html html={r.html} inline class="" /></li>)}</ul></div> : null}
       {minutes ? (
@@ -197,7 +197,7 @@ function Runner({ run }: { run: LoopRun }) {
       <header class="row row--between">
         <div>
           <p class="eyebrow">{run.short ? 'Short loop' : 'Learning loop'} · {d?.access === 'premium' ? 'Premium' : d?.access === 'derive' ? 'Derive yourself' : 'Free'}</p>
-          <h2 style="margin:0">{d?.name ?? run.designId}</h2>
+          <h2 class="m0">{d?.name ?? run.designId}</h2>
         </div>
         <button type="button" class="btn btn--small btn--ghost" onClick={() => { if (confirm('Abandon this loop? Your decision cards are kept.')) clearLoop() }}>Abandon</button>
       </header>
@@ -215,7 +215,7 @@ function Runner({ run }: { run: LoopRun }) {
         })}
       </ol>
       <section class="card stack" aria-label={`Step ${step}`}>
-        <h3 style="margin:0">Step {step}: {stepDef.title}{stepDef.minutes ? ` (${stepDef.minutes} min)` : ''}</h3>
+        <h3 class="m0">Step {step}: {stepDef.title}{stepDef.minutes ? ` (${stepDef.minutes} min)` : ''}</h3>
         {step === 1 ? <Step1 run={run} designId={run.designId} /> : null}
         {step === 2 ? <Step2 run={run} designId={run.designId} /> : null}
         {step === 3 ? (

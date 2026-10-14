@@ -1,6 +1,6 @@
 import { ErrorBoundary, LocationProvider, Route, Router, lazy, useLocation } from 'preact-iso'
 import { useEffect } from 'preact/hooks'
-import { closeOverlay, engine, needsOnboarding, openOverlay, overlay, say, setTheme, sync, toast, toggleTask } from './lib/app'
+import { closeOverlay, engine, needsOnboarding, openOverlay, overlay, say, setTheme, sync, toast, toastAction, toggleTask } from './lib/app'
 import { focusId, focusList } from './lib/focus'
 import { followHash, watchHash } from './lib/anchor'
 import { navigate } from './lib/nav'
@@ -93,7 +93,8 @@ function Banners() {
 }
 
 function Toast() {
-  return toast.value ? <div class="toast" role="status">{toast.value}</div> : null
+  const act = toastAction.value
+  return toast.value ? <div class="toast" role="status"><span>{toast.value}</span>{act ? <button type="button" class="toast__action" onClick={() => { act.run() }}>{act.label}</button> : null}</div> : null
 }
 
 /** Keyboard: j/k move, x ticks, s starts the task's tool, t jumps to Today, ⌘K palette, 1-5 themes, ? shortcuts. */

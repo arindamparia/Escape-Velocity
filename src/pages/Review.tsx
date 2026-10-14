@@ -7,7 +7,8 @@ import { weekMaxPoints, weekPoints, weekTarget } from '../lib/points'
 import { redrawsDue } from '../lib/srs'
 import { withSolved } from '../lib/solved'
 import { scorecard } from '../lib/stats'
-import { dayInfo } from '../lib/today'
+import { dayInfo, waitingFor } from '../lib/today'
+import { fixSuggestions } from '../lib/rhythm'
 import { useDesigns, usePage } from '../ui/hooks'
 import { Icon } from '../ui/Icon'
 import { WeekForm } from './WeekForm'
@@ -51,7 +52,7 @@ export function Review() {
         {STEPS.map((s, i) => <li key={s}><button type="button" class="chip" aria-pressed={i === step} aria-current={i === step ? 'step' : undefined} onClick={() => setStep(i)}>{i < step ? <Icon name="check" /> : <span class="mono">{i + 1}</span>} {s}</button></li>)}
       </ol>
       <section class="card stack" aria-label={STEPS[step]}>
-        <h2 style="margin:0">Step {step + 1}: {STEPS[step]}</h2>
+        <h2 class="m0">Step {step + 1}: {STEPS[step]}</h2>
         {step === 0 ? (
           <>
             <p class="muted">This week you logged <strong>{row.easy + row.medium + row.hard}</strong> problems ({row.medium} medium, {row.hard} hard; {row.dsaNoAi} without AI){row.avgMediumMin ? <>, averaging <strong>{row.avgMediumMin} min</strong> on mediums</> : null}.</p>
@@ -74,9 +75,19 @@ export function Review() {
           </div>
         ) : null}
         {step === 3 ? (
-          <label>One fix for next week
-            <input type="text" value={fix} maxLength={300} placeholder="Say the numbers out loud before I draw" onInput={(e) => setFix((e.target as HTMLInputElement).value)} onBlur={() => { if (fix.trim() !== row.fixNextWeek) engine.dispatch('week.set', { week, fixNextWeek: fix.trim() }) }} />
-          </label>
+          <div class="stack">
+            <label>One fix for next week
+              <input type="text" value={fix} maxLength={300} placeholder="Say the numbers out loud before I draw" onInput={(e) => setFix((e.target as HTMLInputElement).value)} onBlur={() => { if (fix.trim() !== row.fixNextWeek) engine.dispatch('week.set', { week, fixNextWeek: fix.trim() }) }} />
+            </label>
+            <div role="group" aria-label="Suggested fixes from your numbers">
+              <p class="eyebrow">From your numbers</p>
+              <div class="stack" style="gap:0.4rem">
+                {fixSuggestions({ avgMedium: row.avgShown, designScore: row.designScore, redrawsDue: due.length, waiting: waitingFor(week, 6, done).length, week, mocks: plan.tasks.filter((t) => t.week === week && t.type === 'mock' && done.has(t.id)).length }).map((s) => (
+                  <button key={s} type="button" class="chip" style="white-space:normal;text-align:left" onClick={() => { setFix(s); engine.dispatch('week.set', { week, fixNextWeek: s }) }}>{s}</button>
+                ))}
+              </div>
+            </div>
+          </div>
         ) : null}
         {step === 4 ? (
           <div class="stack">

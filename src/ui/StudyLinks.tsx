@@ -20,7 +20,7 @@ export function StudyLinks() {
       {page ? (
         <>
           <section class="card stack" aria-label="Free channels">
-            <h2 style="margin:0">Free channels, and when to use each</h2>
+            <h2 class="m0">Free channels, and when to use each</h2>
             <ul class="reschannels">
               {page.channels.map((c) => (
                 <li key={c.channel}>
@@ -30,7 +30,7 @@ export function StudyLinks() {
                 </li>
               ))}
             </ul>
-            <p class="small muted" style="margin:0"><Html html={page.studyRuleHtml} inline class="" /></p>
+            <p class="small muted m0"><Html html={page.studyRuleHtml} inline class="" /></p>
           </section>
           <section class="card" aria-label="Links by week">
             <h2 style="margin:0 0 0.4rem">By week</h2>
@@ -44,7 +44,7 @@ export function StudyLinks() {
                     const topics = [...new Set(rows.filter((r) => r.day === d).map((r) => r.topic))]
                     return topics.map((t) => (
                       <div key={d + t} style="margin-top:0.7rem">
-                        <p class="eyebrow" style="margin:0">{d ? `${d} · ` : ''}{t}</p>
+                        <p class="eyebrow m0">{d ? `${d} · ` : ''}{t}</p>
                         <ResourceList items={rows.filter((r) => r.day === d && r.topic === t)} />
                       </div>
                     ))

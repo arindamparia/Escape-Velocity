@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import type { SearchEntry } from '../../shared/plan-types'
 import type { AskResponse } from '../../shared/ask'
 import { askAi, AskFailure } from '../lib/ask'
-import { closeOverlay } from '../lib/app'
+import { closeOverlay, engine } from '../lib/app'
 import { today } from '../lib/clock'
 import { loadSearch } from '../lib/plan'
 import { loadRecents, pushRecent, recentWeights } from '../lib/recents'
@@ -29,7 +29,7 @@ const FILTERS: { key: Filter; label: string; kinds?: Kind[] }[] = [
   { key: 'link', label: 'Videos & docs', kinds: ['video', 'doc'] },
 ]
 
-const ICON: Record<Kind, IconName> = { action: 'play', page: 'dot', week: 'star', task: 'check', design: 'orbit', term: 'book', video: 'play', doc: 'book', problem: 'link', company: 'link' }
+const ICON: Record<Kind, IconName> = { action: 'play', page: 'dot', week: 'star', task: 'circle', design: 'orbit', term: 'book', video: 'play', doc: 'book', problem: 'link', company: 'link' }
 const KIND_WORD: Record<Kind, string> = { action: 'Action', page: 'Page', week: 'Week', task: 'Task', design: 'Design', term: 'Term', video: 'Video', doc: 'Doc', problem: 'Machine coding', company: 'Company' }
 
 /** The title with the matched letters in <mark>. They are underlined and bold, never only coloured. */
@@ -206,7 +206,7 @@ export function Palette() {
           ) : null}
           {ask.status === 'error' && ask.error ? (
             <div class="pal__err" role="alert">
-              <p style="margin:0"><strong>{ask.error.code === 'ai_not_configured' ? 'The AI search is not switched on yet.' : 'The AI search could not answer.'}</strong></p>
+              <p class="m0"><strong>{ask.error.code === 'ai_not_configured' ? 'The AI search is not switched on yet.' : 'The AI search could not answer.'}</strong></p>
               <p class="small" style="margin:0.25rem 0 0">{ask.error.message}</p>
               <p class="small muted" style="margin:0.25rem 0 0">The box still searches without it: press Esc, then use the results.</p>
             </div>
@@ -229,7 +229,7 @@ export function Palette() {
               const i = ++n
               return (
                 <li key={`${r.entry.id}-${i}`} id={`palette-opt-${i}`} data-block={b.key} role="option" aria-selected={i === index} class="pal__row" onClick={() => choose(r)} onMouseMove={() => { if (i !== index) { moved.current = true; setIndex(i) } }}>
-                  <span class="pal__icon" title={KIND_WORD[r.entry.kind]}><Icon name={ICON[r.entry.kind]} /></span>
+                  <span class="pal__icon" title={r.entry.kind === 'task' && engine.doneSet.peek().has(r.entry.id.slice(5)) ? 'task, done' : KIND_WORD[r.entry.kind]}><Icon name={r.entry.kind === 'task' && engine.doneSet.peek().has(r.entry.id.slice(5)) ? 'check' : ICON[r.entry.kind]} /></span>
                   <span class="pal__text">
                     <span class="pal__title"><Marked text={r.entry.title} marks={r.marks} /></span>
                     {r.note || r.entry.sub ? <span class="pal__sub">{r.note || r.entry.sub}</span> : null}
@@ -244,7 +244,7 @@ export function Palette() {
         
         {searching && !ask && !hits.length && !smart.length ? (
           <li role="presentation" class="pal__none">
-            <p style="margin:0">Nothing matches “{text.trim()}”.</p>
+            <p class="m0">Nothing matches “{text.trim()}”.</p>
             <p class="muted small" style="margin:0.3rem 0 0">Try fewer words or a topic: kafka, idempotency, outbox. Commands: theme, timer 25, log medium 22, week 4.</p>
           </li>
         ) : null}

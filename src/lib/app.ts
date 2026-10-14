@@ -12,11 +12,14 @@ export const sync = createSync(engine)
 
 /* ---- toast ---- */
 export const toast = signal<string | null>(null)
+/** An optional one-tap action beside the message (Undo). It lives exactly as long as the message does. */
+export const toastAction = signal<{ label: string; run: () => void } | null>(null)
 let toastTimer: ReturnType<typeof setTimeout> | undefined
-export function say(message: string, ms = 2600): void {
+export function say(message: string, ms = 2600, action?: { label: string; run: () => void }): void {
   toast.value = message
+  toastAction.value = action ?? null
   clearTimeout(toastTimer)
-  toastTimer = setTimeout(() => { toast.value = null }, ms)
+  toastTimer = setTimeout(() => { toast.value = null; toastAction.value = null }, ms)
 }
 
 /* ---- overlays (dialogs and sheets that can open from anywhere) ---- */
@@ -94,10 +97,17 @@ export function saveNote(kind: 'why' | 'design' | 'story' | 'free', refId: strin
   engine.dispatch('note.upsert', { id: existing?.id ?? crypto.randomUUID(), kind, ...(refId ? { refId } : {}), body })
 }
 
-export function logProblem(difficulty: 'easy' | 'medium' | 'hard', minutes: number | undefined, noAi: boolean, title: string | undefined, loggedOn: string, url?: string): boolean {
+/** Logs a problem and returns its id (or null if it could not be saved), so the caller can offer Undo. */
+export function logProblem(difficulty: 'easy' | 'medium' | 'hard', minutes: number | undefined, noAi: boolean, title: string | undefined, loggedOn: string, url?: string): string | null {
+  const id = crypto.randomUUID()
   const r = engine.dispatch('problem.add', {
-    id: crypto.randomUUID(), loggedOn, difficulty, noAi, ...(minutes ? { minutes } : {}), ...(title ? { title } : {}), ...(url ? { url } : {}),
+    id, loggedOn, difficulty, noAi, ...(minutes ? { minutes } : {}), ...(title ? { title } : {}), ...(url ? { url } : {}),
   })
   if (!r.ok) say(`Could not save: ${r.error}`)
-  return r.ok
+  return r.ok ? id : null
+}
+
+/** "Logged: medium, 22 min." with an Undo for a few seconds: a slip of the finger is one tap to take back. */
+export function sayLogged(message: string, id: string): void {
+  say(message, 6500, { label: 'Undo', run: () => { engine.dispatch('problem.delete', { id }); say('Removed.', 1800) } })
 }

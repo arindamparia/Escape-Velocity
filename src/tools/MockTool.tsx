@@ -58,7 +58,7 @@ export function MockTool() {
       <div class="stack">
         <div class="card hero stack">
           <p class="eyebrow">Mock in progress</p>
-          <h2 style="margin:0">Design: {d?.name ?? r.designId}</h2>
+          <h2 class="m0">Design: {d?.name ?? r.designId}</h2>
           <p class="muted">Requirements, entities, API, high-level design, deep dives. Out loud.</p>
           {shown.map((p, i) => <div class="card" key={i} role="alert"><p class="eyebrow">Follow-up {i + 1}</p><p style="margin:0;font-size:1.15rem;text-transform:capitalize"><strong>{p}</strong>: redesign for it.</p></div>)}
           {shown.length < 2 ? <p class="small muted">Next follow-up at {shown.length === 0 ? 20 : 35} minutes.</p> : null}
@@ -73,7 +73,7 @@ export function MockTool() {
     <div class="stack">
       <div class="card stack">
         <p class="eyebrow">Score yourself: 1 (weak) to 5 (strong)</p>
-        <h2 style="margin:0">{d?.name ?? r.designId}</h2>
+        <h2 class="m0">{d?.name ?? r.designId}</h2>
         {MOCK_CRITERIA.map((c, i) => (
           <div key={c} class="row row--between">
             <span>{c}</span>

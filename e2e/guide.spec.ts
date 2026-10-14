@@ -26,7 +26,10 @@ test.describe('help and links', () => {
 
   test('the welcome screen links to the guide, and so does the palette', async ({ page }) => {
     await openApp(page, '/')
-    await expect(page.getByRole('dialog', { name: 'Escape Velocity' }).getByRole('link', { name: 'Read the one-page guide' })).toBeVisible()
+    const welcome = page.getByRole('dialog', { name: 'Escape Velocity' })
+    await welcome.getByRole('button', { name: 'Next' }).click()
+    await welcome.getByRole('button', { name: 'Next' }).click() // the guide link is on the last of the three steps
+    await expect(welcome.getByRole('link', { name: 'Read the one-page guide' })).toBeVisible()
     await page.getByRole('link', { name: 'Read the one-page guide' }).click()
     await expect(page).toHaveURL(/\/guide$/)
     await page.keyboard.press('Control+k')

@@ -96,4 +96,6 @@ Pinecone index (once): an integrated-embedding index, `llama-text-embed-v2`, cre
 
 **Scoring the real model.** `OPENAI_API_KEY=sk-… OPENAI_MODEL=gpt-6-luna npm run eval:ask` asks the real model every golden and held-out question and reports how often the first source (what Enter opens) is right, how often a correct source is among them, how many real questions it answers and foreign ones it declines, and the cost per question. Run it with a second `OPENAI_MODEL` to compare models on the same questions. About 7 cents per run; the key is read from the environment and never stored. `EVAL_ASK_DRY=1` checks the harness without calling anything.
 
+**Everything else you can do from Settings**: download a backup and restore one (added to what is there, nothing deleted), put the 13 weeks in your calendar (.ics, your own start times), and get a notification when a timer ends while the tab is hidden.
+
 Privacy: only your question, the plan snippets it matched and the list of actions are sent to OpenAI and Pinecone. Notes, stats, why and solved problems are never sent. The keys are Worker secrets behind Cloudflare Access. If a key was ever pasted into a chat or a file, rotate it.

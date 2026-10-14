@@ -24,7 +24,7 @@ function Frame({ title, subtitle, children, table, legend }: {
 }) {
   const [asTable, setAsTable] = useState(false)
   return (
-    <figure class="card" style="margin:0">
+    <figure class="card m0">
       <figcaption class="row row--between" style="margin-bottom:0.6rem;align-items:flex-start">
         <span style="flex:1;min-width:0"><strong>{title}</strong>{subtitle ? <><br /><span class="small muted">{subtitle}</span></> : null}</span>
         <button type="button" class="btn btn--small btn--ghost noprint" style="flex:none" aria-pressed={asTable} onClick={() => setAsTable(!asTable)}>{asTable ? 'View chart' : 'View as table'}</button>

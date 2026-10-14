@@ -47,7 +47,7 @@ function Readiness() {
   }
   return (
     <section class="card stack" id="ready" aria-label="Readiness">
-      <div class="row" style="gap:1.2rem;align-items:center"><Ring done={n} total={total} /><div><p class="eyebrow">Ready check</p><p style="margin:0" class="muted small">Eight things that say you’re ready. They are worth no points; they only fill the ring.</p></div></div>
+      <div class="row" style="gap:1.2rem;align-items:center"><Ring done={n} total={total} /><div><p class="eyebrow">Ready check</p><p class="muted small m0">Eight things that say you’re ready. They are worth no points; they only fill the ring.</p></div></div>
       {readinessTasks.map((t) => {
         const isDone = done.has(t.id)
         return (
@@ -69,7 +69,7 @@ function ScorecardTable({ current }: { current: number }) {
   const rows = useMemo(() => Array.from({ length: Math.max(current, 1) }, (_, i) => scorecard(state, i + 1, plan.config.startDate, pts[i])), [state, pts, current])
   return (
     <section class="card stack" aria-label="Scorecard">
-      <div class="row row--between"><h2 style="margin:0">Scorecard</h2><a class="btn btn--small btn--primary" href="/progress/review">Start Sunday review</a></div>
+      <div class="row row--between"><h2 class="m0">Scorecard</h2><a class="btn btn--small btn--primary" href="/progress/review">Start Sunday review</a></div>
       <div class="tblwrap"><table class="tbl">
         <thead><tr><th>Wk</th><th>Points</th><th>DSA, no AI</th><th>Avg medium</th><th>Design</th><th>Mock / contest</th><th /></tr></thead>
         <tbody>{rows.map((r) => (
@@ -131,7 +131,7 @@ export default function Progress({ view }: { view?: string }) {
         <Readiness />
         {info.phase === 'during' || info.phase === 'after' ? <MomentumCard date={today.value} /> : null}
         <details class="card" id="points"><summary>How points work</summary><div style="margin-top:0.8rem">{progress ? <Html html={progress.pointsHtml} class="prose small" /> : <div class="skeleton" />}</div></details>
-        {info.phase === 'after' ? <div class="card"><p style="margin:0"><Icon name="star" /> 13 constellations. Go collect offers.</p></div> : null}
+        {info.phase === 'after' ? <div class="card"><p class="m0"><Icon name="star" /> 13 constellations. Go collect offers.</p></div> : null}
         <p class="small muted">Weekly target: {weekTarget(info.week, plan.config) ?? 'none this week'}.</p>
       </div>
     </div>

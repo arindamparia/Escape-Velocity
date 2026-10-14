@@ -2,6 +2,20 @@
 
 Status at the end of the third session. Read `CLAUDE.md` first, then `AUDIT.md` (the build checked against every section of the plan), then the plan itself (`plan/escape-velocity-plan.md`, Part 1).
 
+## The audit and what it changed (15 Oct 2026)
+
+A full read of the code plus real screenshots. Done:
+
+- **Security**: `public/_headers` now sets a Content-Security-Policy (self, plus the YouTube player the focus sound uses; no inline script, because the theme init moved to `public/theme-init.js`), nosniff, no framing, a strict referrer policy and a permissions policy; API responses are nosniff too. `e2e/headers.spec.ts` fails on any header missing or any CSP violation on any page. The Worker re-fetches Cloudflare's signing keys at most once a minute for an unknown key id. **The GitHub repo is public while the app calls itself private** (the plan names your current work, the config has your email and Access ids; no secret is in the history, all 44 commits scanned): make it private in GitHub settings, Cloudflare deploys from private repos.
+- **CI** (`.github/workflows/ci.yml`): compile, both typechecks, all tests and the build on every push and pull request; the browser tests nightly (screenshot specs excluded, baselines are per machine). A push to `main` still deploys through Cloudflare without waiting for CI, unless you make the Cloudflare build wait for it. `links.yml` checks every study link weekly (`npm run check:links`; YouTube via oEmbed, bot walls are not counted as broken).
+- **Search**: "design youtube", "uber design", "term idempotency": a kind word beside other words is a hint about the row's kind, not a word every row must contain (held-out recall@1 64% to 70%, in front of the AI 89% to 94%).
+- **Look**: Library cards stack on a phone (the tags were squeezing the description into a column one word wide); on a phone the next action comes straight after the heading and "Your why" shows two lines; a finished task is one crossed-out line (the greyscale cue stays); a task in the search box is an open circle (a check on every task read as "done"); empty progress tiles are quiet and say so; the first-run welcome is three short steps; 97 repeated `style="margin:0"` became a `.m0` class (244 inline styles to 147). Still inline: the rest, a good next cleanup.
+- **Fixed text**: Settings said to install the app (there is no PWA); the page description said 37 designs; "Plan complete" said applications go out from 4 Jan (now from the plan's last day plus one).
+- **Actions**: Undo (6.5 s) after logging a problem, from the box or the dialog; **Restore from a backup** in Settings (previews what is in the file, adds it, deletes nothing; flashcard schedules cannot be rebuilt from a backup and say so); a **calendar** (.ics) of the 13 weeks with start times you choose (`src/lib/calendar.ts`; lengths from the plan's routine, Puja and Diwali days are 20-minute light blocks, 10-minute reminders); the Sunday review's "One fix" offers up to three suggestions from your own numbers; an opt-in notification when a timer ends while the tab is hidden (a check at the due time makes sure it is not left waiting).
+- **Sync**: a rejection that names no single op no longer drops the whole batch of up to 20; the ops are sent one at a time and only the bad one is dropped.
+- **Task time**: the plan's routine says a morning DSA block is 60 minutes (not 30), so a week now adds up to the promised 15 hours.
+- **Not done, on purpose**: "Move to tomorrow" (the Waiting list and the next-up rule already do it without a new op); collapsing done tasks (many tests and keyboard paths rely on every row being in the page); splitting `scripts/lib/compile.ts` (998 lines, works, no pressure); major dependency upgrades.
+
 ## Time, topics and motivation (14 Oct 2026)
 
 Researched in the session (sources in the reply that proposed it; the evidence is thin and mostly general, so every line is plain and testable):

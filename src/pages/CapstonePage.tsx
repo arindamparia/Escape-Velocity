@@ -60,7 +60,7 @@ export function CapstoneOverview() {
       </section>
 
       <section class="stack" id="flow" aria-label="How it fits together">
-        <h2 style="margin:0">How it fits together</h2>
+        <h2 class="m0">How it fits together</h2>
         {focusTask ? <p class="small" role="status"><span class="muted">On the diagram:</span> <strong>Week {focusTask.week}</strong>{litSteps.length ? <> touches {litSteps.length === 9 ? 'the whole flow' : `step${litSteps.length === 1 ? '' : 's'} ${litSteps.join(', ')}`}.</> : <> is about the whole system.</>} <span class="muted">Pick another milestone below to move the rings.</span></p> : null}
         <CapstoneDiagram lit={litSteps.length === 9 ? [] : litSteps} />
         <ol class="flowsteps">
@@ -69,7 +69,7 @@ export function CapstoneOverview() {
       </section>
 
       <section id="sundays" aria-label="Milestones">
-        <div class="row row--between"><h2 style="margin:0">Your 10 Sundays</h2><span class="mono small">{shipped} of {tasks.length} shipped</span></div>
+        <div class="row row--between"><h2 class="m0">Your 10 Sundays</h2><span class="mono small">{shipped} of {tasks.length} shipped</span></div>
         <div class="bar" style="margin:0.5rem 0 0.9rem" role="progressbar" aria-label="Capstone milestones shipped" aria-valuemin={0} aria-valuemax={tasks.length} aria-valuenow={shipped}><i style={{ width: `${(shipped / tasks.length) * 100}%` }} /></div>
         <ol class="milestones">
           {tasks.map((t) => (
@@ -91,7 +91,7 @@ export function CapstoneOverview() {
       </section>
 
       <section class="stack" id="parts" aria-label="What goes in it">
-        <h2 style="margin:0">What goes in it</h2>
+        <h2 class="m0">What goes in it</h2>
         {['Parts', 'Must-haves'].map((label) => { const f = fact(label); return f ? (
           <div key={label}>
             <p class="eyebrow">{label}</p>
@@ -106,7 +106,7 @@ export function CapstoneOverview() {
       </section>
 
       <section class="stack" aria-label="What it proves in an interview">
-        <h2 style="margin:0">What it lets you say in an interview</h2>
+        <h2 class="m0">What it lets you say in an interview</h2>
         <ul class="proves">
           {PROVES.map((p) => (
             <li key={p.q}><strong>{p.q}</strong><span>{p.a}{p.design ? <> <a href={`/library?design=${p.design[0]}`}>{p.design[1]}</a></> : null}</span></li>
@@ -115,15 +115,15 @@ export function CapstoneOverview() {
       </section>
 
       <section class="card stack" id="resume" aria-label="On your resume">
-        <h2 style="margin:0">On your resume</h2>
-        <p class="muted" style="margin:0">Say what you built, how, and the number you measured. Fill the brackets from your own runs.</p>
+        <h2 class="m0">On your resume</h2>
+        <p class="muted m0">Say what you built, how, and the number you measured. Fill the brackets from your own runs.</p>
         <ul class="bullets">{BULLETS.map((b) => <li key={b}>{b}</li>)}</ul>
-        <p class="small muted" style="margin:0">Only write a number you can explain: interviewers will ask how you measured it. Lead with your Adyen and UCP work, with this project as the one you built end to end (the plan's week 13 resume task says the same). Format from hiring guides like <a href="https://www.rejectless.app/guides/resume-bullet-points-software-engineers" target="_blank" rel="noopener noreferrer">this one</a> and the correctness focus of the <a href="https://w.pitula.me/fintech-engineering-handbook/" target="_blank" rel="noopener noreferrer">Fintech Engineering Handbook</a>.</p>
+        <p class="small muted m0">Only write a number you can explain: interviewers will ask how you measured it. Lead with your Adyen and UCP work, with this project as the one you built end to end (the plan's week 13 resume task says the same). Format from hiring guides like <a href="https://www.rejectless.app/guides/resume-bullet-points-software-engineers" target="_blank" rel="noopener noreferrer">this one</a> and the correctness focus of the <a href="https://w.pitula.me/fintech-engineering-handbook/" target="_blank" rel="noopener noreferrer">Fintech Engineering Handbook</a>.</p>
       </section>
 
       <section class="stack" aria-label="If time runs short">
-        <h2 style="margin:0">If a Sunday slips</h2>
-        <p class="muted" style="margin:0">A suggestion, not part of the plan: protect these in order, and let the ones below go before any of the six.</p>
+        <h2 class="m0">If a Sunday slips</h2>
+        <p class="muted m0">A suggestion, not part of the plan: protect these in order, and let the ones below go before any of the six.</p>
         <ol class="keep">{KEEP_FIRST.map((k) => <li key={k}>{k}</li>)}</ol>
         <p class="eyebrow" style="margin:0.4rem 0 0">Then, if there is time</p>
         <ul class="chips">{THEN.map((k) => <li key={k}><span class="chip">{k}</span></li>)}</ul>

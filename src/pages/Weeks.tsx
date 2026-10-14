@@ -68,7 +68,7 @@ function WeekDetail({ n, current }: { n: number; current: number }) {
       </header>
       <section class="card">
         <p class="eyebrow">DSA focus</p>
-        <p style="margin:0"><strong>{w.dsaFocus}</strong></p>
+        <p class="m0"><strong>{w.dsaFocus}</strong></p>
         {chunk && chunk.reported.length ? <p class="small muted" style="margin:0.5rem 0 0">Reported problems to try: {chunk.reported.join(' · ')}</p> : null}
         {chunk?.introHtml && !/^<p>DSA focus/.test(chunk.introHtml) ? <Html html={chunk.introHtml} class="prose small" /> : null}
       </section>
@@ -93,7 +93,7 @@ function DsaTab() {
     <div class="stack">
       <Html html={page.dsaHtml} class="prose small" />
       <section id="boss" class="card stack" aria-label="The boss problem">
-        <h2 style="margin:0">The boss problem</h2>
+        <h2 class="m0">The boss problem</h2>
         <Html html={page.bossHtml} class="prose" />
       </section>
     </div>

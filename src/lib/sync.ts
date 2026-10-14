@@ -82,9 +82,11 @@ export function createSync(engine: Engine, deps: SyncDeps = {}) {
 
   async function runOnce(wantPull: boolean): Promise<void> {
     let pull = wantPull
+    // after a refusal that names no single op, send one at a time: the good ones go through, only the bad one is dropped
+    let single = false
     status.value = engine.outbox.peek().length ? 'saving' : status.peek()
     while (engine.outbox.peek().length) {
-      const batch = engine.outbox.peek().slice(0, MAX_OPS_PER_REQUEST)
+      const batch = engine.outbox.peek().slice(0, single ? 1 : MAX_OPS_PER_REQUEST)
       const ids = new Set(batch.map((o) => o.opId))
       ids.forEach((id) => engine.inflight.add(id))
       const out = await call<{ applied: number; skipped: number }>(f, '/api/ops', {
@@ -95,6 +97,7 @@ export function createSync(engine: Engine, deps: SyncDeps = {}) {
         failures = 0
         engine.removeFromOutbox(ids)
       } else if (out.kind === 'rejected') {
+        if (!(out.opId && ids.has(out.opId)) && ids.size > 1) { single = true; continue } // cannot tell which: find out, without losing the rest
         const bad = out.opId && ids.has(out.opId) ? new Set([out.opId]) : ids
         rejected.value = [...rejected.peek(), ...[...bad].map((opId) => ({ opId, message: out.message }))]
         engine.removeFromOutbox(bad)

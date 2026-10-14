@@ -23,7 +23,7 @@ export function RhythmLine({ date, week, dow, done, light, welcomeBack }: { date
   const left = leftToday(week, dow, done)
   return (
     <div class="rhythm small muted" style="margin-top:0.35rem">
-      <p style="margin:0" data-testid="chapter-line">
+      <p class="m0" data-testid="chapter-line">
         <a href="/weeks" title={c.chapter.line}>Chapter {c.chapter.n} of 4 · {c.chapter.name}</a> · week {c.weekInChapter} of {c.weeks} · {c.daysLeft === 1 ? 'the last day of it' : `${c.daysLeft} days to the end of it`}{c.next ? `, then ${c.next.name}` : ', then you apply'}.
       </p>
       {!light && !welcomeBack && planned.length ? (
@@ -75,10 +75,10 @@ export function HourBox({ week, dow, done }: { week: number; dow: number; done: 
                   )
                 })}
               </ul>
-              <p class="small muted" style="margin:0">{formatMinutes(r.minutes)} of {formatMinutes(budget)}. The most valuable open work first; the rest waits.</p>
+              <p class="small muted m0">{formatMinutes(r.minutes)} of {formatMinutes(budget)}. The most valuable open work first; the rest waits.</p>
             </>
-          ) : <p class="small muted" style="margin:0">Nothing open fits {formatMinutes(budget)}. Try a longer slot, or take the rest.</p>
-        ) : <p class="small muted" style="margin:0">Pick the time you have. This lists the open work that fits, most valuable first.</p>}
+          ) : <p class="small muted m0">Nothing open fits {formatMinutes(budget)}. Try a longer slot, or take the rest.</p>
+        ) : <p class="small muted m0">Pick the time you have. This lists the open work that fits, most valuable first.</p>}
       </div>
     </details>
   )
@@ -114,7 +114,7 @@ export function MomentumCard({ date }: { date: string }) {
   return (
     <section class="card" aria-label="Momentum" data-testid="momentum">
       <p class="eyebrow">Momentum</p>
-      <dl class="kv" style="margin:0">
+      <dl class="kv m0">
         <dt>Active days this week</dt><dd>{m.thisWeek} of 7{m.lastWeek ? ` (last week ${m.lastWeek})` : ''}</dd>
         {m.bestWeek ? <><dt>Your best week</dt><dd>Week {m.bestWeek.week}, {plural(m.bestWeek.days, 'active day')}</dd></> : null}
         <dt>Longest gap</dt><dd>{m.longestGap ? plural(m.longestGap, 'day') : 'none yet'}</dd>

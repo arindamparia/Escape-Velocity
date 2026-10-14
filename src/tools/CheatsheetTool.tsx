@@ -15,7 +15,7 @@ export function CheatsheetTool() {
   return (
     <div class="stack">
       <div class="row row--between noprint">
-        <p class="muted" style="margin:0">{rows.length} of {study.flashcards.length} concept notes written{missing ? `; ${missing} still blank` : ''}. Compiled from your own words.</p>
+        <p class="muted m0">{rows.length} of {study.flashcards.length} concept notes written{missing ? `; ${missing} still blank` : ''}. Compiled from your own words.</p>
         <button type="button" class="btn btn--primary btn--small" onClick={() => window.print()}>Print (A4)</button>
       </div>
       {rows.length === 0 ? <div class="empty noprint">Write a few why-notes first; this page assembles them into one sheet.</div> : null}

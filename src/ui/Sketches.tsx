@@ -357,11 +357,11 @@ export const SKETCHES: Record<SketchId, Sketch> = {
 export default function Sketch({ id }: { id: SketchId }) {
   const s = SKETCHES[id]
   return (
-    <figure class="sketch" style="margin:0">
+    <figure class="sketch m0">
       <div class="sketch__scroll" tabIndex={0} role="group" aria-label={s.title}>{s.draw()}</div>
       <figcaption>
         <p class="eyebrow" style="margin:0.7rem 0 0.3rem">{s.title}: how to read it</p>
-        <dl class="kv small" style="margin:0">{s.notes.map(([k, v]) => <><dt key={k}>{k}</dt><dd>{v}</dd></>)}</dl>
+        <dl class="kv small m0">{s.notes.map(([k, v]) => <><dt key={k}>{k}</dt><dd>{v}</dd></>)}</dl>
       </figcaption>
     </figure>
   )

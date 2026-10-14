@@ -42,16 +42,16 @@ export function DesignDetail({ id }: { id: string }) {
           <span class="chip">{STATUS_LABEL[status]}</span>
         </div>
       </header>
-      <div><p class="eyebrow">What it really teaches</p><p style="margin:0">{d.teaches}</p></div>
-      <div class="card"><p class="eyebrow">Derive it first</p><p style="margin:0"><strong>{d.derive}</strong></p></div>
+      <div><p class="eyebrow">What it really teaches</p><p class="m0">{d.teaches}</p></div>
+      <div class="card"><p class="eyebrow">Derive it first</p><p class="m0"><strong>{d.derive}</strong></p></div>
       <div class="row">
         <button type="button" class="btn btn--primary" onClick={() => { closeOverlay(); navigate(`/study/loop?design=${id}`) }}><Icon name="play" /> Start learning loop</button>
         {d.link ? <a class="btn" href={d.link} target="_blank" rel="noopener noreferrer"><Icon name="link" /> Breakdown</a> : null}
       </div>
-      {d.link ? <p class="small muted" style="margin:0">Never open a breakdown before your 45-minute cold attempt.</p> : null}
+      {d.link ? <p class="small muted m0">Never open a breakdown before your 45-minute cold attempt.</p> : null}
 
       <div class="stack" style="gap:0.7rem">
-        <p class="eyebrow" style="margin:0">Status</p>
+        <p class="eyebrow m0">Status</p>
         <div class="row" role="group" aria-label="Status">
           {DESIGN_STATUSES.map((s) => <button key={s} type="button" class="chip" aria-pressed={status === s} onClick={() => setStatus(s)}>{STATUS_LABEL[s]}</button>)}
         </div>

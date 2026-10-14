@@ -31,7 +31,7 @@ export default function Guide() {
         </header>
 
         <section class="card stack" aria-label="A normal day">
-          <h2 style="margin:0">A normal day</h2>
+          <h2 class="m0">A normal day</h2>
           <ol class="stack" style="margin:0;padding-left:1.2rem;gap:0.5rem">
             {DAY.map(([a, b]) => <li key={a}><strong>{a}</strong> {b}</li>)}
           </ol>
@@ -39,32 +39,32 @@ export default function Guide() {
         </section>
 
         <section class="stack" aria-label="A normal week">
-          <h2 style="margin:0">A normal week</h2>
-          <p class="muted" style="margin:0">Mornings are DSA. Nights are one concept or infra task. Friday night is off, or one optional paper. Saturday is the big design, Sunday the capstone and the review.</p>
+          <h2 class="m0">A normal week</h2>
+          <p class="muted m0">Mornings are DSA. Nights are one concept or infra task. Friday night is off, or one optional paper. Saturday is the big design, Sunday the capstone and the review.</p>
           <div class="sketch__scroll" tabIndex={0} role="group" aria-label="A normal week, as a diagram" style="min-height:11rem"><WeekRhythmLazy /></div>
         </section>
 
         <section class="stack" aria-label="The boss problem" id="boss">
-          <h2 style="margin:0">The boss problem, in five steps</h2>
-          <p class="muted" style="margin:0">One hard problem each Sunday. The full steps, so you never wonder what to do next. <a href="/weeks/dsa#boss">On the DSA track</a>.</p>
+          <h2 class="m0">The boss problem, in five steps</h2>
+          <p class="muted m0">One hard problem each Sunday. The full steps, so you never wonder what to do next. <a href="/weeks/dsa#boss">On the DSA track</a>.</p>
           <BossHow open />
         </section>
 
         <section class="stack" aria-label="The learning loop">
-          <h2 style="margin:0">Every design goes round the same loop</h2>
-          <p class="muted" style="margin:0">You never memorise a design. You rebuild each decision from the constraint that forced it. <a href="/study/loop">Open the learning loop</a>.</p>
+          <h2 class="m0">Every design goes round the same loop</h2>
+          <p class="muted m0">You never memorise a design. You rebuild each decision from the constraint that forced it. <a href="/study/loop">Open the learning loop</a>.</p>
           <div class="sketch__scroll" tabIndex={0} role="group" aria-label="The learning loop, as a diagram" style="min-height:16rem"><LoopRingLazy /></div>
         </section>
 
         <section class="stack" aria-label="The five pages">
-          <h2 style="margin:0">The five pages</h2>
+          <h2 class="m0">The five pages</h2>
           <ul class="toollist">
             {PAGES.map((p) => <li key={p.href}><a href={p.href}><strong>{p.name}</strong><small>{p.what} {p.when}</small></a></li>)}
           </ul>
         </section>
 
         <section class="stack" aria-label="I want to…">
-          <h2 style="margin:0">I want to…</h2>
+          <h2 class="m0">I want to…</h2>
           <ul class="prose">
             <li>log a problem I solved, with its link: <a href="/">Today</a>, “Log a problem” (or press ⌘K and type “log medium 22 https://…”)</li>
             <li>see everything I have solved, from here and AlgoTracker: <a href="/progress/problems">Solved problems</a></li>
@@ -91,7 +91,7 @@ export default function Guide() {
         <section class="stack" aria-label="Glossary">
           {GLOSSARY.map((g) => (
             <div key={g.title} class="stack">
-              <h2 style="margin:0">{g.title} <span class="muted small" style="font-weight:400">{g.blurb}</span></h2>
+              <h2 class="m0">{g.title} <span class="muted small" style="font-weight:400">{g.blurb}</span></h2>
               <dl class="terms">
                 {g.terms.map((t) => <div key={t.id} id={t.id} class="term"><dt>{t.term}</dt><dd>{t.what}</dd></div>)}
               </dl>
