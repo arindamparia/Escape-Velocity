@@ -12,7 +12,7 @@
 //   cost                 tokens used and the price at the model's list rate
 import 'fake-indexeddb/auto'
 import { describe, expect, it, vi } from 'vitest'
-import { converse, effortFor } from '../../worker/ask'
+import { converse, effortFor } from '../../worker/converse'
 import { inScope } from '../../worker/retrieve'
 import { ASK_LIMITS } from '../../shared/ask'
 import { HELDOUT } from '../golden/heldout'
