@@ -27,7 +27,7 @@ test.describe('logging a problem with its link', () => {
     await openApp(page, '/')
     await page.keyboard.press('Control+k')
     await page.getByRole('combobox').fill(`log medium 22 ${TWO_SUM}`)
-    await expect(page.getByRole('option').first()).toContainText('with its link')
+    await expect(page.getByRole('dialog', { name: 'Command palette' }).getByRole('option').first()).toContainText('with its link')
     await page.keyboard.press('Enter')
     await expect.poll(async () => (await api.state()).problemLog.map((p) => [p.title, p.url, p.minutes])).toContainEqual(['Two Sum', TWO_SUM, 22])
   })
