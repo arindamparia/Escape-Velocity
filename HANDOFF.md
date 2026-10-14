@@ -2,6 +2,13 @@
 
 Status at the end of the third session. Read `CLAUDE.md` first, then `AUDIT.md` (the build checked against every section of the plan), then the plan itself (`plan/escape-velocity-plan.md`, Part 1).
 
+## Search you can measure (14 Oct 2026)
+
+- **Golden questions** (`tests/golden/`): 129 questions with the rows that answer them, a scorer (recall@1/3/10, MRR, bootstrap intervals, paired comparison) and a committed baseline. `npm run eval:search` prints the report and every miss. Run it before and after any change to `src/lib/search.ts`, the palette's keywords, `scripts/lib/rag.ts` or the prompt, and keep a change only if the number moves the right way.
+- **Nothing reachable was missing from the box, and nothing in the box was missing from the AI**: `e2e/crawl.spec.ts` found ten tabs and sections with no row (DSA track, Interview prep, Machine coding, What companies ask, Real systems, Library resources, Design notes, STAR stories, Free notes, Your why), now in `PAGES`/`SECTIONS`; and 36 pages and sections had no text in the corpus, so the Worker dropped them from the model's context. `scripts/lib/rag.ts` now writes a chunk for every page and section from the same table, and a ready-check chunk points at its own row.
+- `worker/retrieve.ts` holds the pure retrieval code (`gather`, the keyword fallback) so the evaluation runs the real thing. `gather` now also adds the other chunks of an entry whose own id is a chunk.
+- **After you deploy, press "Rebuild the index" in Settings** (the corpus changed, so its Pinecone namespace has a new name).
+
 ## The plan moved one week (14 Oct 2026)
 
 The plan now runs **Mon 12 Oct 2026 to Sun 10 Jan 2027** (applications from Mon 11 Jan). The first week (5 to 11 Oct) had only Monday done, so the whole calendar moved forward by a week. Task IDs and week numbers are unchanged. What that meant:

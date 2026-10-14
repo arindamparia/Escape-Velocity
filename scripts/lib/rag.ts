@@ -1,6 +1,7 @@
 // The corpus the AI search answers from: the plan's own content, cut into small chunks. Each chunk's `entry` is the id
 // of the thing in the app it belongs to (the same ids the command palette uses), so an answer can link straight to it.
 // Nothing personal goes in: no notes, no why, no stats, no problems you solved. Only the plan.
+import { PAGES, SECTIONS } from '../../src/lib/destinations'
 import { GLOSSARY } from '../../src/pages/glossary'
 import type { PlanTask } from '../../shared/plan-types'
 import type { CompileOutput } from './compile'
@@ -9,7 +10,7 @@ export interface RagChunk {
   id: string
   /** the palette entry this opens */
   entry: string
-  kind: 'week' | 'task' | 'design' | 'term' | 'link' | 'problem' | 'company' | 'rule' | 'help' | 'project' | 'ready' | 'paper' | 'equation' | 'gap'
+  kind: 'page' | 'week' | 'task' | 'design' | 'term' | 'link' | 'problem' | 'company' | 'rule' | 'help' | 'project' | 'ready' | 'paper' | 'equation' | 'gap'
   title: string
   text: string
 }
@@ -116,9 +117,15 @@ export function buildChunks(out: CompileOutput): RagChunk[] {
     chunks.push({ id: `capstone:${f.label}`, entry: 'section:capstone-parts', kind: 'project', title: `Capstone: ${f.label}`, text: clip(`Capstone ${f.label}: ${plain(f.html)}`, 500) })
   }
   chunks.push({ id: 'capstone:flow', entry: 'section:capstone-flow', kind: 'project', title: 'Capstone flow', text: `The capstone checkout flow: ${out.pages.weeks.capstoneFlow.join(', then ')}.` })
-  Object.entries(out.pages.progress.readiness).forEach(([id, html]) => chunks.push({ id: `ready:${id}`, entry: 'section:ready', kind: 'ready', title: `Ready check ${id}`, text: clip(plain(html), 400) }))
+  Object.entries(out.pages.progress.readiness).forEach(([id, html]) => chunks.push({ id: `ready:${id}`, entry: `task:${id}`, kind: 'ready', title: `Ready check ${id}`, text: clip(plain(html), 400) }))
 
   for (const [id, entry, title, text] of HELP) chunks.push({ id, entry, kind: 'help', title, text })
+
+  // every page, tab and part of a page the search box can open, described by the same table the box uses, so the AI can
+  // point at any of them (a row with no text here is dropped from the model's context and can never be cited)
+  for (const p of [...PAGES, ...SECTIONS]) {
+    chunks.push({ id: p.id, entry: p.id, kind: 'page', title: p.title, text: clip(`${p.title}. ${p.sub}.${p.hint ? ` ${p.hint}.` : ''} Also found by: ${p.keys}.`, 400) })
+  }
 
   // ids must be unique: a duplicate would silently overwrite its vector
   const seen = new Set<string>()

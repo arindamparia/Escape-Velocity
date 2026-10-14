@@ -40,6 +40,15 @@ export const PAGES: Place[] = ([
   ['Cheat sheet', '/study/cheatsheet', 'summary revision', 'Your one-page cheat sheet'],
   ['Sunday review', '/progress/review', 'weekly review scorecard row', 'Fill in this week’s scorecard row'],
   ['Capstone', '/weeks/capstone', 'project checkout order inventory webhooks diagram', 'The checkout project you build on Sundays'],
+  ['DSA track', '/weeks/dsa', 'leetcode problems patterns morning practice topics weekly targets difficulty plan', 'What to practise each week, and how'],
+  ['Interview prep', '/weeks/interview', 'mock interviews stories apply applications resume referrals companies offers', 'Mock interviews, your stories, and applying'],
+  ['Machine coding', '/library?tab=machine', 'lld low level design object oriented classes code ninety minutes timed problems asked', 'The machine-coding problems companies asked, and which week to try each'],
+  ['What companies ask', '/library?tab=companies', 'razorpay phonepe groww cred rounds reported real questions interview loop what they ask', 'The rounds and real questions reported at each company'],
+  ['Real systems', '/library?tab=systems', 'reading engineering blogs case studies production architecture after designing', 'What to read about real systems after designing the related problem'],
+  ['Library resources', '/library?tab=resources', 'videos docs links youtube study by week', 'Every video and doc in the plan, by week'],
+  ['Design notes', '/study/notes?tab=design', 'my design notes written decisions tradeoffs drawings', 'The notes you wrote while deriving a design'],
+  ['STAR stories', '/study/notes?tab=stories', 'behavioural behavioral situation task action result six stories rehearse out loud', 'Your six stories: situation, task, action, result'],
+  ['Free notes', '/study/notes?tab=free', 'scratch notes anything write equation answers paper summaries', 'Notes that belong to no task'],
 ] as const).map(([title, url, keys, sub]) => ({ id: `page:${url}`, title, sub, keys, url }))
 
 /**
@@ -49,6 +58,7 @@ export const PAGES: Place[] = ([
 export const SECTIONS: Place[] = ([
   ['routine', 'Your daily routine', '/#routine', 'Today · how my day works', 'schedule morning night saturday sunday time hours slots day plan', 'Mornings, nights, Saturday and Sunday: what you do and for how long'],
   ['boss', 'The boss problem: how it works', '/weeks/dsa#boss', 'Weeks · DSA track · boss problem', 'hard problem sunday no hints hour hint editorial redo two weeks leetcode stretch', 'The five steps: choose, no hints for an hour, one hint at a time, write three lines, redo'],
+  ['why', 'Your why', '/mindset#why', 'Mindset · your why', 'motivation reason purpose remind write five lines edit', 'The five lines you wrote about why you are doing this'],
   ['rules', 'Rules for your head', '/mindset#rules', 'Mindset · rules', 'plan rules minimum day missed day timeboxes sleep festivals produce first split days', 'Produce first, minimum day, timeboxes, festivals and the other rules'],
   ['why-plan', 'Why this plan', '/mindset#why-plan', 'Mindset · why this plan', 'method jee interviews what loops test', 'Why 13 weeks, and what the interview loops test'],
   ['points', 'How points work', '/progress#points', 'Progress · how points work', 'scoring target 50 weekly points table', 'What each kind of work earns, and the weekly target'],

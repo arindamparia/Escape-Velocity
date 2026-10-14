@@ -120,7 +120,7 @@ describe('what comes back is checked', () => {
   })
 
   it('maps a rule or capstone chunk to the section it belongs to', () => {
-    const chunks = gather({ q: 'what is the capstone', candidates: ['section:capstone-flow'], actions: [] }, [])
+    const chunks = gather({ q: 'what is the capstone', candidates: ['section:capstone-flow'] }, [])
     const clean = sanitize({ answer: 'a', results: [{ id: chunks[0].id, why: 'w' }] }, chunks, new Set())
     expect(clean.results[0].id).toBe('section:capstone-flow')
   })

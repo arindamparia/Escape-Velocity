@@ -22,7 +22,7 @@ describe('every place the AI can cite is a real row in the search box', () => {
   })
 
   it('a chunk about a part of a page points at that part, not at the page', () => {
-    const generic = chunks.filter((c) => ['rule', 'ready', 'project'].includes(c.kind) && !c.entry.startsWith('section:')).map((c) => `${c.id} -> ${c.entry}`)
+    const generic = chunks.filter((c) => ['rule', 'ready', 'project'].includes(c.kind) && !(c.entry.startsWith('section:') || (c.kind === 'ready' && /^task:r-\d\d$/.test(c.entry)))).map((c) => `${c.id} -> ${c.entry}`)
     expect(generic).toEqual([])
     const routine = chunks.filter((c) => c.id.startsWith('routine:'))
     expect(routine.length).toBeGreaterThan(0)
