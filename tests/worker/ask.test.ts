@@ -67,7 +67,8 @@ describe('what goes to OpenAI', () => {
     const b = sentBody()
     expect(sent.bodies[0].url).toBe('https://api.openai.com/v1/chat/completions')
     expect((sent.bodies[0].init.headers as Record<string, string>).Authorization).toBe(`Bearer ${KEY}`)
-    expect(b.model).toBe('gpt-4.1-mini')
+    expect(b.model).toBe('gpt-6-luna')
+    expect((b as unknown as { reasoning_effort?: string }).reasoning_effort).toBe('none') // answering from the context needs no thinking, and thinking would eat the token cap
     // a strict schema: every id the model may return is one that was offered, every action one from the catalogue
     const rf = b.response_format as { type: string; json_schema: { strict: boolean; schema: { properties: { results: { items: { properties: { id: { enum: string[] } } } }; actions: { items: { enum: string[] } } } } } }
     expect(rf.type).toBe('json_schema')
@@ -83,7 +84,7 @@ describe('what goes to OpenAI', () => {
     expect(u.ACTIONS).toEqual([])
     expect(Object.keys(u.CONTEXT[0]).sort()).toEqual(['id', 'text', 'title']) // nothing the model does not need
     expect(u.CONTEXT.length).toBeLessThanOrEqual(8)
-    expect((sentBody() as unknown as { max_completion_tokens: number }).max_completion_tokens).toBeLessThanOrEqual(400)
+    expect((sentBody() as unknown as { max_completion_tokens: number }).max_completion_tokens).toBeLessThanOrEqual(600)
   })
 
   it('sends the action catalogue only when the question asks for something to be done', async () => {
@@ -103,9 +104,27 @@ describe('what goes to OpenAI', () => {
     expect(ids.length).toBeLessThanOrEqual(14)
   })
 
-  it('uses OPENAI_MODEL when set', async () => {
+  it('uses OPENAI_MODEL when set, and sends the reasoning setting only to models that reason', async () => {
+    const effort = () => (sentBody() as unknown as { reasoning_effort?: string }).reasoning_effort
     await ask(q(), { ...BASE, OPENAI_MODEL: 'gpt-5-mini' })
     expect(sentBody().model).toBe('gpt-5-mini')
+    expect(effort()).toBe('minimal')
+    sent.bodies.length = 0
+    await ask(q(), { ...BASE, OPENAI_MODEL: 'gpt-4.1-mini' })
+    expect(sentBody().model).toBe('gpt-4.1-mini')
+    expect(effort()).toBeUndefined() // a model that does not reason would reject it
+  })
+
+  it('asks again without the reasoning setting when the model refuses it', async () => {
+    let n = 0
+    reply = () => (++n === 1
+      ? new Response(JSON.stringify({ error: { message: "Unsupported parameter: 'reasoning_effort' is not supported with this model." } }), { status: 400 })
+      : completion({ in_scope: true, answer: 'ok', results: [], actions: [] }))
+    const body = (await (await ask(q())).json()) as AskResponse
+    expect(body.answer).toBe('ok')
+    expect(sent.bodies).toHaveLength(2)
+    expect((JSON.parse(String(sent.bodies[1].init.body)) as { reasoning_effort?: string }).reasoning_effort).toBeUndefined()
+    expect(JSON.parse(String(sent.bodies[1].init.body)).response_format.type).toBe('json_schema') // still strict
   })
 })
 

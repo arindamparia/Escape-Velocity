@@ -13,7 +13,14 @@ import { CHUNKS, gather, HASH, inScope, wantsAction, type Chunk } from './retrie
 
 export { gather }
 
-export const DEFAULT_MODEL = 'gpt-4.1-mini'
+export const DEFAULT_MODEL = 'gpt-6-luna'
+
+/**
+ * Reasoning models think before they answer (Luna defaults to "medium"), and the thinking is paid for out of the answer's
+ * token cap, so an unconfigured call can come back empty and slow. This question-answering needs no thinking: the answer is
+ * in the context. Models that do not reason must not be sent the setting at all (they reject it).
+ */
+export const effortFor = (model: string): string | undefined => (/^gpt-6/.test(model) ? 'none' : /^gpt-5/.test(model) ? 'minimal' : /^o\d/.test(model) ? 'low' : undefined)
 
 const AskSchema = z.object({
   q: z.string().trim().min(2).max(ASK_LIMITS.question),
@@ -84,8 +91,9 @@ export function replySchema(chunkIds: readonly string[], actionIds: readonly str
   }
 }
 
-async function callOpenAI(env: Env, user: unknown, schema?: ReturnType<typeof replySchema>): Promise<string> {
+async function callOpenAI(env: Env, user: unknown, schema?: ReturnType<typeof replySchema>, thinkingOff = true): Promise<string> {
   let res: Response
+  const effort = thinkingOff ? effortFor(modelOf(env)) : undefined
   try {
     res = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -94,7 +102,8 @@ async function callOpenAI(env: Env, user: unknown, schema?: ReturnType<typeof re
         model: modelOf(env),
         messages: [{ role: 'system', content: SYSTEM }, { role: 'user', content: JSON.stringify(user) }],
         response_format: schema ? { type: 'json_schema', json_schema: schema } : { type: 'json_object' },
-        max_completion_tokens: 350, // in_scope + three sentences + five short sources
+        max_completion_tokens: 600, // a ceiling, not a target: in_scope + three short sentences + five sources is about 150, the rest is headroom
+        ...(effort ? { reasoning_effort: effort } : {}),
       }),
       signal: AbortSignal.timeout(25_000),
     })
@@ -107,7 +116,9 @@ async function callOpenAI(env: Env, user: unknown, schema?: ReturnType<typeof re
     const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null
     const message = body?.error?.message ?? ''
     // an older model that cannot take a schema: ask again in plain JSON mode, and rely on sanitize()
-    if (schema && /response_format|json_schema|structured/i.test(message)) return callOpenAI(env, user)
+    if (schema && /response_format|json_schema|structured/i.test(message)) return callOpenAI(env, user, undefined, thinkingOff)
+    // a model that does not take the reasoning setting: ask again without it
+    if (effort && /reasoning/i.test(message)) return callOpenAI(env, user, schema, false)
     throw new AskError('upstream', `OpenAI rejected the request${message ? `: ${message.slice(0, 160)}` : ''}. If it names the model, set OPENAI_MODEL.`, 502)
   }
   if (!res.ok) throw new AskError('upstream', `OpenAI answered ${res.status}.`, 502)
