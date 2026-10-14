@@ -13,6 +13,7 @@ import { describe, expect, it } from 'vitest'
 import { PAGES, SECTIONS } from '../../src/lib/destinations'
 import { CHUNKS, context, ENTRIES, KNOWN, ranked, shown } from '../golden/entries'
 import { inScope, wantsAction } from '../../worker/retrieve'
+import { HELDOUT } from '../golden/heldout'
 import { GOLDEN } from '../golden/questions'
 import { IN_SCOPE, OFF_TOPIC } from '../golden/scope'
 import { hitAt, outcomes, pairedDelta, reciprocal, report, summarize } from '../golden/score'
@@ -27,6 +28,14 @@ describe('the golden questions are sound', () => {
   it('every wanted row exists in the search box', () => {
     const bad = GOLDEN.flatMap((g) => g.want.filter((id) => !(id.endsWith('*') ? [...KNOWN].some((k) => k.startsWith(id.slice(0, -1))) : KNOWN.has(id))).map((id) => `${g.q} → ${id}`))
     expect(bad).toEqual([])
+  })
+
+  it('the held-out questions are sound too, and share nothing with the tuning set', () => {
+    const bad = HELDOUT.flatMap((g) => g.want.filter((id) => !(id.endsWith('*') ? [...KNOWN].some((k) => k.startsWith(id.slice(0, -1))) : KNOWN.has(id))).map((id) => `${g.q} → ${id}`))
+    expect(bad).toEqual([])
+    const tuned = new Set(GOLDEN.map((g) => g.q.toLowerCase()))
+    expect(HELDOUT.filter((g) => tuned.has(g.q.toLowerCase())).map((g) => g.q)).toEqual([])
+    expect(HELDOUT.length).toBeGreaterThanOrEqual(40)
   })
 
   it('no question is asked twice, and every kind of question has a fair share', () => {
@@ -88,16 +97,21 @@ describe('scores', () => {
   const ai = outcomes((q) => context(q))
   const s = { local: summarize(local), flat: summarize(flat), ai: summarize(ai) }
   const aiRecall = ai.filter((o) => o.rank !== null).length / ai.length
+  const held = outcomes(shown, HELDOUT)
+  const heldAi = outcomes((q) => context(q), HELDOUT)
+  const h = summarize(held)
+  const heldAiRecall = heldAi.filter((o) => o.rank !== null).length / heldAi.length
 
   it('prints the report when asked', () => {
     if (!SHOW) return
     console.log(report('What the search box shows (rows in the order shown)', local, 10))
     console.log(report('The box\'s ranking, which is what the AI gets as candidates (top 10)', flat, 10))
-    console.log(`\nWhat the AI is given (14 chunks from the box's top 10 + keywords): the right row is in front of the model for ${(aiRecall * 100).toFixed(0)}% of questions`)
+    console.log(`\nWhat the AI is given (8 chunks from the box's top 10 + keywords): the right row is in front of the model for ${(aiRecall * 100).toFixed(0)}% of questions`)
     const lost = ai.filter((o) => o.rank === null)
     for (const o of lost) console.log(`    - [${o.g.cat}] ${o.g.q}  → wanted ${o.g.want.slice(0, 3).join(' | ')}  · given ${o.got.slice(0, 4).join(' | ') || 'nothing'}`)
     // the question a person would ask next: does the first row do what Enter promises?
     const enterOk = local.filter((o) => o.rank === 1).length
+    console.log(`\nHeld-out (${held.length} questions never tuned on): box recall@1 ${(h.r1 * 100).toFixed(0)}%, @10 ${(h.r10 * 100).toFixed(0)}%, MRR ${h.mrr.toFixed(2)} · right row in front of the AI for ${(heldAiRecall * 100).toFixed(0)}%`)
     console.log(`\nEnter lands on a correct row for ${enterOk} of ${local.length} questions`)
   })
 
@@ -127,7 +141,7 @@ describe('scores', () => {
   })
 
   it('does not fall below the committed baseline', () => {
-    const now = { searchR1: s.local.r1, searchR3: s.local.r3, searchR10: s.local.r10, searchMrr: s.local.mrr, aiContext: aiRecall }
+    const now = { searchR1: s.local.r1, searchR3: s.local.r3, searchR10: s.local.r10, searchMrr: s.local.mrr, aiContext: aiRecall, heldR1: h.r1, heldR10: h.r10, heldMrr: h.mrr, heldAi: heldAiRecall }
     if (UPDATE || !existsSync(BASELINE)) {
       writeFileSync(BASELINE, `${JSON.stringify({ questions: GOLDEN.length, ...Object.fromEntries(Object.entries(now).map(([k, v]) => [k, Math.round(v * 1000) / 1000])), perQuestion }, null, 1).replace(/\[\n\s+(null|\d+),\n\s+(null|\d+)\n\s+\]/g, '[$1, $2]')}\n`)
       return

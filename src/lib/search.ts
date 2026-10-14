@@ -25,6 +25,8 @@ export interface Hit<T extends Doc = Doc> {
   score: number
   /** [start, end) ranges of the title to highlight */
   marks: [number, number][]
+  /** every word of the query matched (not just most of them) */
+  complete?: boolean
 }
 
 /** Lowercase and strip accents without changing the length, so positions in the folded text are positions in the original. */
@@ -69,16 +71,28 @@ const typoBudget = (len: number) => (len >= 8 ? 2 : len >= 4 ? 1 : 0)
 
 interface Field { text: string; words: Word[]; weight: number }
 
-interface Match { score: number; range?: [number, number] }
+interface Match { score: number; range?: [number, number]; /** initials or scattered letters: good enough to list a row, not to call it a full match */ weak?: true }
+
+/** A crude stem: enough to see that "designing", "designs" and "design" are one word, or "videos" and "video". */
+function stemOf(w: string): string {
+  if (w.length <= 3) return w
+  if (w.length >= 6 && w.endsWith('ing')) return w.slice(0, -3)
+  if (w.length >= 5 && w.endsWith('ed')) return w.slice(0, -2)
+  if (w.endsWith('ss')) return w
+  if (/(x|z|ch|sh)es$/.test(w)) return w.slice(0, -2)
+  return w.endsWith('s') ? w.slice(0, -1) : w
+}
 
 /** How well one query word matches one field, and where (for highlighting). */
 function matchToken(t: string, f: Field, isTitle: boolean): Match | null {
   let best: Match | null = null
   const take = (m: Match) => { if (!best || m.score > best.score) best = m }
   const w = f.weight
+  const st = t.length >= 4 ? stemOf(t) : ''
   for (const word of f.words) {
     if (word.text === t) take({ score: 100 * w, range: [word.at, word.at + t.length] })
     else if (word.text.startsWith(t)) take({ score: 80 * w * (t.length >= 3 ? 1 : 0.7), range: [word.at, word.at + t.length] })
+    else if (st && stemOf(word.text) === st) take({ score: 90 * w, range: [word.at, word.at + word.text.length] })
     else if (t.length >= 3) {
       const i = word.text.indexOf(t)
       if (i > 0) take({ score: 42 * w, range: [word.at + i, word.at + i + t.length] })
@@ -95,12 +109,12 @@ function matchToken(t: string, f: Field, isTitle: boolean): Match | null {
   if (best) return best
   if (isTitle && t.length >= 2 && f.words.length >= 2) {
     const initials = f.words.map((x) => x.text[0]).join('')
-    if (initials.startsWith(t) || initials.includes(t)) return { score: 52 * w }
+    if (initials.startsWith(t) || initials.includes(t)) return { score: 52 * w, weak: true }
   }
   if (isTitle && t.length >= 3) {
     let at = 0
     for (const ch of t) { at = f.text.indexOf(ch, at); if (at === -1) return null; at++ }
-    return { score: 20 * w }
+    return { score: 20 * w, weak: true }
   }
   return null
 }
@@ -143,52 +157,129 @@ export function topicWords(query: string): string[] {
   return topic.length >= 2 ? topic : all
 }
 
+/** A row prepared once: its folded fields and the words in them, so typing does not redo that for every row on every key. */
+interface Prepared { title: Field; keys?: Field; sub?: Field; words: Set<string>; stems: Set<string> }
+const PREPARED = new WeakMap<object, Prepared>()
+
+function prepare(item: Doc): Prepared {
+  let p = PREPARED.get(item)
+  if (p && p.title.text === fold(item.title)) return p
+  const title = fold(item.title)
+  const titleWords = wordsOf(title)
+  const field = (text: string, weight: number): Field => ({ text, words: wordsOf(text), weight })
+  p = {
+    // a word in a long sentence says less than one in a short title
+    title: { text: title, words: titleWords, weight: 1 / (1 + 0.035 * Math.max(0, titleWords.length - 4)) },
+    keys: item.keys ? field(fold(item.keys), 0.62) : undefined,
+    sub: item.sub ? field(fold(item.sub), 0.26) : undefined,
+    words: new Set(), stems: new Set(),
+  }
+  for (const f of [p.title, p.keys, p.sub]) for (const w of f?.words ?? []) { p.words.add(w.text); p.stems.add(stemOf(w.text)) }
+  PREPARED.set(item, p)
+  return p
+}
+
+/**
+ * How much a query word should count, from how many rows use it: "rag" (a few rows) says far more than "system" or
+ * "design" (hundreds). BM25's inverse document frequency, scaled so an ordinary word is 1. A word no row uses gets 1
+ * (it is a typo or a half-typed word, and the fuzzy matching decides).
+ */
+function tokenWeight(t: string, prepared: readonly Prepared[]): number {
+  const st = stemOf(t)
+  let df = 0
+  for (const p of prepared) if (p.words.has(t) || p.stems.has(st)) df++
+  if (!df) return 1
+  const n = prepared.length
+  const idf = Math.log(1 + (n - df + 0.5) / (df + 0.5))
+  return Math.min(1.5, Math.max(0.3, idf / Math.log(1 + n / 10)))
+}
+
+// Words that say the person wants a video or a doc: only then do links compete with the plan's own rows.
+const LINK_WORDS = new Set(['video', 'videos', 'watch', 'youtube', 'doc', 'docs', 'documentation', 'read', 'article', 'articles', 'blog', 'blogs', 'link', 'links', 'tutorial', 'tutorials', 'course', 'lecture', 'talk', 'resource', 'resources'])
+/** Videos and docs are reference material for a task, not the answer to "design a url shortener". */
+const LINK_PENALTY = 0.45
+
+type Intent = 'find' | 'learn' | 'do' | null
+/** What the question is for, from how it starts: a place to go, an idea to read about, or something to do. */
+function intentOf(spoken: readonly string[]): Intent {
+  const q = spoken.join(' ').replace(/^(i (want|need) to|can you|could you|please|let me|help me)\s+/, '')
+  if (/^(where|show me|open|go to|take me|how do i (find|see|open|get to|go to|view|read|check|look))\b/.test(q)) return 'find'
+  if (/^(start|stop|begin|log|record|switch|change|set|turn|toggle|mute|enable|disable|print|refresh|edit|use)\b/.test(q)) return 'do'
+  if (/^(what|explain|how does|how do|how to|why|define|difference|compare)\b/.test(q)) return 'learn'
+  return null
+}
+/** Added to a row's kind weight by intent. A place you can go to beats a sentence that mentions it; an idea beats a page. */
+const INTENT_BONUS: Record<Exclude<Intent, null>, Partial<Record<Kind, number>>> = {
+  find: { page: 40, week: 10, company: 10 },
+  learn: { term: 14, design: 14, task: 6 },
+  do: { action: 50 },
+}
+
+/** Does every word of this (short) title appear in the question, allowing for endings? "uber design" contains "Uber". */
+function nameInQuestion(titleWords: readonly Word[], spokenStems: ReadonlySet<string>): boolean {
+  const words = titleWords.map((w) => w.text).filter((w) => !FILLER.has(w))
+  return words.length > 0 && words.length <= 4 && words.every((w) => spokenStems.has(stemOf(w)) || spokenStems.has(w))
+}
+
 /** Rank `docs` for `query`. An empty query returns nothing: the caller shows suggestions instead. */
 export function search<T extends Doc>(docs: readonly T[], query: string, opts: SearchOptions = {}): Hit<T>[] {
   const spoken = tokenize(query)
   if (!spoken.length) return []
   const tokens = topicWords(query)
   const whole = spoken.join(' ') // a title typed in full still gets its exact-match bonus, filler words and all
+  const prepared = docs.map(prepare)
+  const weights = tokens.map((t) => tokenWeight(t, prepared))
+  const intent = intentOf(spoken)
+  const asksForLinks = !!opts.kinds || spoken.some((t) => LINK_WORDS.has(t))
+  const spokenStems = new Set(spoken.flatMap((t) => [t, stemOf(t)]))
+  const complete = new WeakSet<object>() // hits that matched every word
+  const isLink = (h: Hit<T>) => h.item.kind === 'video' || h.item.kind === 'doc'
   const run = (need: number): Hit<T>[] => {
     const hits: Hit<T>[] = []
-    for (const item of docs) {
-      if (opts.kinds && !opts.kinds.has(item.kind)) continue
-      const title = fold(item.title)
-      const fields: Field[] = [
-        { text: title, words: wordsOf(title), weight: 1 / (1 + 0.035 * Math.max(0, wordsOf(title).length - 4)) }, // a word in a long sentence says less than one in a short title
-        ...(item.keys ? [{ text: fold(item.keys), words: wordsOf(fold(item.keys)), weight: 0.62 }] : []),
-        ...(item.sub ? [{ text: fold(item.sub), words: wordsOf(fold(item.sub)), weight: 0.26 }] : []),
-      ]
+    docs.forEach((item, di) => {
+      if (opts.kinds && !opts.kinds.has(item.kind)) return
+      const p = prepared[di]
+      const fields = [p.title, ...(p.keys ? [p.keys] : []), ...(p.sub ? [p.sub] : [])]
       let score = 0
       let matched = 0
+      let solid = 0 // matches that are not just initials or scattered letters
       let inTitle = 0
       const marks: [number, number][] = []
-      for (const t of tokens) {
+      tokens.forEach((t, ti) => {
         let best: Match | null = null
         let bestField = -1
         fields.forEach((f, i) => { const m = matchToken(t, f, i === 0); if (m && (!best || m.score > best.score)) { best = m; bestField = i } })
         if (best) {
           matched++
-          score += (best as Match).score
+          if (!(best as Match).weak) solid++
+          score += (best as Match).score * weights[ti]
           if (bestField === 0) { inTitle++; const r = (best as Match).range; if (r) marks.push(r) }
         }
-      }
-      if (matched < need) continue
+      })
+      if (matched < need) return
       if (matched < tokens.length) score *= 0.55
-      const joined = wordsOf(title).map((w) => w.text).join(' ')
+      const joined = p.title.words.map((w) => w.text).join(' ')
       if (joined === whole) score += 90
       // the start of a short title is a strong signal; the start of a long sentence (a task) is a weak one
       else if (joined.startsWith(whole)) score += 45 * Math.min(1, Math.max(0.1, (20 / joined.length) ** 1.5))
       if (inTitle === tokens.length) score += 18
-      score += KIND_WEIGHT[item.kind] + (item.boost ?? 0)
+      // a short name that is wholly in the question (a design, a term, a page) is what was meant
+      if (item.kind !== 'task' && item.kind !== 'video' && item.kind !== 'doc' && matched === tokens.length && nameInQuestion(p.title.words, spokenStems)) score += 70
+      score += KIND_WEIGHT[item.kind] + (intent ? (INTENT_BONUS[intent][item.kind] ?? 0) : 0) + (item.boost ?? 0)
       const r = opts.recent?.get(item.id)
       if (r) score += 30 * r
-      hits.push({ item, score, marks: mergeMarks(marks) })
-    }
+      const hit: Hit<T> = { item, score, marks: mergeMarks(marks), complete: solid === tokens.length }
+      if (hit.complete) complete.add(hit)
+      hits.push(hit)
+    })
     return hits
   }
-  let hits = run(tokens.length)
+  // Every word must match, except in a longer question, where all but one (and at least two) is enough: people type
+  // sentences, and one word the plan never uses must not hide the row that answers the rest. Rows missing a word rank lower.
+  let hits = run(tokens.length >= 3 ? Math.max(2, tokens.length - 1) : tokens.length)
   if (!hits.length && tokens.length > 1) hits = run(Math.ceil(tokens.length / 2))
+  // videos and docs follow the plan's own rows, unless nothing of the plan matches every word (or a link was asked for)
+  if (!asksForLinks && hits.some((h) => !isLink(h) && complete.has(h))) for (const h of hits) if (isLink(h)) h.score *= LINK_PENALTY
   hits.sort((a, b) => b.score - a.score || a.item.title.length - b.item.title.length || a.item.title.localeCompare(b.item.title))
   return hits
 }
@@ -215,6 +306,7 @@ export function sections<T extends Doc>(hits: readonly Hit<T>[], per: number | (
   }
   // Enter runs the first row, so the section with the best match comes first. Links that leave the site have to beat
   // your own plan by a clear margin: searching "Networking Essentials" should find the task before the doc it links to.
-  const rank = (s: Section<T>) => s.hits[0].score - (s.key === 'link' ? 160 : 0)
+  const planFull = hits.some((h) => h.item.kind !== 'video' && h.item.kind !== 'doc' && h.complete !== false)
+  const rank = (s: Section<T>) => s.hits[0].score - (s.key === 'link' && planFull ? 160 : 0)
   return out.sort((a, b) => rank(b) - rank(a) || GROUPS.findIndex((g) => g.key === a.key) - GROUPS.findIndex((g) => g.key === b.key))
 }

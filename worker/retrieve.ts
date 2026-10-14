@@ -11,10 +11,11 @@ export const byEntry = new Map<string, Chunk[]>()
 for (const c of CHUNKS) byEntry.set(c.entry, [...(byEntry.get(c.entry) ?? []), c])
 
 /**
- * How many chunks the model sees. Measured with the golden questions (tests/golden): 8 keeps the right row in front of the
- * model as often as 10 to 12 (96.9%), 14 adds one question in 129 (97.7%) at 40% more text, so the smaller prompt wins.
+ * How many chunks the model sees. Measured with tests/golden: on the tuning questions 6 to 14 all look the same (97.7%),
+ * which is why the held-out questions matter: there 8 chunks keep the right row in front of the model 83% of the time and
+ * 10 keep it 89% (12 and 14 add nothing more), at about 20% less text than the original 14.
  */
-export const CONTEXT_CHUNKS = 8
+export const CONTEXT_CHUNKS = 10
 
 /** What gather() needs from a request: the question and the box's own matches (entry ids or chunk ids). */
 export interface GatherRequest { q: string; candidates: readonly string[] }

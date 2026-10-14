@@ -8,8 +8,8 @@ import { GOLDEN, isWanted, type Cat, type Golden } from './questions'
 
 export interface Outcome { g: Golden; /** 1-based position of the first correct row, or null if none is in the list */ rank: number | null; got: string[] }
 
-export function outcomes(rank: (q: string) => string[]): Outcome[] {
-  return GOLDEN.map((g) => {
+export function outcomes(rank: (q: string) => string[], set: readonly Golden[] = GOLDEN): Outcome[] {
+  return set.map((g) => {
     const got = rank(g.q)
     const i = got.findIndex((id) => isWanted(g, id))
     return { g, rank: i === -1 ? null : i + 1, got }

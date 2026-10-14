@@ -83,7 +83,7 @@ describe('what goes to OpenAI', () => {
     expect(u.CONTEXT.some((c) => /idempotency/i.test(c.title))).toBe(true) // found from the words alone, the box sent no candidates (a paraphrase is what Vectorize is for)
     expect(u.ACTIONS).toEqual([])
     expect(Object.keys(u.CONTEXT[0]).sort()).toEqual(['id', 'text', 'title']) // nothing the model does not need
-    expect(u.CONTEXT.length).toBeLessThanOrEqual(8)
+    expect(u.CONTEXT.length).toBeLessThanOrEqual(10)
     expect((sentBody() as unknown as { max_completion_tokens: number }).max_completion_tokens).toBeLessThanOrEqual(600)
   })
 
