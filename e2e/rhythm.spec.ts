@@ -7,8 +7,8 @@ test.describe('Today knows where you are in the 13 weeks', () => {
     await api.onboard()
     await api.activeOn('2026-10-13')
     await openApp(page, '/') // Wednesday 14 Oct, week 1
-    await expect(page.getByTestId('chapter-line')).toHaveText('Chapter 1 of 4 · Foundations · week 1 of 4 · 26 days to the end of it, then Depth.')
-    await expect(page.getByTestId('time-left')).toContainText(/About .* left today \(\d+ tasks?\)\./)
+    await expect(page.getByTestId('chapter-line')).toHaveText('Chapter 1 · Foundations, 26 days left')
+    await expect(page.getByTestId('time-left')).toContainText(/About .* left today/)
   })
 
   test('says "that is enough for today" once the day\'s tasks are ticked, and not before', async ({ page, api }) => {
@@ -18,7 +18,7 @@ test.describe('Today knows where you are in the 13 weeks', () => {
     await expect(page.getByTestId('time-left')).toContainText('left today')
     await api.tick(...plan.tasks.filter((t) => t.week === 1 && t.day === 'Wed' && !t.optional).map((t) => t.id))
     await openApp(page, '/')
-    await expect(page.getByTestId('time-left')).toHaveText('Today’s tasks are done. That is enough for today.')
+    await expect(page.getByTestId('time-left')).toContainText('Today’s tasks are done. That is enough for today.')
   })
 
   test('a light day does not show a time-left figure (the small version is the whole ask)', async ({ page, api }) => {

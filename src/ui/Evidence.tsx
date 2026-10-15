@@ -25,7 +25,7 @@ export function EvidenceStrip() {
           {algotracker.value.status === 'loading' ? 'Reading…' : 'Refresh'}
         </button>
       </div>
-      <div class="evidence">
+      <div class="evidence evidence--rows">
         {items.map(([n, label, href]) => (
           <a key={label} href={href} data-zero={n === 0 ? 'true' : undefined}><strong>{n}</strong><span>{label}</span></a>
         ))}

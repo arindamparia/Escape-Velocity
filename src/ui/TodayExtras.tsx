@@ -6,7 +6,6 @@ import { coreTasks, tasksOn } from '../lib/today'
 import { Html } from './Html'
 import { Icon } from './Icon'
 import { usePage } from './hooks'
-import { EquationCard } from './Equation'
 import { EvidenceStrip } from './Evidence'
 import type { WeekChunk } from '../../shared/plan-types'
 import type { PlanDay } from '../../shared/plan-types'
@@ -94,8 +93,8 @@ export function MiniTimeline({ week }: { week: number }) {
 }
 
 
-/** The right-hand column of Today: how far you have come, this week's maths, the week's star map. */
-export default function TodayAside({ week, chunk, during }: { week: number; chunk: WeekChunk | null; during: boolean }) {
+/** The right-hand column of Today: how far you have come, and the week's star map. (The week's equation is a task in the list, and the bonus one is in the Optional fold: it is no longer shown a third time here.) */
+export default function TodayAside({ week }: { week: number; chunk?: WeekChunk | null; during?: boolean }) {
   const [showSky, setShowSky] = useState(false)
   useEffect(() => {
     const idle = (cb: () => void) => ('requestIdleCallback' in window ? window.requestIdleCallback(cb) : setTimeout(cb, 120))
@@ -104,7 +103,6 @@ export default function TodayAside({ week, chunk, during }: { week: number; chun
   return (
     <>
       <EvidenceStrip />
-      {during ? <EquationCard week={week} chunk={chunk} compact /> : null}
       <section class="card" aria-label="Constellation">
         <p class="eyebrow">This week’s constellation</p>
         <div style="aspect-ratio:16/10">{showSky ? <ErrorBoundary onError={(e) => console.error(e)}><Constellation week={week} /></ErrorBoundary> : <div class="sky" />}</div>

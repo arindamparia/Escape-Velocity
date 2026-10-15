@@ -140,14 +140,24 @@ function Related({ task }: { task: PlanTask }) {
   return <p class="small related" aria-label="Related">{links.map(([label, href], i) => <>{i ? ' · ' : ''}<a key={href} href={href}>{label}</a></>)}</p>
 }
 
-export function TaskRow({ task, chunk, focused = false, actions = true, inWeek = false }: { task: PlanTask; chunk: WeekChunk | null; focused?: boolean; actions?: boolean; /** link the label to the task in its week (on Today; the week page is already there) */ inWeek?: boolean }) {
+/**
+ * One task. On Today it is `compact`: the tick, what it is, two lines of its text, ONE small action, and "Details" for everything
+ * else (links, study material, the other actions). The next-up card above already has the full version of the task to do now.
+ * On the week page it is the full row. `plain` shows the full text even when the task was planned for a light day (a task
+ * that is waiting from a Puja day is no longer being done on one).
+ */
+export function TaskRow({ task, chunk, focused = false, actions = true, inWeek = false, compact = false, plain = false }: { task: PlanTask; chunk: WeekChunk | null; focused?: boolean; actions?: boolean; /** link the label to the task in its week (on Today; the week page is already there) */ inWeek?: boolean; compact?: boolean; plain?: boolean }) {
+  const [open, setOpen] = useState(false)
   const done = engine.doneSet.value.has(task.id)
   const entry = chunk?.tasks[task.id]
   const list = actions && !done ? actionsFor(task, chunk) : []
+  const primary = list.find((a) => a.primary) ?? list[0]
   const pick = task.type === 'design2' ? pickedDesign(task.id) : undefined
-  const lightHere = !!task.hasLight && onLightDay(task)
+  const lightHere = !plain && !!task.hasLight && onLightDay(task)
+  const folded = compact && !open
+  const detailsId = `d-${task.id}`
   return (
-    <li class={`task${task.type === 'rest' ? ' task--rest' : ''}`} data-done={done} data-focus={focused} data-task={task.id}>
+    <li class={`task${task.type === 'rest' ? ' task--rest' : ''}${folded ? ' task--compact' : ''}`} data-done={done} data-focus={focused} data-task={task.id}>
       <TaskCheck task={task} />
       <div>
         <div class="task__meta">
@@ -158,26 +168,41 @@ export function TaskRow({ task, chunk, focused = false, actions = true, inWeek =
           <span class="task__pts" title="points">+{task.points}</span>
         </div>
         {entry && lightHere && entry.light ? (
-          <>
+          folded ? (
             <div class="task__light"><span class="chip chip--accent"><Icon name="moon" /> Light version</span> <Html class="task__text" html={entry.light} inline /></div>
-            <details class="task__full"><summary class="small">Full version</summary><Html class="task__text small" html={entry.html} inline /></details>
-          </>
+          ) : (
+            <>
+              <div class="task__light"><span class="chip chip--accent"><Icon name="moon" /> Light version</span> <Html class="task__text" html={entry.light} inline /></div>
+              <details class="task__full"><summary class="small">Full version</summary><Html class="task__text small" html={entry.html} inline /></details>
+            </>
+          )
         ) : entry ? <Html class="task__text" html={entry.html} inline /> : <span class="task__text muted">…</span>}
-        {task.type === 'boss' ? <BossHow /> : null}
-        <Related task={task} />
-        {task.type === 'capstone' && entry ? <CapstoneLinks taskId={task.id} text={entry.text} /> : null}
-        <StudyPanel items={chunk?.resources?.[task.id]} design={task.type === 'design' || task.type === 'design2'} />
         <DsaProgress task={task} locked={engine.autoDoneSet.value.has(task.id)} />
-        {pick ? <div class="small muted">Your pick: <strong>{chunk?.designs[pick]?.name ?? pick}</strong></div> : null}
-        {list.length ? (
-          <div class="task__actions">
-            {list.map((a) => (
-              <button type="button" key={a.label} class={`btn btn--small${a.primary ? ' btn--primary' : ''}`} onClick={a.run}>
-                {a.label}
-              </button>
-            ))}
+        {!folded ? (
+          <div id={detailsId}>
+            {task.type === 'boss' ? <BossHow /> : null}
+            <Related task={task} />
+            {task.type === 'capstone' && entry ? <CapstoneLinks taskId={task.id} text={entry.text} /> : null}
+            <StudyPanel items={chunk?.resources?.[task.id]} design={task.type === 'design' || task.type === 'design2'} />
+            {pick ? <div class="small muted">Your pick: <strong>{chunk?.designs[pick]?.name ?? pick}</strong></div> : null}
+            {list.length ? (
+              <div class="task__actions">
+                {list.map((a) => (
+                  <button type="button" key={a.label} class={`btn btn--small${a.primary ? ' btn--primary' : ''}`} onClick={a.run}>
+                    {a.label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </div>
         ) : null}
+        {compact ? (
+          <div class="task__actions task__actions--compact">
+            {folded && primary && task.type !== 'design2' ? <button type="button" class={`btn btn--small${primary.primary ? ' btn--primary' : ''}`} onClick={primary.run}>{primary.label}</button> : null}
+            <button type="button" class="task__more" aria-expanded={open} aria-controls={detailsId} onClick={() => setOpen(!open)}>{open ? 'Less' : 'Details'}</button>
+          </div>
+        ) : null}
+        {pick && folded ? <div class="small muted">Your pick: <strong>{chunk?.designs[pick]?.name ?? pick}</strong></div> : null}
       </div>
     </li>
   )

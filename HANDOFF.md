@@ -2,6 +2,17 @@
 
 Status at the end of the third session. Read `CLAUDE.md` first, then `AUDIT.md` (the build checked against every section of the plan), then the plan itself (`plan/escape-velocity-plan.md`, Part 1).
 
+## Today made calm (15 Oct 2026)
+
+Today was 2,720 px tall on a desktop and 5,600 px on a phone, with every task fully open, three copies of the week's maths and a block of zero tiles. Now (normal weekday) it is about 1,590 px and 3,100 px:
+
+- One status line under the title (points, chapter and days left, time left today) instead of four; your why is one line with Edit; on a phone the next action comes straight after the heading.
+- Tasks on Today are short lines with one small action and a **Details** toggle (links, study material, the other actions). The next-up card is still the full version of the task to do now.
+- "Waiting for you (n)", "Optional" (bonus equation, Friday paper) and "This week, any day" are folded lines of the same look; the any-day one stays open while something core is undone. Waiting shows the full text, never a "Light version" chip for a Puja-week task.
+- Removed the duplicate "Equation of the week" card from the side column (the week's equation is a task in the list); the progress tiles became a quiet list; "Only have a little time?" is a line, not a card.
+- **Show everything** (bottom of Today, remembered on this device) brings back every row open, as before.
+- `e2e/today-calm.spec.ts` holds the height budget so it cannot creep back. Playwright's browser had to be reinstalled on this machine (the cache was gone), so the screenshot baselines were regenerated.
+
 ## Cabin: the focus sound reworked (15 Oct 2026)
 
 The focus sound is now **Cabin**, and every sound has a proper name: Engine hum, Cabin air, Monsoon, Ridge wind, Tide (new: generated waves), Forest, and **My sound** (a pasted link you can rename). The names are in one file (`src/tools/sound/catalog.ts`, the `BRAND` constant and `SOUNDS`), so renaming any of them is one edit; the saved ids did not change, so your choice survived.

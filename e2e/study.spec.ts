@@ -44,6 +44,7 @@ test('Study links lists the channels and every week, and the Library tab shows t
 test('the Next up card on Today carries the Study links of its task', async ({ page, api }) => {
   await api.onboard()
   await api.tick('w01-06') // Wednesday's DSA is done, so the next task is the night's Networking Essentials
+  await api.activeOn('2026-10-13') // yesterday had work, so today is not the welcome-back screen (a tick is dated by the real clock, not the fixed one)
   await openApp(page, '/')
   const hero = page.getByRole('region', { name: 'Next up' })
   await expect(hero.locator('details.study summary')).toContainText(/video/)

@@ -16,22 +16,24 @@ import { TYPE_LABEL } from './Task'
 const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`
 const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1).trimEnd()}…` : s)
 
-/** Under the weekly points: the chapter, and what is left of today. */
-export function RhythmLine({ date, week, dow, done, light, welcomeBack }: { date: string; week: number; dow: number; done: ReadonlySet<string>; light: boolean; welcomeBack: boolean }) {
+/**
+ * The one line under the title: this week's points, the chapter you are in, and what is left of today. It replaces what used to
+ * be four separate lines. Each part is a plain fact (nothing invented); on a light day there is no time-left figure.
+ */
+export function StatusLine({ date, week, dow, done, light, welcomeBack, points, target, streak }: { date: string; week: number; dow: number; done: ReadonlySet<string>; light: boolean; welcomeBack: boolean; points: number; target: number | null; streak: number }) {
   const c = chapterNow(date)
   const planned = coreTasks(tasksOn(week, DOW_NAMES[dow])).filter((t) => t.type !== 'rest')
   const left = leftToday(week, dow, done)
   return (
-    <div class="rhythm small muted" style="margin-top:0.35rem">
-      <p class="m0" data-testid="chapter-line">
-        <a href="/weeks" title={c.chapter.line}>Chapter {c.chapter.n} of 4 · {c.chapter.name}</a> · week {c.weekInChapter} of {c.weeks} · {c.daysLeft === 1 ? 'the last day of it' : `${c.daysLeft} days to the end of it`}{c.next ? `, then ${c.next.name}` : ', then you apply'}.
-      </p>
+    <p class="status muted" data-testid="status">
+      {dow === 0 ? <strong>New week, new constellation. </strong> : null}
+      <span>{target ? <>{points} of {target} points this week</> : <>{points} points this week, no target (a light week)</>}</span>
+      {streak > 0 ? <span> · {streak}-week streak</span> : null}
+      <span> · <a href="/weeks" title={`${c.chapter.line} Week ${c.weekInChapter} of ${c.weeks}.`} data-testid="chapter-line">Chapter {c.chapter.n} · {c.chapter.name}, {c.daysLeft === 1 ? 'last day' : `${c.daysLeft} days left`}</a></span>
       {!light && !welcomeBack && planned.length ? (
-        <p style="margin:0.15rem 0 0" data-testid="time-left">
-          {left.tasks.length ? <>About {formatMinutes(left.minutes)} left today ({plural(left.tasks.length, 'task')}).</> : <>Today’s tasks are done. That is enough for today.</>}
-        </p>
+        <span data-testid="time-left"> · {left.tasks.length ? <>About {formatMinutes(left.minutes)} left today</> : <>Today’s tasks are done. That is enough for today.</>}</span>
       ) : null}
-    </div>
+    </p>
   )
 }
 
@@ -55,7 +57,7 @@ export function HourBox({ week, dow, done }: { week: number; dow: number; done: 
   const [budget, setBudget] = useState<number>(0)
   const r = budget ? fitInto(budget, week, dow, done) : null
   return (
-    <details class="card hour" data-testid="hour-box">
+    <details class="hour" data-testid="hour-box">
       <summary>Only have a little time?</summary>
       <div class="stack" style="margin-top:0.7rem;gap:0.6rem">
         <div role="group" aria-label="How much time you have" class="row">

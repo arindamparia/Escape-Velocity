@@ -50,12 +50,12 @@ export function EquationCard({ week, chunk, taskId, compact = false }: { week: n
 }
 
 /** The week's bonus equation on Today: its own panel, with the formula in view, what it is worth, and a way in. */
-function BonusPanel({ task, chunk }: { task: { id: string; points: number }; chunk: WeekChunk | null }) {
+export function BonusPanel({ task, chunk }: { task: { id: string; points: number }; chunk: WeekChunk | null }) {
   const done = engine.doneSet.value.has(task.id)
   const name = (chunk?.tasks[task.id]?.text ?? 'Bonus equation').replace(/^Bonus equation:\s*/, '')
   const formula = /<math[\s\S]*?<\/math>/.exec(chunk?.math[task.id] ?? '')?.[0]
   return (
-    <section class="bonus" data-done={done} aria-label="Bonus equation">
+    <section class="bonus" data-done={done} data-task={task.id} aria-label="Bonus equation">
       <div class="bonus__head">
         <span class="bonus__mark" aria-hidden="true"><Icon name="star" /></span>
         <p class="eyebrow m0">Bonus equation</p>

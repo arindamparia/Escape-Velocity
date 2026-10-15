@@ -17,8 +17,10 @@ import { Html } from '../ui/Html'
 import { Icon } from '../ui/Icon'
 import { BossHow } from '../ui/BossHow'
 import { CapstoneLinks } from '../ui/CapstoneLinks'
-import { HourBox, PlanLine, RestNote, RhythmLine, WeekStart } from '../ui/Rhythm'
+import { HourBox, PlanLine, RestNote, StatusLine, WeekStart } from '../ui/Rhythm'
 import { SoundLine } from '../ui/SoundLine'
+import { OptionalBox } from '../ui/Optional'
+import { setShowAll, showAll } from '../lib/todayView'
 import { momentum } from '../lib/rhythm'
 import { StudyPanel } from '../ui/Resources'
 import { actionsFor, labelOf, TaskRow, TYPE_LABEL } from '../ui/Task'
@@ -26,7 +28,7 @@ import { actionsFor, labelOf, TaskRow, TYPE_LABEL } from '../ui/Task'
 const RuleOfTheDay = lazy(() => import('../ui/TodayExtras').then((m) => m.RuleOfTheDay))
 // The right column and the day rail are not needed for the first paint. They are fetched right away and awaited briefly
 // before the first render (see main.tsx), so they usually appear with everything else; their space is reserved.
-const TodayAside = lazyPage(() => import('../ui/TodayExtras'), <div style="min-height:44rem" />)
+const TodayAside = lazyPage(() => import('../ui/TodayExtras'), <div style="min-height:34rem" />)
 const TodayRail = lazyPage<{ week: number; todayName: PlanDay }>(() => import('../ui/TodayExtras').then((m) => ({ default: m.TodayRail })), <div style="min-height:24rem" />)
 export const preloadToday = () => Promise.all([TodayAside.preload(), TodayRail.preload()])
 
@@ -42,18 +44,13 @@ function WhyStrip() {
   const why = whyNote.value
   return (
     <section class="why" aria-label="Your why">
-      <p class="eyebrow">Your why</p>
-      {why.trim() ? (
-        <p style="white-space:pre-wrap;margin-bottom:0.5rem;max-width:72ch">{why}</p>
-      ) : (
-        <p class="muted" style="margin-bottom:0.5rem">Write your why in five lines, in your own words. It’s the first thing Today shows you.</p>
-      )}
+      <span class="eyebrow m0">Your why</span>
+      {why.trim() ? <p class="why__text m0" title={why}>{why}</p> : <p class="why__text muted m0">Write your why in five lines, in your own words. It is the first thing Today shows you.</p>}
       <button type="button" class="btn btn--link small" onClick={() => openOverlay({ kind: 'mywhy' })}>{why.trim() ? 'Edit' : 'Write your why'}</button>
     </section>
   )
 }
 
-/** Study work that is waiting today, one tap away. Shown only when something is due: never a backlog list. */
 function DueToday() {
   const { cards, redraws } = dueSummary(engine.state.value, today.value)
   if (!cards && !redraws) return null
@@ -82,8 +79,8 @@ function Tomorrow({ info }: { info: ReturnType<typeof dayInfo> }) {
   )
 }
 
-/** Tasks from earlier days that are still open. Quiet by design: a few, the most valuable first, and "take one". */
-function Waiting({ week, dow, done }: { week: number; dow: number; done: ReadonlySet<string> }) {
+/** Tasks from earlier days that are still open. Quiet by design: one line until you open it, then a few, most valuable first. */
+function Waiting({ week, dow, done, open }: { week: number; dow: number; done: ReadonlySet<string>; open: boolean }) {
   const list = waitingFor(week, dow, done)
   const current = useWeekChunk(week)
   const previous = useWeekChunk(Math.max(1, week - 1))
@@ -91,10 +88,12 @@ function Waiting({ week, dow, done }: { week: number; dow: number; done: Readonl
   const shown = list.slice(0, 3)
   return (
     <section class="card waiting" aria-label="Waiting for you">
-      <div class="row row--between"><p class="eyebrow m0">Waiting for you</p><span class="small muted">{list.length} in all</span></div>
-      <p class="small muted" style="margin:0.3rem 0 0.7rem">Nothing is lost. Take one when there is room, never all of it.</p>
-      <ul class="tasks">{shown.map((t) => <TaskRow key={t.id} task={t} chunk={t.week === week ? current : previous} inWeek />)}</ul>
-      {list.length > shown.length ? <p class="small" style="margin:0.6rem 0 0"><a href={`/weeks/${week}`}>{list.length - shown.length} more, in the weeks</a></p> : null}
+      <details open={open}>
+        <summary>Waiting for you ({list.length}) <span class="small muted">· from earlier days. Nothing is lost.</span></summary>
+        <p class="small muted" style="margin:0.6rem 0 0.7rem">Take one when there is room, never all of it.</p>
+        <ul class="tasks">{shown.map((t) => <TaskRow key={t.id} task={t} chunk={t.week === week ? current : previous} inWeek compact plain actions={false} />)}</ul>
+        {list.length > shown.length ? <p class="small" style="margin:0.6rem 0 0"><a href={`/weeks/${week}`}>{list.length - shown.length} more, in the weeks</a></p> : null}
+      </details>
     </section>
   )
 }
@@ -253,7 +252,11 @@ export default function Today() {
     )
   }
 
+  const full = showAll.value
   const dayList = todays.filter((t) => t.type !== 'rest' || !light)
+  // the extras (a Friday paper, the bonus equation) have a folded section of their own; the list is the work of the day
+  const mainList = dayList.filter((t) => !t.optional)
+  const weeklyCore = weekly.filter((t) => !t.optional)
   // the any-day list stays open while something in it is still undone (the weekly DSA is already the morning's next action)
   const weeklyOpen = coreTasks(weekly).some((t) => !done.has(t.id) && t.type !== 'dsa')
   // a look ahead, so a Friday paper, a Saturday cold attempt or a Sunday mock never arrives as a surprise
@@ -267,14 +270,7 @@ export default function Today() {
           <p class="eyebrow">{longDate(date)}{info.phase === 'during' ? ` · week ${info.week} of 13` : ''}</p>
           <h1>{info.phase === 'during' ? week.title : 'Escape Velocity'}</h1>
           {isLateNight(Date.now()) ? <p class="small muted" data-testid="late-night">It is past midnight, and this is still {longDate(date)}. The day ends at {DAY_STARTS_HOUR}:00 am, so tonight’s work counts for it.</p> : null}
-          {info.phase === 'during' ? (
-            <p class="muted">
-              {info.dow === 0 ? <strong>New week, new constellation. </strong> : null}
-              {target ? <>{points} of {target} points this week. </> : <>{points} points this week, no target (a light week). </>}
-              {streak > 0 ? <>{streak}-week streak.</> : null}
-            </p>
-          ) : null}
-          {info.phase === 'during' ? <RhythmLine date={date} week={info.week} dow={info.dow} done={done} light={!!info.light} welcomeBack={welcomeBack} /> : null}
+          {info.phase === 'during' ? <StatusLine date={date} week={info.week} dow={info.dow} done={done} light={!!info.light} welcomeBack={welcomeBack} points={points} target={target} streak={streak} /> : null}
           {info.phase === 'during' ? <PlanLine week={info.week} dow={info.dow} /> : null}
           {info.phase === 'during' ? <RestNote m={rhythm} /> : null}
           {info.phase === 'during' && target ? <div class="bar weekbar" role="progressbar" aria-label={`Week ${info.week} points`} aria-valuemin={0} aria-valuemax={target} aria-valuenow={Math.min(points, target)}><i style={{ width: `${Math.min(100, (points / target) * 100)}%` }} /></div> : null}
@@ -284,37 +280,38 @@ export default function Today() {
         {hero}
         {info.phase === 'during' && !light ? <DueToday /> : null}
         {info.phase === 'during' && !welcomeBack ? <WeekStart week={info.week} dow={info.dow} done={done} /> : null}
-        {info.phase === 'during' && !light && !welcomeBack ? <HourBox week={info.week} dow={info.dow} done={done} /> : null}
-
         {info.phase === 'during' ? (
           <section aria-label="Today's tasks">
-            <div class="row row--between" style="margin-bottom:0.6rem">
+            <div class="row row--between" style="margin-bottom:0.4rem">
               <h2 class="m0">Today’s tasks {coreTasks(dayList).length ? <span class="muted small" style="font-weight:400">{coreTasks(dayList).filter((t) => done.has(t.id)).length} of {coreTasks(dayList).length} done</span> : null}</h2>
               {!light && !welcomeBack ? (
                 <button type="button" class="btn btn--small btn--ghost" onClick={() => openOverlay({ kind: 'log', difficulty: 'medium', minimum: true })}>Bad day? Minimum day</button>
               ) : null}
             </div>
+            {!light && !welcomeBack ? <HourBox week={info.week} dow={info.dow} done={done} /> : null}
             {welcomeBack ? (
               <button type="button" class="btn btn--link" onClick={() => navigate(`/weeks/${info.week}`)}>See this week’s plan</button>
-            ) : dayList.length ? (
+            ) : mainList.length ? (
               <ul class="tasks">
-                {dayList.map((t) => <TaskRow key={t.id} task={t} chunk={chunk} focused={focusId.value === t.id} actions={!(heroOffersTask && t.id === next?.id)} inWeek />)}
+                {mainList.map((t) => <TaskRow key={t.id} task={t} chunk={chunk} focused={focusId.value === t.id} actions={!(heroOffersTask && t.id === next?.id)} inWeek compact={!full} />)}
               </ul>
             ) : (
-              <div class="empty">Nothing is scheduled for {info.dayName}. {weekly.length ? 'This week’s open tasks are below.' : ''}</div>
+              <div class="empty">{dayList.length ? 'Nothing else is planned for today.' : `Nothing is scheduled for ${info.dayName}.`} {weeklyCore.length ? 'This week’s open tasks are below.' : ''}</div>
             )}
-            {!welcomeBack && weekly.length ? (
-              <details style="margin-top:1rem" open={dayList.length === 0 || weeklyOpen}>
+            {!welcomeBack && weeklyCore.length ? (
+              <details style="margin-top:1rem" open={full || weeklyOpen}>
                 <summary>This week, any day ({coreTasks(weekly).filter((t) => done.has(t.id)).length} of {coreTasks(weekly).length} done)</summary>
                 <ul class="tasks" style="margin-top:0.6rem">
-                  {weekly.map((t) => <TaskRow key={t.id} task={t} chunk={chunk} focused={focusId.value === t.id} inWeek />)}
+                  {weeklyCore.map((t) => <TaskRow key={t.id} task={t} chunk={chunk} focused={focusId.value === t.id} inWeek compact={!full} />)}
                 </ul>
               </details>
             ) : null}
           </section>
         ) : null}
-        {info.phase === 'during' && !light && !welcomeBack ? <Waiting week={info.week} dow={info.dow} done={done} /> : null}
+        {info.phase === 'during' && !welcomeBack ? <OptionalBox week={info.week} dow={info.dow} chunk={chunk} open={full} /> : null}
+        {info.phase === 'during' && !light && !welcomeBack ? <Waiting week={info.week} dow={info.dow} done={done} open={full || (!mainList.some((t) => !done.has(t.id)) && !(next && heroOffersTask))} /> : null}
         {tomorrow && tomorrow.phase === 'during' ? <Tomorrow info={tomorrow} /> : null}
+        {info.phase === 'during' ? <p class="small muted m0"><button type="button" class="btn btn--link small" aria-pressed={full} onClick={() => setShowAll(!full)}>{full ? 'Back to the calm view' : 'Show everything'}</button> <span>{full ? 'Every task is open, as before.' : 'Tasks are short lines; extras and what is waiting are folded.'}</span></p> : null}
       </div>
 
       <div class="slot-aside">

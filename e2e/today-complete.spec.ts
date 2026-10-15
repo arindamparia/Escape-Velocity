@@ -63,6 +63,7 @@ test.describe('a capstone milestone is linked to what it is about', () => {
     await api.activeOn('2026-11-28'); await api.activeOn('2026-11-29')
     await openApp(page, '/', { at: kolkata('2026-11-29T10:00:00') }) // Sunday of week 7: outbox, payment service, mock provider
     const row = page.locator('[data-task="w07-10"]')
+    if (await row.getByRole('button', { name: 'Details' }).count()) await row.getByRole('button', { name: 'Details' }).click() // the row is a short line until opened
     const links = row.getByTestId('capstone-links').or(page.getByRole('region', { name: 'Next up' }).getByTestId('capstone-links')).first()
     await expect(links).toContainText('steps 4, 5, 6, 7')
     await expect(links.getByRole('link', { name: 'Transactional outbox' })).toHaveAttribute('href', '/guide#outbox')
@@ -100,6 +101,7 @@ test.describe('light days keep going, and a missed day waits for you', () => {
     // the same task in the list shows its light version first, the full one behind a click
     const row = page.locator('[data-task="w01-12"]')
     await expect(row).toContainText('Light version')
+    await row.getByRole('button', { name: 'Details' }).click() // the full version is under the row's details
     await row.locator('summary', { hasText: 'Full version' }).click()
     await expect(row).toContainText('How many base62 characters')
     await h.getByRole('button', { name: 'Done, the small version' }).click()
@@ -118,7 +120,8 @@ test.describe('light days keep going, and a missed day waits for you', () => {
     await openApp(page, '/', { at: kolkata('2026-10-14T10:00:00') }) // Wednesday of week 1: Monday and Tuesday's tasks are still open
     const w = page.getByRole('region', { name: 'Waiting for you' })
     await expect(w).toBeVisible()
-    await expect(w).toContainText('Nothing is lost')
+    await expect(w).toContainText('Nothing is lost') // one line until you open it
+    await w.locator('summary').click()
     await expect(w.locator('[data-task]')).toHaveCount(3) // a few, never the whole list
     await expect(w.locator('[data-task="w01-05"]')).toBeVisible() // Tuesday's Numbers to Know
     await w.locator('[data-task="w01-05"] .task__check').click()

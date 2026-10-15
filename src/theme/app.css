@@ -343,7 +343,6 @@ kbd {
 @media (max-width: 899px) {
   .page--rail-hide > .slot-main > header { order: -2; }
   .page--rail-hide > .slot-main > .hero { order: -1; }
-  .why p { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
 }
 .task__meta { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; margin-bottom: 0.3rem; }
 .task__text { overflow-wrap: anywhere; }
@@ -745,3 +744,33 @@ input[type='range'] { accent-color: var(--accent); }
   .soundmenu { position: static; }
   .soundmenu__panel { position: fixed; left: 0.75rem; right: 0.75rem; top: calc(env(safe-area-inset-top, 0px) + 4rem); width: auto; }
 }
+
+/* ── Today, calmer: a task is a line or two, and its details are one click away ─────────────────────────────────── */
+.task--compact .task__text { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+.task__actions--compact { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.45rem; }
+.task__more { margin-left: auto; min-height: 2rem; padding: 0 0.2rem; border: 0; background: none; color: var(--text-muted); font: inherit; font-size: 0.88rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.task__more:hover { color: var(--text); }
+.status { margin: 0.35rem 0 0; font-size: 0.95rem; }
+.status a { color: inherit; }
+/* your why: one line with the Edit link beside it (the whole text is in the title, and in the dialog) */
+.why { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: baseline; gap: 0.2rem 0.8rem; }
+.why__text { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; line-clamp: 1; overflow: hidden; max-width: none; }
+@media (max-width: 599px) { .why { grid-template-columns: minmax(0, 1fr) auto; } .why .eyebrow { grid-column: 1 / -1; } }
+
+/* the numbers beside what they count, one to a line: a quiet list instead of five tall tiles */
+.evidence--rows { display: grid; grid-template-columns: 1fr; gap: 0.3rem; margin-top: 0.5rem; }
+.evidence--rows a { display: flex; align-items: baseline; gap: 0.7rem; padding: 0.4rem 0.65rem; }
+.evidence--rows a:last-child:nth-child(odd) { grid-column: auto; }
+.evidence--rows strong { display: inline; min-width: 2ch; font-size: 1.15rem; }
+.evidence--rows span { display: inline; margin: 0; font-size: 0.88rem; }
+/* "Only have a little time?" is a quiet line under the heading; its answer opens as a panel */
+.hour { margin: 0 0 0.7rem; }
+.hour > summary { cursor: pointer; font-size: 0.92rem; color: var(--text-muted); text-decoration: underline; text-underline-offset: 3px; width: fit-content; }
+.hour > summary:hover { color: var(--text); }
+.hour > .stack { margin-top: 0.5rem; padding: 0.8rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+/* folded groups: a summary line with its eyebrow and a few words, like a table of contents */
+.card.waiting, .card.optional { padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
+.waiting > details > summary, .optional > details > summary { cursor: pointer; }
+.waiting > details > summary .small, .optional > details > summary .small { font-weight: 400; }
+.waiting > details[open] > summary, .optional > details[open] > summary { margin-bottom: 0.2rem; }
+.card.waiting > details[open] { padding-left: 0.8rem; border-left: 4px solid var(--line); }
