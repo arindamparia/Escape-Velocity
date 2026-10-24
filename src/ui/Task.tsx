@@ -144,7 +144,7 @@ function Related({ task }: { task: PlanTask }) {
  * One task. On Today it is `compact`: the tick, what it is, two lines of its text, ONE small action, and "Details" for everything
  * else (links, study material, the other actions). The next-up card above already has the full version of the task to do now.
  * On the week page it is the full row. `plain` shows the full text even when the task was planned for a light day (a task
- * that is waiting from a Puja day is no longer being done on one).
+ * that is waiting from a festival day is no longer being done on one).
  */
 export function TaskRow({ task, chunk, focused = false, actions = true, inWeek = false, compact = false, plain = false }: { task: PlanTask; chunk: WeekChunk | null; focused?: boolean; actions?: boolean; /** link the label to the task in its week (on Today; the week page is already there) */ inWeek?: boolean; compact?: boolean; plain?: boolean }) {
   const [open, setOpen] = useState(false)

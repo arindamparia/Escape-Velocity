@@ -39,7 +39,7 @@ describe('chapters', () => {
     expect(c.endsOn).toBe(add(START, 27))
     expect(chapterNow(add(START, 27)).daysLeft).toBe(1) // the last day of the chapter
     expect(chapterNow(add(START, 28))).toMatchObject({ weekInChapter: 1, chapter: { name: 'Depth' } })
-    expect(chapterNow('2027-01-10').next).toBeNull()
+    expect(chapterNow('2027-01-24').next).toBeNull()
     expect(chapterNow('2026-09-01').chapter.name).toBe('Foundations') // before the start: the first chapter
   })
 })
@@ -96,7 +96,7 @@ describe('how the weeks have gone', () => {
 })
 
 describe('focus time', () => {
-  const at = (h: number, m = 0) => `2026-10-14T${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00.000Z`
+  const at = (h: number, m = 0) => `2026-10-28T${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00.000Z`
   it('adds up the sessions, and a timer left running counts as four hours at most', () => {
     expect(focusMinutes([{ startedAt: at(1), endedAt: at(1, 25) }, { startedAt: at(3), endedAt: at(3, 45) }])).toBe(70)
     expect(focusMinutes([{ startedAt: at(1), endedAt: at(23) }])).toBe(240)
@@ -130,8 +130,8 @@ describe('a fresh start each week', () => {
 describe('the calendar file', () => {
   it('has one valid event per block, in Kolkata time written as UTC, with a reminder and a link back', async () => {
     const { blocks, buildIcs, utcStamp, DEFAULT_STARTS } = await import('../../src/lib/calendar')
-    expect(utcStamp('2026-10-12', 6 * 60 + 30)).toBe('20261012T010000Z') // 06:30 in Kolkata is 01:00 UTC
-    const ics = buildIcs('https://example.test', DEFAULT_STARTS, new Date('2026-10-14T00:00:00Z'))
+    expect(utcStamp('2026-10-26', 6 * 60 + 30)).toBe('20261026T010000Z') // 06:30 in Kolkata is 01:00 UTC
+    const ics = buildIcs('https://example.test', DEFAULT_STARTS, new Date('2026-10-28T00:00:00Z'))
     const n = blocks().length
     expect(n).toBeGreaterThan(150)
     expect(ics.match(/BEGIN:VEVENT/g)).toHaveLength(n)
@@ -140,9 +140,9 @@ describe('the calendar file', () => {
     expect(ics.endsWith('END:VCALENDAR\r\n')).toBe(true)
     expect(ics).toContain('https://example.test/weeks/1#w01-01')
     expect(ics.split('\r\n').every((l) => new TextEncoder().encode(l).length <= 75)).toBe(true)
-    // the first Monday morning is the week's DSA, at the morning start; a Puja day is a short "light" block
-    expect(blocks()[0]).toMatchObject({ date: '2026-10-12', start: 6 * 60 + 30, minutes: 60 })
-    expect(blocks().some((b) => b.date === '2026-10-19' && b.minutes <= 20)).toBe(true)
+    // the first Monday morning is the week's DSA, at the morning start; a festival day would be a short "light" block (Diwali has no work planned)
+    expect(blocks()[0]).toMatchObject({ date: '2026-10-26', start: 6 * 60 + 30, minutes: 60 })
+    expect(blocks().filter((b) => b.date === '2026-11-08').every((b) => b.minutes <= 20)).toBe(true) // Diwali: nothing, or a short block
     expect(new Set(ics.match(/UID:[^\r]+/g)).size).toBe(n) // every event has its own id
   })
 })

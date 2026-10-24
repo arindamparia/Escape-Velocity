@@ -1,4 +1,5 @@
 import { CalendarExport } from '../ui/CalendarExport'
+import { HistoryCalendar } from '../ui/HistoryCalendar'
 import { Restore } from '../ui/Restore'
 import { useEffect, useState } from 'preact/hooks'
 import type { AiStatus } from '../../shared/ask'
@@ -105,6 +106,7 @@ export default function Settings() {
     <div class="page">
       <div class="slot-main stack">
         <h1>Settings</h1>
+        <HistoryCalendar />
         <section class="card stack" id="theme"><h2>Theme</h2>
           <ThemePicker />
           <p class="small muted m0">Match the monitor mode you’re in: Dark and Light for the BenQ’s coding modes, Paper for its Paper Color or ePaper modes. Paper has no motion, shadows or gradients, and it’s also the print style.</p>

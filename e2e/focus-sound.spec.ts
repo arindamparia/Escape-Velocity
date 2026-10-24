@@ -3,7 +3,7 @@
 import type { Page } from '@playwright/test'
 import { axeSeriousViolations, expect, kolkata, openApp, test } from './support'
 
-const MON = kolkata('2026-10-12T10:00:00')
+const MON = kolkata('2026-10-26T10:00:00')
 
 const STUB = `
 window.__yt = { created: [], calls: [], vols: [], block: !!window.__blockAutoplay, error: 0 };
@@ -47,6 +47,22 @@ test('it is off until chosen: no request to the player, no hidden element, no sp
   await expect(chip(page).getByRole('button', { name: /focus sound/i })).toHaveCount(0)
 })
 
+test('Dawn chorus, Leaf rain and Temple bowls each play their own recording', async ({ page, api }) => {
+  await api.onboard()
+  await stubPlayer(page)
+  const want = { 'Dawn chorus': 'RUuTIx2gSM4', 'Leaf rain': 'Go4YMAws6BU', 'Temple bowls': 'X0JA-XfHi_w' }
+  for (const [name, id] of Object.entries(want)) {
+    await openApp(page, '/settings', { at: MON, ticking: true })
+    await page.getByRole('group', { name: 'Cabin sound' }).getByRole('button', { name: new RegExp(`^${name}`) }).click()
+    await page.goto('/')
+    await startDsaTimer(page)
+    await expect(chip(page)).toHaveAttribute('data-sound', 'playing')
+    expect((await yt(page)).created.at(-1)?.videoId).toBe(id)
+    expect((await page.locator('body').innerText()).toLowerCase()).not.toContain('youtube')
+    await chip(page).getByRole('button', { name: /^Stop/ }).click()
+  }
+})
+
 test('the nature sounds start with the timer, in a hidden player, fade in, and nothing says where they come from', async ({ page, api }) => {
   await api.onboard()
   await stubPlayer(page)
@@ -57,8 +73,9 @@ test('the nature sounds start with the timer, in a hidden player, fade in, and n
   await expect(chip(page)).toHaveAttribute('data-sound', 'playing')
   const y = await yt(page)
   expect(y.created).toHaveLength(1)
-  expect(y.created[0].vars).toMatchObject({ autoplay: 1, controls: 0, listType: 'playlist', list: 'PLlvaRq9tQVPrX_Rg8UOJ73TK8pmsyoHD_', disablekb: 1, playsinline: 1 })
-  expect(y.calls).toEqual(expect.arrayContaining(['loop', 'shuffle', 'play']))
+  expect(y.created[0].videoId).toBe('FxAgAyZYXJ8')
+  expect(y.created[0].vars).toMatchObject({ autoplay: 1, controls: 0, loop: 1, playlist: 'FxAgAyZYXJ8', disablekb: 1, playsinline: 1 })
+  expect(y.calls).toEqual(expect.arrayContaining(['loop', 'play']))
   // hidden: one transparent pixel, out of the accessibility tree and the tab order
   const host = page.locator('#ev-focus-sound')
   await expect(host).toHaveAttribute('aria-hidden', 'true')

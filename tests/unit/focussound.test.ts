@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+import { RECORDINGS } from '../../src/tools/sound/catalog'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fadeLevels } from '../../src/tools/sound/types'
 import { parseStreamLink } from '../../src/tools/sound/stream'
@@ -55,10 +56,15 @@ describe('the settings it keeps', () => {
     const m = await import('../../src/tools/focusSound')
     const labels = m.SOUNDS.map((x) => `${x.name} ${x.kind} ${x.hint}`).join(' ')
     expect(labels).not.toMatch(/youtube|google/i)
-    expect(m.SOUNDS.map((x) => x.id)).toEqual(['off', 'brown', 'pink', 'rain', 'wind', 'ocean', 'nature', 'custom'])
-    expect(m.SOUNDS.map((x) => x.name)).toEqual(['Silence', 'Engine hum', 'Cabin air', 'Monsoon', 'Ridge wind', 'Tide', 'Forest', 'My sound'])
+    expect(m.SOUNDS.map((x) => x.id)).toEqual(['off', 'brown', 'pink', 'rain', 'wind', 'ocean', 'nature', 'birds', 'leafrain', 'bowls', 'custom'])
+    expect(m.SOUNDS.map((x) => x.name)).toEqual(['Silence', 'Engine hum', 'Cabin air', 'Monsoon', 'Ridge wind', 'Tide', 'Forest', 'Dawn chorus', 'Leaf rain', 'Temple bowls', 'My sound'])
     expect(new Set(m.SOUNDS.map((x) => x.name)).size).toBe(m.SOUNDS.length)
-    expect(m.NATURE_LIST).toBe('PLlvaRq9tQVPrX_Rg8UOJ73TK8pmsyoHD_')
+    // every recorded sound has its own recording, a real video id, and no two share one
+    const recorded = m.SOUNDS.filter((x) => x.group === 'recorded')
+    expect(recorded.map((x) => x.id)).toEqual(['nature', 'birds', 'leafrain', 'bowls'])
+    const ids = recorded.map((x) => RECORDINGS[x.id])
+    for (const id of ids) expect(id).toMatch(/^[\w-]{11}$/)
+    expect(new Set(ids).size).toBe(ids.length)
   })
   it('call your own sound whatever you named it, and keep the name short', async () => {
     const m = await import('../../src/tools/focusSound')

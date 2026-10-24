@@ -161,8 +161,8 @@ test.describe('how many server calls does each thing cost', () => {
 
   test('writing your plan for the week is one note: one request to save it, nothing read back', async ({ page, api }) => {
     await api.onboard()
-    await api.activeOn('2026-10-25')
-    await openApp(page, '/', { at: new Date('2026-10-26T04:30:00Z') }) // Monday of week 3
+    await api.activeOn('2026-11-08')
+    await openApp(page, '/', { at: new Date('2026-11-09T04:30:00Z') }) // Monday of week 3
     await page.waitForTimeout(500)
     const w = watch(page)
     const box = page.getByTestId('week-start').locator('textarea')

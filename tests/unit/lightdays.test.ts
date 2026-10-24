@@ -3,14 +3,16 @@ import { plan } from '../../src/lib/plan'
 import { onLightDay, pickLight, taskDate, waitingFor } from '../../src/lib/today'
 
 describe('light days keep a small version, never nothing', () => {
-  it('every task planned for a Puja or Diwali day has a light version', () => {
+  it('every task planned for a festival day has a light version', () => {
+    // Diwali (Sunday 8 Nov) is the Sunday of week 2, which plans no work for that day (Friday to Sunday are catch-up days),
+    // so no task needs a small version today; the rule still holds for any festival day added to the front matter
     const onLight = plan.tasks.filter((t) => t.type !== 'rest' && onLightDay(t))
-    expect(onLight.length).toBeGreaterThanOrEqual(10)
     expect(onLight.filter((t) => !t.hasLight).map((t) => t.id)).toEqual([])
-    // Saturday 17 Oct is the first Puja day, in week 1; Sunday 8 Nov is Diwali, in week 4
-    expect(taskDate(plan.tasks.find((t) => t.id === 'w01-11')!)).toBe('2026-10-17')
-    expect(taskDate(plan.tasks.find((t) => t.id === 'w04-10')!)).toBe('2026-11-08')
-    expect(onLightDay(plan.tasks.find((t) => t.id === 'w01-10')!)).toBe(false) // Friday 16 Oct is a normal day
+    // Saturday 31 Oct is the design day of week 1; Sunday 22 Nov is the boss day of week 4
+    expect(taskDate(plan.tasks.find((t) => t.id === 'w01-11')!)).toBe('2026-10-31')
+    expect(taskDate(plan.tasks.find((t) => t.id === 'w04-10')!)).toBe('2026-11-22')
+    expect(onLightDay(plan.tasks.find((t) => t.id === 'w01-10')!)).toBe(false) // an ordinary Friday
+    expect(onLightDay(plan.tasks.find((t) => t.id === 'w01-11')!)).toBe(false) // and the first Saturday is a normal one
   })
 
   it('offers the lightest undone task, never an extra, and nothing once it is done', () => {

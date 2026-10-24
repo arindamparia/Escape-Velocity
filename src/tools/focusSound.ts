@@ -5,7 +5,7 @@
 // What makes it feel smooth: a new sound fades in while the old one fades out (a crossfade, not a cut); mute survives a
 // switch; the volume ramps instead of jumping; a stream that cannot play falls back to Engine hum and says why.
 import { signal } from '@preact/signals'
-import { BRAND, DEFAULT_CUSTOM_NAME, SOUNDS, soundNameOf, type SourceId } from './sound/catalog'
+import { BRAND, DEFAULT_CUSTOM_NAME, RECORDINGS, SOUNDS, soundNameOf, type SourceId } from './sound/catalog'
 import { noiseSource } from './sound/noise'
 import { parseStreamLink, streamSource } from './sound/stream'
 import type { SoundSource } from './sound/types'
@@ -14,9 +14,6 @@ export { BRAND, SOUNDS, soundNameOf }
 export type { SourceId }
 /** Kept under the old name for the code that lists the choices. */
 export const FOCUS_SOURCES = SOUNDS
-
-/** The playlist behind "Forest". */
-export const NATURE_LIST = 'PLlvaRq9tQVPrX_Rg8UOJ73TK8pmsyoHD_'
 
 export interface FocusSettings { source: SourceId; volume: number; custom: string; customName: string }
 const KEY = 'ev:focus-sound'
@@ -80,7 +77,7 @@ function pick(s: FocusSettings): { key: string; make: () => SoundSource } | null
   switch (s.source) {
     case 'off': return null
     case 'brown': case 'pink': case 'rain': case 'wind': case 'ocean': return { key: s.source, make: () => noiseSource(s.source as 'brown') }
-    case 'nature': return { key: 'nature', make: () => streamSource({ list: NATURE_LIST }) }
+    case 'nature': case 'birds': case 'leafrain': case 'bowls': return { key: s.source, make: () => streamSource({ video: RECORDINGS[s.source] }) }
     case 'custom': {
       const ref = parseStreamLink(s.custom)
       if (!ref) return { key: 'bad-custom', make: () => ({ start: () => Promise.reject(new Error('That link is not a video or playlist link.')), stop() {}, setVolume() {}, mute() {}, dispose() {} }) }
@@ -130,7 +127,7 @@ async function begin(crossfade = false): Promise<void> {
     // a stream that cannot play must not mean silence: say why, and play Engine hum instead
     mine.src.dispose()
     current = null
-    if (s.source === 'nature' || s.source === 'custom') {
+    if (RECORDINGS[s.source] || s.source === 'custom') {
       sessionFallback = true
       soundNotice.value = `${e instanceof Error ? e.message : 'That sound could not play.'} Playing ${soundNameOf('brown')} instead.`
       void begin()

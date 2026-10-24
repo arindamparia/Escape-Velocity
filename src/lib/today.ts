@@ -90,7 +90,8 @@ export function waitingFor(week: number, dow: number, done: ReadonlySet<string>)
   return out.sort((a, b) => b.points - a.points || (a.week ?? 0) - (b.week ?? 0) || a.id.localeCompare(b.id))
 }
 
-const toDay = (iso: string): string | null => {
+/** The plan day (Asia/Kolkata, 04:00 to 03:59) a timestamp belongs to, or null if it is not a time. */
+export const toDay = (iso: string): string | null => {
   const t = Date.parse(iso)
   return Number.isNaN(t) ? null : kolkataToday(t)
 }

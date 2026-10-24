@@ -9,20 +9,21 @@ const START = plan.config.startDate
 const LIGHT = plan.config.lightDays
 
 describe('dayInfo', () => {
-  it('Monday 5 Oct, morning: week 1, Mon', () => {
-    const d = dayInfo('2026-10-12', kolkata('2026-10-12', 7))
+  it('Monday 26 Oct, morning: week 1, Mon', () => {
+    const d = dayInfo('2026-10-26', kolkata('2026-10-26', 7))
     expect(d).toMatchObject({ phase: 'during', week: 1, dow: 0, dayName: 'Mon', block: 'morning' })
     expect(d.light).toBeUndefined()
   })
-  it('flags Puja days as light', () => {
-    expect(dayInfo('2026-10-19').light?.label).toBe('Durga Puja')
+  it('flags Diwali as a light day, and nothing around it', () => {
     expect(dayInfo('2026-11-08').light?.label).toBe('Kali Puja / Diwali')
-    expect(dayInfo('2026-10-16').light).toBeUndefined() // the Friday before is a normal day
-    expect(dayInfo('2026-10-22').light).toBeUndefined()
+    expect(dayInfo('2026-11-08')).toMatchObject({ week: 2, dow: 6, dayName: 'Sun' })
+    expect(dayInfo('2026-11-07').light).toBeUndefined() // the Saturday before is a normal day
+    expect(dayInfo('2026-11-09').light).toBeUndefined()
+    expect(dayInfo('2026-10-31').light).toBeUndefined() // Durga Puja was before the plan started
   })
   it('clamps the week before the start and after the end', () => {
-    expect(dayInfo('2026-10-01')).toMatchObject({ phase: 'before', week: 1 })
-    expect(dayInfo('2027-01-11')).toMatchObject({ phase: 'after', week: 13 })
+    expect(dayInfo('2026-10-15')).toMatchObject({ phase: 'before', week: 1 })
+    expect(dayInfo('2027-01-25')).toMatchObject({ phase: 'after', week: 13 })
   })
 })
 
@@ -58,8 +59,7 @@ describe('the one next action', () => {
     expect(pickNextUp(4, 4, 'night', new Set(['w04-01']))).toBeUndefined()
   })
   it('skips rest tasks, and returns nothing when the day is done', () => {
-    // Fri of week 2 is Puja: its only dated task is a rest task, so the weekly DSA task is all that is left
-    // (the Today view checks for a light day first and shows "Puja mode" instead of any task)
+    // Fri of week 2 has only a rest task dated to it, so the weekly DSA task is all that is left
     expect(pickNextUp(2, 4, 'night', none)?.id).toBe('w02-01')
     expect(pickNextUp(2, 4, 'night', new Set(['w02-01']))).toBeUndefined()
     const allMonday = new Set(['w01-01', 'w01-02', 'w01-03'])
@@ -74,59 +74,59 @@ const problem = (loggedOn: string, difficulty: 'easy' | 'medium' | 'hard' = 'med
 
 describe('missed days and the welcome-back restart', () => {
   it('no history on day 1 or 2 is not "missed"', () => {
-    expect(missedDays(none, '2026-10-12', START, LIGHT)).toBe(0)
-    expect(missedDays(none, '2026-10-13', START, LIGHT)).toBe(0)
+    expect(missedDays(none, '2026-10-26', START, LIGHT)).toBe(0)
+    expect(missedDays(none, '2026-10-27', START, LIGHT)).toBe(0)
   })
   it('one missed day is not a backlog; two or more triggers the restart', () => {
-    const act = new Set(['2026-10-13'])
-    expect(missedDays(act, '2026-10-14', START, LIGHT)).toBe(0)
-    expect(missedDays(act, '2026-10-15', START, LIGHT)).toBe(1)
-    expect(missedDays(act, '2026-10-16', START, LIGHT)).toBe(2)
-    expect(missedDays(act, '2026-10-19', START, LIGHT)).toBe(3) // 17 and 18 Oct are Puja: only the 14th to 16th count
+    const act = new Set(['2026-10-27'])
+    expect(missedDays(act, '2026-10-28', START, LIGHT)).toBe(0)
+    expect(missedDays(act, '2026-10-29', START, LIGHT)).toBe(1)
+    expect(missedDays(act, '2026-10-30', START, LIGHT)).toBe(2)
+    expect(missedDays(new Set(['2026-11-05']), '2026-11-09', START, LIGHT)).toBe(2) // the 6th and 7th; Diwali (the 8th) is skipped, not counted
   })
   it('work done on a light day ends the run of missed days (a light day is kept light, not skipped)', () => {
-    expect(missedDays(new Set(['2026-10-17']), '2026-10-22', START, LIGHT)).toBe(0) // Saturday 17 Oct was a light day, and something was done
+    expect(missedDays(new Set(['2026-11-08']), '2026-11-09', START, LIGHT)).toBe(0) // Sunday 8 Nov was Diwali, and something was done
   })
   it('light days never count as missed', () => {
-    const act = new Set(['2026-10-16'])
-    expect(missedDays(act, '2026-10-22', START, LIGHT)).toBe(0) // 17 to 21 Oct is Puja
-    expect(missedDays(act, '2026-10-23', START, LIGHT)).toBe(1)
+    const act = new Set(['2026-11-07'])
+    expect(missedDays(act, '2026-11-09', START, LIGHT)).toBe(0) // yesterday was Diwali: it is skipped, and the day before had work
+    expect(missedDays(act, '2026-11-10', START, LIGHT)).toBe(1)
   })
   it('a minimum day (one problem) counts as active', () => {
-    const act = activityDates(stateWith({ problemLog: [problem('2026-10-15')] }))
-    expect(missedDays(act, '2026-10-16', START, LIGHT)).toBe(0)
+    const act = activityDates(stateWith({ problemLog: [problem('2026-10-29')] }))
+    expect(missedDays(act, '2026-10-30', START, LIGHT)).toBe(0)
   })
   it('counts ticks by their plan day: after midnight is still the day before, from 04:00 it is the next', () => {
-    const late = activityDates(stateWith({ taskProgress: [{ taskId: 'w01-01', done: true, doneAt: '2026-10-12T19:00:00.000Z', updatedAt: '' }] }))
-    expect(late.has('2026-10-12')).toBe(true) // 00:30 on the 6th in Kolkata: the 5th's late night
-    expect(late.has('2026-10-13')).toBe(false)
-    const morning = activityDates(stateWith({ taskProgress: [{ taskId: 'w01-01', done: true, doneAt: '2026-10-12T22:30:00.000Z', updatedAt: '' }] }))
-    expect(morning.has('2026-10-13')).toBe(true) // 04:00 on the 6th
+    const late = activityDates(stateWith({ taskProgress: [{ taskId: 'w01-01', done: true, doneAt: '2026-10-26T19:00:00.000Z', updatedAt: '' }] }))
+    expect(late.has('2026-10-26')).toBe(true) // 00:30 on the 6th in Kolkata: the 5th's late night
+    expect(late.has('2026-10-27')).toBe(false)
+    const morning = activityDates(stateWith({ taskProgress: [{ taskId: 'w01-01', done: true, doneAt: '2026-10-26T22:30:00.000Z', updatedAt: '' }] }))
+    expect(morning.has('2026-10-27')).toBe(true) // 04:00 on the 6th
   })
 })
 
 describe('kind streaks', () => {
   it('counts weeks with at least 3 active days, and the week in progress never breaks it', () => {
-    const w1 = ['2026-10-12', '2026-10-13', '2026-10-15']
-    const w2 = ['2026-10-19', '2026-10-20', '2026-10-21']
-    expect(streakWeeks(new Set([...w1, ...w2]), '2026-10-26', START)).toBe(2) // week 3 only just started
-    expect(streakWeeks(new Set([...w1, ...w2, '2026-10-26', '2026-10-27', '2026-10-28']), '2026-10-29', START)).toBe(3)
+    const w1 = ['2026-10-26', '2026-10-27', '2026-10-29']
+    const w2 = ['2026-11-02', '2026-11-03', '2026-11-04']
+    expect(streakWeeks(new Set([...w1, ...w2]), '2026-11-09', START)).toBe(2) // week 3 only just started
+    expect(streakWeeks(new Set([...w1, ...w2, '2026-11-09', '2026-11-10', '2026-11-11']), '2026-11-12', START)).toBe(3)
   })
   it('a week with fewer than 3 active days ends the streak', () => {
-    const w1 = ['2026-10-12', '2026-10-13', '2026-10-15']
-    const w2 = ['2026-10-19', '2026-10-20']
-    const w3 = ['2026-10-26', '2026-10-27', '2026-10-28']
-    expect(streakWeeks(new Set([...w1, ...w2, ...w3]), '2026-10-30', START)).toBe(1)
+    const w1 = ['2026-10-26', '2026-10-27', '2026-10-29']
+    const w2 = ['2026-11-02', '2026-11-03']
+    const w3 = ['2026-11-09', '2026-11-10', '2026-11-11']
+    expect(streakWeeks(new Set([...w1, ...w2, ...w3]), '2026-11-13', START)).toBe(1)
   })
 })
 
 describe('evidence and constellations', () => {
   it('counts only no-AI mediums and hards, and owned designs', () => {
     const s = stateWith({
-      problemLog: [problem('2026-10-12'), problem('2026-10-12', 'medium', false), problem('2026-10-13', 'hard'), problem('2026-10-13', 'easy')],
+      problemLog: [problem('2026-10-26'), problem('2026-10-26', 'medium', false), problem('2026-10-27', 'hard'), problem('2026-10-27', 'easy')],
       designStatus: [
-        { designId: 'bitly', status: 'redrawn-2', attemptedOn: '2026-10-17', drawingUrl: null, updatedAt: '' },
-        { designId: 'dropbox', status: 'redrawn-1', attemptedOn: '2026-10-17', drawingUrl: null, updatedAt: '' },
+        { designId: 'bitly', status: 'redrawn-2', attemptedOn: '2026-10-31', drawingUrl: null, updatedAt: '' },
+        { designId: 'dropbox', status: 'redrawn-1', attemptedOn: '2026-10-31', drawingUrl: null, updatedAt: '' },
       ],
       flashcards: [
         { cardId: 'w01-05', box: 4, dueOn: '', reviews: 4, lastGrade: 'good', updatedAt: '' },

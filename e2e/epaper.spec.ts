@@ -54,15 +54,15 @@ test.describe('told apart without colour', () => {
 
   test('today, an ordinary day and a light day differ by border width, weight, icon and word', async ({ page, api }) => {
     await api.onboard()
-    // Friday 16 Oct: Thursday is an ordinary day, Saturday starts Durga Puja
-    await openApp(page, '/', { at: kolkata('2026-10-16T10:00:00'), theme: 'paper' })
-    await api.activeOn('2026-10-15')
+    // Saturday 7 Nov: Friday is an ordinary day, Sunday is Diwali, a light day
+    await openApp(page, '/', { at: kolkata('2026-11-07T10:00:00'), theme: 'paper' })
+    await api.activeOn('2026-11-06')
     const rail = page.locator('.dayrail')
     const style = (name: string) => rail.locator('a', { hasText: name }).first().evaluate((e) => {
       const cs = getComputedStyle(e)
       return { width: cs.borderTopWidth, style: cs.borderTopStyle, weight: Number(cs.fontWeight), text: e.textContent ?? '', moon: !!e.querySelector('use[href="#i-moon"]') }
     })
-    const [today, ordinary, light] = [await style('Fri'), await style('Thu'), await style('Sat')]
+    const [today, ordinary, light] = [await style('Sat'), await style('Fri'), await style('Sun')]
     expect(today).toMatchObject({ width: '2px', style: 'solid' })
     expect(today.weight).toBeGreaterThanOrEqual(600)
     expect(today.text).toContain('Today')

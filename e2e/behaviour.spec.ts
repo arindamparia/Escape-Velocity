@@ -103,8 +103,8 @@ test.describe('themes', () => {
 test.describe('the timer', () => {
   test('stores a start time: it survives a reload and a long sleep, then runs out, offers to log the problem, and records the session', async ({ page, api }) => {
     await api.onboard()
-    await api.activeOn('2026-10-13')
-    await openApp(page, '/', { at: kolkata('2026-10-14T10:00:00'), ticking: true })
+    await api.activeOn('2026-10-27')
+    await openApp(page, '/', { at: kolkata('2026-10-28T10:00:00'), ticking: true })
     await page.getByRole('button', { name: /Start 25-min timer/ }).first().click()
     const card = page.locator('header.topbar').getByRole('group', { name: 'Timer in the top bar' })
     await expect(card.getByRole('timer')).toHaveText(/^2[45]:\d\d$/)
@@ -124,7 +124,7 @@ test.describe('the timer', () => {
     await expect(dialog.getByRole('button', { name: 'medium' })).toHaveAttribute('aria-pressed', 'true')
     await dialog.getByRole('button', { name: 'Log it', exact: true }).click()
     // the problem seeded for 6 Oct, and the one just logged: 25 minutes, dated 7 Oct in Kolkata
-    await expect.poll(async () => (await api.state()).problemLog.map((p) => [p.difficulty, p.minutes, p.loggedOn])).toEqual([['medium', 20, '2026-10-13'], ['medium', 25, '2026-10-14']])
+    await expect.poll(async () => (await api.state()).problemLog.map((p) => [p.difficulty, p.minutes, p.loggedOn])).toEqual([['medium', 20, '2026-10-27'], ['medium', 25, '2026-10-28']])
     expect((await api.state()).sessions).toHaveLength(1)
     expect((await api.state()).sessions[0]).toMatchObject({ kind: 'dsa', plannedMin: 25 })
   })
@@ -132,7 +132,7 @@ test.describe('the timer', () => {
   test('a boss problem runs 40 minutes and then keeps counting up, with no guilt', async ({ page, api }) => {
     await api.onboard()
     const boss = firstTask('boss')
-    await openApp(page, `/weeks/${boss.week}`, { at: kolkata('2026-10-18T10:00:00'), ticking: true })
+    await openApp(page, `/weeks/${boss.week}`, { at: kolkata('2026-11-01T10:00:00'), ticking: true })
     await taskRow(page, boss.id).getByRole('button', { name: /Start 40-min timer/ }).click()
     const card = page.locator('header.topbar').getByRole('group', { name: 'Timer in the top bar' })
     await page.clock.fastForward('45:00')

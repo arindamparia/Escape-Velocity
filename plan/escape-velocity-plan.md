@@ -3,14 +3,13 @@ title: Escape Velocity
 subtitle: From "I feel mediocre" to SDE-2 interviews at Indian fintech
 tagline: 13 weeks. 42 designs. One jump.
 owner: Arindam
-start_date: 2026-10-12
-end_date: 2027-01-10
-applications_from: 2027-01-11
+start_date: 2026-10-26
+end_date: 2027-01-24
+applications_from: 2027-01-25
 weeks: 13
 hours_per_week: 15
 weekly_points_target: 50
 light_days:
-  - { from: 2026-10-17, to: 2026-10-21, label: "Durga Puja" }
   - { date: 2026-11-08, label: "Kali Puja / Diwali" }
 ---
 
@@ -116,7 +115,7 @@ When a task appears on Today or in week detail, its type decides what opens next
 
 ### First run
 
-Shown once: a one-screen welcome with "Why this plan", a field for your why note (skippable, prompted again on Mon 12 Oct night as task `w01-02`), and the theme picker. Then straight to Today.
+Shown once: a one-screen welcome with "Why this plan", a field for your why note (skippable, prompted again on Mon 26 Oct night as task `w01-02`), and the theme picker. Then straight to Today.
 
 ## 3. Pages
 
@@ -468,7 +467,7 @@ These pairs were checked: text contrast is at least 14:1 in Dark and Light, mute
   - Minimum day: "One problem. Still counts. Tomorrow's you says thanks."
   - Boss problem: "Boss defeated."
   - Sunday: "Redraw time. Let's see what stuck."
-  - Light day: "Puja mode. The stars will wait."
+  - Light day: "Festival mode. The stars will wait."
   - Welcome back: "No backlog here. Ten minutes and you're back."
   - Plan complete: "13 constellations. Go collect offers."
 - **Keyboard:** `j`/`k` move, `x` ticks, `s` starts the task's tool, `t` jumps to today, `⌘K` palette, `1` to `4` themes, `?` shortcuts.
@@ -533,7 +532,7 @@ These pairs were checked: text contrast is at least 14:1 in Dark and Light, mute
 - [ ] An offline tick survives a reload and syncs when back online
 - [ ] An expired Access session shows "Signed out" and loses nothing
 - [ ] At 00:00 Kolkata time, Today rolls to the new day without a reload
-- [ ] Puja and Diwali days show as light days with no points target
+- [ ] A festival day (Kali Puja / Diwali, Sun 8 Nov) shows as a light day with no points target
 - [ ] Every task type opens its inline tool
 - [ ] Redraws come due at +7 and +21 days; flashcards never exceed 10 a day
 - [ ] All pages pass in Dark, Light and Paper on 1512×982 and 2560×1440
@@ -545,7 +544,7 @@ These pairs were checked: text contrast is at least 14:1 in Dark and Light, mute
 
 - **Front matter:** `start_date`, `end_date`, `weekly_points_target`, `light_days`.
 - **Surface marker:** `<!-- surface: weeks.dsa -->` on the line right after a heading. Required on every level-1 or level-2 heading in Parts 2 to 6 that has its own content before the next level-1 or level-2 heading; level-3 headings may carry one, otherwise they inherit. Allowed surfaces: `mindset.why-plan`, `mindset.main`, `library.companies`, `library.designs`, `library.machine-coding`, `library.reading`, `library.resources`, `library.papers`, `library.equations`, `library.gaps`, `study.loop-guide`, `study.loop-steps`, `study.decision-card`, `study.six-forces`, `study.formulas`, `today.rules`, `today.routine`, `progress.points-help`, `progress.readiness`, `progress.scorecard`, `weeks.timeline`, `weeks.tasks`, `weeks.dsa`, `weeks.capstone`, `weeks.interview`.
-- **Week heading:** `### Week 04 · 2 to 8 Nov · Caching and contention (Diwali Sun)`
+- **Week heading:** `### Week 02 · 2 to 8 Nov · Data foundations (Diwali Sun)`
 - **Task line:** ``- [ ] `w04-07` `design` `+10` Sat · text…``
   - Pattern: ``^- \[( |x)\] `((?:w\d{2})-\d{2}|r-\d{2})` `([a-z0-9]+)` `\+(\d+)` (Mon|Tue|Wed|Thu|Fri|Sat|Sun|Week) · (.+)$``
   - Types: `dsa`, `boss`, `concept`, `infra`, `design`, `design2`, `lld`, `maths`, `capstone`, `redraw`, `read`, `mock`, `story`, `career`, `mindset`, `review`, `rest`, `ai`, `ready`, `paper`
@@ -555,7 +554,7 @@ These pairs were checked: text contrast is at least 14:1 in Dark and Light, mute
 - **Maths:** in `maths` tasks, `^` exponents and plain formulas are converted to MathML at build time. A maths task is **derive-first**: ``question ‖ check: the answer`` (split on the exact text ` ‖ check: `). The question is the task; the check is kept apart and the site hides it until you have tried. An empty check, or ` ‖ check: ` on any other type, fails the build.
 - **Equation bank** (`library.equations`): a `### Bonus equations` table (`ID | Wk | Name | Equation | Setup and what to derive | Check (derive first) | Tied to | Task`) and a `### The shelf` table (the same without `Task`, with `Best wk` for `Wk`). The Equation cell is TeX between dollar signs, converted to MathML at build time (a formula that does not convert fails the build). A bonus row names the one `maths` task, in its own week, that carries it; that task is an extra (`optional`). A shelf equation has no task and is ticked under its own `eq-NN` id. IDs are permanent.
 - **Papers** (`library.papers`): `### The schedule` is a table `Task | Wk | Paper | Link | Length | Why this week | The number to find | Anchor`. Every `paper` task needs exactly one row (matched by `Task`, same week); a row with `—` for Task is on the shelf. `★` in Anchor means a third pass. Each scheduled paper becomes a free doc on its task. `### How to read one in 45 minutes`, `### Alternates` (`Instead of | Try | Because`) and `### One honest warning` are read by heading.
-- **Extras** are the `paper` tasks and the bonus equations: they are **optional**. They are listed but never the next action, never counted in "n of m done", and never needed for a light week's star. None sits in a Puja week (1 and 2).
+- **Extras** are the `paper` tasks and the bonus equations: they are **optional**. They are listed but never the next action, never counted in "n of m done", and never needed for a light week's star. None sits in the first two weeks (a gentle start, and the Diwali week).
 - **Gap check** (`library.gaps`): `### The ten gaps` is a table `ID | Gap | Task | Sketch | Why it matters | Derive it | Free sources`. Each task must be a concept or infra task (it ends in `Why:`, so it is a flashcard); `Sketch` names a drawing in `shared/sketches.ts`. Two tables whose headings contain "syllabus" (`His topic | Your plan | Status`) set the plan against a syllabus: a Status starts with `Covered`, `Partial gap`, `Gap` or `Skip`, and a gap says where it is closed (a gap ID like G4, or a design ID in backticks). A task id in any of these tables is shown as a link labelled "Week 4 · Task 7".
 - **Taglines count:** the front matter's "N designs" must equal the number of designs in the library.
 - **Design library rows:** tables under `# Part 5`, first column `ID` (kebab-case, permanent).
@@ -568,7 +567,7 @@ These pairs were checked: text contrast is at least 14:1 in Dark and Light, mute
 ## Why this plan
 <!-- surface: mindset.why-plan -->
 
-Thirteen weeks, Mon 12 Oct 2026 to Sun 10 Jan 2027, about 15 hours a week, ending with you sitting SDE-2 backend interviews at Indian fintech companies. Dubai stays on the table as the move after this jump.
+Thirteen weeks, Mon 26 Oct 2026 to Sun 24 Jan 2027, about 15 hours a week, ending with you sitting SDE-2 backend interviews at Indian fintech companies. Dubai stays on the table as the move after this jump.
 
 The method is the one that worked for JEE: a fixed syllabus, daily practice, timed mock tests, and a score you can watch move. Confidence comes from that evidence, not before it.
 
@@ -693,7 +692,7 @@ This draws on motivation research; it isn't therapy. If the low feeling stays mo
 4. **Missed a day? Nothing is lost, and nothing is stacked.** What you missed waits quietly under "Waiting for you" on Today. Take one thing when there is room, never all of it at once.
 5. **Timeboxes.** Medium 25 min, hard 40 min. Stuck at the limit: take one hint, finish, and mark it for a redo in two weeks.
 6. **Body first.** 7+ hours of sleep and a 20 to 30 minute walk or workout most days.
-7. **Festivals are planned in, and kept light, not stopped.** Durga Puja (17 to 21 Oct) and Kali Puja/Diwali (Sun 8 Nov) have no points target, and every task on those days has a small version (shown in place of the full one). Do the small version, or one problem, or nothing: whatever is left waits for you.
+7. **Festivals are planned in, and kept light, not stopped.** Kali Puja/Diwali (Sun 8 Nov) has no points target, and every task planned for a festival day has a small version (shown in place of the full one). Do the small version, or one problem, or nothing: whatever is left waits for you.
 8. **Core first.** Papers and bonus equations are extras: drop them before anything else. If a week overflows, cut that week's second design, never the Saturday design, the DSA or a mock.
 
 ## Points
@@ -726,24 +725,24 @@ Points measure output, never your worth. Aim for about 50 a week; skip the targe
 
 | Week | Dates | Theme | Saturday design |
 | --- | --- | --- | --- |
-| 1 | 12 to 18 Oct | Baseline and your own "why" (Puja from Sat) | Bitly |
-| 2 | 19 to 25 Oct | Data foundations (Puja till Wed) | None |
-| 3 | 26 Oct to 1 Nov | Partitioning | Rate Limiter |
-| 4 | 2 to 8 Nov | Caching and contention (Diwali Sun) | Ticketmaster |
-| 5 | 9 to 15 Nov | Events, async, checkpoint | Dropbox |
-| 6 | 16 to 22 Nov | Payments | Payment System, or a payment gateway you derive |
-| 7 | 23 to 29 Nov | Scaling reads and writes | Flash Sale |
-| 8 | 30 Nov to 6 Dec | Real-time | WhatsApp |
-| 9 | 7 to 13 Dec | AI systems | ChatGPT, or an agentic checkout you derive |
-| 10 | 14 to 20 Dec | Feeds, search, first applications | FB News Feed |
-| 11 | 21 to 27 Dec | Streams and counting | Ad Click Aggregator |
-| 12 | 28 Dec to 3 Jan | Geo and wrap-up | Uber |
-| 13 | 4 to 10 Jan | Ready check | Wallet ledger, as a mock |
+| 1 | 26 Oct to 1 Nov | Baseline and your own "why" | Bitly |
+| 2 | 2 to 8 Nov | Data foundations (Diwali Sun) | None |
+| 3 | 9 to 15 Nov | Partitioning | Rate Limiter |
+| 4 | 16 to 22 Nov | Caching and contention | Ticketmaster |
+| 5 | 23 to 29 Nov | Events, async, checkpoint | Dropbox |
+| 6 | 30 Nov to 6 Dec | Payments | Payment System, or a payment gateway you derive |
+| 7 | 7 to 13 Dec | Scaling reads and writes | Flash Sale |
+| 8 | 14 to 20 Dec | Real-time | WhatsApp |
+| 9 | 21 to 27 Dec | AI systems | ChatGPT, or an agentic checkout you derive |
+| 10 | 28 Dec to 3 Jan | Feeds, search, first applications | FB News Feed |
+| 11 | 4 to 10 Jan | Streams and counting | Ad Click Aggregator |
+| 12 | 11 to 17 Jan | Geo and wrap-up | Uber |
+| 13 | 18 to 24 Jan | Ready check | Wallet ledger, as a mock |
 
 ## Weekly tasks
 <!-- surface: weeks.tasks -->
 
-### Week 01 · 12 to 18 Oct · Baseline and your own "why" (Puja from Sat)
+### Week 01 · 26 Oct to 1 Nov · Baseline and your own "why"
 
 - [ ] `w01-01` `dsa` `+4` Mon · Morning: 2 timed LeetCode mediums, no AI. Note your times; this is your baseline
 - [ ] `w01-02` `mindset` `+2` Mon · Night (10 min): write your "why" in 5 lines, in your own words: what kind of engineer you want to be in 2 years, and what you'll be able to do then that you can't today. Not your parents' reasons, not LinkedIn's
@@ -762,7 +761,7 @@ Points measure output, never your worth. Aim for about 50 a week; skip the targe
 - [ ] `w01-15` `story` `+8` Sun · Design doc for your UCP middleware (2 h): the six forces, the request flow from the Gemini agent through your middleware to SFCC and Adyen, failure modes (Adyen timeout, duplicate webhook, SFCC down), and decision cards for 3 decisions you actually made ‖ light: Write only the request flow and the three failure modes (45 minutes); the decision cards can wait
 - [ ] `w01-16` `review` `+0` Sun · Weekly review (30 min): fill in row 1 of the scorecard ‖ light: Fill in the scorecard row (10 minutes)
 
-### Week 02 · 19 to 25 Oct · Data foundations (Puja till Wed)
+### Week 02 · 2 to 8 Nov · Data foundations (Diwali Sun)
 
 DSA focus: arrays, two pointers, sliding window, prefix sums.
 
@@ -772,14 +771,14 @@ DSA focus: arrays, two pointers, sliding window, prefix sums.
 - [ ] `w02-04` `infra` `+2` Wed · Docker basics (images, layers, containers, volumes). Build and run a small Go container. Why: why does layer order in a Dockerfile change build time? ‖ light: Watch the first video; build the container on Thursday night
 - [ ] `w02-05` `concept` `+2` Thu · [PostgreSQL deep dive](https://www.hellointerview.com/learn/system-design/deep-dives/postgres). Why: two transfers debit the same account at once under READ COMMITTED. What goes wrong, and would you fix it with SELECT FOR UPDATE, an atomic UPDATE, or SERIALIZABLE?
 - [ ] `w02-06` `maths` `+3` Thu · B-tree height for 1 billion rows at fan-out 500. Why does that keep lookups fast? ‖ check: log base 500 of 10^9 is about 3.3, so 4 levels; the top levels stay cached, so most lookups cost one or two disk reads
-- [ ] `w02-07` `rest` `+0` Fri · Fri to Sun: catch-up days. Anything still waiting from the Puja days goes here; if nothing is, rest
+- [ ] `w02-07` `rest` `+0` Fri · Fri to Sun: catch-up days. Sunday is Diwali, a light day. Anything still waiting goes here; if nothing is, rest
 - [ ] `w02-08` `concept` `+3` Thu · Isolation levels in full: name the anomaly each level allows (dirty read, non-repeatable read, phantom, lost update, write skew), then build a write skew that SERIALIZABLE stops and snapshot isolation does not, on a wallet with a minimum balance. Read [Decoding isolation, the I in ACID](https://arpitbhayani.me/blogs/isolation) and [Why databases deadlock](https://arpitbhayani.me/blogs/database-deadlocks) only after your own answer. Why: which anomaly does each isolation level still allow, and how can two correct transactions on a wallet with a minimum balance both commit and still break the rule?
 
-### Week 03 · 26 Oct to 1 Nov · Partitioning
+### Week 03 · 9 to 15 Nov · Partitioning
 
 DSA focus: binary search (including on the answer), heaps, intervals.
 
-- [ ] `w03-01` `rest` `+0` Mon · Mon to Wed: a lighter start. Use the evenings for anything still waiting from the Puja weeks, or rest
+- [ ] `w03-01` `rest` `+0` Mon · Mon to Wed: a lighter start. Use the evenings for anything still waiting from the first two weeks, or rest
 - [ ] `w03-02` `dsa` `+4` Week · Morning DSA, Thu and Fri
 - [ ] `w03-03` `concept` `+2` Thu · [Sharding](https://www.hellointerview.com/learn/system-design/core-concepts/sharding) and [Consistent Hashing](https://www.hellointerview.com/learn/system-design/core-concepts/consistent-hashing). Why: why does hash(key) mod N break when you add a server?
 - [ ] `w03-04` `maths` `+3` Thu · You add the (N+1)th node to a consistent-hash ring. What fraction of the keys move? Why do virtual nodes even out the load? ‖ check: about 1/(N+1) of the keys; virtual nodes make each server own many small arcs, so its load averages out
@@ -792,7 +791,7 @@ DSA focus: binary search (including on the answer), heaps, intervals.
 - [ ] `w03-11` `paper` `+2` Fri · Paper: [Designing Access Methods, the RUM Conjecture](https://openproceedings.org/2016/conf/edbt/paper-12.pdf). Before reading, write your own answer to why an index speeds reads and slows writes; then check it against where the paper puts the B-tree, the LSM tree and the Bloom filter
 - [ ] `w03-12` `maths` `+1` Week · Bonus equation: how many virtual nodes give a 5% load spread
 
-### Week 04 · 2 to 8 Nov · Caching and contention (Diwali Sun)
+### Week 04 · 16 to 22 Nov · Caching and contention
 
 DSA focus: graphs (BFS, DFS, topological sort, Dijkstra, union-find).
 
@@ -812,7 +811,7 @@ DSA focus: graphs (BFS, DFS, topological sort, Dijkstra, union-find).
 - [ ] `w04-14` `paper` `+2` Fri · Paper: [SIEVE is Simpler than LRU](https://junchengyang.com/publication/nsdi24-SIEVE.pdf). Three passes, 45 minutes. Read it before tomorrow's pluggable-eviction machine coding, then add SIEVE as a fourth policy behind the same interface (one FIFO queue, one hand pointer, one visited bit per object)
 - [ ] `w04-15` `maths` `+1` Week · Bonus equation: the Zipf hit ratio when you cache only the top 1% of keys
 
-### Week 05 · 9 to 15 Nov · Events, async, checkpoint
+### Week 05 · 23 to 29 Nov · Events, async, checkpoint
 
 DSA focus: DP (1D and 2D, knapsack, LIS, interval DP).
 
@@ -830,7 +829,7 @@ DSA focus: DP (1D and 2D, knapsack, LIS, interval DP).
 - [ ] `w05-12` `paper` `+2` Fri · Paper: [Kora, Kafka as a multi-tenant cloud service](https://vldb.org/pvldb/vol16/p3822-povzner.pdf). One decision card on why cells cut the load from 73% to 53%, and what a tenant loses by living in one
 - [ ] `w05-13` `maths` `+1` Week · Bonus equation: how many Kafka partitions
 
-### Week 06 · 16 to 22 Nov · Payments, your home turf
+### Week 06 · 30 Nov to 6 Dec · Payments, your home turf
 
 DSA focus: trees, tries, monotonic stack and queue. From this week, alternate contests with a 75-minute mock online assessment.
 
@@ -852,7 +851,7 @@ DSA focus: trees, tries, monotonic stack and queue. From this week, alternate co
 - [ ] `w06-16` `paper` `+4` Fri · ★ Paper: [Spanner](https://static.googleusercontent.com/media/research.google.com/en//archive/spanner-osdi2012.pdf). All three passes. Redraw TrueTime from memory and explain external consistency out loud in 5 minutes. Note what two-phase commit costs as participants grow
 - [ ] `w06-17` `maths` `+1` Week · Bonus equation: Spanner's commit wait and the hot-row ceiling (check the lock claim in the paper)
 
-### Week 07 · 23 to 29 Nov · Scaling reads and writes
+### Week 07 · 7 to 13 Dec · Scaling reads and writes
 
 DSA focus: mixed timed sets, 1 hard.
 
@@ -874,7 +873,7 @@ DSA focus: mixed timed sets, 1 hard.
 - [ ] `w07-16` `paper` `+4` Fri · ★ Paper: [Dynamo](https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf). All three passes. Then one page: where Dynamo and Spanner disagree, and which one a wallet balance needs
 - [ ] `w07-17` `maths` `+1` Week · Bonus equation: shuffle-sharding combinations and blast radius
 
-### Week 08 · 30 Nov to 6 Dec · Real-time
+### Week 08 · 14 to 20 Dec · Real-time
 
 DSA focus: mixed timed sets, 1 hard.
 
@@ -897,7 +896,7 @@ DSA focus: mixed timed sets, 1 hard.
 - [ ] `w08-17` `paper` `+4` Fri · ★ Paper: [Chubby](https://static.googleusercontent.com/media/research.google.com/en//archive/chubby-osdi06.pdf). All three passes. Find the sequencer and connect it to the fencing-token problem in this week's leader-election task. Why did Google ship a lock service instead of a Paxos library?
 - [ ] `w08-18` `maths` `+1` Week · Bonus equation: the chance of a split vote in a Raft election
 
-### Week 09 · 7 to 13 Dec · AI systems, your edge
+### Week 09 · 21 to 27 Dec · AI systems, your edge
 
 DSA focus: mixed timed sets, 1 hard.
 
@@ -918,7 +917,7 @@ DSA focus: mixed timed sets, 1 hard.
 - [ ] `w09-15` `paper` `+2` Fri · Paper: [vLLM and PagedAttention](https://arxiv.org/abs/2309.06180). One decision card: which operating-system idea did they borrow, and what does it save? Then use it to answer why one LLM request can cost 100 times another
 - [ ] `w09-16` `maths` `+1` Week · Bonus equation: hedged requests and the tail
 
-### Week 10 · 14 to 20 Dec · Feeds, search, first applications
+### Week 10 · 28 Dec to 3 Jan · Feeds, search, first applications
 
 DSA focus: interview format, 2 problems in 45 min, out loud.
 
@@ -941,7 +940,7 @@ DSA focus: interview format, 2 problems in 45 min, out loud.
 - [ ] `w10-17` `paper` `+2` Fri · Paper: [Understanding Inverse Document Frequency](https://www.staff.city.ac.uk/~sbrp622/idfpapers/Robertson_idf_JDoc.pdf). Before reading, derive why a rare term should weigh more; then see which of the paper's arguments Robertson accepts and which he rejects
 - [ ] `w10-18` `maths` `+1` Week · Bonus equation: Kingman's formula, and why service-time variance matters
 
-### Week 11 · 21 to 27 Dec · Streams and counting
+### Week 11 · 4 to 10 Jan · Streams and counting
 
 DSA focus: interview format.
 
@@ -963,7 +962,7 @@ DSA focus: interview format.
 - [ ] `w11-16` `paper` `+2` Fri · Paper: [Probabilistic Counting (Flajolet and Martin)](https://algo.inria.fr/flajolet/Publications/src/FlMa85.pdf), sections 1 to 3 only. Try to invent the trick first: you may keep only a few bytes and must estimate how many distinct items you saw
 - [ ] `w11-17` `maths` `+1` Week · Bonus equation: HyperLogLog accuracy against memory
 
-### Week 12 · 28 Dec to 3 Jan · Geo and wrap-up
+### Week 12 · 11 to 17 Jan · Geo and wrap-up
 
 DSA focus: interview format.
 
@@ -985,7 +984,7 @@ DSA focus: interview format.
 - [ ] `w12-16` `paper` `+2` Fri · Paper: [MyRocks](https://www.vldb.org/pvldb/vol13/p3217-matsunobu.pdf). Read it after Wednesday's LSM derivation and list every consequence of compaction you did not predict
 - [ ] `w12-17` `maths` `+1` Week · Bonus equation: a Snowflake-style ID and its per-node ceiling
 
-### Week 13 · 4 to 10 Jan · Ready check
+### Week 13 · 18 to 24 Jan · Ready check
 
 - [ ] `w13-01` `dsa` `+10` Week · Morning DSA, interview format
 - [ ] `w13-02` `mock` `+10` Sat · Derive a wallet with a double-entry ledger as a full 45-minute mock with a partner
@@ -994,7 +993,7 @@ DSA focus: interview format.
 - [ ] `w13-05` `career` `+2` Week · Resume: lead with the UCP story and the capstone
 - [ ] `w13-06` `career` `+2` Week · Ask for referrals at your target companies; research pay bands and know your number
 - [ ] `w13-07` `review` `+0` Sun · Go through the readiness checklist
-- [ ] `w13-08` `career` `+0` Sun · Target applications go out from Mon 11 Jan
+- [ ] `w13-08` `career` `+0` Sun · Target applications go out from Mon 25 Jan
 - [ ] `w13-09` `paper` `+4` Fri · ★ Unseen-paper exam: [Aurora DSQL](https://arxiv.org/abs/2607.13276). Read it once. Then write one page: how it avoids coordination on reads, what it gives up (only write-write conflicts abort), whether your wallet write-skew example gets through, and how it differs from Spanner
 - [ ] `w13-10` `paper` `+2` Sun · After Saturday's ledger mock, read [Jepsen's TigerBeetle analysis](https://jepsen.io/analyses/tigerbeetle-0.16.11). List what you got right, what you missed, and which of its guarantees you would not have thought to test
 - [ ] `w13-11` `maths` `+1` Week · Bonus equation: prove the double-entry invariant
@@ -1289,7 +1288,7 @@ Arpit reads a paper a week because it is his craft and he has done it for years.
 
 The Thursday equation is the part of this plan that fits how you learn best, so there are more of them, every one tied to a design, task or paper you are already doing that week. **Every derivation hides its answer** until you have tried. The routine is the same each time: write down the shape you expect before you calculate, derive it on paper, reveal the check value, and if you are off by more than 5%, find the error. That last step is the learning; do not skip it by copying the answer.
 
-- **Bonus equation** (+1, 15 minutes, any day, skippable): one in most weeks, always tied to what you are reading or designing. There are none in the Puja weeks (1 and 2).
+- **Bonus equation** (+1, 15 minutes, any day, skippable): one in most weeks, always tied to what you are reading or designing. There are none in the first two weeks.
 - **The shelf** (optional, unscored): 11 more, each with its best week. Use one on a day you want a win. Tick it when you have done it.
 - **These are models, not measurements.** Three are simplified on purpose (balls in bins, two followers, independent failures). Say which assumption you are making out loud, because that is exactly what a good interviewer probes.
 
@@ -1483,7 +1482,7 @@ Sources:
 - [Can You Use AI in a Coding Interview? The 2026 Rules](https://devsunite.com/blog/can-you-use-ai-in-a-coding-interview-the-2026-rules)
 - [Flipkart Interview Process](https://www.finalroundai.com/blog/flipkart-interview-process), [Flipkart SDE 2 interview experience](https://leetcode.com/discuss/post/7591327/)
 - [Best Fintech Companies to Work at in India 2026](https://hirestepx.com/blog/best-fintech-companies-india-2026)
-- [Navratri and Durga Puja 2026 dates](https://abnnews.net/navratri-and-durga-puja-2026/), [Kali Puja](https://en.wikipedia.org/wiki/Kali_Puja)
+- [Kali Puja](https://en.wikipedia.org/wiki/Kali_Puja)
 
 ## Study resources: docs, videos, free and premium
 <!-- surface: library.resources -->

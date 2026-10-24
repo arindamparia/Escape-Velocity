@@ -36,11 +36,10 @@ describe('compiler: the real plan', () => {
   })
 
   it('reads the front matter', () => {
-    expect(out.core.config.startDate).toBe('2026-10-12')
-    expect(out.core.config.endDate).toBe('2027-01-10')
+    expect(out.core.config.startDate).toBe('2026-10-26')
+    expect(out.core.config.endDate).toBe('2027-01-24')
     expect(out.core.config.weeklyPointsTarget).toBe(50)
     expect(out.core.config.lightDays).toEqual([
-      { from: '2026-10-17', to: '2026-10-21', label: 'Durga Puja' },
       { from: '2026-11-08', to: '2026-11-08', label: 'Kali Puja / Diwali' },
     ])
   })
@@ -165,7 +164,7 @@ describe('compiler: every failure rule fails the build', () => {
   })
 
   it('a week heading out of order', () => {
-    expect(errorsOf(mutate('### Week 03 · 26 Oct to 1 Nov', '### Week 04 · 26 Oct to 1 Nov')).join('\n')).toMatch(/out of order/)
+    expect(errorsOf(mutate('### Week 03 · 9 to 15 Nov', '### Week 04 · 9 to 15 Nov')).join('\n')).toMatch(/out of order/)
   })
 
   it('a task whose week prefix does not match its heading', () => {
@@ -190,7 +189,7 @@ describe('compiler: every failure rule fails the build', () => {
   })
 
   it('week dates that disagree with the start date', () => {
-    expect(errorsOf(mutate('### Week 02 · 19 to 25 Oct', '### Week 02 · 20 to 26 Oct')).join('\n')).toMatch(/Week 02 says "20 to 26 Oct"/)
+    expect(errorsOf(mutate('### Week 02 · 2 to 8 Nov', '### Week 02 · 3 to 9 Nov')).join('\n')).toMatch(/Week 02 says "3 to 9 Nov"/)
   })
 
   it('a task outside the tasks sections', () => {
@@ -282,7 +281,7 @@ describe('compiler: the extras (papers, equations, gaps)', () => {
       expect(e.checkHtml, e.id).toBeTruthy()
     }
     expect(out.core.shelfIds).toHaveLength(11)
-    // no bonus equation in a Puja week
+    // no bonus equation in the gentle first two weeks (week 1, and week 2 with Diwali on its Sunday)
     expect(bonus.map((t) => t.week).filter((w) => [1, 2].includes(w!))).toEqual([])
   })
 
@@ -293,7 +292,7 @@ describe('compiler: the extras (papers, equations, gaps)', () => {
     expect(out.pages.library.papers.schedule.map((p) => p.taskId).sort()).toEqual(papers.map((t) => t.id).sort())
     expect(out.pages.library.papers.shelf.length).toBe(1)
     expect(out.pages.library.papers.schedule.filter((p) => p.anchor).map((p) => p.week)).toEqual([6, 7, 8, 13])
-    // no paper in the Puja weeks, or in week 1, where Friday night is off
+    // no paper in the first two weeks, and week 1's Friday night is off
     expect(papers.map((t) => t.week).filter((w) => [1, 2].includes(w!))).toEqual([])
     // each paper is a free doc on its task
     for (const t of papers) expect(out.weekChunks[String(t.week).padStart(2, '0')].resources[t.id].some((r) => r.kind === 'doc' && r.access === 'free'), t.id).toBe(true)

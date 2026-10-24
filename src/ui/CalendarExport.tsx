@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'preact/hooks'
 import { blocks, buildIcs, DEFAULT_STARTS, type Starts } from '../lib/calendar'
+import { formatShort } from '../lib/dates'
+import { plan } from '../lib/plan'
 
 const KEY = 'ev:calendar-starts'
 const load = (): Starts => {
@@ -35,7 +37,7 @@ export function CalendarExport() {
           <label key={k} class="small">{label}<input type="time" value={starts[k]} aria-invalid={!valid(starts[k])} onInput={(e) => set(k, (e.target as HTMLInputElement).value)} /></label>
         ))}
       </div>
-      <div class="row"><button type="button" class="btn" disabled={!ok} onClick={download}>Download calendar (.ics)</button><span class="small muted">{ok ? `${count} blocks, 12 Oct to 10 Jan. Puja and Diwali days are 20-minute light blocks.` : 'Enter a time for each.'}</span></div>
+      <div class="row"><button type="button" class="btn" disabled={!ok} onClick={download}>Download calendar (.ics)</button><span class="small muted">{ok ? `${count} blocks, ${formatShort(plan.config.startDate)} to ${formatShort(plan.config.endDate)}. Festival days are 20-minute light blocks.` : 'Enter a time for each.'}</span></div>
     </section>
   )
 }

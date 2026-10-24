@@ -2,6 +2,14 @@
 
 Status at the end of the third session. Read `CLAUDE.md` first, then `AUDIT.md` (the build checked against every section of the plan), then the plan itself (`plan/escape-velocity-plan.md`, Part 1).
 
+## The plan moved to Mon 26 Oct, your calendar, new sounds (24 Oct 2026)
+
+- **New dates**: the plan now runs **Mon 26 Oct 2026 to Sun 24 Jan 2027** (applications from Mon 25 Jan). Weeks are Monday to Sunday with weekday-labelled content, so it starts on the next Monday, not on Saturday 24 Oct. `scripts/set-start.py <Monday>` rewrites the front matter, week headings and the "At a glance" table; festival wording is by hand. The only light day left is Diwali, Sun 8 Nov (week 2, the only light week); Durga Puja is behind us. Tests moved 14 days.
+- **Day 1 is done**: tasks 1 to 3 of week 1 (`w01-01`, `w01-02`, `w01-03`) were already ticked; their dates and your four focus sessions in the live database were moved to 24 Oct (backup: `backups/before-calendar-move-2026-10-24.sql`, git-ignored). A device that still has the old copy picks it up on the next open.
+- **Your calendar** (Settings, top card): every day as a shape, hover or focus for details, click to pin. See CLAUDE.md "Your calendar".
+- **Sounds**: Forest is now one 8-hour birdsong recording; new Dawn chorus (birds chirping), Leaf rain (rain, no thunder) and Temple bowls (Tibetan singing bowls, the Buddhist one). They are plain video ids in `RECORDINGS` (`src/tools/sound/catalog.ts`); to swap one, change the id and run `npx vitest run tests/unit/focussound.test.ts`.
+- **To do after deploy**: rebuild the search index (Settings → AI search), because the plan text changed.
+
 ## Today made calm (15 Oct 2026)
 
 Today was 2,720 px tall on a desktop and 5,600 px on a phone, with every task fully open, three copies of the week's maths and a block of zero tiles. Now (normal weekday) it is about 1,590 px and 3,100 px:

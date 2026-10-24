@@ -23,8 +23,8 @@ test('every task is on Today on its day', async ({ page, api }) => {
 test.describe('Today leaves nothing to chance', () => {
   test('the any-day list is open while something in it is undone, and tomorrow is one line away', async ({ page, api }) => {
     await api.onboard()
-    await api.activeOn('2026-11-17'); await api.activeOn('2026-11-18')
-    await openApp(page, '/', { at: kolkata('2026-11-18T10:00:00') }) // week 6, a Wednesday: the AI-fluency rep is an any-day task
+    await api.activeOn('2026-12-01'); await api.activeOn('2026-12-02')
+    await openApp(page, '/', { at: kolkata('2026-12-02T10:00:00') }) // week 6, a Wednesday: the AI-fluency rep is an any-day task
     const anyDay = page.locator('details', { hasText: 'This week, any day' })
     await expect(anyDay).toHaveAttribute('open', '')
     const tomorrow = page.getByTestId('tomorrow')
@@ -35,23 +35,23 @@ test.describe('Today leaves nothing to chance', () => {
 
   test('tomorrow knows a light day, a Friday paper (optional), the next week, and the last day', async ({ page, api }) => {
     await api.onboard()
-    for (const d of ['2026-10-15', '2026-10-16', '2026-11-04', '2026-11-05', '2026-11-08', '2027-01-09', '2027-01-10']) await api.activeOn(d)
-    await openApp(page, '/', { at: kolkata('2026-10-16T10:00:00') }) // Friday of week 1: Saturday is the first Puja day
-    await expect(page.getByTestId('tomorrow')).toContainText('Durga Puja')
-    await openApp(page, '/', { at: kolkata('2026-11-05T10:00:00') }) // Thursday of week 4: Friday has a paper
+    for (const d of ['2026-11-06', '2026-11-07', '2026-11-18', '2026-11-19', '2026-11-22', '2027-01-23', '2027-01-24']) await api.activeOn(d)
+    await openApp(page, '/', { at: kolkata('2026-11-07T10:00:00') }) // Saturday of week 2: tomorrow is Diwali
+    await expect(page.getByTestId('tomorrow')).toContainText('Kali Puja / Diwali')
+    await openApp(page, '/', { at: kolkata('2026-11-19T10:00:00') }) // Thursday of week 4: Friday has a paper
     await expect(page.getByTestId('tomorrow')).toContainText('Paper (optional)')
-    await openApp(page, '/', { at: kolkata('2026-11-08T10:00:00') }) // Sunday of week 4: tomorrow is Monday of week 5
+    await openApp(page, '/', { at: kolkata('2026-11-22T10:00:00') }) // Sunday of week 4: tomorrow is Monday of week 5
     await expect(page.getByTestId('tomorrow').getByRole('link')).toHaveAttribute('href', '/weeks/5#day-Mon')
-    await openApp(page, '/', { at: kolkata('2027-01-10T10:00:00') }) // the last day
+    await openApp(page, '/', { at: kolkata('2027-01-24T10:00:00') }) // the last day
     await expect(page.getByTestId('tomorrow')).toHaveCount(0)
   })
 
   test('the day rail goes to the day, and the day is on the week page', async ({ page, api }) => {
     await api.onboard()
-    await openApp(page, '/', { at: kolkata('2026-10-14T10:00:00') })
+    await openApp(page, '/', { at: kolkata('2026-10-28T10:00:00') })
     const link = page.locator('nav[aria-label="This week by day"] a').nth(4) // the rail shows on wide screens only
     await expect(link).toHaveAttribute('href', '/weeks/1#day-Fri')
-    await openApp(page, '/weeks/1#day-Mon', { at: kolkata('2026-10-14T10:00:00') })
+    await openApp(page, '/weeks/1#day-Mon', { at: kolkata('2026-10-28T10:00:00') })
     await expect(page.locator('#day-Mon')).toBeVisible()
     await expect(page.locator('#day-Sat')).toBeVisible()
   })
@@ -60,8 +60,8 @@ test.describe('Today leaves nothing to chance', () => {
 test.describe('a capstone milestone is linked to what it is about', () => {
   test('Today names the diagram steps and the terms, and the button goes to that milestone', async ({ page, api }) => {
     await api.onboard()
-    await api.activeOn('2026-11-28'); await api.activeOn('2026-11-29')
-    await openApp(page, '/', { at: kolkata('2026-11-29T10:00:00') }) // Sunday of week 7: outbox, payment service, mock provider
+    await api.activeOn('2026-12-12'); await api.activeOn('2026-12-13')
+    await openApp(page, '/', { at: kolkata('2026-12-13T10:00:00') }) // Sunday of week 7: outbox, payment service, mock provider
     const row = page.locator('[data-task="w07-10"]')
     if (await row.getByRole('button', { name: 'Details' }).count()) await row.getByRole('button', { name: 'Details' }).click() // the row is a short line until opened
     const links = row.getByTestId('capstone-links').or(page.getByRole('region', { name: 'Next up' }).getByTestId('capstone-links')).first()
@@ -90,22 +90,15 @@ test.describe('a capstone milestone is linked to what it is about', () => {
 })
 
 test.describe('light days keep going, and a missed day waits for you', () => {
-  test('on a Puja day Today offers the small version of the lightest task, and ticking it counts', async ({ page, api }) => {
+  test('on a festival day Today stays light: one small thing, one problem, and no target', async ({ page, api }) => {
     await api.onboard()
-    await api.activeOn('2026-10-16')
-    await openApp(page, '/', { at: kolkata('2026-10-17T10:00:00') }) // Saturday of week 1: the first Puja day
+    await api.activeOn('2026-11-07')
+    await openApp(page, '/', { at: kolkata('2026-11-08T10:00:00') }) // Sunday of week 2: Diwali
     const h = page.getByRole('region', { name: 'Light day' })
     await expect(h).toContainText('Keep it light. Do not stop.')
-    await expect(h).toContainText('The first question only') // the base62 maths, the lightest of the day's three tasks
+    await expect(h).toContainText('Kali Puja / Diwali')
     await expect(h.getByRole('button', { name: 'I did one problem' })).toBeVisible()
-    // the same task in the list shows its light version first, the full one behind a click
-    const row = page.locator('[data-task="w01-12"]')
-    await expect(row).toContainText('Light version')
-    await row.getByRole('button', { name: 'Details' }).click() // the full version is under the row's details
-    await row.locator('summary', { hasText: 'Full version' }).click()
-    await expect(row).toContainText('How many base62 characters')
-    await h.getByRole('button', { name: 'Done, the small version' }).click()
-    await expect.poll(() => api.doneIds()).toContain('w01-12')
+    await expect(page.getByRole('button', { name: 'Bad day? Minimum day' })).toHaveCount(0) // a light day has no "bad day" button: it is already light
   })
 
   test('the same task on a normal day shows no light version', async ({ page, api }) => {
@@ -116,8 +109,8 @@ test.describe('light days keep going, and a missed day waits for you', () => {
 
   test('a missed day loses nothing: it waits on Today, quietly, a few at a time, and is gone once done', async ({ page, api }) => {
     await api.onboard()
-    await api.activeOn('2026-10-13')
-    await openApp(page, '/', { at: kolkata('2026-10-14T10:00:00') }) // Wednesday of week 1: Monday and Tuesday's tasks are still open
+    await api.activeOn('2026-10-27')
+    await openApp(page, '/', { at: kolkata('2026-10-28T10:00:00') }) // Wednesday of week 1: Monday and Tuesday's tasks are still open
     const w = page.getByRole('region', { name: 'Waiting for you' })
     await expect(w).toBeVisible()
     await expect(w).toContainText('Nothing is lost') // one line until you open it
@@ -129,21 +122,19 @@ test.describe('light days keep going, and a missed day waits for you', () => {
     await expect.poll(() => api.doneIds()).toContain('w01-05')
   })
 
-  test('nothing waits on a light day, and next week it is last week that waits, most valuable first', async ({ page, api }) => {
+  test('nothing waits on a light day, and on the Thursday before it is last week that waits, most valuable first', async ({ page, api }) => {
     await api.onboard()
-    await api.activeOn('2026-10-17')
-    await openApp(page, '/', { at: kolkata('2026-10-18T10:00:00') }) // Puja Sunday
+    await api.activeOn('2026-11-04'); await api.activeOn('2026-11-07')
+    await openApp(page, '/', { at: kolkata('2026-11-08T10:00:00') }) // Diwali, Sunday of week 2
     await expect(page.getByRole('region', { name: 'Waiting for you' })).toHaveCount(0)
-    await api.activeOn('2026-10-18')
-    await openApp(page, '/', { at: kolkata('2026-10-19T10:00:00') }) // Monday of week 2, a Puja day too
-    await openApp(page, '/', { at: kolkata('2026-10-22T10:00:00') }) // Thursday of week 2: Puja is over
+    await openApp(page, '/', { at: kolkata('2026-11-05T10:00:00') }) // Thursday of week 2: week 1's work waits
     const w = page.getByRole('region', { name: 'Waiting for you' })
     await expect(w.locator('[data-task]').first()).toHaveAttribute('data-task', 'w01-11') // the Bitly design, +10, is first
   })
 
   test('the boss problem is explained where it appears, in the guide and on the DSA track', async ({ page, api }) => {
     await api.onboard()
-    await api.activeOn('2026-10-31'); await api.activeOn('2026-11-01')
+    await api.activeOn('2026-11-14'); await api.activeOn('2026-11-15')
     await openApp(page, '/weeks/3')
     const boss = page.locator('[data-task="w03-07"]')
     await boss.locator('summary', { hasText: 'How a boss problem works' }).click()

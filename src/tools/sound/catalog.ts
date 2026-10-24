@@ -1,7 +1,7 @@
 // The sounds, and what they are called. Cabin is the app's name for its focus sound: the quiet of a cabin before launch.
 // Each sound has a name of its own and, under it, what it actually is. None of the labels says where a recording comes
 // from: it is just a sound. The ids are stable (they are what is saved on this device); only the names change here.
-export type SourceId = 'off' | 'brown' | 'pink' | 'rain' | 'wind' | 'ocean' | 'nature' | 'custom'
+export type SourceId = 'off' | 'brown' | 'pink' | 'rain' | 'wind' | 'ocean' | 'nature' | 'birds' | 'leafrain' | 'bowls' | 'custom'
 
 export const BRAND = 'Cabin'
 
@@ -21,9 +21,20 @@ export const SOUNDS: SoundDef[] = [
   { id: 'rain', name: 'Monsoon', kind: 'Rain', hint: 'Rain on a roof, made on the spot.', group: 'made' },
   { id: 'wind', name: 'Ridge wind', kind: 'Wind', hint: 'Slow wind in the trees.', group: 'made' },
   { id: 'ocean', name: 'Tide', kind: 'Waves', hint: 'Slow waves rolling in and out.', group: 'made' },
-  { id: 'nature', name: 'Forest', kind: 'Recorded', hint: 'Rain, birds and forest recordings, hours long.', group: 'recorded' },
+  { id: 'nature', name: 'Forest', kind: 'Birdsong, recorded', hint: 'A deep forest, robins and blackbirds, 8 hours of one unlooped recording.', group: 'recorded' },
+  { id: 'birds', name: 'Dawn chorus', kind: 'Birds chirping, recorded', hint: 'A summer morning in the woods: chirping, a cuckoo, bees. 10 hours.', group: 'recorded' },
+  { id: 'leafrain', name: 'Leaf rain', kind: 'Rain, recorded', hint: 'Steady rain on leaves on a forest road. No thunder. 10 hours.', group: 'recorded' },
+  { id: 'bowls', name: 'Temple bowls', kind: 'Tibetan singing bowls', hint: 'Slow bowls and a temple’s quiet, from the Buddhist tradition. Steady and without words. 10 hours.', group: 'recorded' },
   { id: 'custom', name: 'My sound', kind: 'Your link', hint: 'Any video or playlist you paste. Give it a name.', group: 'yours' },
 ]
+
+/** The recordings behind the recorded sounds (video ids; each was checked to allow playing on other sites). */
+export const RECORDINGS: Partial<Record<SourceId, string>> = {
+  nature: 'FxAgAyZYXJ8',
+  birds: 'RUuTIx2gSM4',
+  leafrain: 'Go4YMAws6BU',
+  bowls: 'X0JA-XfHi_w',
+}
 
 export const DEFAULT_CUSTOM_NAME = 'My sound'
 

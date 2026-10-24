@@ -12,7 +12,7 @@ export const GLOSSARY: TermGroup[] = [
       { id: 'task', term: 'Task', what: 'One line of the plan, with points. “Week 4 · Task 7” is the 7th line of week 4. Tick it when it is done.' },
       { id: 'points', term: 'Points', what: 'The points of every task you ticked. A normal week aims for 50. Points measure output, never your worth.' },
       { id: 'constellation', term: 'Constellation', what: 'A picture of one week. Each ticked task lights a star; when the week reaches its target the shape glows.' },
-      { id: 'light-day', term: 'Light day', what: 'A festival day (Durga Puja 17 to 21 Oct, Diwali 8 Nov) with no points target. You do not stop: each task shows a small version, and one problem is plenty. Anything left waits for you.' },
+      { id: 'light-day', term: 'Light day', what: 'A festival day (Diwali, Sun 8 Nov) with no points target. You do not stop: each task shows a small version, and one problem is plenty. Anything left waits for you.' },
       { id: 'waiting', term: 'Waiting for you', what: 'Tasks from earlier days that are still open, shown quietly on Today (a few at a time, the most valuable first). A missed day never loses a task. Take one when there is room, never all of it.' },
       { id: 'minimum-day', term: 'Minimum day', what: 'On a bad day, do one problem and stop. It still counts as an active day.' },
       { id: 'readiness', term: 'Readiness check', what: 'Eight signs you are ready to apply. Worth no points; they fill a ring on Progress.' },
