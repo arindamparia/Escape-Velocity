@@ -65,6 +65,21 @@ describe('the Growth content', () => {
   })
 })
 
+describe('every idea is sourced and connected', () => {
+  it('every idea names its source; research claims name the study', () => {
+    for (const b of BOOKS) for (const idea of out.books[b].ideas) expect(idea.sourceHtml, idea.id).not.toBe('')
+    expect(out.books.ah.ideas.find((i) => i.id === 'ah-07')!.sourceHtml).toMatch(/Milne, Orbell &amp; Sheeran \(2002\)/)
+    expect(out.books.law.ideas[16].sourceHtml).toMatch(/Law 17/)
+    for (const b of BOOKS) expect(out.books[b].notesHtml.replace(/<[^>]+>/g, '').length, b).toBeGreaterThan(150)
+  })
+  it('related ideas show on both cards, and an idea lists the scenarios that use it', () => {
+    const byId = new Map(BOOKS.flatMap((b) => out.books[b].ideas).map((i) => [i.id, i]))
+    for (const idea of byId.values()) for (const r of idea.related) expect(byId.get(r)!.related, `${r} back to ${idea.id}`).toContain(idea.id)
+    expect(byId.get('ns-01')!.related).toEqual(expect.arrayContaining(['law-44', 'law-04']))
+    for (const sc of out.deck.scenarios) for (const id of sc.ideas) expect(byId.get(id)!.scenarios, `${id} lists ${sc.id}`).toContain(sc.id)
+  })
+})
+
 describe('the Growth compiler fails loudly', () => {
   it('on a missing field', () => {
     expect(errorsOf(mutate('02-48-laws.md', /- \*\*Counter:\*\* [^\n]+\n/, '')).join('\n')).toMatch(/law-01.*missing "Counter"/)
@@ -89,6 +104,13 @@ describe('the Growth compiler fails loudly', () => {
   it('on a kind of task with no two-minute start, or a week with no coach note', () => {
     expect(errorsOf(mutate('00-programme.md', /\| `boss` \|[^\n]+\n/, '')).join('\n')).toMatch(/no start for "boss"/)
     expect(errorsOf(mutate('00-programme.md', /\| 13 \| \*\*Know your number[^\n]+\n/, '')).join('\n')).toMatch(/no note for week 13/)
+  })
+  it('on an idea with no source, or a related idea that does not exist', () => {
+    expect(errorsOf(mutate('06-deep-work.md', /(### dw-03[\s\S]*?)- \*\*Source:\*\* [^\n]+\n/, '$1')).join('\n')).toMatch(/dw-03.*missing "Source"/)
+    expect(errorsOf(mutate('01-atomic-habits.md', '- **Related:** ah-08', '- **Related:** ah-99')).join('\n')).toMatch(/ah-07: Related names ah-99/)
+  })
+  it('on a book with no notes on its sources', () => {
+    expect(errorsOf(mutate('06-deep-work.md', /### Notes[\s\S]*$/, '')).join('\n')).toMatch(/dw: the book needs a "### Notes" block/)
   })
   it('on a lesson that is too long to read in a minute', () => {
     const long = Array.from({ length: 200 }, () => 'word').join(' ')

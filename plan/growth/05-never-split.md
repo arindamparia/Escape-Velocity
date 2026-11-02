@@ -12,6 +12,7 @@ An FBI hostage negotiator's toolkit. Week 13 asks you to "know your number"; thi
 - **Script:** Recruiter: "We usually don't go above the band." You (curious): "Above the band?" Then wait four seconds.
 - **Card:** What is a mirror in negotiation? ‖ Repeat the last one to three critical words as a curious question, then stay silent: people elaborate and reveal more.
 - **Try:** Use three mirrors in conversations today. Write down what each one surfaced.
+- **Source:** *Never Split the Difference*, ch. 2, “Be a Mirror”.
 
 ### ns-02 · Label their emotions
 - **Group:** Listening
@@ -21,6 +22,7 @@ An FBI hostage negotiator's toolkit. Week 13 asks you to "know your number"; thi
 - **Script:** Offer call, when the recruiter hesitates: "It seems like there's some pressure to close this role quickly." (Silence.)
 - **Card:** How do you label, and what does it do? ‖ "It seems like / it sounds like / it looks like…" a feeling or position, then silence. It defuses negatives and reinforces positives without agreeing.
 - **Try:** Label one person's emotion this week in a tense moment, then stay quiet.
+- **Source:** *Never Split the Difference*, ch. 3, “Don’t Feel Their Pain, Label It”.
 
 ### ns-03 · The accusation audit
 - **Group:** Listening
@@ -30,6 +32,7 @@ An FBI hostage negotiator's toolkit. Week 13 asks you to "know your number"; thi
 - **Script:** "You might feel I'm asking for too much, and that I'm not grateful for the offer. I am grateful, and I want to join. Based on the scope we discussed, I'm looking for a base of 42."
 - **Card:** What is an accusation audit? ‖ Say the negative things the other side might think about you before they do ("you'll probably think this is greedy"); naming them defuses them.
 - **Try:** Write the accusation audit for your future salary ask: the three worst things they might think.
+- **Source:** *Never Split the Difference*, ch. 3, “Don’t Feel Their Pain, Label It”.
 
 ### ns-04 · Seek "no", beware "yes"
 - **Group:** Steering
@@ -39,6 +42,7 @@ An FBI hostage negotiator's toolkit. Week 13 asks you to "know your number"; thi
 - **Script:** Reviving a stalled referral: "Hi Neha, have you given up on me joining your team?" (It almost always gets a reply.)
 - **Card:** Why seek "no"? ‖ "No" feels safe and gives control, so people answer honestly and relax; "yes" is often counterfeit. Use no-oriented questions ("is now a bad time?").
 - **Try:** Send one "have you given up on…?" message to a conversation that went quiet.
+- **Source:** *Never Split the Difference*, ch. 4, “Beware “Yes”—Master “No””.
 
 ### ns-05 · Trigger "that's right"
 - **Group:** Steering
@@ -48,6 +52,7 @@ An FBI hostage negotiator's toolkit. Week 13 asks you to "know your number"; thi
 - **Script:** "So if I've got it: you need checkout to survive a region outage, you're nervous because last year's failover took an hour, and you'd rather pay for complexity than risk that again." ("That's right.")
 - **Card:** How do you trigger "that's right"? ‖ Summarise their position and label the emotions behind it until they feel fully understood. "You're right" is a brush-off; "that's right" is the breakthrough.
 - **Try:** In your next disagreement, summarise the other side until they say "that's right" before you argue.
+- **Source:** *Never Split the Difference*, ch. 5, “Trigger the Two Words That Immediately Transform Any Negotiation”.
 
 ### ns-06 · Bend their reality: anchors and loss
 - **Group:** Bargaining
@@ -57,6 +62,9 @@ An FBI hostage negotiator's toolkit. Week 13 asks you to "know your number"; thi
 - **Script:** "What's the budget you have in mind for this role?" … "That's lower than I expected. Based on similar roles at Razorpay and PhonePe, I'm looking at 42 to 46, and I'm flexible on the joining date."
 - **Card:** Why never split the difference, and how do you anchor? ‖ Meeting halfway is often bad for both. Let them name a number first; if not, give a range whose bottom is your target, use precise odd numbers, and frame what they lose.
 - **Try:** Research the pay band for your target role and write your range, with the bottom as your real target.
+- **Plan:** Week 13: [research pay bands and know your number](/weeks/13#w13-06).
+- **Related:** fk-08
+- **Source:** *Never Split the Difference*, ch. 6, “Bend Their Reality”.
 
 ### ns-07 · Calibrated questions
 - **Group:** Steering
@@ -66,6 +74,7 @@ An FBI hostage negotiator's toolkit. Week 13 asks you to "know your number"; thi
 - **Script:** Offer too low: "I really want to make this work. How am I supposed to accept a base that's below my current one?"
 - **Card:** What are calibrated questions, and the most powerful one? ‖ "How" and "what" questions that make the other side solve your problem while feeling in control. "How am I supposed to do that?" is a polite no.
 - **Try:** Turn one "can you…?" request you need to make into a "how" or "what" question.
+- **Source:** *Never Split the Difference*, ch. 7, “Create the Illusion of Control”.
 
 ### ns-08 · Guarantee execution
 - **Group:** Steering
@@ -75,6 +84,7 @@ An FBI hostage negotiator's toolkit. Week 13 asks you to "know your number"; thi
 - **Script:** "Great, thank you. Just so I understand: who else is involved in approving the revised offer, and what usually holds it up?"
 - **Card:** How do you make sure a yes is real? ‖ Ask how it will be implemented and who else decides; get the same agreement three times (Rule of Three); trust tone and body over words.
 - **Try:** In your next agreement at work, ask "what could stop this from happening?"
+- **Source:** *Never Split the Difference*, ch. 8, “Guarantee Execution”.
 
 ### ns-09 · Bargain hard: the Ackerman model
 - **Group:** Bargaining
@@ -84,6 +94,9 @@ An FBI hostage negotiator's toolkit. Week 13 asks you to "know your number"; thi
 - **Script:** Final round: "I can come to 41.75 if we can agree a compensation review at six months. That's as far as I can go."
 - **Card:** The Ackerman model? ‖ Target; offer 65%, 85%, 95%, 100% with shrinking steps; make them counter between; end on a precise, odd number plus a non-monetary item.
 - **Try:** Write your own concession plan for the offer call: first ask, three steps, and the non-cash item at the end.
+- **Plan:** Week 13: [know your number](/weeks/13#w13-06).
+- **Related:** fk-08
+- **Source:** *Never Split the Difference*, ch. 9, “Bargain Hard”.
 
 ### ns-10 · Find the black swan
 - **Group:** Bargaining
@@ -93,3 +106,11 @@ An FBI hostage negotiator's toolkit. Week 13 asks you to "know your number"; thi
 - **Script:** "If the band is fixed for SDE-2, is there flexibility in the level, or in a joining bonus?"
 - **Card:** What is a black swan, and the three kinds of leverage? ‖ An unknown that changes the whole negotiation, found by asking and listening (assume they are not crazy, just constrained). Leverage: positive, negative, normative (their own rules).
 - **Try:** In your next interview, ask "what's driving the timeline to fill this role?" and listen for the swan.
+- **Source:** *Never Split the Difference*, ch. 10, “Find the Black Swan”.
+
+### Notes
+
+- **Edition:** Chris Voss with Tahl Raz, *Never Split the Difference: Negotiating as if Your Life Depended on It* (Harper Business, 2016).
+- **The 7-38-55 rule** comes from Albert Mehrabian's 1960s studies of how people judge *feelings* from messages where words and tone disagree. It does not mean words carry 7% of all meaning. Use it only as "when words and tone disagree, trust the tone".
+- **The Ackerman model** is written for the side that pays. For asking for pay it runs the other way: start high, and come down in shrinking steps.
+- **Rupees, not dollars:** the scripts use lakh figures as examples only. Your real numbers come from week 13's pay-band research.

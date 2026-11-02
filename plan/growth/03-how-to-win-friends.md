@@ -11,6 +11,8 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** Code review, instead of "This is wrong, why would you do this?": "I think there might be a race here when two requests hit at once. What was the thinking behind this approach? Happy to pair on it."
 - **Card:** Carnegie's principle 1, and why it works? ‖ Don't criticise, condemn or complain: criticism makes people defend themselves and resent you. Seek to understand why they did it.
 - **Try:** Go one full workday without a single complaint about a person. Count how often you nearly slip.
+- **Related:** hf-11
+- **Source:** *How to Win Friends and Influence People*, Part One, “Fundamental Techniques in Handling People”, principle 1 of the part (1 of 30).
 
 ### hf-02 · Give honest, sincere appreciation
 - **Group:** Handling people
@@ -19,6 +21,8 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** Standup: "Before I start, thanks to Priya: the retry fix she shipped yesterday stopped the 3 a.m. pages. That saved my night." Specific, sincere, public.
 - **Card:** Appreciation versus flattery? ‖ Appreciation is sincere and specific (what exactly they did and why it mattered); flattery is insincere and general. People are starving for the first.
 - **Try:** Give three specific, sincere thanks this week: what they did, and the difference it made.
+- **Related:** hf-22, hf-27
+- **Source:** *How to Win Friends and Influence People*, Part One, “Fundamental Techniques in Handling People”, principle 2 of the part (2 of 30).
 
 ### hf-03 · Arouse in the other person an eager want
 - **Group:** Handling people
@@ -27,6 +31,7 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** Asking another team for a review: "This change cuts your service's error budget burn by about half, so I'd love your eyes on it before Friday. It should take 20 minutes."
 - **Card:** Principle 3: how do you influence anyone? ‖ Arouse an eager want: talk about what they want and show how your request gets it for them (bait the hook with worms, not strawberries).
 - **Try:** Rewrite your next request so its first line says what the other person gets.
+- **Source:** *How to Win Friends and Influence People*, Part One, “Fundamental Techniques in Handling People”, principle 3 of the part (3 of 30).
 
 ### hf-04 · Become genuinely interested in other people
 - **Group:** Making people like you
@@ -35,6 +40,8 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** Networking message: "Hi Rahul, I read your post on how Razorpay moved settlements to an event-sourced ledger. How did you handle backfilling the old data? I'm working through a similar problem."
 - **Card:** Principle 4, and the line that sums it up? ‖ Become genuinely interested in other people. You make more friends in two months by being interested in them than in two years trying to get them interested in you.
 - **Try:** Ask one colleague a real question about their life or work, and follow up on it a week later.
+- **Related:** inf-04
+- **Source:** *How to Win Friends and Influence People*, Part Two, “Six Ways to Make People Like You”, principle 1 of the part (4 of 30).
 
 ### hf-05 · Smile
 - **Group:** Making people like you
@@ -43,6 +50,7 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** Interview opening, smiling, camera at eye level: "Hi, good to meet you. Thanks for taking the time. I'm looking forward to this one."
 - **Card:** Principle 5, and why it works even when you don't feel it? ‖ Smile. Acting as if you're glad tends to make you glad, and a warm smile at the start sets the tone (it is heard even on the phone).
 - **Try:** Start every call tomorrow with a real smile before you say a word.
+- **Source:** *How to Win Friends and Influence People*, Part Two, “Six Ways to Make People Like You”, principle 2 of the part (5 of 30).
 
 ### hf-06 · Remember names
 - **Group:** Making people like you
@@ -51,6 +59,8 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** Interview: "That's a great question, Ananya. Let me think about the hot partition case first." (Use the interviewer's name once or twice, not every sentence.)
 - **Card:** Principle 6, and a method for it? ‖ A person's name is the sweetest sound to them. Repeat it when you hear it, use it in the conversation, write it down afterwards.
 - **Try:** In every meeting this week, learn and use the name of one person you did not know.
+- **Related:** inf-04
+- **Source:** *How to Win Friends and Influence People*, Part Two, “Six Ways to Make People Like You”, principle 3 of the part (6 of 30).
 
 ### hf-07 · Be a good listener
 - **Group:** Making people like you
@@ -59,6 +69,8 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** Interview, the "any questions for us?" moment: "What's the hardest problem your team is working on right now?" Then listen, and follow up on their answer.
 - **Card:** Principle 7? ‖ Be a good listener and encourage others to talk about themselves. Listening is a compliment; people find good listeners interesting.
 - **Try:** In one conversation today, ask a question and then ask two follow-up questions about the answer before saying anything about yourself.
+- **Related:** hf-15, ns-02
+- **Source:** *How to Win Friends and Influence People*, Part Two, “Six Ways to Make People Like You”, principle 4 of the part (7 of 30).
 
 ### hf-08 · Talk in terms of the other person's interests
 - **Group:** Making people like you
@@ -67,6 +79,7 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** Interview prep: before the hiring-manager round, read the team's engineering blog and open with "I saw your post on idempotent payouts; that's close to what I built for checkout at…"
 - **Card:** Principle 8, and Roosevelt's habit? ‖ Talk in terms of the other person's interests. Roosevelt read up on each visitor's interests the night before.
 - **Try:** Before your next important conversation, spend five minutes learning what the other person cares about.
+- **Source:** *How to Win Friends and Influence People*, Part Two, “Six Ways to Make People Like You”, principle 5 of the part (8 of 30).
 
 ### hf-09 · Make the other person feel important, sincerely
 - **Group:** Making people like you
@@ -75,6 +88,8 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** Asking a senior for help: "You know the reconciliation system better than anyone; you're the person who'd see what I'm missing. Could I get 15 minutes?"
 - **Card:** Principle 9? ‖ Make the other person feel important, and do it sincerely: recognise the area where they genuinely excel.
 - **Try:** Tell a colleague, specifically, what they are the best person on the team for.
+- **Related:** hf-28
+- **Source:** *How to Win Friends and Influence People*, Part Two, “Six Ways to Make People Like You”, principle 6 of the part (9 of 30).
 
 ### hf-10 · Avoid arguments
 - **Group:** Winning people to your thinking
@@ -83,6 +98,7 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** Design review: "That's a fair point, and I hadn't weighed it that way. Let me think it over and come back with numbers on both options tomorrow."
 - **Card:** Principle 10, and why? ‖ The only way to get the best of an argument is to avoid it. Even winning one loses you goodwill; a person convinced against their will keeps their opinion.
 - **Try:** The next time you feel an argument starting, say "let me think about that" and come back with data.
+- **Source:** *How to Win Friends and Influence People*, Part Three, “How to Win People to Your Way of Thinking”, principle 1 of the part (10 of 30).
 
 ### hf-11 · Never say "you're wrong"
 - **Group:** Winning people to your thinking
@@ -91,6 +107,8 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** Code review: "I might be missing something, but I think this can double-charge if the webhook retries. Could we look at it together?"
 - **Card:** Principle 11, and Franklin's habit? ‖ Show respect for others' opinions; never say "you're wrong". Franklin dropped words like "certainly" for "it appears to me". Say "I may be wrong; let's look at the facts."
 - **Try:** For a week, replace "that's wrong" with "I may be wrong, but…" in reviews. Notice the replies.
+- **Related:** ns-04
+- **Source:** *How to Win Friends and Influence People*, Part Three, “How to Win People to Your Way of Thinking”, principle 2 of the part (11 of 30).
 
 ### hf-12 · If you're wrong, admit it quickly
 - **Group:** Winning people to your thinking
@@ -99,6 +117,7 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** Incident channel: "That outage was my change: the migration ran without the index. I've rolled it back, and here's the fix and the test that would have caught it."
 - **Card:** Principle 12, and what it does to the other person? ‖ If you are wrong, admit it quickly and emphatically: it disarms them, they become generous, and you look honest.
 - **Try:** The next time you make a mistake at work, be the first to say it, in one sentence, with the fix.
+- **Source:** *How to Win Friends and Influence People*, Part Three, “How to Win People to Your Way of Thinking”, principle 3 of the part (12 of 30).
 
 ### hf-13 · Begin in a friendly way
 - **Group:** Winning people to your thinking
@@ -107,6 +126,8 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** Salary talk: "First, thank you. I'm genuinely excited about this team and the problems you described. I want to make this work, and there's one thing I'd like to talk through: the base."
 - **Card:** Principle 13? ‖ Begin in a friendly way: show you are on their side before you make your point. A drop of honey catches more flies than a gallon of gall.
 - **Try:** Start your next disagreement with one sincere, friendly sentence about what you agree on.
+- **Related:** ns-03
+- **Source:** *How to Win Friends and Influence People*, Part Three, “How to Win People to Your Way of Thinking”, principle 4 of the part (13 of 30).
 
 ### hf-14 · Get the other person saying "yes, yes"
 - **Group:** Winning people to your thinking
@@ -115,6 +136,8 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** Design review: "We agree checkout must never double-charge? (yes) And retries will happen when the network blips? (yes) So the API needs to be safe to retry? (yes) That's why I want idempotency keys here."
 - **Card:** Principle 14, the Socratic method? ‖ Get the other person saying "yes" early: begin with what you agree on and build. A "no" is hard to take back, because of pride.
 - **Try:** Prepare three yes-questions before your next persuasion. Lead with them.
+- **Related:** inf-02
+- **Source:** *How to Win Friends and Influence People*, Part Three, “How to Win People to Your Way of Thinking”, principle 5 of the part (14 of 30).
 
 ### hf-15 · Let the other person do most of the talking
 - **Group:** Winning people to your thinking
@@ -123,6 +146,7 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** Hiring-manager round: "Before I go into my background, could you tell me what success looks like in the first six months for this role?" Then tailor every answer to what they said.
 - **Card:** Principle 15? ‖ Let the other person do a great deal of the talking. Ask questions; they will not hear you until they have said what they need to say.
 - **Try:** In your next 1:1, aim for the other person to speak at least two-thirds of the time.
+- **Source:** *How to Win Friends and Influence People*, Part Three, “How to Win People to Your Way of Thinking”, principle 6 of the part (15 of 30).
 
 ### hf-16 · Let them feel the idea is theirs
 - **Group:** Winning people to your thinking
@@ -131,6 +155,7 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** To your tech lead: "I've been stuck on how to make the payout job safe to rerun. You mentioned an outbox pattern last month; could that work here?"
 - **Card:** Principle 16, and Colonel House? ‖ Let the other person feel the idea is theirs: suggest and ask, so they discover it. House planted ideas Wilson then proposed as his own.
 - **Try:** Get one idea of yours adopted this week by asking a question that leads to it, not by proposing it.
+- **Source:** *How to Win Friends and Influence People*, Part Three, “How to Win People to Your Way of Thinking”, principle 7 of the part (16 of 30).
 
 ### hf-17 · See things from their point of view
 - **Group:** Winning people to your thinking
@@ -139,6 +164,8 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** "Help me understand what's driving the date. Is it a customer commitment? If so, maybe we can ship a smaller slice that keeps the promise."
 - **Card:** Principle 17? ‖ Try honestly to see things from the other person's point of view: find the reason behind their position and you have the key to it.
 - **Try:** Before your next disagreement, write one paragraph arguing their side as well as you can.
+- **Related:** ns-05, hf-18
+- **Source:** *How to Win Friends and Influence People*, Part Three, “How to Win People to Your Way of Thinking”, principle 8 of the part (17 of 30).
 
 ### hf-18 · Be sympathetic to their ideas and desires
 - **Group:** Winning people to your thinking
@@ -147,6 +174,8 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** Teammate frustrated about on-call: "I'd feel exactly the same after three nights of pages. Let's fix the alert that's waking you up first."
 - **Card:** Principle 18, and its magic phrase? ‖ Be sympathetic with the other person's ideas and desires: "I don't blame you for feeling as you do. If I were you I'd feel the same."
 - **Try:** Use the sympathy phrase, in your own words, the next time someone is upset with you.
+- **Related:** ns-02
+- **Source:** *How to Win Friends and Influence People*, Part Three, “How to Win People to Your Way of Thinking”, principle 9 of the part (18 of 30).
 
 ### hf-19 · Appeal to the nobler motives
 - **Group:** Winning people to your thinking
@@ -155,6 +184,7 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** Asking for tests: "Users trust us with their money; I'd love it if we could be the team that never ships a payment bug. Could we add the double-submit test before we merge?"
 - **Card:** Principle 19, the two reasons? ‖ People act for a reason that sounds good and a real one. Appeal to the nobler motive (fairness, quality, pride in craft); people respond to being treated as honest.
 - **Try:** Reframe one request you have to make around a nobler motive the other person holds.
+- **Source:** *How to Win Friends and Influence People*, Part Three, “How to Win People to Your Way of Thinking”, principle 10 of the part (19 of 30).
 
 ### hf-20 · Dramatise your ideas
 - **Group:** Winning people to your thinking
@@ -163,6 +193,8 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** Interview: instead of "my change improved latency", say "p99 at checkout went from 1.8 s to 350 ms, and the drop-off on the payment page fell by a fifth the same week."
 - **Card:** Principle 20? ‖ Dramatise your ideas: a truth stated plainly is not enough; make it vivid (a number with a story, a live demo, a before and after).
 - **Try:** Take your best STAR story and add one vivid, specific detail or number that makes it a picture.
+- **Plan:** Your six [STAR stories](/study/notes?tab=stories), week 11.
+- **Source:** *How to Win Friends and Influence People*, Part Three, “How to Win People to Your Way of Thinking”, principle 11 of the part (20 of 30).
 
 ### hf-21 · Throw down a challenge
 - **Group:** Winning people to your thinking
@@ -171,6 +203,7 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** To your team: "I bet we can get checkout p99 under 300 ms before the sale. Who wants the payment-service part?"
 - **Card:** Principle 21, and Schwab's chalk? ‖ Throw down a challenge: people love the chance to prove their worth. Schwab chalked the day shift's number and the night shift beat it.
 - **Try:** Set yourself one visible challenge this week (a time to beat on a problem type) and tell one person.
+- **Source:** *How to Win Friends and Influence People*, Part Three, “How to Win People to Your Way of Thinking”, principle 12 of the part (21 of 30).
 
 ### hf-22 · Begin with praise and honest appreciation
 - **Group:** Leading without resentment
@@ -179,6 +212,7 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** Code review comment: "The way you split the retry logic into its own module is really clean. One thing: the timeout here should probably come from config so we can tune it in prod."
 - **Card:** Principle 22, leadership's first step? ‖ Begin with praise and honest appreciation before you correct: it is the anaesthetic before the drill. Sincere and specific, or it backfires.
 - **Try:** In your next review comment, start with one sincere, specific thing done well.
+- **Source:** *How to Win Friends and Influence People*, Part Four, “Be a Leader”, principle 1 of the part (22 of 30).
 
 ### hf-23 · Call attention to mistakes indirectly
 - **Group:** Leading without resentment
@@ -187,6 +221,8 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** "This PR reads really well, and if we add a test for the empty-cart case it'll be ready to ship today."
 - **Card:** Principle 23, and the word to replace? ‖ Call attention to mistakes indirectly: replace "but" with "and" after praise, or hint so the person corrects it themselves (Schwab's cigars).
 - **Try:** For one week, remove "but" after any praise you give.
+- **Related:** hf-26
+- **Source:** *How to Win Friends and Influence People*, Part Four, “Be a Leader”, principle 2 of the part (23 of 30).
 
 ### hf-24 · Talk about your own mistakes first
 - **Group:** Leading without resentment
@@ -195,6 +231,7 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** Mentoring a junior: "I shipped a migration without a rollback plan in my first year and spent a weekend fixing it. Let's add one here so you never have that weekend."
 - **Card:** Principle 24? ‖ Talk about your own mistakes before criticising the other person: it puts you beside them, not above them.
 - **Try:** Next time you correct someone, start with a real mistake of your own in the same area.
+- **Source:** *How to Win Friends and Influence People*, Part Four, “Be a Leader”, principle 3 of the part (24 of 30).
 
 ### hf-25 · Ask questions instead of giving orders
 - **Group:** Leading without resentment
@@ -203,6 +240,8 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** To a teammate: "What do you think about moving the cache invalidation into the write path? Would that work with how you've set up the consumer?"
 - **Card:** Principle 25, Owen Young's habit? ‖ Ask questions instead of giving direct orders: it saves pride, invites ideas and makes people own the decision.
 - **Try:** Turn every instruction you give tomorrow into a question.
+- **Related:** ns-07
+- **Source:** *How to Win Friends and Influence People*, Part Four, “Be a Leader”, principle 4 of the part (25 of 30).
 
 ### hf-26 · Let the other person save face
 - **Group:** Leading without resentment
@@ -211,6 +250,7 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** Closing a design debate you won: "Both approaches were reasonable; the traffic numbers just tipped it. Your point about the cold-start cost is going into the doc as a risk to watch."
 - **Card:** Principle 26, and the Steinmetz story? ‖ Let the other person save face: give them a dignified way out (GE moved Steinmetz to a title that fit him rather than demoting him).
 - **Try:** After the next decision that goes your way, publicly credit something the other side got right.
+- **Source:** *How to Win Friends and Influence People*, Part Four, “Be a Leader”, principle 5 of the part (26 of 30).
 
 ### hf-27 · Praise every improvement
 - **Group:** Leading without resentment
@@ -219,6 +259,7 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** To a junior: "Your last two PRs had tests for the edge cases without anyone asking. That's exactly the habit that makes someone trusted with payments."
 - **Card:** Principle 27? ‖ Praise the slightest improvement and every improvement, specifically and heartily: it makes people want to keep going.
 - **Try:** Praise yourself, in writing, for one small improvement in this week's study (it works on you too).
+- **Source:** *How to Win Friends and Influence People*, Part Four, “Be a Leader”, principle 6 of the part (27 of 30).
 
 ### hf-28 · Give them a fine reputation to live up to
 - **Group:** Leading without resentment
@@ -227,6 +268,7 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** "You're the one person here who always thinks about failure modes, which is why I want you on the reconciliation design."
 - **Card:** Principle 28? ‖ Give the other person a fine reputation to live up to: treat the trait you want as one they already have, and they will work to deserve it.
 - **Try:** Give one person a specific reputation to live up to this week, sincerely.
+- **Source:** *How to Win Friends and Influence People*, Part Four, “Be a Leader”, principle 7 of the part (28 of 30).
 
 ### hf-29 · Make the fault seem easy to correct
 - **Group:** Leading without resentment
@@ -235,6 +277,7 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** To a teammate struggling with a design round: "You already think about consistency better than most; the rest is a framework. Two mock rounds with the six forces and it'll click."
 - **Card:** Principle 29? ‖ Use encouragement: make the fault seem easy to correct and show faith in the person's ability.
 - **Try:** Tell yourself this about your weakest topic: "This is a framework I haven't practised yet." Then practise it once.
+- **Source:** *How to Win Friends and Influence People*, Part Four, “Be a Leader”, principle 8 of the part (29 of 30).
 
 ### hf-30 · Make them happy to do what you suggest
 - **Group:** Leading without resentment
@@ -243,3 +286,10 @@ The other half of power: getting people to *want* to work with you, back you and
 - **Script:** Delegating: "Would you lead the rollout of the new retry library? You'd present it at the platform review, which is the visibility you said you wanted for promotion."
 - **Card:** Principle 30, the checklist? ‖ Make the other person happy to do what you suggest: be sincere, be clear, find what they gain (recognition, growth) and frame the request around it.
 - **Try:** Next time you need help, name the specific benefit for the other person in the same sentence as the request.
+- **Source:** *How to Win Friends and Influence People*, Part Four, “Be a Leader”, principle 9 of the part (30 of 30).
+
+### Notes
+
+- **Edition:** Dale Carnegie, *How to Win Friends and Influence People* (Simon & Schuster, 1936). The thirty principles follow the 1936 order. Later revised editions dropped a part on letters and on family life; those parts are not here.
+- **Quotes** in the lessons are Carnegie's, or the people he quotes (Lincoln, Franklin, Schwab). The "Say it like this" scripts are mine, written for an engineering job.
+- **A caution:** the book is built from anecdotes, not experiments. The research on liking that backs much of it is in *Influence* ("Liking").

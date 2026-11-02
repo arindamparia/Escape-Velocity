@@ -18,6 +18,8 @@ const BOOK_HEADING = /^## Book · ([a-z]+) · (.+?) · (.+)$/
 const ITEM_HEADING = /^### ([a-z]+-\d{2}) · (.+)$/
 const FIELD = /^- \*\*([A-Za-z]+):\*\* ?(.*)$/
 const SPLIT = ' ‖ '
+/** How an idea's book is named in a reference */
+const SHORT: Record<BookId, string> = { ah: 'Atomic Habits', law: '48 Laws', hf: 'How to Win Friends', inf: 'Influence', ns: 'Never Split the Difference', dw: 'Deep Work', ms: 'Make It Stick', fk: 'Field kit' }
 /** Task types with no work in them, so no two-minute start */
 const NO_START: readonly TaskType[] = ['rest', 'ready']
 const CHAPTERS = 4
@@ -26,25 +28,29 @@ const WEEKS = 13
 interface RawItem { id: string; title: string; fields: Map<string, string>; file: string; line: number; book?: BookId; section: string }
 
 /** Read one file into books, items (ideas and scenarios) and plain sections (by their ## heading). */
-function scan(file: string, src: string, errors: string[], out: { books: Map<BookId, { title: string; by: string; why: string[] }>; items: RawItem[]; sections: Map<string, string[]> }) {
+type RawBook = { title: string; by: string; why: string[]; notes: string[] }
+
+function scan(file: string, src: string, errors: string[], out: { books: Map<BookId, RawBook>; items: RawItem[]; sections: Map<string, string[]> }) {
   const lines = src.split('\n')
   let section = ''
   let book: BookId | undefined
   let item: RawItem | null = null
   let field: string | null = null
+  let notes = false // inside a book's "### Notes"
   const finish = () => { if (item) out.items.push(item); item = null; field = null }
   lines.forEach((raw, i) => {
     const line = raw.replace(/\s+$/, '')
     const at = `${file}:${i + 1}`
-    if (/^# /.test(line)) { finish(); section = ''; book = undefined; return }
+    if (/^# /.test(line)) { finish(); section = ''; book = undefined; notes = false; return }
     if (line.startsWith('## ')) {
       finish()
+      notes = false
       const b = BOOK_HEADING.exec(line)
       if (b) {
         if (!(BOOKS as readonly string[]).includes(b[1])) { errors.push(`${at}: unknown book id "${b[1]}" (known: ${BOOKS.join(', ')})`); book = undefined; section = ''; return }
         book = b[1] as BookId
         if (out.books.has(book)) errors.push(`${at}: book ${book} appears twice`)
-        out.books.set(book, { title: b[2].trim(), by: b[3].trim(), why: [] })
+        out.books.set(book, { title: b[2].trim(), by: b[3].trim(), why: [], notes: [] })
         section = `book:${book}`
       } else {
         book = undefined
@@ -54,9 +60,12 @@ function scan(file: string, src: string, errors: string[], out: { books: Map<Boo
       }
       return
     }
+    if (line === '### Notes' && book) { finish(); notes = true; return }
+    if (notes && book && !line.startsWith('### ')) { out.books.get(book)!.notes.push(line); return }
     const h = ITEM_HEADING.exec(line)
     if (h) {
       finish()
+      notes = false
       item = { id: h[1], title: h[2].trim(), fields: new Map(), file, line: i + 1, book, section }
       return
     }
@@ -107,6 +116,10 @@ function compileIdea(raw: RawItem, errors: string[]): GrowthIdea | null {
     more: (IDEA_FIELDS as readonly IdeaField[]).filter((f) => MORE_LABEL[f] && raw.fields.get(f)?.trim()).map((f) => ({ field: f, label: MORE_LABEL[f]!, html: block(raw.fields.get(f)!) })),
     card: { front: plain(parts[0] ?? ''), back: plain(parts[1] ?? '') },
     tryHtml: block(raw.fields.get('Try') ?? ''),
+    planHtml: raw.fields.get('Plan')?.trim() ? block(raw.fields.get('Plan')!) : '',
+    sourceHtml: sup(renderInline(raw.fields.get('Source') ?? '')),
+    related: (raw.fields.get('Related') ?? '').split(/,\s*/).map((s) => s.trim()).filter(Boolean),
+    scenarios: [],
     text: plain(lesson.replace(/\n/g, ' ')),
   }
 }
@@ -183,7 +196,7 @@ function compileProgramme(sections: Map<string, string[]>, ideaIds: string[], er
 /** Compile every file under plan/growth (name -> text, read in name order). */
 export function compileGrowth(files: Record<string, string>): GrowthOutput {
   const errors: string[] = []
-  const acc = { books: new Map<BookId, { title: string; by: string; why: string[] }>(), items: [] as RawItem[], sections: new Map<string, string[]>() }
+  const acc = { books: new Map<BookId, RawBook>(), items: [] as RawItem[], sections: new Map<string, string[]>() }
   for (const name of Object.keys(files).sort()) scan(name, files[name], errors, acc)
 
   // ideas, numbered 01, 02 … in file order inside each book, ids unique
@@ -208,9 +221,20 @@ export function compileGrowth(files: Record<string, string>): GrowthOutput {
 
   const known = new Set(ideas.map((i) => i.id))
   const scenarios = rawScenarios.map((r) => compileScenario(r, known, errors)).filter((s): s is GrowthScenario => !!s)
+  // links run both ways: a related idea written on one card shows on both, and every idea knows the scenarios that use it
+  const byIdea = new Map(ideas.map((i) => [i.id, i]))
+  for (const idea of ideas) {
+    for (const r of idea.related) {
+      if (r === idea.id) errors.push(`${idea.id}: Related names itself`)
+      else if (!byIdea.has(r)) errors.push(`${idea.id}: Related names ${r}, which does not exist`)
+    }
+  }
+  for (const idea of ideas) for (const r of idea.related) { const other = byIdea.get(r); if (other && !other.related.includes(idea.id)) other.related.push(idea.id) }
+  for (const sc of scenarios) for (const id of sc.ideas) byIdea.get(id)?.scenarios.push(sc.id)
   scenarios.forEach((s, i) => { if (s.id !== `sc-${String(i + 1).padStart(2, '0')}`) errors.push(`Scenarios must be numbered in order from sc-01; found ${s.id} at place ${i + 1}`) })
 
   const { programme, order } = compileProgramme(acc.sections, ideas.map((i) => i.id), errors)
+  for (const b of BOOKS) if (acc.books.has(b) && !acc.books.get(b)!.notes.join('').trim()) errors.push(`${b}: the book needs a "### Notes" block (edition, what was left out, what is disputed)`)
   if (errors.length) throw new PlanCompileError(errors)
 
   const byId = new Map(ideas.map((i) => [i.id, i]))
@@ -218,8 +242,8 @@ export function compileGrowth(files: Record<string, string>): GrowthOutput {
   const bookMeta: GrowthBook[] = BOOKS.map((b) => {
     const meta = acc.books.get(b)!
     const mine = ideas.filter((i) => i.book === b)
-    const book: GrowthBook = { id: b, title: meta.title, by: meta.by, whyHtml: renderBlock(meta.why.join('\n').trim()), groups: [...new Set(mine.map((i) => i.group))], count: mine.length }
-    books[b] = { book, ideas: mine }
+    const book: GrowthBook = { id: b, title: meta.title, short: SHORT[b], by: meta.by, whyHtml: renderBlock(meta.why.join('\n').trim()), groups: [...new Set(mine.map((i) => i.group))], count: mine.length }
+    books[b] = { book, ideas: mine, notesHtml: renderBlock(meta.notes.join('\n').trim()) }
     return book
   })
   const index: GrowthIndex = {

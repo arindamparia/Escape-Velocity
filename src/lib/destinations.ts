@@ -108,7 +108,7 @@ export const urls = {
   /** A readiness item (r-03) is not in a week: it is on Progress, in the ready check. */
   readiness: (id: string) => `/progress#${id}`,
   /** a Growth idea, in its book (law-03 is on /growth/law) */
-  idea: (id: string) => `/growth/${id.split('-')[0]}#${id}`,
+  idea: (id: string) => (id.startsWith('sc-') ? `/growth/scenarios#${id}` : `/growth/${id.split('-')[0]}#${id}`),
   term: (id: string) => `/guide#${id}`,
   design: (id: string) => `/library?design=${id}`,
   machine: () => '/library?tab=machine',

@@ -11,6 +11,7 @@ The operating manual for the 13 weeks. Every other book here is easier to apply 
 - **Plan:** Six problems a week looks like nothing. Over 13 weeks it is about 80 timed problems with notes, and every design you redraw makes the next one cheaper. Trust the direction, not this week's feeling.
 - **Card:** What does 1% better every day give you in a year? ‖ About 37 times better (1.01^365); 1% worse leaves you near zero. Habits compound, so judge the trajectory, not this week's result.
 - **Try:** Pick one study habit you have kept this week. Write what it becomes if you keep it for 13 weeks (count it: problems, designs, cards).
+- **Source:** *Atomic Habits*, ch. 1, “The Surprising Power of Atomic Habits”.
 
 ### ah-02 · The plateau of latent potential
 - **Group:** The fundamentals
@@ -19,6 +20,8 @@ The operating manual for the 13 weeks. Every other book here is easier to apply 
 - **Plan:** Weeks 5 to 8 are the valley: designs get harder, mocks begin, and the scorecard can go flat. That is stored work. Check the redraws: those are the degrees.
 - **Card:** What is the valley of disappointment? ‖ The gap between the straight line you expect and the flat-then-sudden curve that really happens. The work is stored, not lost; most people quit inside it.
 - **Try:** Write down one skill you have that came "all at once" after a long flat stretch (JEE maths, a language, coding). Keep it where you see it during week 5.
+- **Related:** ms-07
+- **Source:** *Atomic Habits*, ch. 1, “The Surprising Power of Atomic Habits”.
 
 ### ah-03 · Systems beat goals
 - **Group:** The fundamentals
@@ -27,14 +30,18 @@ The operating manual for the 13 weeks. Every other book here is easier to apply 
 - **Plan:** The goal (an SDE-2 offer at Indian fintech) is set. The system is the routine: DSA every morning, a design every Saturday, a mock every week from week 8. Measure the system.
 - **Card:** "You do not rise to the level of your goals…" ‖ "…you fall to the level of your systems." Goals set direction; systems make progress. Goals end; systems keep going.
 - **Try:** Rewrite one goal as a system in one line: not "solve 80 problems" but "every weekday at 7:00, one timed medium, then log it".
+- **Related:** law-29
+- **Source:** *Atomic Habits*, ch. 1, “The Surprising Power of Atomic Habits”.
 
 ### ah-04 · Identity: every action is a vote
 - **Group:** The fundamentals
 - **Ask:** Two people are offered a cigarette. One says "No thanks, I'm trying to quit." The other says "No thanks, I'm not a smoker." Who is more likely to still be off them in a year?
 - **Lesson:** Change has three layers: outcomes (what you get), processes (what you do), identity (what you believe about yourself). Most people start with outcomes. Lasting change starts with identity: decide who you want to be, then prove it to yourself with small wins. Every action is a vote for the type of person you want to become. You do not need a unanimous vote, just a majority. Habits are how you embody an identity, and the identity is what keeps the habits going on the days the motivation is gone.
-- **Plan:** Each chapter of the plan gets an identity statement ("I am an engineer who solves one problem a day"). The Growth tab counts the votes from your real actions, every week.
+- **Plan:** Each chapter of the plan has an identity statement ("I am an engineer who solves one problem a day"). Write yours under [Who you are becoming](/growth/habits#identity-edit); the session counts the week's votes for it.
 - **Card:** What are the three layers of behaviour change, and which one do lasting habits start from? ‖ Outcomes, processes, identity. Start from identity: decide who you are, then prove it with small wins. Every action is a vote.
 - **Try:** Write your identity statement for this chapter on the Growth tab. Then cast one vote for it today, as small as you like.
+- **Related:** inf-02, ah-24, law-25
+- **Source:** *Atomic Habits*, ch. 2, “How Your Habits Shape Your Identity (and Vice Versa)”.
 
 ### ah-05 · The habit loop
 - **Group:** The fundamentals
@@ -43,6 +50,8 @@ The operating manual for the 13 weeks. Every other book here is easier to apply 
 - **Plan:** Every app feature you use maps to a law: the next-up card (obvious), Cabin and your why (attractive), the two-minute start (easy), the tick and the votes (satisfying).
 - **Card:** The habit loop, and the four laws it gives you? ‖ Cue, craving, response, reward. Make it obvious, attractive, easy, satisfying (and invisible, unattractive, difficult, unsatisfying to break one).
 - **Try:** Take one habit you want to break (doomscrolling at night, say). Write its cue, craving, response and reward.
+- **Related:** ah-18
+- **Source:** *Atomic Habits*, ch. 3, “How to Build Better Habits in 4 Simple Steps”.
 
 ### ah-06 · The habits scorecard
 - **Group:** 1st law: make it obvious
@@ -51,14 +60,17 @@ The operating manual for the 13 weeks. Every other book here is easier to apply 
 - **Plan:** Before you change your routine, list your weekday from waking to the morning DSA slot. You will usually find the cue that is stealing the slot.
 - **Card:** What is the habits scorecard? ‖ A list of your daily habits, each marked +, − or =, judged by one question: does it vote for the person I want to become? Awareness first, change second.
 - **Try:** Write your weekday scorecard tomorrow morning, from waking up to opening the laptop: every habit, + − or =.
+- **Source:** *Atomic Habits*, ch. 4, “The Man Who Didn’t Look Right”.
 
 ### ah-07 · Implementation intentions
 - **Group:** 1st law: make it obvious
 - **Ask:** Two groups want to exercise. One is also asked to write "I will exercise on [day] at [time] in [place]". Roughly how much more often does that group actually do it?
 - **Lesson:** In a well-known British study, 91% of the group who wrote down when and where exercised at least once a week, against about 35 to 38% of the others. Many people who think they lack motivation actually lack clarity. Use this sentence: **I will [behaviour] at [time] in [location].** A concrete plan removes the decision from the moment; you are no longer deciding whether, only following a plan you already made. It also makes it obvious when you have missed, so you can come back.
-- **Plan:** Each block of the routine has an anchor in this form. Edit yours on the Growth tab's Habits view; Today shows the one for the block you are in.
+- **Plan:** Each block of your routine has an anchor in this form, under [Habits and anchors](/growth/habits). Today shows the one for the block you are in.
 - **Card:** The implementation intention sentence? ‖ "I will [behaviour] at [time] in [location]." Many people who think they lack motivation lack clarity.
 - **Try:** Write the implementation intention for tomorrow's morning DSA: time, place, and the first click.
+- **Related:** ah-08
+- **Source:** *Atomic Habits*, ch. 5, “The Best Way to Start a New Habit”. The 91% figure: Milne, Orbell & Sheeran (2002), *British Journal of Health Psychology* 7(2).
 
 ### ah-08 · Habit stacking
 - **Group:** 1st law: make it obvious
@@ -67,6 +79,7 @@ The operating manual for the 13 weeks. Every other book here is easier to apply 
 - **Plan:** The launch ritual is a stack: after I pour my tea → I open Today → I press Start (the Cabin sound is the signal that work has begun).
 - **Card:** The habit stacking formula? ‖ "After [current habit], I will [new habit]." Use a specific anchor that happens at the right time and frequency.
 - **Try:** Write a three-step stack ending in "I press Start". Run it once tomorrow.
+- **Source:** *Atomic Habits*, ch. 5, “The Best Way to Start a New Habit”. The “After I…” recipe also appears in BJ Fogg’s *Tiny Habits* (2019).
 
 ### ah-09 · Design your environment
 - **Group:** 1st law: make it obvious
@@ -75,6 +88,8 @@ The operating manual for the 13 weeks. Every other book here is easier to apply 
 - **Plan:** One study corner, one browser profile or window with only Today pinned. The notebook and pen stay on the desk overnight, open.
 - **Card:** What does "one space, one use" mean? ‖ Give each place (or device, or chair) one job, so the context itself becomes the cue for the habit. Environment beats motivation.
 - **Try:** Change one thing in your space tonight so tomorrow's study cue is the first thing you see.
+- **Related:** ah-10, dw-03
+- **Source:** *Atomic Habits*, ch. 6, “Motivation Is Overrated; Environment Often Matters More”. The cafeteria study: Thorndike et al. (2012), *American Journal of Public Health* 102(3).
 
 ### ah-10 · Self-control is a short-term strategy
 - **Group:** 1st law: make it obvious
@@ -83,6 +98,7 @@ The operating manual for the 13 weeks. Every other book here is easier to apply 
 - **Plan:** During a timer, the phone lives outside the room. Instagram and YouTube are logged out on the study browser (Cabin plays without the YouTube tab).
 - **Card:** How do you break a habit through the first law? ‖ Make it invisible: reduce exposure to its cue. Disciplined people structure their environment so they need less self-control.
 - **Try:** Pick the one cue that most often breaks your study session. Make it invisible for a week.
+- **Source:** *Atomic Habits*, ch. 7, “The Secret to Self-Control”.
 
 ### ah-11 · Temptation bundling
 - **Group:** 2nd law: make it attractive
@@ -91,6 +107,8 @@ The operating manual for the 13 weeks. Every other book here is easier to apply 
 - **Plan:** Your best tea, the playlist you like, or the Forest sound only during the timer. After the morning DSA, then the news.
 - **Card:** The temptation bundling formula? ‖ "After [current habit], I will [habit I need]. After [habit I need], I will [habit I want]." Dopamine rises in anticipation, so make the habit look attractive.
 - **Try:** Name one thing you enjoy and allow it only with, or right after, one study block this week.
+- **Related:** ah-13
+- **Source:** *Atomic Habits*, ch. 8, “How to Make a Habit Irresistible”. Premack (1959), *Psychological Review* 66(4).
 
 ### ah-12 · Join a culture where your habit is normal
 - **Group:** 2nd law: make it attractive
@@ -99,6 +117,8 @@ The operating manual for the 13 weeks. Every other book here is easier to apply 
 - **Plan:** From week 8 you will have a mock partner. Earlier: a Discord or WhatsApp group of people preparing for SDE-2 interviews, or one colleague doing the same. Make preparing normal.
 - **Card:** Which three groups do we imitate? ‖ The close (family, friends), the many (the tribe), and the powerful (status). Join a culture where your habit is the normal behaviour.
 - **Try:** Find one person or group preparing for the same interviews this week and send them one message.
+- **Related:** inf-03, inf-07
+- **Source:** *Atomic Habits*, ch. 9, “The Role of Family and Friends in Shaping Your Habits”.
 
 ### ah-13 · Reframe "have to" as "get to"
 - **Group:** 2nd law: make it attractive
@@ -107,6 +127,7 @@ The operating manual for the 13 weeks. Every other book here is easier to apply 
 - **Plan:** Read your why line on Today before the hard block. It is the reframe already written down.
 - **Card:** How do you make a hard habit more attractive through mindset? ‖ Reframe it: "have to" becomes "get to", nerves become excitement, and link it to a deeper motive. A motivation ritual right before it sets the mood.
 - **Try:** Rewrite your three least favourite study tasks as "I get to…, which means…".
+- **Source:** *Atomic Habits*, ch. 10, “How to Find and Fix the Causes of Your Bad Habits”. Reappraising nerves as excitement: Brooks (2014), *Journal of Experimental Psychology: General* 143(3).
 
 ### ah-14 · Motion versus action
 - **Group:** 3rd law: make it easy
@@ -115,6 +136,8 @@ The operating manual for the 13 weeks. Every other book here is easier to apply 
 - **Plan:** Watching the design video is motion; the cold 45-minute attempt is action. That is why the learning loop starts with the attempt.
 - **Card:** Motion or action: what is the difference, and what forms a habit? ‖ Motion is planning and learning about it; action produces the result. Habits form from the number of repetitions, not the number of days.
 - **Try:** Look at yesterday's study time. How much was motion and how much was action? Turn one motion item into action today.
+- **Related:** ms-05
+- **Source:** *Atomic Habits*, ch. 11, “Walk Slowly, but Never Backward”. How long habits take: Lally et al. (2010), *European Journal of Social Psychology* 40(6). The photography class comes from Bayles & Orland, *Art & Fear* (1993).
 
 ### ah-15 · The law of least effort
 - **Group:** 3rd law: make it easy
@@ -123,14 +146,17 @@ The operating manual for the 13 weeks. Every other book here is easier to apply 
 - **Plan:** One click on Today starts the timer, the sound and the right tool. Keep it that way: a task that needs four tabs set up before it starts will not start.
 - **Card:** How does the law of least effort apply to habits? ‖ We follow the path with the least friction. Remove steps before good habits, add them before bad ones, and prime the environment for the next use.
 - **Try:** Tonight, prime tomorrow's first task: open what it needs and leave it there.
+- **Source:** *Atomic Habits*, ch. 12, “The Law of Least Effort”.
 
 ### ah-16 · The two-minute rule
 - **Group:** 3rd law: make it easy
 - **Ask:** You want to read 30 books a year. What is the two-minute version of that habit?
 - **Lesson:** When you start a new habit, it should take less than two minutes. "Read before bed" becomes "read one page". "Do a design" becomes "write the functional requirements". The point is that a habit must be **established before it can be improved**: master the art of showing up. The first two minutes become a ritual that starts the larger routine (a gateway habit). Clear's own trick: some days he goes to the gym, works out for five minutes and leaves, on purpose, to protect the habit of going.
-- **Plan:** Today's next-up card has a two-minute start for every kind of task ("Can't face it?"). On a bad day the two minutes count. Often they become forty.
+- **Plan:** Every kind of task has one (see [Two-minute starts](/growth/habits#starts)), and Today's next-up card offers it under "Can't face it?". On a bad day the two minutes count. Often they turn into forty.
 - **Card:** The two-minute rule? ‖ A new habit should take less than two minutes to start. Standardise before you optimise: a habit must be established before it can be improved.
 - **Try:** Use the two-minute start on the task you have avoided the longest. Stop at two minutes if you want.
+- **Related:** ah-15
+- **Source:** *Atomic Habits*, ch. 13, “How to Stop Procrastinating by Using the Two-Minute Rule”.
 
 ### ah-17 · Make it inevitable
 - **Group:** 3rd law: make it easy
@@ -139,6 +165,7 @@ The operating manual for the 13 weeks. Every other book here is easier to apply 
 - **Plan:** Download the calendar file from Settings once: every block of the 13 weeks is in your calendar with a reminder. That one action does more than daily willpower.
 - **Card:** What are commitment devices and one-time actions? ‖ Choices made now that lock in future behaviour (Hugo's shawl), and single actions that make a good habit automatic for good (a calendar block, a blocker, unsubscribing).
 - **Try:** Do one one-time action this week that makes studying the default (calendar file, blocker, an app deleted).
+- **Source:** *Atomic Habits*, ch. 14, “How to Make Good Habits Inevitable and Bad Habits Impossible”.
 
 ### ah-18 · The cardinal rule of behaviour change
 - **Group:** 4th law: make it satisfying
@@ -147,14 +174,17 @@ The operating manual for the 13 weeks. Every other book here is easier to apply 
 - **Plan:** The tick, the star in the constellation, the vote count on Growth. Make the reward instant: tick the moment you finish, not at the end of the day.
 - **Card:** The cardinal rule of behaviour change? ‖ What is immediately rewarded is repeated; what is immediately punished is avoided. Add an immediate reward to habits that pay off later.
 - **Try:** Choose a small, identity-friendly reward for finishing tomorrow's hardest block, and take it right away.
+- **Source:** *Atomic Habits*, ch. 15, “The Cardinal Rule of Behavior Change”.
 
 ### ah-19 · Track it, and never miss twice
 - **Group:** 4th law: make it satisfying
 - **Ask:** Jerry Seinfeld put an X on a calendar for every day he wrote jokes. What was his only rule?
 - **Lesson:** Don't break the chain. Tracking makes a habit obvious (the tracker is a cue), attractive (progress is motivating) and satisfying (the X is a reward). But life will interrupt any chain, so the real rule is **never miss twice**. Missing once is an accident; missing twice is the start of a new habit. The first miss is rarely the problem; the spiral after it is. Showing up on a bad day, even for two minutes, is the most valuable rep. A warning: measure the right thing (Goodhart's law: when a measure becomes a target, it stops being a good measure).
-- **Plan:** The study calendar in Settings and the Growth votes are your X's. After a miss, Today's welcome-back is ten minutes on purpose: it exists so you never miss twice.
+- **Plan:** Your X's are the [study calendar](/settings#history) and the habit ticks in each Growth session. After a missed day, Today's welcome-back asks for ten minutes and no more: it is there so you never miss twice.
 - **Card:** The habit tracking rule that matters most? ‖ Never miss twice. One miss is an accident, two is the start of a new habit. Showing up on a bad day is the rep that matters.
 - **Try:** Next time you miss a day, do the two-minute version the very next day, whatever else happens.
+- **Related:** ah-20, fk-03
+- **Source:** *Atomic Habits*, ch. 16, “How to Stick with Good Habits Every Day”.
 
 ### ah-20 · The habit contract
 - **Group:** 4th law: make it satisfying
@@ -163,6 +193,8 @@ The operating manual for the 13 weeks. Every other book here is easier to apply 
 - **Plan:** From week 8, the mock partner is this: you show up because someone is waiting. Earlier, send your weekly points to one friend every Sunday.
 - **Card:** How do you break a bad habit through the fourth law? ‖ Make it unsatisfying: an immediate, visible cost. A habit contract with an accountability partner adds social pain.
 - **Try:** Tell one person your weekly study target and ask them to check on Sunday.
+- **Related:** inf-02
+- **Source:** *Atomic Habits*, ch. 17, “How an Accountability Partner Can Change Everything”.
 
 ### ah-21 · Pick the right game
 - **Group:** Advanced tactics
@@ -171,22 +203,27 @@ The operating manual for the 13 weeks. Every other book here is easier to apply 
 - **Plan:** Your edge is fintech: payments (Adyen, checkout, UCP) plus systems plus AI. Week 6 (payments) and week 9 (AI systems) are where you play your own game. Lean into them in stories.
 - **Card:** How do you choose habits and fields that suit you? ‖ Pick the game where your nature gives you an edge: what feels like fun to you but work to others. If you cannot be better, be different (combine skills).
 - **Try:** Write the one sentence that makes you different from other SDE-2 candidates (your combination of skills).
+- **Source:** *Atomic Habits*, ch. 18, “The Truth About Talent”.
 
 ### ah-22 · The Goldilocks rule
 - **Group:** Advanced tactics
 - **Ask:** Why do you lose interest in a problem that is too easy, and also in one that is far too hard?
-- **Lesson:** Humans have peak motivation working on tasks at the edge of their current ability: not too hard, not too easy, just right. Too easy is boring; too hard is discouraging. Some research puts the sweet spot near a 4% stretch past your current skill. The greatest threat to success is not failure but **boredom**: when the novelty wears off, the professionals keep going and the amateurs drift. "Professionals stick to the schedule; amateurs let life get in the way." Learn to fall in love with boredom.
+- **Lesson:** Humans have peak motivation working on tasks at the edge of their current ability: not too hard, not too easy, just right. Too easy is boring; too hard is discouraging. Clear calls it working on tasks of “just manageable difficulty”. The greatest threat to success is not failure but **boredom**: when the novelty wears off, the professionals keep going and the amateurs drift. "Professionals stick to the schedule; amateurs let life get in the way." Learn to fall in love with boredom.
 - **Plan:** If you solve every medium in 15 minutes, move to harder ones; if you miss three in a row, drop back a level for a day. The boss problem is the deliberate stretch.
 - **Card:** The Goldilocks rule? ‖ Motivation peaks on tasks at the edge of your ability, just manageable. The biggest threat is boredom, not failure: professionals keep the schedule when it stops being exciting.
 - **Try:** Check your last five problems: too easy, just right, or too hard? Adjust the next one.
+- **Related:** ms-07, hf-21
+- **Source:** *Atomic Habits*, ch. 19, “The Goldilocks Rule”.
 
 ### ah-23 · Habits plus deliberate practice
 - **Group:** Advanced tactics
 - **Ask:** A habit makes something automatic. Why can that be a problem when you want to get better at it?
 - **Lesson:** The upside of habits is that you do things without thinking; the downside is that you stop paying attention to small errors and stop improving. Mastery is **habits + deliberate practice**: automate the basics so you can spend attention on the next challenge, then repeat. Keep a system of **reflection and review**: Clear does an annual review (what went well, what did not, what did I learn) and an integrity report (am I living by my values?). Reviews let you notice the plateau before it turns into a rut.
-- **Plan:** The Sunday review is this. The redraws are deliberate practice on top of the Saturday habit: you check against the answer and find the error.
+- **Plan:** The [Sunday review](/progress/review) for study, and the Growth review that appears in Sunday's session. The redraws are deliberate practice on top of the Saturday habit: you check against the answer and find the error.
 - **Card:** What is mastery, in Atomic Habits? ‖ Habits plus deliberate practice: automate the basics, spend attention on the next weakness, and review regularly so automaticity does not freeze your skill.
 - **Try:** This Sunday, write three lines: what went well, what didn't, and one thing to change next week.
+- **Related:** ms-06, dw-07
+- **Source:** *Atomic Habits*, ch. 20, “The Downside of Creating Good Habits”.
 
 ### ah-24 · Keep your identity small
 - **Group:** Advanced tactics
@@ -195,3 +232,12 @@ The operating manual for the 13 weeks. Every other book here is easier to apply 
 - **Plan:** A failed mock or a rejection is data about a skill, not a verdict on you. Your identity statement is about how you work, never about the outcome.
 - **Card:** Why keep your identity small? ‖ An identity tied to one role or belief breaks when reality changes, and makes failure feel like a threat. Define yourself by how you work, not by the role or the result.
 - **Try:** Rewrite one identity you hold ("I'm bad at DP", "I'm a backend guy") as a statement about how you work.
+- **Source:** *Atomic Habits*, ch. 20, “The Downside of Creating Good Habits”. The phrase is Paul Graham’s, from his 2009 essay “Keep Your Identity Small”.
+
+### Notes
+
+- **Edition:** James Clear, *Atomic Habits: An Easy & Proven Way to Build Good Habits & Break Bad Ones* (Avery, 2018). Chapter numbers follow that edition.
+- **The 1% figure** is a picture of compounding, not a measured rate of improvement.
+- **How long a habit takes:** Lally and colleagues (2010) followed 96 people building a new daily habit. The median time to automaticity was 66 days, and the range ran from 18 to 254. The "21 days" figure has no study behind it.
+- **The 91% study** compared people who only read about the benefits of exercise, people who also got a motivational talk, and people who also wrote an implementation intention. Only the last group changed much.
+- **Left out:** the chapter on genes is cut down to its practical advice. The book's appendix, on applying the laws to business and parenting, is left out.

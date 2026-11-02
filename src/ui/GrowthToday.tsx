@@ -59,7 +59,7 @@ export function GrowthFold({ small, open = false }: { small: boolean; open?: boo
               {fresh.map((i) => <li key={i.id}><strong>{i.title}</strong> <span class="muted">· {index.books.find((b) => b.id === i.book)?.title}</span></li>)}
             </ul>
           ) : <p class="small muted m0">{s.pathDone ? 'Every idea is learned; your cards keep it sharp.' : 'Today’s ideas are done.'}</p>}
-          <div><a class="btn btn--small" href="/growth">Open today’s session</a> <span class="small muted">Its own track: no study points, no streak.</span></div>
+          <div><a class="btn btn--small" href="/growth">Open today’s session</a></div>
           <Habits compact />
         </div>
       </details>

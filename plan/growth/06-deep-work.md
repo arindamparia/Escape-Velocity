@@ -11,6 +11,7 @@ You have about 15 hours a week. Done deep, they are worth twice as much. This is
 - **Plan:** A 25-minute timer with the phone in the other room is worth more than an hour with Slack open. The timer and Cabin exist to make your hours deep.
 - **Card:** Newport's formula for high-quality work, and his hypothesis? ‖ Work produced = time spent × intensity of focus. Deep work is becoming more valuable and more rare, so those who can do it will thrive.
 - **Try:** Track one study session: how many minutes were truly undistracted?
+- **Source:** *Deep Work*, Part 1, chs. 1–3 (valuable, rare, meaningful).
 
 ### dw-02 · Attention residue
 - **Group:** The idea
@@ -19,6 +20,8 @@ You have about 15 hours a week. Done deep, they are worth twice as much. This is
 - **Plan:** During the morning DSA block: no inbox, no news, no "just checking". If you must check, do it before you press Start, not during.
 - **Card:** What is attention residue? ‖ When you switch tasks, part of your attention stays on the old one, lowering performance on the new one. Even quick checks fragment focus.
 - **Try:** Do tomorrow's DSA block with zero checks of anything. Compare how it felt.
+- **Related:** dw-04
+- **Source:** *Deep Work*, Part 1, ch. 2, “Deep Work Is Rare”. Attention residue: Leroy (2009), *Organizational Behavior and Human Decision Processes* 109(2).
 
 ### dw-03 · Choose your depth philosophy, and ritualise it
 - **Group:** Rules
@@ -27,6 +30,7 @@ You have about 15 hours a week. Done deep, they are worth twice as much. This is
 - **Plan:** This plan is rhythmic: every weekday morning and night at a fixed time, a long Saturday block. The anchors on the Growth tab are your rituals; keep them exact.
 - **Card:** Newport's four depth philosophies, and which suits a full-time job? ‖ Monastic, bimodal, rhythmic, journalistic. Rhythmic (a fixed daily time, made a habit) suits most people with jobs; ritualise where, how long, how and what supports it.
 - **Try:** Write your ritual for the Saturday design block: place, length, rules, support.
+- **Source:** *Deep Work*, Part 2, Rule #1, “Work Deeply”.
 
 ### dw-04 · Embrace boredom
 - **Group:** Rules
@@ -35,6 +39,7 @@ You have about 15 hours a week. Done deep, they are worth twice as much. This is
 - **Plan:** On your walk, take one design or the boss problem and think it through with no phone. It doubles as exercise (rule 6) and practice.
 - **Card:** "Don't take breaks from distraction…" ‖ "…take breaks from focus." Schedule internet use; be bored on purpose; practise productive meditation on one problem during a walk.
 - **Try:** Take one 20-minute walk this week thinking only about one design problem.
+- **Source:** *Deep Work*, Part 2, Rule #2, “Embrace Boredom”.
 
 ### dw-05 · Quit social media (the craftsman approach)
 - **Group:** Rules
@@ -43,6 +48,7 @@ You have about 15 hours a week. Done deep, they are worth twice as much. This is
 - **Plan:** LinkedIn may earn its place in weeks 12 and 13 (referrals). Most other feeds don't earn a place in the 13 weeks.
 - **Card:** Any-benefit versus craftsman approach? ‖ Any-benefit: use a tool if it has any benefit. Craftsman: only if its positive impact on your core goals substantially outweighs the negative. Test with a 30-day break.
 - **Try:** Pick one app and leave it for 30 days without telling anyone. Note the date.
+- **Source:** *Deep Work*, Part 2, Rule #3, “Quit Social Media”.
 
 ### dw-06 · Drain the shallows
 - **Group:** Rules
@@ -51,11 +57,19 @@ You have about 15 hours a week. Done deep, they are worth twice as much. This is
 - **Plan:** At work, protect one block of deep time a day for the work that gets you promoted. At home, the study blocks are deep by definition: keep logistics (planning, browsing links) out of them.
 - **Card:** Two of Newport's tools for draining the shallows? ‖ Schedule every minute in blocks, and set a shallow-work budget (with fixed-schedule productivity: a hard end time). Ask "how long to train a graduate to do this?" to tell deep from shallow.
 - **Try:** Plan tomorrow's workday in blocks on paper, before it starts.
+- **Source:** *Deep Work*, Part 2, Rule #4, “Drain the Shallows”.
 
 ### dw-07 · The shutdown ritual
 - **Group:** Rules
 - **Ask:** Why does an unfinished task keep popping into your head at dinner?
 - **Lesson:** The **Zeigarnik effect**: incomplete tasks dominate our attention. Newport's fix is a strict **shutdown ritual** at the end of each work day: check every open task, capture it, and make a plan for it (when it will be done). Then say a set phrase ("Shutdown complete") and stop thinking about work. Downtime aids insights (unconscious thought), recharges the energy deep work needs, and the evening work you would replace it with is usually shallow anyway.
-- **Plan:** The **Close the day** row on Today is this ritual: tick what is done, one line for tomorrow, and you're finished. The next morning, Today shows that line.
+- **Plan:** **Close the day**, on Today in the evening, is this ritual: tick what is done, write one line for tomorrow, stop. The next morning the next-up card shows that line.
 - **Card:** Why a shutdown ritual, and what does it involve? ‖ Unfinished tasks hold attention (the Zeigarnik effect). Review open tasks, plan each one, say "shutdown complete" and stop. Rest recharges deep work and lets insight happen.
 - **Try:** Use Close the day on Today every night this week.
+- **Source:** *Deep Work*, Part 2, Rule #1, “Work Deeply” (the section “Be Lazy”). The effect: Zeigarnik (1927), *Psychologische Forschung* 9.
+
+### Notes
+
+- **Edition:** Cal Newport, *Deep Work: Rules for Focused Success in a Distracted World* (Grand Central, 2016).
+- **The deep work hypothesis** is an argument from economics and examples, not a measured result. The research Newport leans on is narrower (attention residue, from Leroy, 2009).
+- **Left out:** the case studies (Carl Jung's tower, Bill Gates's think weeks) are cut to a line, and the chapter on deep work's meaning is folded into the first idea.

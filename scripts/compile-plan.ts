@@ -33,6 +33,7 @@ try {
     const n = numbered(i.id, i.book)
     return { k: 'g' as const, id: i.id, t: n ? `${n} · ${i.title}` : i.title, x: `${growth.books[i.book].book.title} · ${i.group}${n ? ` · ${n.toLowerCase()} ${n.toLowerCase().replace(' ', '')}` : ''}` }
   })
+  for (const sc of growth.deck.scenarios) growthSearch.push({ k: 'g' as const, id: sc.id, t: `Scenario: ${sc.title}`, x: `growth scenario practice situation ${sc.kind === 'spot' ? 'spot the tactic manipulation' : 'what would you do'}` })
   write('search.json', [...result.search, ...growthSearch])
   const rag = buildChunks(result, growth)
   write('rag.json', { hash: corpusHash(rag), chunks: rag })

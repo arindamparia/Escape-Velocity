@@ -15,7 +15,7 @@ function placeOf(href: string): string | null {
   if (u.searchParams.has('design') || u.searchParams.has('company')) return null // design and company rows
   if (u.pathname === '/guide') return null // a row per term
   if (/^(w\d\d-\d\d|r-\d\d|day-.+|eq-\d\d|G\d+)$/.test(hash)) return null
-  if (/^\/growth\/[a-z]+$/.test(u.pathname) && /^(ah|law|hf|inf|ns|dw|ms|fk)-\d\d$/.test(hash)) return null // a Growth idea has a row of its own (growth:law-07) // a task, a readiness item, a day, a shelf equation, one of the ten gaps ("The ten gaps" is their row)
+  if (/^\/growth\/[a-z]+$/.test(u.pathname) && /^(ah|law|hf|inf|ns|dw|ms|fk|sc)-\d\d$/.test(hash)) return null // a Growth idea or scenario has a row of its own (growth:law-07, growth:sc-03) // a task, a readiness item, a day, a shelf equation, one of the ten gaps ("The ten gaps" is their row)
   u.searchParams.delete('story') // /study/notes?tab=stories&story=3 is the stories tab
   u.searchParams.delete('design')
   return `${u.pathname}${u.search}${hash ? `#${hash}` : ''}`

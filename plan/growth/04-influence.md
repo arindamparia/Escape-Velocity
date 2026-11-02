@@ -13,6 +13,7 @@ The science under both the 48 laws and How to Win Friends: seven shortcuts the h
 - **Counter:** Accept the gift, but redefine it in your head: a sales tactic deserves no repayment. Judge the second request on its own.
 - **Card:** Reciprocity, and its door-in-the-face variant? ‖ We repay what we receive, even unasked. Rejection-then-retreat: a big ask refused, then a smaller one, which feels like a concession to reciprocate.
 - **Try:** Do one useful, unasked favour for someone at work this week, with no ask attached.
+- **Source:** *Influence*, chapter “Reciprocation”. The zoo-chaperone request: Cialdini et al. (1975), *Journal of Personality and Social Psychology* 31(2).
 
 ### inf-02 · Commitment and consistency
 - **Group:** Obligation and commitment
@@ -23,6 +24,7 @@ The science under both the 48 laws and How to Win Friends: seven shortcuts the h
 - **Counter:** Ask yourself: "Knowing what I know now, if I could go back, would I make the same choice?" If not, consistency is a trap; step out.
 - **Card:** Commitment and consistency: what makes a commitment stick, and what is the counter? ‖ Active, public, effortful, freely chosen (and written). Counter: "knowing what I know now, would I choose this again?"
 - **Try:** Write your weekly study target and send it to one person. That is a public, written commitment.
+- **Source:** *Influence*, chapter “Commitment and Consistency”. The sticker and the billboard: Freedman & Fraser (1966), *Journal of Personality and Social Psychology* 4(2).
 
 ### inf-03 · Social proof
 - **Group:** People and proof
@@ -33,6 +35,7 @@ The science under both the 48 laws and How to Win Friends: seven shortcuts the h
 - **Counter:** Check whether the proof is real, and whether those people are really like you. Ask for the numbers.
 - **Card:** Social proof: when is it strongest? ‖ Under uncertainty, and when the people we watch are similar to us. Counter: check whether the proof is real and the people really comparable.
 - **Try:** Find the community where people like you are preparing for SDE-2 interviews and spend 20 minutes in it this week.
+- **Source:** *Influence*, chapter “Social Proof”. The hotel towels: Goldstein, Cialdini & Griskevicius (2008), *Journal of Consumer Research* 35(3).
 
 ### inf-04 · Liking
 - **Group:** People and proof
@@ -43,6 +46,7 @@ The science under both the 48 laws and How to Win Friends: seven shortcuts the h
 - **Counter:** Separate the person from the offer: "Would I take this deal from someone I didn't like?"
 - **Card:** Liking: what makes us like someone? ‖ Similarity, compliments, cooperation toward a shared goal, familiarity and good associations. Counter: separate the person you like from the deal.
 - **Try:** In your next conversation with someone new, find one real thing you have in common in the first two minutes.
+- **Source:** *Influence*, chapter “Liking”.
 
 ### inf-05 · Authority
 - **Group:** People and proof
@@ -53,6 +57,8 @@ The science under both the 48 laws and How to Win Friends: seven shortcuts the h
 - **Counter:** Ask two questions: is this person really an expert *on this*? And how truthful are they likely to be here (what do they gain)?
 - **Card:** Authority: the two questions that disarm it? ‖ Is this person truly an expert on this topic? How truthful can I expect them to be here (what do they gain)? Titles, clothes and trappings are symbols, not proof.
 - **Try:** Write the 15-second sentence that establishes your expertise at the start of an interview.
+- **Related:** law-34
+- **Source:** *Influence*, chapter “Authority”. Milgram (1963), *Journal of Abnormal and Social Psychology* 67(4); a partial replication: Burger (2009), *American Psychologist* 64(1).
 
 ### inf-06 · Scarcity
 - **Group:** Scarcity and unity
@@ -63,6 +69,8 @@ The science under both the 48 laws and How to Win Friends: seven shortcuts the h
 - **Counter:** Notice the rush of arousal as a signal to slow down. Ask what you want the thing for: to use it (scarcity doesn't make it better) or to have it.
 - **Card:** Scarcity: why does it work, and what is the counter? ‖ Rare or disappearing things feel more valuable, and losses loom larger than gains. Counter: treat the sudden urge as a signal to slow down and ask what you want it for.
 - **Try:** Next time an offer has a deadline, ask for more time. See whether the deadline is real.
+- **Related:** fk-08
+- **Source:** *Influence*, chapter “Scarcity”. The cookie jar: Worchel, Lee & Adewole (1975), *Journal of Personality and Social Psychology* 32(5).
 
 ### inf-07 · Unity
 - **Group:** Scarcity and unity
@@ -73,3 +81,11 @@ The science under both the 48 laws and How to Win Friends: seven shortcuts the h
 - **Counter:** Ask whether the "us" is real and whether family would actually be treated this way.
 - **Card:** Unity: how is it different from liking, and how do you create it? ‖ It is shared identity ("of us"), not similarity ("like us"). It comes from belonging (family, place, alma mater) and acting together. Asking for advice creates it too.
 - **Try:** Send one alumni message asking for advice, not a favour.
+- **Source:** *Influence*, chapter “Unity” (added in the 2021 edition).
+
+### Notes
+
+- **Edition:** Robert Cialdini, *Influence: The Psychology of Persuasion, New and Expanded* (Harper Business, 2021). The first edition (1984) had six principles; unity was added in 2021.
+- **Milgram's obedience studies** are disputed. Gina Perry's *Behind the Shock Machine* (2013) argues that many participants doubted the shocks were real, and the procedure varied more than the papers said. Burger's partial replication (2009) found similar obedience up to the 150-volt point, the furthest it went for ethical reasons.
+- **The towel study** compared hotel cards. "Most guests reuse their towels" beat the environmental appeal, and "most guests *in this room*" did best.
+- **Left out:** the book's chapters on defending against each principle are folded into "Spot it" and "The counter".

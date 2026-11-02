@@ -6,7 +6,7 @@ export const BOOKS = ['ah', 'law', 'hf', 'inf', 'ns', 'dw', 'ms', 'fk'] as const
 export type BookId = (typeof BOOKS)[number]
 
 /** Every field an idea can carry, in the order they are shown. */
-export const IDEA_FIELDS = ['Group', 'Ask', 'Lesson', 'Story', 'Use', 'Backfires', 'Spot', 'Counter', 'Script', 'Plan', 'Card', 'Try'] as const
+export const IDEA_FIELDS = ['Group', 'Ask', 'Lesson', 'Story', 'Use', 'Backfires', 'Spot', 'Counter', 'Script', 'Plan', 'Card', 'Try', 'Related', 'Source'] as const
 export type IdeaField = (typeof IDEA_FIELDS)[number]
 
 /** What every idea must have, and what each book adds. */
@@ -20,12 +20,12 @@ export const REQUIRED_FIELDS: Record<BookId, readonly IdeaField[]> = {
   ms: ['Plan'],
   fk: [],
 }
-export const ALWAYS_REQUIRED: readonly IdeaField[] = ['Group', 'Ask', 'Lesson', 'Card', 'Try']
+export const ALWAYS_REQUIRED: readonly IdeaField[] = ['Group', 'Ask', 'Lesson', 'Card', 'Try', 'Source']
 
 /** The "More" fields of an idea, with the label shown for each. */
 export const MORE_LABEL: Partial<Record<IdeaField, string>> = {
   Story: 'The story', Use: 'Use it', Backfires: 'How it backfires', Spot: 'Spot it used on you', Counter: 'The counter',
-  Script: 'Say it like this', Plan: 'In your 13 weeks',
+  Script: 'Say it like this',
 }
 
 export const IDEA_ID = /^(ah|law|hf|inf|ns|dw|ms|fk)-(\d{2})$/
@@ -41,6 +41,8 @@ export interface GrowthBook {
   /** the book's own groups, in order (themes for the laws, parts for How to Win Friends) */
   groups: string[]
   count: number
+  /** a short name for references: "48 Laws", "Atomic Habits" */
+  short: string
 }
 
 /** What Today and the session need about every idea, without its content. In path order. */
@@ -83,12 +85,20 @@ export interface GrowthIdea {
   more: { field: IdeaField; label: string; html: string }[]
   card: { front: string; back: string }
   tryHtml: string
+  /** where it is used in your own plan and in this app (html), if anywhere */
+  planHtml: string
+  /** the chapter, and the research behind any claim (html) */
+  sourceHtml: string
+  /** related ideas, in both directions (a link written on one side shows on both) */
+  related: string[]
+  /** the scenarios that use this idea */
+  scenarios: string[]
   /** plain text of the lesson, for search and the AI corpus */
   text: string
 }
 
 /** pages/growth-<book>.json */
-export interface GrowthBookChunk { book: GrowthBook; ideas: GrowthIdea[] }
+export interface GrowthBookChunk { book: GrowthBook; ideas: GrowthIdea[]; /** edition, what was left out, where the research is disputed (html) */ notesHtml: string }
 
 export interface GrowthScenario extends GrowthScenarioRef {
   situationHtml: string

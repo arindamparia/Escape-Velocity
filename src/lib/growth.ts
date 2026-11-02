@@ -231,6 +231,7 @@ export function ideaNumber(id: string): string {
 
 export const GROWTH_BOOK_PATH = (book: string) => `/growth/${book}`
 export const ideaUrl = (id: string) => `/growth/${id.split('-')[0]}#${id}`
+export const scenarioUrl = (id: string) => `/growth/scenarios#${id}`
 
 /** today's week number for coach notes, clamped to the plan */
 export const coachWeek = (day: string, startDate: string) => Math.min(13, Math.max(1, weekNumber(day, startDate)))

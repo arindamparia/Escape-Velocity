@@ -884,3 +884,34 @@ input[type='range'] { accent-color: var(--accent); }
 .grow-identity__text { font-size: 1.18rem; line-height: 1.45; text-wrap: balance; }
 .grow-lesson:not([data-learned]) .grow-ask strong:first-child { color: var(--accent); }
 .grow-lesson sup, .grow-idea sup { font-size: 0.7em; line-height: 0; }
+/* Growth: one idea card everywhere, a numbered daily flow, breadcrumbs, contents */
+.crumbs { color: var(--text-muted); margin: 0 0 -0.4rem; }
+.crumbs a { color: inherit; }
+.grow-kicker { margin: 0; font-size: 0.82rem; color: var(--text-muted); letter-spacing: 0.01em; }
+.grow-head { display: flex; justify-content: space-between; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+.grow-mark { font-size: 0.8rem; font-weight: 650; color: var(--done); display: inline-flex; gap: 0.25rem; align-items: center; }
+.grow-label { display: block; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 0.15rem; }
+.grow-try .grow-label { display: inline; margin-right: 0.35rem; }
+.grow-links { margin: 0.2rem 0 0; padding-top: 0.6rem; border-top: 1px solid var(--line); display: grid; gap: 0.35rem; font-size: 0.86rem; }
+.grow-links > div { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0.6rem; }
+.grow-links dt { color: var(--text-muted); }
+.grow-links dd { margin: 0; min-width: 0; }
+.grow-links dd .prose > * { margin: 0; }
+@media (max-width: 520px) { .grow-links > div { grid-template-columns: minmax(0, 1fr); gap: 0; } }
+.grow-idea--ask { border-left: 3px solid var(--accent); }
+.grow-rate { display: grid; gap: 0.35rem; }
+.grow-step { display: grid; gap: 0.7rem; }
+.grow-step__title { display: flex; align-items: center; gap: 0.6rem; font-size: 1.1rem; margin: 0.6rem 0 0; }
+.grow-step__n { display: inline-grid; place-items: center; width: 1.7rem; height: 1.7rem; border: 1.5px solid var(--text-muted); border-radius: 50%; font-size: 0.85rem; font-weight: 700; flex: none; }
+.grow-step[data-done='1'] .grow-step__n { border-color: var(--done); color: var(--done); }
+.grow-how summary, .grow-inline summary { cursor: pointer; font-size: 0.9rem; }
+.grow-how > div { margin-top: 0.5rem; }
+.grow-inline > :not(summary) { margin-top: 0.4rem; }
+.grow-close { margin: 0.4rem 0 0; display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap; }
+.grow-close .i { color: var(--done); }
+.grow-toc__cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 0.8rem 1.4rem; margin: 0.5rem 0; }
+.grow-toc__group { margin: 0 0 0.25rem; font-weight: 650; font-size: 0.9rem; }
+.grow-toc__list { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 0.15rem; font-size: 0.88rem; }
+.grow-toc__mark { color: var(--done); font-weight: 700; }
+.grow-notes h2 { font-size: 1.05rem; margin-bottom: 0.5rem; }
+.grow-rail .eyebrow:not(:first-child) { margin-top: 1.1rem; }

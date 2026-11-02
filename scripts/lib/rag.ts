@@ -131,6 +131,10 @@ export function buildChunks(out: CompileOutput, growth?: GrowthOutput): RagChunk
       const label = ref.book === 'law' ? `Law ${n}: ${idea.title}` : idea.title
       chunks.push({ id: `growth:${ref.id}`, entry: `growth:${ref.id}`, kind: 'growth', title: label, text: clip(`${book.title} (${idea.group}). ${label}. ${idea.text} Card: ${idea.card.back}`, 800), gate: `${book.title} ${idea.group}` })
     }
+    for (const sc of growth.deck.scenarios) {
+      const best = sc.options.find((o) => o.verdict === 'best')!
+      chunks.push({ id: `growth:${sc.id}`, entry: `growth:${sc.id}`, kind: 'growth', title: `Scenario: ${sc.title}`, text: clip(`Growth scenario. ${plain(sc.situationHtml)} Best move: ${plain(best.html)} ${plain(best.feedbackHtml)}`, 800), gate: 'growth scenario' })
+    }
   }
 
   for (const [id, entry, title, text] of HELP) chunks.push({ id, entry, kind: 'help', title, text })
