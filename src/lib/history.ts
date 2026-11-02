@@ -6,8 +6,8 @@ import type { AppState, ProblemLogRow } from '../../shared/state'
 import { addDays, dayNum, DOW_NAMES, lightDayOn, planDow, planPhase, weekNumber } from './dates'
 import { plan, taskLabel } from './plan'
 import { focusMinutes } from './rhythm'
-import { lastReviewedOn } from './srs'
-import { coreTasks, tasksOn, toDay } from './today'
+import { lastReviewedOn, planCardRows } from './srs'
+import { coreTasks, isGrowthNote, tasksOn, toDay } from './today'
 
 /**
  * done: everything the plan asked of that day is done. partial: some of it. active: no plan task done, but you worked (a problem,
@@ -58,8 +58,8 @@ export function buildHistory(state: AppState, problems: readonly ProblemLogRow[]
   }
   const solvedOn = by(problems, (p) => p.loggedOn)
   const sessionsOn = by(state.sessions, (s) => toDay(s.startedAt))
-  const notesOn = by(state.notes, (n) => toDay(n.updatedAt))
-  const reviewsOn = by(state.flashcards, (c) => (c.reviews > 0 ? lastReviewedOn(c) : null))
+  const notesOn = by(state.notes.filter((n) => !isGrowthNote(n.refId)), (n) => toDay(n.updatedAt))
+  const reviewsOn = by(planCardRows(state.flashcards), (c) => (c.reviews > 0 ? lastReviewedOn(c) : null))
 
   const out = new Map<string, DayRecord>()
   for (let n = dayNum(from); n <= dayNum(to); n++) {

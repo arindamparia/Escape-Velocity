@@ -50,9 +50,20 @@ it('reducer(ops) equals the Worker state after the same ops', async () => {
     mk('session.add', { id: crypto.randomUUID(), kind: 'dsa', startedAt: '2026-10-05T04:00:00.000Z', endedAt: '2026-10-05T04:25:00.000Z', plannedMin: 25 }),
     mk('setting.set', { key: 'theme', value: 'dark' }),
     mk('setting.set', { key: 'theme', value: 'paper' }),
+    // the Growth track: desired state, null removes, and its deck shares the card table
+    mk('growth.set', { key: 'learned:ah-01', value: 'close', on: '2026-11-02' }),
+    mk('growth.set', { key: 'learned:law-07', value: 'new', on: '2026-11-02' }),
+    mk('growth.set', { key: 'learned:law-07', value: null, on: '2026-11-03' }),
+    mk('growth.set', { key: 'scenario:sc-01', value: 'A', on: '2026-11-02' }),
+    mk('growth.set', { key: 'scenario:sc-01', value: 'B', on: '2026-11-03' }),
+    mk('growth.set', { key: 'kept:h1:2026-11-03', value: '1', on: '2026-11-03' }),
+    mk('flashcard.review', { cardId: 'ah-01', grade: 'good', reviewedOn: '2026-11-03' }),
   ]
-  const res = await app.fetch(new Request('http://x/api/ops', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ops }) }), DEV)
-  expect(res.status).toBe(200)
+  // at most 20 ops a request, as the client sends them
+  for (let i = 0; i < ops.length; i += 20) {
+    const res = await app.fetch(new Request('http://x/api/ops', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ops: ops.slice(i, i + 20) }) }), DEV)
+    expect(res.status).toBe(200)
+  }
   const server = (await (await app.fetch(new Request('http://x/api/state'), DEV)).json()) as Record<string, unknown[]>
   const client = applyOps(EMPTY_STATE, ops) as unknown as Record<string, unknown[]>
   const sortKey = (r: any) => JSON.stringify([r.taskId ?? r.week ?? r.id ?? r.designId ?? r.cardId ?? r.key])
@@ -61,4 +72,13 @@ it('reducer(ops) equals the Worker state after the same ops', async () => {
     const b = (strip(server[k]) as any[]).slice().sort((x, y) => sortKey(x).localeCompare(sortKey(y)))
     expect(a, k).toEqual(b)
   }
+})
+
+it('the Worker refuses a Growth key it does not know, and a value that does not fit the key', async () => {
+  const mk = (payload: Record<string, unknown>): Op => ({ opId: crypto.randomUUID(), type: 'growth.set', payload, at: new Date().toISOString() }) as Op
+  const send = (op: Op) => app.fetch(new Request('http://x/api/ops', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ops: [op] }) }), DEV)
+  expect((await send(mk({ key: 'learned:law-49', value: 'new', on: '2026-11-02' }))).status).toBe(422)
+  expect((await send(mk({ key: 'scenario:sc-99', value: 'A', on: '2026-11-02' }))).status).toBe(422)
+  expect((await send(mk({ key: 'learned:ah-02', value: 'A', on: '2026-11-02' }))).status).toBe(422)
+  expect((await send(mk({ key: 'tried:ah-02', value: '1', on: '2026-11-02' }))).status).toBe(200)
 })

@@ -36,8 +36,8 @@ describe('points', () => {
 
   it('hides the weekly target in light weeks only', () => {
     const cfg = plan.config as PlanConfig
-    expect(weekTarget(1, cfg)).toBe(50)
-    expect(weekTarget(2, cfg)).toBeNull() // Diwali on the Sunday (8 Nov)
+    expect(weekTarget(1, cfg)).toBeNull() // Diwali on the Sunday (8 Nov)
+    expect(weekTarget(2, cfg)).toBe(50)
     expect(weekTarget(3, cfg)).toBe(50)
     expect(weekTarget(4, cfg)).toBe(50)
     expect(weekTarget(5, cfg)).toBe(50)

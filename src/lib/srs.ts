@@ -2,6 +2,11 @@
 import type { DesignStatus, DesignStatusRow, FlashcardStateRow, Grade } from '../../shared/state'
 import { addDays, dayNum } from './dates'
 
+/** A Growth card (an idea id like law-03) rather than one of the plan's why-question cards (a task id). */
+export const isGrowthCard = (id: string): boolean => /^(ah|law|hf|inf|ns|dw|ms|fk)-\d{2}$/.test(id)
+/** The two decks share a table but never a daily cap: each counts only its own rows. */
+export const planCardRows = <T extends { cardId: string }>(rows: readonly T[]): T[] => rows.filter((r) => !isGrowthCard(r.cardId))
+
 /** Days until a card is due again, by box 1 to 5. */
 export const LEITNER_DAYS = [1, 3, 7, 14, 30] as const
 export const MAX_CARDS_PER_DAY = 10

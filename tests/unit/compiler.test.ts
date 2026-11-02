@@ -36,8 +36,8 @@ describe('compiler: the real plan', () => {
   })
 
   it('reads the front matter', () => {
-    expect(out.core.config.startDate).toBe('2026-10-26')
-    expect(out.core.config.endDate).toBe('2027-01-24')
+    expect(out.core.config.startDate).toBe('2026-11-02')
+    expect(out.core.config.endDate).toBe('2027-01-31')
     expect(out.core.config.weeklyPointsTarget).toBe(50)
     expect(out.core.config.lightDays).toEqual([
       { from: '2026-11-08', to: '2026-11-08', label: 'Kali Puja / Diwali' },
@@ -164,7 +164,7 @@ describe('compiler: every failure rule fails the build', () => {
   })
 
   it('a week heading out of order', () => {
-    expect(errorsOf(mutate('### Week 03 · 9 to 15 Nov', '### Week 04 · 9 to 15 Nov')).join('\n')).toMatch(/out of order/)
+    expect(errorsOf(mutate('### Week 03 · 16 to 22 Nov', '### Week 04 · 16 to 22 Nov')).join('\n')).toMatch(/out of order/)
   })
 
   it('a task whose week prefix does not match its heading', () => {
@@ -189,7 +189,7 @@ describe('compiler: every failure rule fails the build', () => {
   })
 
   it('week dates that disagree with the start date', () => {
-    expect(errorsOf(mutate('### Week 02 · 2 to 8 Nov', '### Week 02 · 3 to 9 Nov')).join('\n')).toMatch(/Week 02 says "3 to 9 Nov"/)
+    expect(errorsOf(mutate('### Week 02 · 9 to 15 Nov', '### Week 02 · 10 to 16 Nov')).join('\n')).toMatch(/Week 02 says "10 to 16 Nov"/)
   })
 
   it('a task outside the tasks sections', () => {

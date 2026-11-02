@@ -22,6 +22,7 @@ function entityKey(op: Op): string | null {
     case 'decision.upsert': return `decision:${op.payload.id}`
     case 'week.set': return `week:${op.payload.week}`
     case 'problem.add': return `problem:${op.payload.id}`
+    case 'growth.set': return `growth:${op.payload.key}`
     default: return null
   }
 }
@@ -93,7 +94,7 @@ export function createEngine(deps: EngineDeps = {}) {
       if (snap?.v === 1) {
         restored = true
         batch(() => {
-          state.value = snap.state
+          state.value = { ...EMPTY_STATE, ...snap.state } // a copy saved before a table existed lacks it
           outbox.value = snap.outbox
         })
       }
@@ -134,7 +135,7 @@ export function createEngine(deps: EngineDeps = {}) {
   /** Replace local state with the server's, replaying any ops still waiting in the outbox on top. */
   function replaceFromServer(server: AppState): void {
     batch(() => {
-      state.value = applyOps(server, outbox.peek())
+      state.value = applyOps({ ...EMPTY_STATE, ...server }, outbox.peek())
     })
     void persist()
   }

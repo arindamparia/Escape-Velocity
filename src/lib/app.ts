@@ -97,6 +97,11 @@ export function saveNote(kind: 'why' | 'design' | 'story' | 'free', refId: strin
   engine.dispatch('note.upsert', { id: existing?.id ?? crypto.randomUUID(), kind, ...(refId ? { refId } : {}), body })
 }
 
+/** Sets one Growth fact for today (learned, a scenario move, tried, a kept habit). null removes it. */
+export function setGrowth(key: string, value: string | null, on: string): void {
+  engine.dispatch('growth.set', { key, value, on })
+}
+
 /** Logs a problem and returns its id (or null if it could not be saved), so the caller can offer Undo. */
 export function logProblem(difficulty: 'easy' | 'medium' | 'hard', minutes: number | undefined, noAi: boolean, title: string | undefined, loggedOn: string, url?: string): string | null {
   const id = crypto.randomUUID()

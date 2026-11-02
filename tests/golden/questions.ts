@@ -130,6 +130,20 @@ export const GOLDEN: Golden[] = [
   w('concept', 'chance of a split vote in raft', 'task:w08-18'),
   w('concept', 'why do b-trees keep lookups fast', 'task:w02-06', 'task:w02-03'),
 
+  // ── the Growth track ──
+  w('concept', 'how do I stack habits', 'growth:ah-08'),
+  w('concept', 'law 3', 'growth:law-03'),
+  w('concept', 'never outshine the master', 'growth:law-01'),
+  w('concept', 'how to disagree politely', 'growth:hf-11', 'growth:hf-10'),
+  w('concept', 'how do I remember people\'s names', 'growth:hf-06'),
+  w('concept', 'the two minute rule', 'growth:ah-16', 'section:growth-starts'),
+  w('concept', 'how to negotiate my salary', 'growth:ns-06', 'growth:ns-09', 'growth:fk-08', 'page:/growth/ns'),
+  w('concept', 'what is reciprocity', 'growth:inf-01'),
+  w('concept', 'mirroring in negotiation', 'growth:ns-01', 'growth:law-44'),
+  w('concept', 'attention residue', 'growth:dw-02'),
+  w('where', 'where are the 48 laws of power', 'page:/growth/law'),
+  w('where', 'my habit tracker', 'page:/growth/habits', 'section:growth-anchors'),
+  w('where', 'growth scenarios', 'page:/growth/scenarios'),
   // ── week ──
   w('week', 'what is in week 6', 'week:6'),
   w('week', 'week 9 ai systems', 'week:9'),

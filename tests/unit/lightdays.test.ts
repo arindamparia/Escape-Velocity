@@ -9,8 +9,8 @@ describe('light days keep a small version, never nothing', () => {
     const onLight = plan.tasks.filter((t) => t.type !== 'rest' && onLightDay(t))
     expect(onLight.filter((t) => !t.hasLight).map((t) => t.id)).toEqual([])
     // Saturday 31 Oct is the design day of week 1; Sunday 22 Nov is the boss day of week 4
-    expect(taskDate(plan.tasks.find((t) => t.id === 'w01-11')!)).toBe('2026-10-31')
-    expect(taskDate(plan.tasks.find((t) => t.id === 'w04-10')!)).toBe('2026-11-22')
+    expect(taskDate(plan.tasks.find((t) => t.id === 'w01-11')!)).toBe('2026-11-07')
+    expect(taskDate(plan.tasks.find((t) => t.id === 'w04-10')!)).toBe('2026-11-29')
     expect(onLightDay(plan.tasks.find((t) => t.id === 'w01-10')!)).toBe(false) // an ordinary Friday
     expect(onLightDay(plan.tasks.find((t) => t.id === 'w01-11')!)).toBe(false) // and the first Saturday is a normal one
   })

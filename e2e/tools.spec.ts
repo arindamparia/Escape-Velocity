@@ -160,7 +160,7 @@ test.describe('every task type opens its inline tool', () => {
 test.describe('keyboard and command palette', () => {
   test('j / k move, x ticks, s starts the tool, ? lists the keys, t jumps to Today', async ({ page, api }) => {
     await api.onboard()
-    await api.activeOn('2026-10-27')
+    await api.activeOn('2026-11-03')
     await openApp(page, '/')
     await page.keyboard.press('j')
     const first = page.locator('[data-task][data-focus="true"]')

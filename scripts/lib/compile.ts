@@ -7,7 +7,7 @@ import { SKETCH_IDS, type SketchId } from '../../shared/sketches'
 import { addDays, dayNum, formatRange, isRealDate, weekEnd, weekStart } from '../../src/lib/dates'
 import {
   DAYS, SURFACES, TASK_TYPES,
-  type DesignAccess, type DesignFull, type DesignRef, type EquationRow, type GapStatus, type LightDay, type PageChunks, type PaperRow, type PlanConfig,
+  type DesignAccess, type DesignFull, type DesignRef, type EquationRow, type GapStatus, type LightDay, type PlanPages, type PaperRow, type PlanConfig,
   type PlanCore, type PlanDay, type PlanTask, type PlanWeek, type ResourceAccess, type ResourceKind, type ResourceRow, type SearchEntry, type Surface,
   type TaskType, type WeekChunk,
 } from '../../shared/plan-types'
@@ -24,7 +24,7 @@ export class PlanCompileError extends Error {
 export interface CompileOutput {
   core: PlanCore
   weekChunks: Record<string, WeekChunk>
-  pages: PageChunks
+  pages: PlanPages
   search: SearchEntry[]
 }
 
@@ -47,7 +47,7 @@ function escapeAttr(s: string): string {
 }
 
 /** Strip markdown to plain text. */
-function plain(src: string): string {
+export function plain(src: string): string {
   return src
     .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
     .replace(/[*`]/g, '')
@@ -99,13 +99,13 @@ function restoreMath(html: string, tokens: string[]): string {
   return html.replace(/%%MATH(\d+)%%/g, (_, i) => tokens[Number(i)] ?? '')
 }
 
-function renderInline(src: string, math = false): string {
+export function renderInline(src: string, math = false): string {
   if (!math) return md.parseInline(src, { async: false }) as string
   const { text, tokens } = extractMath(src)
   return restoreMath(md.parseInline(text, { async: false }) as string, tokens)
 }
 
-function renderBlock(src: string, math = false): string {
+export function renderBlock(src: string, math = false): string {
   if (!src.trim()) return ''
   if (!math) return (md.parse(src, { async: false }) as string).trim()
   const { text, tokens } = extractMath(src)
@@ -113,7 +113,7 @@ function renderBlock(src: string, math = false): string {
 }
 
 /** "w04-13" in a table cell becomes a link to that task, labelled "Week 4 · Task 13": a task id is a key, never shown. */
-function linkTaskIds(src: string, known: Set<string>, errors: string[], at: string): string {
+export function linkTaskIds(src: string, known: Set<string>, errors: string[], at: string): string {
   return src.replace(/\bw(\d{2})-(\d{2})\b/g, (id, w, n) => {
     if (!known.has(id)) { errors.push(`${at}: mentions task ${id}, which is not in the plan`); return id }
     return `[Week ${Number(w)} · Task ${Number(n)}](/weeks/${Number(w)}#${id})`
@@ -129,9 +129,9 @@ function splitRow(line: string): string[] {
   return s.split('|').map((c) => c.trim())
 }
 
-interface Table { header: string[]; rows: Record<string, string>[] }
+export interface Table { header: string[]; rows: Record<string, string>[] }
 
-function parseTable(lines: string[]): Table | null {
+export function parseTable(lines: string[]): Table | null {
   const start = lines.findIndex((l) => l.trim().startsWith('|'))
   if (start === -1) return null
   const block: string[] = []
@@ -694,7 +694,7 @@ export function compilePlan(source: string): CompileOutput {
   for (const t of tasks.filter((x) => x.week === null)) readinessText[t.id] = renderInline(t.text)
 
   // ---------------------------------------------------------------- rules
-  const rules: PageChunks['today']['rules'] = []
+  const rules: PlanPages['today']['rules'] = []
   for (const s of sectionsBySurface.get('today.rules') ?? []) {
     const source = /head/i.test(s.heading) ? 'head' : 'routine'
     for (const item of listItems(bodyLines(s))) rules.push({ source, html: renderInline(item) })
@@ -907,7 +907,7 @@ export function compilePlan(source: string): CompileOutput {
 
   if (errors.length) throw new PlanCompileError(errors)
 
-  const pages: PageChunks = {
+  const pages: PlanPages = {
     today: {
       rules,
       routineHtml: sectionHtml(routineSection),

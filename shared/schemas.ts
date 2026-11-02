@@ -2,6 +2,7 @@
 // zod/mini keeps the client bundle small. Every object is strict: unknown fields are rejected.
 import * as z from 'zod/mini'
 import { isRealDate } from '../src/lib/dates'
+import { GROWTH_KEY } from './growth-types'
 import { DESIGN_STATUSES, DIFFICULTIES, GRADES, MAX_OPS_PER_REQUEST, NOTE_KINDS, THEMES } from './constants'
 
 export { DESIGN_STATUSES, DIFFICULTIES, GRADES, MAX_OPS_PER_REQUEST, NOTE_KINDS, THEMES }
@@ -10,6 +11,8 @@ const text = (max: number) => z.string().check(z.maxLength(max))
 const nonEmpty = (max: number) => z.string().check(z.minLength(1), z.maxLength(max))
 const id = z.uuid()
 const taskId = z.string().check(z.regex(/^(w\d{2}-\d{2}|r-\d{2}|eq-\d{2})$/))
+/** A plan flashcard (a task id) or a Growth card (an idea id, law-03) */
+const cardId = z.string().check(z.regex(/^(w\d{2}-\d{2}|r-\d{2}|eq-\d{2}|(?:ah|law|hf|inf|ns|dw|ms|fk)-\d{2})$/))
 const designId = z.string().check(z.regex(/^[a-z0-9]+(-[a-z0-9]+)*$/), z.maxLength(80))
 /** A real calendar date as YYYY-MM-DD (Asia/Kolkata on the client). */
 const ymd = z.string().check(z.regex(/^\d{4}-\d{2}-\d{2}$/), z.refine(isRealDate, 'Not a real date'))
@@ -80,7 +83,7 @@ export const OpSchema = z.discriminatedUnion('type', [
     'note.upsert',
     z.strictObject({ id, kind: z.enum(NOTE_KINDS), refId: z.optional(z.string().check(z.maxLength(80))), body: text(20000) }),
   ),
-  op('flashcard.review', z.strictObject({ cardId: taskId, grade: z.enum(GRADES), reviewedOn: ymd })),
+  op('flashcard.review', z.strictObject({ cardId, grade: z.enum(GRADES), reviewedOn: ymd })),
   op(
     'session.add',
     z.strictObject({
@@ -93,6 +96,15 @@ export const OpSchema = z.discriminatedUnion('type', [
     }),
   ),
   op('setting.set', settingPayload),
+  op(
+    'growth.set',
+    z.strictObject({
+      key: z.string().check(z.maxLength(40), z.regex(GROWTH_KEY)),
+      /** null removes it (un-learn, un-tick) */
+      value: z.nullable(z.string().check(z.regex(/^(had|close|new|[A-E]|1)$/))),
+      on: ymd,
+    }),
+  ),
 ])
 
 export type Op = z.infer<typeof OpSchema>

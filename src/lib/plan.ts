@@ -78,12 +78,13 @@ export function prefetchFor(path: string, today: string): Promise<unknown> {
   const current = Math.min(plan.weeks.length, Math.max(1, weekNumber(today, plan.config.startDate)))
   const week = (n: number) => loadWeek(n)
   switch (first) {
-    case '': return Promise.all([week(current), loadPage('today')])
+    case '': return Promise.all([week(current), loadPage('today'), loadPage('growth')])
     case 'weeks': return Promise.all([week(Math.min(13, Math.max(1, Number(second) || current))), loadPage('weeks')])
     case 'study': return Promise.all([loadPage('study'), loadPage('library')])
     case 'library': return loadPage('library')
     case 'progress': return Promise.all([loadPage('progress'), loadPage('study')])
     case 'mindset': return loadPage('mindset')
+    case 'growth': return Promise.all([loadPage('growth'), loadPage('growth-deck'), ...(/^(ah|law|hf|inf|ns|dw|ms|fk)$/.test(second) ? [loadPage(`growth-${second}` as 'growth-ah')] : [])])
     default: return Promise.resolve()
   }
 }

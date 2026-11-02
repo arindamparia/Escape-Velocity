@@ -6,6 +6,15 @@
 //  OFF_TOPIC  questions that have nothing to do with it. The gate should catch most; whatever it lets through is caught by
 //             the model's own in_scope flag, which costs one call, so the target here is a high rate, not perfection.
 export const IN_SCOPE = [
+  // the Growth track
+  'how do I stack habits',
+  'what is law 3',
+  'how to disagree politely',
+  'how do I negotiate my salary offer',
+  'what is the two minute rule',
+  'how do I spot manipulation at work',
+  'why do I keep breaking my habits',
+  'how do I ask for a referral',
   'why does the plan have light days',
   'what is the difference between a task and a design',
   'can I skip the bonus equation',

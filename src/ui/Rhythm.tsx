@@ -3,7 +3,7 @@
 // Everything comes from src/lib/rhythm.ts (pure, tested). Few words, no streak that breaks on one missed day, nothing
 // that moves: it has to read the same in the Paper theme.
 import { useState } from 'preact/hooks'
-import { DOW_NAMES } from '../lib/dates'
+import { addDays, DOW_NAMES } from '../lib/dates'
 import { engine, findNote } from '../lib/app'
 import { plan, taskLabel, weekLoaded } from '../lib/plan'
 import { activityDates, coreTasks, tasksOn } from '../lib/today'
@@ -12,6 +12,7 @@ import { algotracker } from '../lib/solved'
 import { useMemo } from 'preact/hooks'
 import { NoteEditor } from './NoteEditor'
 import { TYPE_LABEL } from './Task'
+import { CoachLine } from './GrowthToday'
 
 const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`
 const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1).trimEnd()}…` : s)
@@ -99,6 +100,7 @@ export function WeekStart({ week, dow, done }: { week: number; dow: number; done
           {r.win ? <> Your best moment: <a href={`/weeks/${r.week}#${r.win.id}`}>{taskLabel(r.win.id)}</a> (+{r.win.points}).</> : null}
         </p>
       ) : <p style="margin:0 0 0.7rem">The first week sets the pace. Make it a small, steady one.</p>}
+      <CoachLine date={addDays(plan.config.startDate, (week - 1) * 7)} />
       <label class="small">Two plans for this week, as “If … then I …”
         <NoteEditor kind="free" refId={intentionRef(week)} rows={3} placeholder="If it is 7 pm on Tuesday, then I open the Kafka task. If I miss a day, then I take one waiting task." />
       </label>

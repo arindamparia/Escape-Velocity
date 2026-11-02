@@ -18,11 +18,11 @@ test('Settings: a backup file is previewed, then restored without deleting anyth
   await api.onboard()
   await openApp(page, '/settings')
   const backup = {
-    version: 1, exportedAt: '2026-10-28T10:00:00.000Z',
-    taskProgress: [{ taskId: 'w01-01', done: true, doneAt: '2026-10-26T04:00:00Z', updatedAt: '2026-10-26T04:00:00Z' }],
-    weekLog: [], designStatus: [], decisionCards: [], flashcards: [{ cardId: 'w01-05', box: 2, dueOn: '2026-11-03', reviews: 2, lastGrade: 'good', updatedAt: '2026-10-26T04:00:00Z' }], sessions: [], settings: [],
-    problemLog: [{ id: '11111111-1111-4111-8111-111111111111', loggedOn: '2026-10-26', difficulty: 'medium', minutes: 21, noAi: true, title: 'Two Sum', url: null, createdAt: '2026-10-26T05:00:00Z' }],
-    notes: [{ id: '22222222-2222-4222-8222-222222222222', kind: 'free', refId: 'free-abc', body: 'from the backup', createdAt: '2026-10-26T05:00:00Z', updatedAt: '2026-10-26T05:00:00Z' }],
+    version: 1, exportedAt: '2026-11-04T10:00:00.000Z',
+    taskProgress: [{ taskId: 'w01-01', done: true, doneAt: '2026-11-02T04:00:00Z', updatedAt: '2026-11-02T04:00:00Z' }],
+    weekLog: [], designStatus: [], decisionCards: [], flashcards: [{ cardId: 'w01-05', box: 2, dueOn: '2026-11-10', reviews: 2, lastGrade: 'good', updatedAt: '2026-11-02T04:00:00Z' }], sessions: [], settings: [],
+    problemLog: [{ id: '11111111-1111-4111-8111-111111111111', loggedOn: '2026-11-02', difficulty: 'medium', minutes: 21, noAi: true, title: 'Two Sum', url: null, createdAt: '2026-11-02T05:00:00Z' }],
+    notes: [{ id: '22222222-2222-4222-8222-222222222222', kind: 'free', refId: 'free-abc', body: 'from the backup', createdAt: '2026-11-02T05:00:00Z', updatedAt: '2026-11-02T05:00:00Z' }],
   }
   const box = page.getByTestId('restore')
   await box.locator('input[type=file]').setInputFiles({ name: 'backup.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(backup)) })
@@ -46,8 +46,8 @@ test('Settings: the calendar file downloads with the times you chose', async ({ 
   expect(download.suggestedFilename()).toBe('escape-velocity-plan.ics')
   const text = (await (await download.createReadStream()).toArray()).map((b) => Buffer.from(b).toString()).join('')
   expect(text).toContain('BEGIN:VCALENDAR')
-  expect(text).toContain('DTSTART:20261026T001500Z') // Monday 26 Oct, 05:45 in Kolkata
-  await expect(page.getByText(/\d+ blocks, 26 Oct to 24 Jan/)).toBeVisible()
+  expect(text).toContain('DTSTART:20261102T001500Z') // Monday 2 Nov, 05:45 in Kolkata
+  await expect(page.getByText(/\d+ blocks, 2 Nov to 31 Jan/)).toBeVisible()
 })
 
 test.describe('on a phone', () => {
@@ -62,8 +62,8 @@ test.describe('on a phone', () => {
 
   test('the next action comes before "Your why"', async ({ page, api }) => {
     await api.onboard()
-    await api.activeOn('2026-10-27')
-    await openApp(page, '/', { at: kolkata('2026-10-28T10:00:00') })
+    await api.activeOn('2026-11-03')
+    await openApp(page, '/', { at: kolkata('2026-11-04T10:00:00') })
     const hero = (await page.locator('.hero').boundingBox())!
     const why = (await page.locator('.why').boundingBox())!
     expect(hero.y).toBeLessThan(why.y)

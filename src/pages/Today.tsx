@@ -19,6 +19,7 @@ import { BossHow } from '../ui/BossHow'
 import { CapstoneLinks } from '../ui/CapstoneLinks'
 import { HourBox, PlanLine, RestNote, StatusLine, WeekStart } from '../ui/Rhythm'
 import { SoundLine } from '../ui/SoundLine'
+import { CloseDay, CueLines, GrowthFold } from '../ui/GrowthToday'
 import { OptionalBox } from '../ui/Optional'
 import { setShowAll, showAll } from '../lib/todayView'
 import { momentum } from '../lib/rhythm'
@@ -198,12 +199,13 @@ export default function Today() {
       <section class="card hero">
         <p class="eyebrow">Welcome back</p>
         <h2>Welcome back: a 10-minute restart</h2>
-        <p class="hero__text">No backlog here. Ten minutes and you’re back. One medium, nothing else.</p>
+        <p class="hero__text">No backlog here. Ten minutes and you’re back. One medium, nothing else. Never miss twice: one missed day is an accident, two is the start of a new habit.</p>
         <div class="hero__actions">
           <button type="button" class="btn btn--primary btn--big" onClick={() => startTimer('restart', PRESETS.restart)}>
             <Icon name="play" /> Start 10 minutes
           </button>
         </div>
+        <CueLines type="dsa" block={info.block} />
         <RuleOfTheDay seed={missed} />
       </section>
     )
@@ -238,6 +240,7 @@ export default function Today() {
           <button type="button" class="btn btn--big btn--ghost" onClick={() => toggleTask(next.id)}><Icon name="check" /> Mark done</button>
         </div>
         {primary && /timer/i.test(primary.label) && !timer.value ? <SoundLine /> : null}
+        <CueLines type={next.type} block={info.block} />
         {info.dow === 6 ? <p class="small muted" style="margin-top:0.9rem">Redraw time. Let’s see what stuck.</p> : null}
       </section>
     )
@@ -310,6 +313,8 @@ export default function Today() {
         ) : null}
         {info.phase === 'during' && !welcomeBack ? <OptionalBox week={info.week} dow={info.dow} chunk={chunk} open={full} /> : null}
         {info.phase === 'during' && !light && !welcomeBack ? <Waiting week={info.week} dow={info.dow} done={done} open={full || (!mainList.some((t) => !done.has(t.id)) && !(next && heroOffersTask))} /> : null}
+        {info.phase === 'during' && !welcomeBack ? <GrowthFold small={!!light} open={full} /> : null}
+        {info.phase === 'during' && !welcomeBack && (info.block === 'night' || (mainList.length > 0 && mainList.every((t) => done.has(t.id)))) ? <CloseDay open={full} /> : null}
         {tomorrow && tomorrow.phase === 'during' ? <Tomorrow info={tomorrow} /> : null}
         {info.phase === 'during' ? <p class="small muted m0"><button type="button" class="btn btn--link small" aria-pressed={full} onClick={() => setShowAll(!full)}>{full ? 'Back to the calm view' : 'Show everything'}</button> <span>{full ? 'Every task is open, as before.' : 'Tasks are short lines; extras and what is waiting are folded.'}</span></p> : null}
       </div>

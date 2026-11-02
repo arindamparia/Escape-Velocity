@@ -2,6 +2,13 @@
 
 Status at the end of the third session. Read `CLAUDE.md` first, then `AUDIT.md` (the build checked against every section of the plan), then the plan itself (`plan/escape-velocity-plan.md`, Part 1).
 
+## Growth, and the plan starts today (2 Nov 2026)
+
+- **The plan runs Mon 2 Nov 2026 to Sun 31 Jan 2027** (applications from Mon 1 Feb). Diwali (Sun 8 Nov) is now in week 1, which is the light week. Day 1 (tasks 1 to 3 of week 1) was already done; its ticks and your four focus sessions were moved to today in the live database (backup: `backups/before-start-2026-11-02.sql`). Tests moved a week.
+- **Growth** is a new tab: eight books taught by doing, 141 ideas, 24 scenarios, habits and anchors, its own progress. Design: `docs/growth-design.md`; format: plan Part 1 section 23; rules: CLAUDE.md "Growth". Migration `0005_growth.sql` is applied to the live database.
+- **Search**: Growth rows have their own group in the box (laws by number: "law 17"). Before and after on the golden set: 10 Growth questions gained, none lost, held-out unchanged. The scope gate now catches 72% of the foreign set (was 75%): "ignore your instructions…" passes it because Law 36's title says "ignoring"; the model's own `in_scope` flag still refuses it.
+- **Not done**: the 48 laws' stories marked "an illustration" are mine, not the book's (laws 11, 14, 24, 38, 39, 40, 41, 42, 44, 46). Rebuild the search index in Settings after deploying.
+
 ## The plan moved to Mon 26 Oct, your calendar, new sounds (24 Oct 2026)
 
 - **New dates**: the plan now runs **Mon 26 Oct 2026 to Sun 24 Jan 2027** (applications from Mon 25 Jan). Weeks are Monday to Sunday with weekday-labelled content, so it starts on the next Monday, not on Saturday 24 Oct. `scripts/set-start.py <Monday>` rewrites the front matter, week headings and the "At a glance" table; festival wording is by hand. The only light day left is Diwali, Sun 8 Nov (week 2, the only light week); Durga Puja is behind us. Tests moved 14 days.

@@ -230,7 +230,7 @@ a.chip:hover { color: var(--accent); }
   .nav { display: none; }
   .topbar .brand span { display: none; }
   .tabbar {
-    display: grid; grid-template-columns: repeat(5, 1fr);
+    display: grid; grid-template-columns: repeat(6, 1fr);
     position: fixed; bottom: 0; left: 0; right: 0; z-index: 30;
     background: var(--bg); border-top: 1px solid var(--line);
     padding-bottom: env(safe-area-inset-bottom);
@@ -815,3 +815,72 @@ input[type='range'] { accent-color: var(--accent); }
 .hist__key .hist__mark { margin: 0; }
 .hist__key .m-fill { fill: var(--text-muted); } .hist__key .m-tick { stroke: var(--bg); }
 @media (max-width: 480px) { .hist__day { min-height: 2.6rem; } .hist__tip { display: none; } }
+
+/* ---------- Growth ---------- */
+.grow-lesson, .grow-idea, .grow-sc { display: flex; flex-direction: column; gap: 0.6rem; }
+.grow-lesson[data-learned] { border-left: 3px solid var(--done); }
+.grow-title { font-size: 1.12rem; margin: 0; text-wrap: balance; }
+.grow-ask { margin: 0; }
+.grow-guess { margin: 0; padding: 0.4rem 0.6rem; border-left: 2px solid var(--line); }
+.grow-done { color: var(--text-muted); }
+.grow-done .i { color: var(--done); }
+.grow-more summary { cursor: pointer; font-size: 0.88rem; color: var(--text-muted); }
+.grow-fields { margin: 0.6rem 0 0; display: grid; gap: 0.7rem; }
+.grow-fields > div { display: grid; gap: 0.15rem; }
+.grow-fields dt { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted); }
+.grow-fields dd { margin: 0; min-width: 0; }
+.grow-fields dd > .prose > :first-child { margin-top: 0; }
+.grow-fields dd > .prose > :last-child { margin-bottom: 0; }
+.grow-cardpreview { border: 1px solid var(--line); border-radius: calc(var(--radius) / 2); padding: 0.55rem 0.75rem; background: var(--surface-2); display: grid; gap: 0.2rem; }
+.grow-try { padding-top: 0.2rem; }
+.grow-mark .i { width: 0.9em; height: 0.9em; }
+.grow-mark:not(.grow-mark--open) { color: var(--done); }
+.grow-idea[data-learned] { border-left: 3px solid var(--done); }
+.grow-options { display: grid; gap: 0.45rem; }
+.grow-option {
+  display: grid; grid-template-columns: 1.7rem minmax(0, 1fr); gap: 0.5rem; align-items: start; text-align: left; width: 100%;
+  padding: 0.6rem 0.75rem; border: 1px solid var(--line); border-radius: calc(var(--radius) / 2); background: var(--surface); color: var(--text); font: inherit; cursor: pointer;
+}
+.grow-option:hover { border-color: var(--text-muted); }
+.grow-option[aria-pressed='true'] { border: 2px solid var(--accent); font-weight: 600; }
+.grow-option__key { display: inline-grid; place-items: center; width: 1.5rem; height: 1.5rem; border: 1px solid var(--line); border-radius: 50%; font-size: 0.8rem; font-weight: 700; }
+.grow-feedback { display: grid; gap: 0.55rem; }
+.grow-fb { padding: 0.5rem 0.7rem; border-left: 3px solid var(--line); }
+.grow-fb[data-verdict='best'] { border-left-color: var(--done); }
+.grow-fb[data-verdict='ok'] { border-left-color: var(--accent); }
+.grow-fb[data-chosen='1'] { background: var(--surface-2); }
+.grow-fb .small > :first-child { margin-top: 0.2rem; }
+.grow-fb .small > :last-child { margin-bottom: 0; }
+
+.grow-deck { display: grid; gap: 0.6rem; }
+.grow-deck__front { font-weight: 650; margin: 0; }
+.grow-deck__back { margin: 0; padding: 0.55rem 0.75rem; border-left: 3px solid var(--done); background: var(--surface-2); }
+.grow-identity__text { font-size: 1.08rem; font-style: italic; }
+.grow-coach { margin: 0; }
+.grow-habits { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; }
+.grow-habits li { display: grid; gap: 0.3rem; }
+.grow-week { display: inline-flex; gap: 3px; }
+.grow-day { display: inline-grid; place-items: center; width: 1.6rem; height: 1.6rem; border: 1px solid var(--line); border-radius: 4px; font-size: 0.8rem; color: var(--text-muted); }
+.grow-day[data-kept='1'] { border-color: var(--done); color: var(--done); font-weight: 700; }
+.grow-bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.55rem; }
+.grow-bars li { display: grid; gap: 0.2rem; font-size: 0.9rem; }
+.grow-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 0.9rem; }
+.grow-table th, .grow-table td { padding: 0.35rem 0.5rem; border-bottom: 1px solid var(--line); text-align: right; }
+.grow-table th:first-child, .grow-table thead th:first-child { text-align: left; }
+.table-wrap { overflow-x: auto; }
+/* Today: the Growth row, the cue and the two-minute start, Close the day */
+.hero__cue { margin: 0.6rem 0 0; }
+.closeday textarea { margin-top: 0.4rem; }
+.hero__cue-more summary { cursor: pointer; }
+.hero__cue-more[open] { display: grid; gap: 0.2rem; }
+/* rails: space between groups of links */
+.slot-rail .toollist + .eyebrow, .slot-rail div + div > .eyebrow { margin-top: 1.1rem; }
+/* Growth polish */
+.grow-group { gap: 0.8rem; }
+.grow-group + .grow-group { margin-top: 0.8rem; }
+.grow-group__title { font-size: 1.05rem; margin: 0; padding-bottom: 0.35rem; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+.grow-path { display: grid; gap: 0.35rem; }
+.grow-identity { border-left: 3px solid var(--accent); }
+.grow-identity__text { font-size: 1.18rem; line-height: 1.45; text-wrap: balance; }
+.grow-lesson:not([data-learned]) .grow-ask strong:first-child { color: var(--accent); }
+.grow-lesson sup, .grow-idea sup { font-size: 0.7em; line-height: 0; }

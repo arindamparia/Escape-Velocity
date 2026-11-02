@@ -6,7 +6,7 @@
 // of match scores differently and a title counts for more than a keyword, which counts for more than a description.
 // If nothing matches every word, the best partial matches are shown instead of an empty list.
 
-export type Kind = 'action' | 'page' | 'week' | 'task' | 'design' | 'term' | 'video' | 'doc' | 'problem' | 'company'
+export type Kind = 'action' | 'page' | 'week' | 'task' | 'design' | 'term' | 'idea' | 'video' | 'doc' | 'problem' | 'company'
 
 export interface Doc {
   id: string
@@ -119,7 +119,7 @@ function matchToken(t: string, f: Field, isTitle: boolean): Match | null {
   return null
 }
 
-const KIND_WEIGHT: Record<Kind, number> = { action: 18, page: 16, week: 12, design: 10, term: 8, task: 6, problem: 6, company: 6, video: 4, doc: 3 }
+const KIND_WEIGHT: Record<Kind, number> = { action: 18, page: 16, week: 12, design: 10, term: 8, idea: 8, task: 6, problem: 6, company: 6, video: 4, doc: 3 }
 
 export interface SearchOptions {
   /** id to a value from 0 to 1: how recently the person chose it */
@@ -215,7 +215,7 @@ function intentOf(spoken: readonly string[]): Intent {
 /** Added to a row's kind weight by intent. A place you can go to beats a sentence that mentions it; an idea beats a page. */
 const INTENT_BONUS: Record<Exclude<Intent, null>, Partial<Record<Kind, number>>> = {
   find: { page: 40, week: 10, company: 10 },
-  learn: { term: 14, design: 14, task: 6 },
+  learn: { term: 14, design: 14, idea: 14, task: 6 },
   do: { action: 50 },
 }
 
@@ -297,6 +297,7 @@ export const GROUPS: { key: string; label: string; kinds: Kind[] }[] = [
   { key: 'task', label: 'Tasks', kinds: ['task'] },
   { key: 'design', label: 'Designs', kinds: ['design'] },
   { key: 'term', label: 'Terms', kinds: ['term'] },
+  { key: 'idea', label: 'Growth', kinds: ['idea'] },
   { key: 'link', label: 'Videos and docs', kinds: ['video', 'doc'] },
   { key: 'other', label: 'Machine coding and companies', kinds: ['problem', 'company'] },
 ]

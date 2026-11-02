@@ -1,0 +1,117 @@
+// The Growth tab: a lesson that asks before it tells, scenarios with honest feedback, the Growth deck, habits, and its
+// own progress, which never moves study points. Every Growth action is one POST /api/ops, like a tick.
+import { expect, kolkata, openApp, test } from './support'
+
+const MON = kolkata('2026-11-02T08:00:00')
+const TUE = kolkata('2026-11-03T08:00:00')
+
+test.describe('Growth', () => {
+  test('a lesson asks first, then teaches; rating your guess learns it, and the server keeps it', async ({ page, api }) => {
+    await api.onboard()
+    await openApp(page, '/growth', { at: MON })
+    await expect(page.getByRole('heading', { level: 1, name: 'Growth' })).toBeVisible()
+    const lesson = page.locator('#lesson-ah-01')
+    await expect(lesson).toContainText('First, your guess')
+    await expect(lesson).not.toContainText('Habits are compound interest') // the idea is hidden until you guess
+    await lesson.locator('textarea').fill('It grows a lot')
+    await lesson.getByRole('button', { name: 'Show the idea' }).click()
+    await expect(lesson.getByRole('heading', { name: 'Habits are compound interest' })).toBeVisible()
+    await expect(lesson).toContainText('You guessed: It grows a lot')
+    await lesson.getByRole('group', { name: 'How your guess compared' }).getByRole('button', { name: 'Close' }).click()
+    await expect(lesson).toContainText('Learned today')
+    await expect.poll(async () => (await api.state()).growth?.map((r: { key: string; value: string }) => `${r.key}=${r.value}`)).toContain('learned:ah-01=close')
+    // the next day it is gone from the session, and its card is due
+    await openApp(page, '/growth', { at: TUE })
+    await expect(page.locator('#lesson-ah-01')).toHaveCount(0)
+    await expect(page.locator('#lesson-ah-03')).toBeVisible()
+    const deck = page.getByRole('region', { name: 'Growth cards' })
+    await expect(deck).toContainText('What does 1% better every day give you in a year?')
+    await deck.getByRole('button', { name: 'Show the answer' }).click()
+    await deck.getByRole('button', { name: 'Good' }).click()
+    await expect(deck).toContainText('No cards due')
+  })
+
+  test('a scenario gives honest feedback on every move, marked by shape as well as colour', async ({ page, api }) => {
+    await api.onboard()
+    await openApp(page, '/growth/scenarios', { at: MON })
+    const sc = page.locator('#sc-03')
+    await sc.getByRole('button', { name: 'Try it anyway' }).click()
+    await sc.getByRole('group', { name: 'Your move' }).getByRole('button').nth(0).click()
+    await expect(sc.locator('.grow-fb')).toHaveCount(3)
+    await expect(sc).toContainText('★ B: The best move')
+    await expect(sc).toContainText('✕ A: Backfires · your choice')
+    await expect.poll(async () => (await api.state()).growth?.find((r: { key: string }) => r.key === 'scenario:sc-03')?.value).toBe('A')
+  })
+
+  test('the 48 laws: a law is reached by its number from the search box, and opens in its book', async ({ page, api }) => {
+    await api.onboard()
+    await openApp(page, '/', { at: MON })
+    await page.keyboard.press('Control+k')
+    await page.getByRole('combobox').fill('law 17')
+    const rows = page.getByRole('listbox').getByRole('option')
+    await expect(rows.filter({ hasText: 'Law 17 ·' })).toBeVisible()
+    await expect(rows.first()).toContainText('Law 17')
+    await rows.first().click()
+    await expect(page).toHaveURL(/\/growth\/law#law-17$/)
+    await expect(page.locator('#law-17')).toBeInViewport()
+    await expect(page.locator('#law-17')).toContainText('unpredictability')
+  })
+
+  test('build a habit with the four laws, tick it today, and see it in the week', async ({ page, api }) => {
+    await api.onboard()
+    await openApp(page, '/growth/habits', { at: MON })
+    await page.getByRole('button', { name: 'Build a habit' }).click()
+    await page.getByLabel('The habit').fill('Morning medium')
+    await page.getByLabel('Cue: after I …, I will …').fill('After tea, I press Start')
+    await page.getByRole('button', { name: 'Save' }).click()
+    const habit = page.getByRole('region', { name: 'Your habits' })
+    await habit.getByRole('checkbox', { name: /Morning medium/ }).check()
+    await expect(habit.locator('.grow-day[data-kept="1"]')).toHaveCount(1)
+    await expect.poll(async () => (await api.state()).growth?.map((r: { key: string }) => r.key)).toContain('kept:h1:2026-11-02')
+  })
+
+  test('on Today, Growth is one folded row and two quiet lines; it never changes the points', async ({ page, api }) => {
+    await api.onboard()
+    await openApp(page, '/', { at: MON })
+    const fold = page.getByTestId('growth-fold')
+    await expect(fold.locator('summary')).toContainText('Growth today (2 ideas)')
+    await expect(fold.locator('details')).not.toHaveAttribute('open', '')
+    await page.getByTestId('cue-lines').locator('summary').click()
+    await expect(page.getByTestId('cue-lines')).toContainText('Your cue:')
+    await expect(page.getByTestId('two-minute')).toContainText('Two-minute start')
+    const status = await page.getByTestId('status').textContent()
+    await openApp(page, '/growth', { at: MON })
+    await page.locator('#lesson-ah-01').getByRole('button', { name: 'Show the idea' }).click()
+    await page.locator('#lesson-ah-01').getByRole('button', { name: 'New to me' }).click()
+    await expect.poll(async () => (await api.state()).growth?.length).toBe(1)
+    await openApp(page, '/', { at: MON })
+    await expect(page.getByTestId('status')).toHaveText(status!)
+    await expect(page.getByTestId('growth-fold').locator('summary')).toContainText('(1 idea)')
+  })
+
+  test('Close the day: one line tonight is the first thing tomorrow’s next-up card shows', async ({ page, api }) => {
+    await api.onboard()
+    await openApp(page, '/', { at: kolkata('2026-11-03T21:00:00') })
+    const close = page.getByTestId('close-day')
+    await close.locator('summary').click()
+    await close.locator('textarea').fill('Start with the heap problem')
+    await close.locator('textarea').blur()
+    await expect.poll(async () => (await api.state()).notes.find((n: { refId: string }) => n.refId === 'grow:tomorrow:2026-11-03')?.body).toBe('Start with the heap problem')
+    await openApp(page, '/', { at: kolkata('2026-11-04T08:00:00') })
+    await expect(page.getByTestId('last-night')).toContainText('Start with the heap problem')
+  })
+
+  test('learning an idea costs one request, and nothing is read back', async ({ page, api }) => {
+    await api.onboard()
+    await openApp(page, '/growth', { at: MON })
+    await page.waitForTimeout(500)
+    const calls: string[] = []
+    page.on('request', (r) => { const u = new URL(r.url()); if (u.pathname.startsWith('/api/')) calls.push(`${r.method()} ${u.pathname}`) })
+    await page.locator('#lesson-ah-01').getByRole('button', { name: 'Show the idea' }).click()
+    await page.locator('#lesson-ah-01').getByRole('button', { name: 'I had it' }).click()
+    await expect.poll(async () => (await api.state()).growth?.length).toBe(1)
+    await page.waitForTimeout(1000)
+    expect(calls.filter((c) => c === 'POST /api/ops')).toHaveLength(1)
+    expect(calls.filter((c) => c.startsWith('GET'))).toEqual([])
+  })
+})

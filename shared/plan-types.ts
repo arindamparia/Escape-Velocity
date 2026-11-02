@@ -1,6 +1,7 @@
 // Types for the compiled plan. Pure types and constants: no runtime dependencies,
 // so the compiler, the client and the Worker can all import this file.
 import type { SketchId } from './sketches'
+import type { GrowthBookChunk, GrowthDeck, GrowthIndex } from './growth-types'
 
 export const TASK_TYPES = [
   'dsa', 'boss', 'concept', 'infra', 'design', 'design2', 'lld', 'maths', 'capstone', 'redraw',
@@ -181,8 +182,8 @@ export interface DesignFull extends DesignRef {
 export interface SectionOut { id: string; level: number; heading: string; html: string }
 
 export interface SearchEntry {
-  /** kind: w = week, d = design, t = task, s = tool/section */
-  k: 'w' | 'd' | 't'
+  /** kind: w = week, d = design, t = task, g = a Growth idea */
+  k: 'w' | 'd' | 't' | 'g'
   id: string
   /** title */
   t: string
@@ -191,6 +192,16 @@ export interface SearchEntry {
 }
 
 export interface PageChunks {
+  growth: GrowthIndex
+  'growth-deck': GrowthDeck
+  'growth-ah': GrowthBookChunk
+  'growth-law': GrowthBookChunk
+  'growth-hf': GrowthBookChunk
+  'growth-inf': GrowthBookChunk
+  'growth-ns': GrowthBookChunk
+  'growth-dw': GrowthBookChunk
+  'growth-ms': GrowthBookChunk
+  'growth-fk': GrowthBookChunk
   today: {
     /** Pre-rendered one-line rules, rotated on Today after a missed day or a minimum day */
     rules: { source: 'head' | 'routine'; html: string }[]
@@ -271,3 +282,6 @@ export interface PageChunks {
     stories: string[]
   }
 }
+
+/** The chunks the plan compiler makes (the Growth ones come from scripts/lib/growth.ts). */
+export type PlanPages = Omit<PageChunks, 'growth' | `growth-${string}`>

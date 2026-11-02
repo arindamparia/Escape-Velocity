@@ -47,6 +47,7 @@ app.post('/dev/reset', async (c) => {
     db.prepare('DELETE FROM settings'),
     db.prepare('DELETE FROM applied_op'),
     db.prepare('DELETE FROM ai_usage'),
+    db.prepare('DELETE FROM growth'),
   ])
   return json({ reset: true })
 })

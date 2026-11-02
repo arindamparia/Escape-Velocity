@@ -48,6 +48,18 @@ export const PAGES: Place[] = ([
   ['Library resources', '/library?tab=resources', 'videos docs links youtube study by week', 'Every video and doc in the plan, by week'],
   ['Design notes', '/study/notes?tab=design', 'my design notes written decisions tradeoffs drawings', 'The notes you wrote while deriving a design'],
   ['STAR stories', '/study/notes?tab=stories', 'behavioural behavioral situation task action result six stories rehearse out loud', 'Your six stories: situation, task, action, result'],
+  ['Growth', '/growth', 'self improvement habits session today ideas lessons personal growth', 'Today’s Growth session: two ideas, your cards, a scenario'],
+  ['Atomic Habits', '/growth/ah', 'james clear habits four laws identity habit stacking two minute rule compound', 'Atomic Habits: build habits on purpose, applied to your 13 weeks'],
+  ['The 48 Laws of Power', '/growth/law', 'robert greene power laws politics office manipulation strategy court', 'All 48 laws: the move, how it backfires, how to spot it, the counter'],
+  ['How to Win Friends and Influence People', '/growth/hf', 'dale carnegie friends influence people persuade like listening names principles', 'Carnegie’s 30 principles, with words to say'],
+  ['Influence', '/growth/inf', 'cialdini persuasion reciprocity commitment social proof liking authority scarcity unity', 'Cialdini’s seven principles of persuasion'],
+  ['Never Split the Difference', '/growth/ns', 'chris voss negotiation salary offer mirror label calibrated questions ackerman', 'Negotiation: mirrors, labels, anchors, the Ackerman model'],
+  ['Deep Work', '/growth/dw', 'cal newport focus concentration distraction shallow shutdown ritual', 'Focus: deep versus shallow, rituals, the shutdown'],
+  ['Make It Stick', '/growth/ms', 'learning science retrieval spacing interleaving study memory', 'Why retrieval, spacing and interleaving work'],
+  ['The field kit', '/growth/fk', 'sleep exercise burnout interview nerves anxiety referral resume linkedin offer call reputation', 'Sleep, burnout, nerves, referrals, the resume and the offer call'],
+  ['Growth scenarios', '/growth/scenarios', 'scenario practice situations role play what would you do spot the tactic manipulation', 'Real situations: choose a move, get honest feedback'],
+  ['Habits and anchors', '/growth/habits', 'habits habit tracker anchors cues identity build a habit', 'Your anchors, your habits, who you are becoming'],
+  ['Growth progress', '/growth/progress', 'growth progress votes weeks review', 'Growth by week, and the Sunday Growth review'],
   ['Free notes', '/study/notes?tab=free', 'scratch notes anything write equation answers paper summaries', 'Notes that belong to no task'],
 ] as const).map(([title, url, keys, sub]) => ({ id: `page:${url}`, title, sub, keys, url }))
 
@@ -74,6 +86,11 @@ export const SECTIONS: Place[] = ([
   ['gap-coverage', 'Gap check: against his syllabi', '/library?tab=gaps#coverage', 'Gap check · coverage', 'arpit bhayani beginners masterclass syllabus topics covered partly', 'Every topic in both syllabi, and whether the plan covers it'],
   ['gap-missing', 'What you are still missing', '/library?tab=gaps#missing', 'Gap check · still missing', 'machine coding mocks ucp capstone priorities', 'Machine coding, mocks out loud, and your own two systems'],
   ['gap-courses', 'Should you buy a course?', '/library?tab=gaps#courses', 'Gap check · the courses', 'arpit bhayani masterclass beginners price worth buy cohort', 'Price, format, and why not before January'],
+  ['growth-anchors', 'Your anchors (cues)', '/growth/habits#anchors', 'Growth · anchors', 'cue implementation intention after i will when where morning night block ritual', 'One cue per block: after I …, I will …'],
+  ['growth-identity', 'Who you are becoming', '/growth/habits#identity-edit', 'Growth · identity', 'identity statement votes chapter who i am', 'One identity statement per chapter'],
+  ['growth-diagnose', 'Why did a habit stop?', '/growth/habits#diagnose', 'Growth · why it failed', 'habit failed broke stopped quit diagnose fix four laws', 'One question per law of behaviour change'],
+  ['growth-starts', 'Two-minute starts', '/growth/habits#starts', 'Growth · two-minute starts', 'procrastination start small cannot start too big tiny version', 'The smallest start for every kind of task'],
+  ['growth-review', 'Growth review', '/growth/progress#review', 'Growth · review', 'sunday reflection what worked change drop', 'Three lines on Sunday: worked, change, drop'],
   ['settings-theme', 'Settings: theme', '/settings#theme', 'Settings · theme', 'appearance look colours paper night light dark system', 'Pick Paper, Paper night, Light, Dark or System'],
   ['settings-focus-sound', 'Settings: Cabin sound', '/settings#focus-sound', 'Settings · Cabin sound', 'focus sound cabin music noise rain brown pink wind nature ambient background audio concentrate study playlist volume engine hum cabin air monsoon ridge wind tide waves forest my sound name', 'Pick the sound for your timer (Engine hum, Monsoon, Tide, Forest or your own, which you can name)'],
   ['settings-sound', 'Settings: sound', '/settings#sound', 'Settings · sound', 'chime timer audio mute', 'The soft chime when a timer ends'],
@@ -90,6 +107,8 @@ export const urls = {
   task: (id: string, week: number) => `/weeks/${week}#${id}`,
   /** A readiness item (r-03) is not in a week: it is on Progress, in the ready check. */
   readiness: (id: string) => `/progress#${id}`,
+  /** a Growth idea, in its book (law-03 is on /growth/law) */
+  idea: (id: string) => `/growth/${id.split('-')[0]}#${id}`,
   term: (id: string) => `/guide#${id}`,
   design: (id: string) => `/library?design=${id}`,
   machine: () => '/library?tab=machine',
@@ -111,6 +130,7 @@ export function allInternalUrls(opts: {
   const out = new Set<string>([...PAGES.map((p) => p.url), ...SECTION_URLS])
   for (const e of opts.search) {
     if (e.k === 'w') out.add(urls.week(e.id))
+    else if (e.k === 'g') out.add(urls.idea(e.id))
     else if (e.k === 'd') out.add(urls.design(e.id))
     else { const w = weekOfTask(e.id); if (w) out.add(urls.task(e.id, w)); else if (/^r-\d\d$/.test(e.id)) out.add(urls.readiness(e.id)) }
   }

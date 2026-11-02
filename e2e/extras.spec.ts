@@ -37,9 +37,9 @@ test.describe('papers', () => {
   test('on Friday night a paper is listed, marked optional, and never the next action', async ({ page, api }) => {
     await api.onboard()
     await api.tick('w04-01') // the week's DSA, so nothing core is left
-    await api.activeOn('2026-11-19') // not a "welcome back" day
-    await api.activeOn('2026-11-20')
-    await openApp(page, '/', { at: kolkata('2026-11-20T21:00:00') })
+    await api.activeOn('2026-11-26') // not a "welcome back" day
+    await api.activeOn('2026-11-27')
+    await openApp(page, '/', { at: kolkata('2026-11-27T21:00:00') })
     await expect(page.getByRole('region', { name: 'Next up' })).toHaveCount(0)
     await page.getByRole('region', { name: 'Optional extras' }).locator('summary').click() // extras are folded into one line
     const row = taskRow(page, 'w04-14')
@@ -87,8 +87,8 @@ test.describe('equations', () => {
 
   test('Today keeps the bonus equation as a panel of its own, folded under Optional (the week\'s equation is a task in the list)', async ({ page, api }) => {
     await api.onboard()
-    await api.activeOn('2026-11-16'); await api.activeOn('2026-11-17') // not a welcome-back day
-    await openApp(page, '/', { at: kolkata('2026-11-18T10:00:00') }) // week 4 has a Thursday derivation and a bonus equation
+    await api.activeOn('2026-11-23'); await api.activeOn('2026-11-24') // not a welcome-back day
+    await openApp(page, '/', { at: kolkata('2026-11-25T10:00:00') }) // week 4 has a Thursday derivation and a bonus equation
     await expect(page.getByRole('region', { name: 'Equation of the week' })).toHaveCount(0) // not shown a third time in the side column
     await page.getByRole('region', { name: 'Optional extras' }).locator('summary').click()
     const bonus = page.getByRole('region', { name: 'Bonus equation' })

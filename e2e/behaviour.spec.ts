@@ -103,8 +103,8 @@ test.describe('themes', () => {
 test.describe('the timer', () => {
   test('stores a start time: it survives a reload and a long sleep, then runs out, offers to log the problem, and records the session', async ({ page, api }) => {
     await api.onboard()
-    await api.activeOn('2026-10-27')
-    await openApp(page, '/', { at: kolkata('2026-10-28T10:00:00'), ticking: true })
+    await api.activeOn('2026-11-03')
+    await openApp(page, '/', { at: kolkata('2026-11-04T10:00:00'), ticking: true })
     await page.getByRole('button', { name: /Start 25-min timer/ }).first().click()
     const card = page.locator('header.topbar').getByRole('group', { name: 'Timer in the top bar' })
     await expect(card.getByRole('timer')).toHaveText(/^2[45]:\d\d$/)
@@ -124,7 +124,7 @@ test.describe('the timer', () => {
     await expect(dialog.getByRole('button', { name: 'medium' })).toHaveAttribute('aria-pressed', 'true')
     await dialog.getByRole('button', { name: 'Log it', exact: true }).click()
     // the problem seeded for 6 Oct, and the one just logged: 25 minutes, dated 7 Oct in Kolkata
-    await expect.poll(async () => (await api.state()).problemLog.map((p) => [p.difficulty, p.minutes, p.loggedOn])).toEqual([['medium', 20, '2026-10-27'], ['medium', 25, '2026-10-28']])
+    await expect.poll(async () => (await api.state()).problemLog.map((p) => [p.difficulty, p.minutes, p.loggedOn])).toEqual([['medium', 20, '2026-11-03'], ['medium', 25, '2026-11-04']])
     expect((await api.state()).sessions).toHaveLength(1)
     expect((await api.state()).sessions[0]).toMatchObject({ kind: 'dsa', plannedMin: 25 })
   })
@@ -132,7 +132,7 @@ test.describe('the timer', () => {
   test('a boss problem runs 40 minutes and then keeps counting up, with no guilt', async ({ page, api }) => {
     await api.onboard()
     const boss = firstTask('boss')
-    await openApp(page, `/weeks/${boss.week}`, { at: kolkata('2026-11-01T10:00:00'), ticking: true })
+    await openApp(page, `/weeks/${boss.week}`, { at: kolkata('2026-11-08T10:00:00'), ticking: true })
     await taskRow(page, boss.id).getByRole('button', { name: /Start 40-min timer/ }).click()
     const card = page.locator('header.topbar').getByRole('group', { name: 'Timer in the top bar' })
     await page.clock.fastForward('45:00')
@@ -165,11 +165,11 @@ test.describe('small celebrations', () => {
 
   test('a light week lights its constellation when everything with points is ticked, and says so in words', async ({ page, api }) => {
     await api.onboard()
-    const tasks = plan.tasks.filter((t) => t.week === 2 && t.points > 0)
+    const tasks = plan.tasks.filter((t) => t.week === 1 && t.points > 0 && !t.optional)
     await api.tick(...tasks.slice(0, -1).map((t) => t.id))
-    await openApp(page, '/weeks/2')
+    await openApp(page, '/weeks/1')
     await tickButton(page, tasks.at(-1)!.id).click()
-    await expect(page.locator('.toast')).toHaveText('Week 2: constellation lit.')
+    await expect(page.locator('.toast')).toHaveText('Week 1: constellation lit.')
   })
 
   test('a week with a target lights its constellation when the points reach it', async ({ page, api }) => {

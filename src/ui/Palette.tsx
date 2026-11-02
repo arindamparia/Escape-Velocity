@@ -29,8 +29,8 @@ const FILTERS: { key: Filter; label: string; kinds?: Kind[] }[] = [
   { key: 'link', label: 'Videos & docs', kinds: ['video', 'doc'] },
 ]
 
-const ICON: Record<Kind, IconName> = { action: 'play', page: 'dot', week: 'star', task: 'circle', design: 'orbit', term: 'book', video: 'play', doc: 'book', problem: 'link', company: 'link' }
-const KIND_WORD: Record<Kind, string> = { action: 'Action', page: 'Page', week: 'Week', task: 'Task', design: 'Design', term: 'Term', video: 'Video', doc: 'Doc', problem: 'Machine coding', company: 'Company' }
+const ICON: Record<Kind, IconName> = { action: 'play', page: 'dot', week: 'star', task: 'circle', design: 'orbit', term: 'book', idea: 'sprout', video: 'play', doc: 'book', problem: 'link', company: 'link' }
+const KIND_WORD: Record<Kind, string> = { action: 'Action', page: 'Page', week: 'Week', task: 'Task', design: 'Design', term: 'Term', idea: 'Growth', video: 'Video', doc: 'Doc', problem: 'Machine coding', company: 'Company' }
 
 /** The title with the matched letters in <mark>. They are underlined and bold, never only coloured. */
 function Marked({ text, marks }: { text: string; marks: [number, number][] }) {

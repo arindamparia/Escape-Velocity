@@ -23,6 +23,7 @@ const Mindset = lazyPage(() => import('./pages/Mindset'))
 const Sources = lazyPage(() => import('./pages/Sources'))
 const Settings = lazyPage(() => import('./pages/Settings'))
 const Guide = lazyPage(() => import('./pages/Guide'))
+const Growth = lazyPage(() => import('./pages/Growth'))
 
 const NAV: { href: string; label: string; match: (p: string) => boolean }[] = [
   { href: '/', label: 'Today', match: (p) => p === '/' },
@@ -30,6 +31,7 @@ const NAV: { href: string; label: string; match: (p: string) => boolean }[] = [
   { href: '/study', label: 'Study', match: (p) => p.startsWith('/study') },
   { href: '/library', label: 'Library', match: (p) => p.startsWith('/library') },
   { href: '/progress', label: 'Progress', match: (p) => p.startsWith('/progress') },
+  { href: '/growth', label: 'Growth', match: (p) => p.startsWith('/growth') },
 ]
 
 function SyncDot() {
@@ -65,7 +67,7 @@ function TopBar() {
 
 function TabBar() {
   const { path } = useLocation()
-  const icons = ['star', 'orbit', 'book', 'link', 'check'] as const
+  const icons = ['star', 'orbit', 'book', 'link', 'check', 'sprout'] as const
   return (
     <nav class="tabbar" aria-label="Main">
       {NAV.map((n, i) => (
@@ -176,6 +178,7 @@ function Shell() {
               <Route path="/sources" component={Sources} />
               <Route path="/settings" component={Settings} />
               <Route path="/guide" component={Guide} />
+              <Route path="/growth/:view?" component={Growth} />
               <Route default component={NotFound} />
             </Router>
           </ErrorBoundary>

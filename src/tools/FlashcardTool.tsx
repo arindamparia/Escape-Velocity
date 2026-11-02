@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'preact/hooks'
 import { engine } from '../lib/app'
 import { today } from '../lib/clock'
-import { MAX_CARDS_PER_DAY, dueCards, reviewedOnDay } from '../lib/srs'
+import { MAX_CARDS_PER_DAY, dueCards, planCardRows, reviewedOnDay } from '../lib/srs'
 import { plan } from '../lib/plan'
 import { TextBlock } from '../ui/Html'
 import { usePage } from '../ui/hooks'
@@ -12,7 +12,7 @@ export function FlashcardTool() {
   const state = engine.state.value
   const [revealed, setRevealed] = useState(false)
   const date = today.value
-  const states = useMemo(() => new Map(state.flashcards.map((c) => [c.cardId, c])), [state.flashcards])
+  const states = useMemo(() => new Map(planCardRows(state.flashcards).map((c) => [c.cardId, c])), [state.flashcards])
   // a card exists once its why-note has been written
   const eligible = useMemo(
     () => plan.flashcardIds.filter((id) => (state.notes.find((n) => n.kind === 'why' && n.refId === id)?.body ?? '').trim()),

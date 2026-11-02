@@ -3,7 +3,7 @@
 import ragData from '../src/generated/rag.json'
 import { LINK_WORDS, tokenize, topicWords, within } from '../src/lib/search'
 
-export interface Chunk { id: string; entry: string; kind: string; title: string; text: string }
+export interface Chunk { id: string; entry: string; kind: string; title: string; text: string; gate?: string }
 export const CHUNKS = (ragData as { chunks: Chunk[] }).chunks
 export const HASH = (ragData as { hash: string }).hash
 export const byId = new Map(CHUNKS.map((c) => [c.id, c]))
@@ -82,7 +82,7 @@ let vocab: { set: Set<string>; list: string[] } | null = null
 function words() {
   if (!vocab) {
     const set = new Set<string>()
-    for (const c of CHUNKS) for (const w of `${c.title} ${c.text}`.toLowerCase().match(/[a-z0-9]+/g) ?? []) set.add(w)
+    for (const c of CHUNKS) for (const w of `${c.title} ${c.gate ?? c.text}`.toLowerCase().match(/[a-z0-9]+/g) ?? []) set.add(w)
     vocab = { set, list: [...set] }
   }
   return vocab
@@ -91,7 +91,7 @@ function words() {
 let haystacks: string[] | null = null
 /** Do all of these words appear together in one chunk of the plan (allowing for endings)? */
 function together(ws: string[]): boolean {
-  haystacks ??= CHUNKS.map((c) => ` ${(`${c.title} ${c.text}`.toLowerCase().match(/[a-z0-9]+/g) ?? []).join(' ')} `)
+  haystacks ??= CHUNKS.map((c) => ` ${(`${c.title} ${c.gate ?? c.text}`.toLowerCase().match(/[a-z0-9]+/g) ?? []).join(' ')} `)
   const needles = ws.map((w) => (w.length >= 5 ? ` ${w.slice(0, Math.max(4, w.length - 3))}` : ` ${w} `))
   return haystacks.some((h) => needles.every((n) => h.includes(n)))
 }

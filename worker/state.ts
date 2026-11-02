@@ -6,7 +6,7 @@ type Row = Record<string, unknown>
 const str = (v: unknown) => (v === null || v === undefined ? null : String(v))
 
 export async function readState(db: D1Database): Promise<AppState> {
-  const [tp, wl, pl, ds, dc, nt, fc, fs, st] = await db.batch<Row>([
+  const [tp, wl, pl, ds, dc, nt, fc, fs, st, gr] = await db.batch<Row>([
     db.prepare('SELECT task_id, done, done_at, updated_at FROM task_progress ORDER BY task_id'),
     db.prepare('SELECT * FROM week_log ORDER BY week'),
     db.prepare('SELECT * FROM problem_log ORDER BY logged_on, created_at'),
@@ -16,6 +16,7 @@ export async function readState(db: D1Database): Promise<AppState> {
     db.prepare('SELECT * FROM flashcard_state ORDER BY card_id'),
     db.prepare('SELECT * FROM focus_session ORDER BY started_at'),
     db.prepare('SELECT key, value, updated_at FROM settings ORDER BY key'),
+    db.prepare('SELECT key, value, on_day, updated_at FROM growth ORDER BY key'),
   ])
   return {
     taskProgress: tp.results.map((r) => ({ taskId: String(r.task_id), done: r.done === 1, doneAt: str(r.done_at), updatedAt: String(r.updated_at) })),
@@ -82,6 +83,7 @@ export async function readState(db: D1Database): Promise<AppState> {
       plannedMin: Number(r.planned_min),
     })),
     settings: st.results.map((r) => ({ key: String(r.key), value: String(r.value), updatedAt: String(r.updated_at) })),
+    growth: gr.results.map((r) => ({ key: String(r.key), value: String(r.value), onDay: String(r.on_day), updatedAt: String(r.updated_at) })),
   }
 }
 

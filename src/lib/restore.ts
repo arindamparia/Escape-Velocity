@@ -26,6 +26,7 @@ export function planRestore(json: unknown): RestorePlan | { error: string } {
   add('decision cards', arr<AppState['decisionCards'][number]>(b.decisionCards).map((r) => ['decision.upsert', keep({ id: r.id, designId: r.designId, decision: r.decision, forcedBy: r.forcedBy, rejectedAlternative: r.rejectedAlternative, whatBreaks: r.whatBreaks, numbers: r.numbers })]))
   add('notes', arr<AppState['notes'][number]>(b.notes).map((r) => ['note.upsert', keep({ id: r.id, kind: r.kind, refId: r.refId, body: r.body })]))
   add('focus sessions', arr<AppState['sessions'][number]>(b.sessions).map((r) => ['session.add', keep({ id: r.id, kind: r.kind, refId: r.refId, startedAt: r.startedAt, endedAt: r.endedAt, plannedMin: r.plannedMin })]))
+  add('Growth progress', arr<AppState['growth'][number]>(b.growth).map((r) => ['growth.set', { key: r.key, value: r.value, on: r.onDay }]))
   add('settings', arr<AppState['settings'][number]>(b.settings).filter((r) => SETTINGS.has(r.key)).map((r) => ['setting.set', { key: r.key, value: r.value }]))
 
   return { exportedAt: typeof b.exportedAt === 'string' ? b.exportedAt : null, ops, counts, flashcardsSkipped: arr(b.flashcards).length }

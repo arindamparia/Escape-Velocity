@@ -58,6 +58,9 @@ export interface FlashcardStateRow {
 export interface FocusSessionRow { id: string; kind: string; refId: string | null; startedAt: string; endedAt: string; plannedMin: number }
 export interface SettingRow { key: string; value: string; updatedAt: string }
 
+/** One Growth fact (see migrations/0005_growth.sql for the keys). */
+export interface GrowthRow { key: string; value: string; onDay: string; updatedAt: string }
+
 export interface AppState {
   taskProgress: TaskProgressRow[]
   weekLog: WeekLogRow[]
@@ -68,10 +71,11 @@ export interface AppState {
   flashcards: FlashcardStateRow[]
   sessions: FocusSessionRow[]
   settings: SettingRow[]
+  growth: GrowthRow[]
 }
 
 export const EMPTY_STATE: AppState = {
-  taskProgress: [], weekLog: [], problemLog: [], designStatus: [], decisionCards: [], notes: [], flashcards: [], sessions: [], settings: [],
+  taskProgress: [], weekLog: [], problemLog: [], designStatus: [], decisionCards: [], notes: [], flashcards: [], sessions: [], settings: [], growth: [],
 }
 
 export interface ApiError { error: { code: string; message: string; opId?: string } }

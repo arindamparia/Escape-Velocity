@@ -5,14 +5,17 @@ import { PAGES, SECTIONS } from '../../src/lib/destinations'
 import { GLOSSARY } from '../../src/pages/glossary'
 import type { PlanTask } from '../../shared/plan-types'
 import type { CompileOutput } from './compile'
+import type { GrowthOutput } from './growth'
 
 export interface RagChunk {
   id: string
   /** the palette entry this opens */
   entry: string
-  kind: 'page' | 'week' | 'task' | 'design' | 'term' | 'link' | 'problem' | 'company' | 'rule' | 'help' | 'project' | 'ready' | 'paper' | 'equation' | 'gap'
+  kind: 'page' | 'week' | 'task' | 'design' | 'term' | 'link' | 'problem' | 'company' | 'rule' | 'help' | 'project' | 'ready' | 'paper' | 'equation' | 'gap' | 'growth'
   title: string
   text: string
+  /** the words the scope gate learns from, when they should be fewer than the text (a Growth lesson's prose is full of everyday words) */
+  gate?: string
 }
 
 const plain = (html: string) => html.replace(/<[^>]+>/g, ' ').replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/\s+/g, ' ').trim()
@@ -34,7 +37,7 @@ const HELP: [string, string, string, string][] = [
   ['help:links', 'page:/sources', 'Videos and docs', 'Every task has a Study line with its videos (with their length) and docs, free ones first. All of them are listed by week on the Study links page. Watch the video, answer the why-question yourself, then skim the doc.'],
 ]
 
-export function buildChunks(out: CompileOutput): RagChunk[] {
+export function buildChunks(out: CompileOutput, growth?: GrowthOutput): RagChunk[] {
   const chunks: RagChunk[] = []
   const taskById = new Map<string, PlanTask>(out.core.tasks.map((t) => [t.id, t]))
 
@@ -118,6 +121,17 @@ export function buildChunks(out: CompileOutput): RagChunk[] {
   }
   chunks.push({ id: 'capstone:flow', entry: 'section:capstone-flow', kind: 'project', title: 'Capstone flow', text: `The capstone checkout flow: ${out.pages.weeks.capstoneFlow.join(', then ')}.` })
   Object.entries(out.pages.progress.readiness).forEach(([id, html]) => chunks.push({ id: `ready:${id}`, entry: `task:${id}`, kind: 'ready', title: `Ready check ${id}`, text: clip(plain(html), 400) }))
+
+  // the Growth track: one chunk per idea (its lesson and its card), so "law 3" or "how do I stack habits" can be answered and cited
+  if (growth) {
+    for (const ref of growth.index.path) {
+      const { book } = growth.books[ref.book]
+      const idea = growth.books[ref.book].ideas.find((i) => i.id === ref.id)!
+      const n = Number(ref.id.slice(-2))
+      const label = ref.book === 'law' ? `Law ${n}: ${idea.title}` : idea.title
+      chunks.push({ id: `growth:${ref.id}`, entry: `growth:${ref.id}`, kind: 'growth', title: label, text: clip(`${book.title} (${idea.group}). ${label}. ${idea.text} Card: ${idea.card.back}`, 800), gate: `${book.title} ${idea.group}` })
+    }
+  }
 
   for (const [id, entry, title, text] of HELP) chunks.push({ id, entry, kind: 'help', title, text })
 

@@ -9,21 +9,21 @@ const START = plan.config.startDate
 const LIGHT = plan.config.lightDays
 
 describe('dayInfo', () => {
-  it('Monday 26 Oct, morning: week 1, Mon', () => {
-    const d = dayInfo('2026-10-26', kolkata('2026-10-26', 7))
+  it('Monday 2 Nov, morning: week 1, Mon', () => {
+    const d = dayInfo('2026-11-02', kolkata('2026-11-02', 7))
     expect(d).toMatchObject({ phase: 'during', week: 1, dow: 0, dayName: 'Mon', block: 'morning' })
     expect(d.light).toBeUndefined()
   })
   it('flags Diwali as a light day, and nothing around it', () => {
     expect(dayInfo('2026-11-08').light?.label).toBe('Kali Puja / Diwali')
-    expect(dayInfo('2026-11-08')).toMatchObject({ week: 2, dow: 6, dayName: 'Sun' })
+    expect(dayInfo('2026-11-08')).toMatchObject({ week: 1, dow: 6, dayName: 'Sun' })
     expect(dayInfo('2026-11-07').light).toBeUndefined() // the Saturday before is a normal day
     expect(dayInfo('2026-11-09').light).toBeUndefined()
-    expect(dayInfo('2026-10-31').light).toBeUndefined() // Durga Puja was before the plan started
+    expect(dayInfo('2026-11-01').phase).toBe('before') // the plan starts on Mon 2 Nov
   })
   it('clamps the week before the start and after the end', () => {
-    expect(dayInfo('2026-10-15')).toMatchObject({ phase: 'before', week: 1 })
-    expect(dayInfo('2027-01-25')).toMatchObject({ phase: 'after', week: 13 })
+    expect(dayInfo('2026-10-22')).toMatchObject({ phase: 'before', week: 1 })
+    expect(dayInfo('2027-02-01')).toMatchObject({ phase: 'after', week: 13 })
   })
 })
 
@@ -74,14 +74,14 @@ const problem = (loggedOn: string, difficulty: 'easy' | 'medium' | 'hard' = 'med
 
 describe('missed days and the welcome-back restart', () => {
   it('no history on day 1 or 2 is not "missed"', () => {
-    expect(missedDays(none, '2026-10-26', START, LIGHT)).toBe(0)
-    expect(missedDays(none, '2026-10-27', START, LIGHT)).toBe(0)
+    expect(missedDays(none, '2026-11-02', START, LIGHT)).toBe(0)
+    expect(missedDays(none, '2026-11-03', START, LIGHT)).toBe(0)
   })
   it('one missed day is not a backlog; two or more triggers the restart', () => {
-    const act = new Set(['2026-10-27'])
-    expect(missedDays(act, '2026-10-28', START, LIGHT)).toBe(0)
-    expect(missedDays(act, '2026-10-29', START, LIGHT)).toBe(1)
-    expect(missedDays(act, '2026-10-30', START, LIGHT)).toBe(2)
+    const act = new Set(['2026-11-03'])
+    expect(missedDays(act, '2026-11-04', START, LIGHT)).toBe(0)
+    expect(missedDays(act, '2026-11-05', START, LIGHT)).toBe(1)
+    expect(missedDays(act, '2026-11-06', START, LIGHT)).toBe(2)
     expect(missedDays(new Set(['2026-11-05']), '2026-11-09', START, LIGHT)).toBe(2) // the 6th and 7th; Diwali (the 8th) is skipped, not counted
   })
   it('work done on a light day ends the run of missed days (a light day is kept light, not skipped)', () => {
@@ -93,40 +93,40 @@ describe('missed days and the welcome-back restart', () => {
     expect(missedDays(act, '2026-11-10', START, LIGHT)).toBe(1)
   })
   it('a minimum day (one problem) counts as active', () => {
-    const act = activityDates(stateWith({ problemLog: [problem('2026-10-29')] }))
-    expect(missedDays(act, '2026-10-30', START, LIGHT)).toBe(0)
+    const act = activityDates(stateWith({ problemLog: [problem('2026-11-05')] }))
+    expect(missedDays(act, '2026-11-06', START, LIGHT)).toBe(0)
   })
   it('counts ticks by their plan day: after midnight is still the day before, from 04:00 it is the next', () => {
-    const late = activityDates(stateWith({ taskProgress: [{ taskId: 'w01-01', done: true, doneAt: '2026-10-26T19:00:00.000Z', updatedAt: '' }] }))
-    expect(late.has('2026-10-26')).toBe(true) // 00:30 on the 6th in Kolkata: the 5th's late night
-    expect(late.has('2026-10-27')).toBe(false)
-    const morning = activityDates(stateWith({ taskProgress: [{ taskId: 'w01-01', done: true, doneAt: '2026-10-26T22:30:00.000Z', updatedAt: '' }] }))
-    expect(morning.has('2026-10-27')).toBe(true) // 04:00 on the 6th
+    const late = activityDates(stateWith({ taskProgress: [{ taskId: 'w01-01', done: true, doneAt: '2026-11-02T19:00:00.000Z', updatedAt: '' }] }))
+    expect(late.has('2026-11-02')).toBe(true) // 00:30 on the 6th in Kolkata: the 5th's late night
+    expect(late.has('2026-11-03')).toBe(false)
+    const morning = activityDates(stateWith({ taskProgress: [{ taskId: 'w01-01', done: true, doneAt: '2026-11-02T22:30:00.000Z', updatedAt: '' }] }))
+    expect(morning.has('2026-11-03')).toBe(true) // 04:00 on the 6th
   })
 })
 
 describe('kind streaks', () => {
   it('counts weeks with at least 3 active days, and the week in progress never breaks it', () => {
-    const w1 = ['2026-10-26', '2026-10-27', '2026-10-29']
-    const w2 = ['2026-11-02', '2026-11-03', '2026-11-04']
-    expect(streakWeeks(new Set([...w1, ...w2]), '2026-11-09', START)).toBe(2) // week 3 only just started
-    expect(streakWeeks(new Set([...w1, ...w2, '2026-11-09', '2026-11-10', '2026-11-11']), '2026-11-12', START)).toBe(3)
+    const w1 = ['2026-11-02', '2026-11-03', '2026-11-05']
+    const w2 = ['2026-11-09', '2026-11-10', '2026-11-11']
+    expect(streakWeeks(new Set([...w1, ...w2]), '2026-11-16', START)).toBe(2) // week 3 only just started
+    expect(streakWeeks(new Set([...w1, ...w2, '2026-11-16', '2026-11-17', '2026-11-18']), '2026-11-19', START)).toBe(3)
   })
   it('a week with fewer than 3 active days ends the streak', () => {
-    const w1 = ['2026-10-26', '2026-10-27', '2026-10-29']
-    const w2 = ['2026-11-02', '2026-11-03']
-    const w3 = ['2026-11-09', '2026-11-10', '2026-11-11']
-    expect(streakWeeks(new Set([...w1, ...w2, ...w3]), '2026-11-13', START)).toBe(1)
+    const w1 = ['2026-11-02', '2026-11-03', '2026-11-05']
+    const w2 = ['2026-11-09', '2026-11-10']
+    const w3 = ['2026-11-16', '2026-11-17', '2026-11-18']
+    expect(streakWeeks(new Set([...w1, ...w2, ...w3]), '2026-11-20', START)).toBe(1)
   })
 })
 
 describe('evidence and constellations', () => {
   it('counts only no-AI mediums and hards, and owned designs', () => {
     const s = stateWith({
-      problemLog: [problem('2026-10-26'), problem('2026-10-26', 'medium', false), problem('2026-10-27', 'hard'), problem('2026-10-27', 'easy')],
+      problemLog: [problem('2026-11-02'), problem('2026-11-02', 'medium', false), problem('2026-11-03', 'hard'), problem('2026-11-03', 'easy')],
       designStatus: [
-        { designId: 'bitly', status: 'redrawn-2', attemptedOn: '2026-10-31', drawingUrl: null, updatedAt: '' },
-        { designId: 'dropbox', status: 'redrawn-1', attemptedOn: '2026-10-31', drawingUrl: null, updatedAt: '' },
+        { designId: 'bitly', status: 'redrawn-2', attemptedOn: '2026-11-07', drawingUrl: null, updatedAt: '' },
+        { designId: 'dropbox', status: 'redrawn-1', attemptedOn: '2026-11-07', drawingUrl: null, updatedAt: '' },
       ],
       flashcards: [
         { cardId: 'w01-05', box: 4, dueOn: '', reviews: 4, lastGrade: 'good', updatedAt: '' },
@@ -136,16 +136,16 @@ describe('evidence and constellations', () => {
     expect(evidence(s, none)).toEqual({ mediums: 1, hards: 1, designsOwned: 1, cardsMastered: 1, constellations: 0 })
   })
   it('a normal week lights at 50 points; a light week lights when everything is ticked', () => {
-    const w1 = plan.tasks.filter((t) => t.week === 1)
+    const w4 = plan.tasks.filter((t) => t.week === 4)
     const fifty = new Set<string>()
     let sum = 0
-    for (const t of w1) { if (sum >= 50) break; fifty.add(t.id); sum += t.points }
-    expect(constellationLit(1, fifty)).toBe(true)
-    expect(constellationLit(1, new Set(['w01-11']))).toBe(false)
-    // week 2 contains Puja: no target, so every task with points must be ticked
-    const w2 = new Set(plan.tasks.filter((t) => t.week === 2).map((t) => t.id))
-    expect(constellationLit(2, w2)).toBe(true)
-    w2.delete('w02-05')
-    expect(constellationLit(2, w2)).toBe(false)
+    for (const t of w4) { if (sum >= 50) break; fifty.add(t.id); sum += t.points }
+    expect(constellationLit(4, fifty)).toBe(true)
+    expect(constellationLit(4, new Set([w4[0].id]))).toBe(false)
+    // week 1 contains Diwali: no target, so every core task with points must be ticked
+    const w1 = new Set(plan.tasks.filter((t) => t.week === 1).map((t) => t.id))
+    expect(constellationLit(1, w1)).toBe(true)
+    w1.delete('w01-11')
+    expect(constellationLit(1, w1)).toBe(false)
   })
 })

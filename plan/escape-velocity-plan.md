@@ -3,9 +3,9 @@ title: Escape Velocity
 subtitle: From "I feel mediocre" to SDE-2 interviews at Indian fintech
 tagline: 13 weeks. 42 designs. One jump.
 owner: Arindam
-start_date: 2026-10-26
-end_date: 2027-01-24
-applications_from: 2027-01-25
+start_date: 2026-11-02
+end_date: 2027-01-31
+applications_from: 2027-02-01
 weeks: 13
 hours_per_week: 15
 weekly_points_target: 50
@@ -42,7 +42,7 @@ Constraints:
 
 ## 2. Information architecture
 
-### Navigation: five destinations
+### Navigation: six destinations
 
 | Destination | Answers the question | Contains |
 | --- | --- | --- |
@@ -51,10 +51,11 @@ Constraints:
 | **Study** (`/study`) | "Which tool do I need?" | Learning loop, redraw queue, flashcards, focus timer, mock mode, envelope calculator, formula sheet, notes |
 | **Library** (`/library`) | "What should I design next, and what do companies ask?" | 42 designs, machine coding list, papers, what companies ask, gap check, real systems, resources |
 | **Progress** (`/progress`) | "Am I actually getting better?" | Scorecard, charts, readiness ring, Sunday review |
+| **Growth** (`/growth`) | "Who am I becoming?" | Today's Growth session, the books as paths (the 48 laws by theme), scenarios, habits and anchors, Growth progress |
 
 Secondary, never in the main nav: **Mindset** (`/mindset`, opened from your why note on Today), **Settings** (theme, export), and the **command palette** (`⌘K`), which reaches everything.
 
-Five is deliberate: every extra nav item is a decision you make before studying. Tools and content come to you when a task needs them (next section), so you rarely navigate at all.
+Six is deliberate: every extra nav item is a decision you make before studying. Growth is the one addition, because it is a second track with its own progress; folded into Study it would be hidden. Tools and content come to you when a task needs them (next section), so you rarely navigate at all.
 
 ### Where every part of this file appears
 
@@ -115,7 +116,7 @@ When a task appears on Today or in week detail, its type decides what opens next
 
 ### First run
 
-Shown once: a one-screen welcome with "Why this plan", a field for your why note (skippable, prompted again on Mon 26 Oct night as task `w01-02`), and the theme picker. Then straight to Today.
+Shown once: a one-screen welcome with "Why this plan", a field for your why note (skippable, prompted again on Mon 2 Nov night as task `w01-02`), and the theme picker. Then straight to Today.
 
 ## 3. Pages
 
@@ -544,7 +545,7 @@ These pairs were checked: text contrast is at least 14:1 in Dark and Light, mute
 
 - **Front matter:** `start_date`, `end_date`, `weekly_points_target`, `light_days`.
 - **Surface marker:** `<!-- surface: weeks.dsa -->` on the line right after a heading. Required on every level-1 or level-2 heading in Parts 2 to 6 that has its own content before the next level-1 or level-2 heading; level-3 headings may carry one, otherwise they inherit. Allowed surfaces: `mindset.why-plan`, `mindset.main`, `library.companies`, `library.designs`, `library.machine-coding`, `library.reading`, `library.resources`, `library.papers`, `library.equations`, `library.gaps`, `study.loop-guide`, `study.loop-steps`, `study.decision-card`, `study.six-forces`, `study.formulas`, `today.rules`, `today.routine`, `progress.points-help`, `progress.readiness`, `progress.scorecard`, `weeks.timeline`, `weeks.tasks`, `weeks.dsa`, `weeks.capstone`, `weeks.interview`.
-- **Week heading:** `### Week 02 · 2 to 8 Nov · Data foundations (Diwali Sun)`
+- **Week heading:** `### Week 01 · 2 to 8 Nov · Theme (Diwali Sun)`
 - **Task line:** ``- [ ] `w04-07` `design` `+10` Sat · text…``
   - Pattern: ``^- \[( |x)\] `((?:w\d{2})-\d{2}|r-\d{2})` `([a-z0-9]+)` `\+(\d+)` (Mon|Tue|Wed|Thu|Fri|Sat|Sun|Week) · (.+)$``
   - Types: `dsa`, `boss`, `concept`, `infra`, `design`, `design2`, `lld`, `maths`, `capstone`, `redraw`, `read`, `mock`, `story`, `career`, `mindset`, `review`, `rest`, `ai`, `ready`, `paper`
@@ -560,6 +561,16 @@ These pairs were checked: text contrast is at least 14:1 in Dark and Light, mute
 - **Design library rows:** tables under `# Part 5`, first column `ID` (kebab-case, permanent).
 - **Machine coding rows:** the table under `## Machine coding problems actually asked`.
 
+## 23. The Growth track (`plan/growth/*.md`)
+
+A second, smaller track: Atomic Habits, The 48 Laws of Power, How to Win Friends and Influence People, Influence, Never Split the Difference, Deep Work, Make It Stick and a field kit, taught by doing (guess, lesson, card, scenario, try it, review), plus the habit science applied to this plan (an anchor per block, a two-minute start per task type, a coach's line per week, an identity per chapter). It is its own track: it never changes points, the weekly target, the streak, readiness or the study calendar. The design is in `docs/growth-design.md`. The content lives beside this file, one file per book, and the same compile step reads it (`scripts/lib/growth.ts`) and fails on any error:
+
+- **A book:** `## Book · <id> · <Title> · <Author, year>` (ids: `ah`, `law`, `hf`, `inf`, `ns`, `dw`, `ms`, `fk`), then a line or two on why it is here.
+- **An idea:** `### <id>-NN · <title>`, numbered from 01 in order, then `- **Field:** text` bullets (a continuation line is indented two spaces). Every idea has Group, Ask (shown before the idea), Lesson (170 words at most), Card (`front ‖ back`) and Try. Laws add Story, Use, Backfires, Spot and Counter; How to Win Friends adds Script; Influence adds Use, Spot and Counter; Never Split the Difference adds Use and Script; Atomic Habits, Deep Work and Make It Stick add Plan. There are exactly 48 laws.
+- **A scenario** (under `## Scenarios`): `### sc-NN · <title>`, then Ideas (real idea ids), Kind (`choose` or `spot`), Situation, and options `- **A:** move ‖ best|ok|poor ‖ feedback`, at least three, exactly one best.
+- **The programme** (`00-programme.md`): `## Anchors` (`Block | When | Cue`, one per block), `## Two-minute starts` (`Type | Start`, every task type but rest and ready), `## Coach notes` (`Wk | Note`, weeks 1 to 13), `## Identity` (`Chapter | Statement`, 1 to 4), `## Why did it fail` (`Law | Ask yourself | Fix`, four rows) and `## Path` (every idea once, in order; two a day is the pace).
+- **Progress** is one table, `growth` (`migrations/0005_growth.sql`): keys `learned:<idea>`, `scenario:<sc>`, `tried:<idea>`, `kept:h<n>:<date>`. Notes under `grow:` hold your guesses, anchors, habits, identity, reflections and reviews. The Growth deck shares the flashcard table (card id = idea id) with its own daily cap of 8.
+
 ---
 
 # Part 2 · Plan
@@ -567,7 +578,7 @@ These pairs were checked: text contrast is at least 14:1 in Dark and Light, mute
 ## Why this plan
 <!-- surface: mindset.why-plan -->
 
-Thirteen weeks, Mon 26 Oct 2026 to Sun 24 Jan 2027, about 15 hours a week, ending with you sitting SDE-2 backend interviews at Indian fintech companies. Dubai stays on the table as the move after this jump.
+Thirteen weeks, Mon 2 Nov 2026 to Sun 31 Jan 2027, about 15 hours a week, ending with you sitting SDE-2 backend interviews at Indian fintech companies. Dubai stays on the table as the move after this jump.
 
 The method is the one that worked for JEE: a fixed syllabus, daily practice, timed mock tests, and a score you can watch move. Confidence comes from that evidence, not before it.
 
@@ -725,24 +736,24 @@ Points measure output, never your worth. Aim for about 50 a week; skip the targe
 
 | Week | Dates | Theme | Saturday design |
 | --- | --- | --- | --- |
-| 1 | 26 Oct to 1 Nov | Baseline and your own "why" | Bitly |
-| 2 | 2 to 8 Nov | Data foundations (Diwali Sun) | None |
-| 3 | 9 to 15 Nov | Partitioning | Rate Limiter |
-| 4 | 16 to 22 Nov | Caching and contention | Ticketmaster |
-| 5 | 23 to 29 Nov | Events, async, checkpoint | Dropbox |
-| 6 | 30 Nov to 6 Dec | Payments | Payment System, or a payment gateway you derive |
-| 7 | 7 to 13 Dec | Scaling reads and writes | Flash Sale |
-| 8 | 14 to 20 Dec | Real-time | WhatsApp |
-| 9 | 21 to 27 Dec | AI systems | ChatGPT, or an agentic checkout you derive |
-| 10 | 28 Dec to 3 Jan | Feeds, search, first applications | FB News Feed |
-| 11 | 4 to 10 Jan | Streams and counting | Ad Click Aggregator |
-| 12 | 11 to 17 Jan | Geo and wrap-up | Uber |
-| 13 | 18 to 24 Jan | Ready check | Wallet ledger, as a mock |
+| 1 | 2 to 8 Nov | Baseline and your own "why" (Diwali Sun) | Bitly |
+| 2 | 9 to 15 Nov | Data foundations | None |
+| 3 | 16 to 22 Nov | Partitioning | Rate Limiter |
+| 4 | 23 to 29 Nov | Caching and contention | Ticketmaster |
+| 5 | 30 Nov to 6 Dec | Events, async, checkpoint | Dropbox |
+| 6 | 7 to 13 Dec | Payments | Payment System, or a payment gateway you derive |
+| 7 | 14 to 20 Dec | Scaling reads and writes | Flash Sale |
+| 8 | 21 to 27 Dec | Real-time | WhatsApp |
+| 9 | 28 Dec to 3 Jan | AI systems | ChatGPT, or an agentic checkout you derive |
+| 10 | 4 to 10 Jan | Feeds, search, first applications | FB News Feed |
+| 11 | 11 to 17 Jan | Streams and counting | Ad Click Aggregator |
+| 12 | 18 to 24 Jan | Geo and wrap-up | Uber |
+| 13 | 25 to 31 Jan | Ready check | Wallet ledger, as a mock |
 
 ## Weekly tasks
 <!-- surface: weeks.tasks -->
 
-### Week 01 · 26 Oct to 1 Nov · Baseline and your own "why"
+### Week 01 · 2 to 8 Nov · Baseline and your own "why" (Diwali Sun)
 
 - [ ] `w01-01` `dsa` `+4` Mon · Morning: 2 timed LeetCode mediums, no AI. Note your times; this is your baseline
 - [ ] `w01-02` `mindset` `+2` Mon · Night (10 min): write your "why" in 5 lines, in your own words: what kind of engineer you want to be in 2 years, and what you'll be able to do then that you can't today. Not your parents' reasons, not LinkedIn's
@@ -761,7 +772,7 @@ Points measure output, never your worth. Aim for about 50 a week; skip the targe
 - [ ] `w01-15` `story` `+8` Sun · Design doc for your UCP middleware (2 h): the six forces, the request flow from the Gemini agent through your middleware to SFCC and Adyen, failure modes (Adyen timeout, duplicate webhook, SFCC down), and decision cards for 3 decisions you actually made ‖ light: Write only the request flow and the three failure modes (45 minutes); the decision cards can wait
 - [ ] `w01-16` `review` `+0` Sun · Weekly review (30 min): fill in row 1 of the scorecard ‖ light: Fill in the scorecard row (10 minutes)
 
-### Week 02 · 2 to 8 Nov · Data foundations (Diwali Sun)
+### Week 02 · 9 to 15 Nov · Data foundations
 
 DSA focus: arrays, two pointers, sliding window, prefix sums.
 
@@ -771,10 +782,10 @@ DSA focus: arrays, two pointers, sliding window, prefix sums.
 - [ ] `w02-04` `infra` `+2` Wed · Docker basics (images, layers, containers, volumes). Build and run a small Go container. Why: why does layer order in a Dockerfile change build time? ‖ light: Watch the first video; build the container on Thursday night
 - [ ] `w02-05` `concept` `+2` Thu · [PostgreSQL deep dive](https://www.hellointerview.com/learn/system-design/deep-dives/postgres). Why: two transfers debit the same account at once under READ COMMITTED. What goes wrong, and would you fix it with SELECT FOR UPDATE, an atomic UPDATE, or SERIALIZABLE?
 - [ ] `w02-06` `maths` `+3` Thu · B-tree height for 1 billion rows at fan-out 500. Why does that keep lookups fast? ‖ check: log base 500 of 10^9 is about 3.3, so 4 levels; the top levels stay cached, so most lookups cost one or two disk reads
-- [ ] `w02-07` `rest` `+0` Fri · Fri to Sun: catch-up days. Sunday is Diwali, a light day. Anything still waiting goes here; if nothing is, rest
+- [ ] `w02-07` `rest` `+0` Fri · Fri to Sun: catch-up days, after Diwali week. Anything still waiting goes here; if nothing is, rest
 - [ ] `w02-08` `concept` `+3` Thu · Isolation levels in full: name the anomaly each level allows (dirty read, non-repeatable read, phantom, lost update, write skew), then build a write skew that SERIALIZABLE stops and snapshot isolation does not, on a wallet with a minimum balance. Read [Decoding isolation, the I in ACID](https://arpitbhayani.me/blogs/isolation) and [Why databases deadlock](https://arpitbhayani.me/blogs/database-deadlocks) only after your own answer. Why: which anomaly does each isolation level still allow, and how can two correct transactions on a wallet with a minimum balance both commit and still break the rule?
 
-### Week 03 · 9 to 15 Nov · Partitioning
+### Week 03 · 16 to 22 Nov · Partitioning
 
 DSA focus: binary search (including on the answer), heaps, intervals.
 
@@ -791,7 +802,7 @@ DSA focus: binary search (including on the answer), heaps, intervals.
 - [ ] `w03-11` `paper` `+2` Fri · Paper: [Designing Access Methods, the RUM Conjecture](https://openproceedings.org/2016/conf/edbt/paper-12.pdf). Before reading, write your own answer to why an index speeds reads and slows writes; then check it against where the paper puts the B-tree, the LSM tree and the Bloom filter
 - [ ] `w03-12` `maths` `+1` Week · Bonus equation: how many virtual nodes give a 5% load spread
 
-### Week 04 · 16 to 22 Nov · Caching and contention
+### Week 04 · 23 to 29 Nov · Caching and contention
 
 DSA focus: graphs (BFS, DFS, topological sort, Dijkstra, union-find).
 
@@ -811,7 +822,7 @@ DSA focus: graphs (BFS, DFS, topological sort, Dijkstra, union-find).
 - [ ] `w04-14` `paper` `+2` Fri · Paper: [SIEVE is Simpler than LRU](https://junchengyang.com/publication/nsdi24-SIEVE.pdf). Three passes, 45 minutes. Read it before tomorrow's pluggable-eviction machine coding, then add SIEVE as a fourth policy behind the same interface (one FIFO queue, one hand pointer, one visited bit per object)
 - [ ] `w04-15` `maths` `+1` Week · Bonus equation: the Zipf hit ratio when you cache only the top 1% of keys
 
-### Week 05 · 23 to 29 Nov · Events, async, checkpoint
+### Week 05 · 30 Nov to 6 Dec · Events, async, checkpoint
 
 DSA focus: DP (1D and 2D, knapsack, LIS, interval DP).
 
@@ -829,7 +840,7 @@ DSA focus: DP (1D and 2D, knapsack, LIS, interval DP).
 - [ ] `w05-12` `paper` `+2` Fri · Paper: [Kora, Kafka as a multi-tenant cloud service](https://vldb.org/pvldb/vol16/p3822-povzner.pdf). One decision card on why cells cut the load from 73% to 53%, and what a tenant loses by living in one
 - [ ] `w05-13` `maths` `+1` Week · Bonus equation: how many Kafka partitions
 
-### Week 06 · 30 Nov to 6 Dec · Payments, your home turf
+### Week 06 · 7 to 13 Dec · Payments, your home turf
 
 DSA focus: trees, tries, monotonic stack and queue. From this week, alternate contests with a 75-minute mock online assessment.
 
@@ -851,7 +862,7 @@ DSA focus: trees, tries, monotonic stack and queue. From this week, alternate co
 - [ ] `w06-16` `paper` `+4` Fri · ★ Paper: [Spanner](https://static.googleusercontent.com/media/research.google.com/en//archive/spanner-osdi2012.pdf). All three passes. Redraw TrueTime from memory and explain external consistency out loud in 5 minutes. Note what two-phase commit costs as participants grow
 - [ ] `w06-17` `maths` `+1` Week · Bonus equation: Spanner's commit wait and the hot-row ceiling (check the lock claim in the paper)
 
-### Week 07 · 7 to 13 Dec · Scaling reads and writes
+### Week 07 · 14 to 20 Dec · Scaling reads and writes
 
 DSA focus: mixed timed sets, 1 hard.
 
@@ -873,7 +884,7 @@ DSA focus: mixed timed sets, 1 hard.
 - [ ] `w07-16` `paper` `+4` Fri · ★ Paper: [Dynamo](https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf). All three passes. Then one page: where Dynamo and Spanner disagree, and which one a wallet balance needs
 - [ ] `w07-17` `maths` `+1` Week · Bonus equation: shuffle-sharding combinations and blast radius
 
-### Week 08 · 14 to 20 Dec · Real-time
+### Week 08 · 21 to 27 Dec · Real-time
 
 DSA focus: mixed timed sets, 1 hard.
 
@@ -896,7 +907,7 @@ DSA focus: mixed timed sets, 1 hard.
 - [ ] `w08-17` `paper` `+4` Fri · ★ Paper: [Chubby](https://static.googleusercontent.com/media/research.google.com/en//archive/chubby-osdi06.pdf). All three passes. Find the sequencer and connect it to the fencing-token problem in this week's leader-election task. Why did Google ship a lock service instead of a Paxos library?
 - [ ] `w08-18` `maths` `+1` Week · Bonus equation: the chance of a split vote in a Raft election
 
-### Week 09 · 21 to 27 Dec · AI systems, your edge
+### Week 09 · 28 Dec to 3 Jan · AI systems, your edge
 
 DSA focus: mixed timed sets, 1 hard.
 
@@ -917,7 +928,7 @@ DSA focus: mixed timed sets, 1 hard.
 - [ ] `w09-15` `paper` `+2` Fri · Paper: [vLLM and PagedAttention](https://arxiv.org/abs/2309.06180). One decision card: which operating-system idea did they borrow, and what does it save? Then use it to answer why one LLM request can cost 100 times another
 - [ ] `w09-16` `maths` `+1` Week · Bonus equation: hedged requests and the tail
 
-### Week 10 · 28 Dec to 3 Jan · Feeds, search, first applications
+### Week 10 · 4 to 10 Jan · Feeds, search, first applications
 
 DSA focus: interview format, 2 problems in 45 min, out loud.
 
@@ -940,7 +951,7 @@ DSA focus: interview format, 2 problems in 45 min, out loud.
 - [ ] `w10-17` `paper` `+2` Fri · Paper: [Understanding Inverse Document Frequency](https://www.staff.city.ac.uk/~sbrp622/idfpapers/Robertson_idf_JDoc.pdf). Before reading, derive why a rare term should weigh more; then see which of the paper's arguments Robertson accepts and which he rejects
 - [ ] `w10-18` `maths` `+1` Week · Bonus equation: Kingman's formula, and why service-time variance matters
 
-### Week 11 · 4 to 10 Jan · Streams and counting
+### Week 11 · 11 to 17 Jan · Streams and counting
 
 DSA focus: interview format.
 
@@ -962,7 +973,7 @@ DSA focus: interview format.
 - [ ] `w11-16` `paper` `+2` Fri · Paper: [Probabilistic Counting (Flajolet and Martin)](https://algo.inria.fr/flajolet/Publications/src/FlMa85.pdf), sections 1 to 3 only. Try to invent the trick first: you may keep only a few bytes and must estimate how many distinct items you saw
 - [ ] `w11-17` `maths` `+1` Week · Bonus equation: HyperLogLog accuracy against memory
 
-### Week 12 · 11 to 17 Jan · Geo and wrap-up
+### Week 12 · 18 to 24 Jan · Geo and wrap-up
 
 DSA focus: interview format.
 
@@ -984,7 +995,7 @@ DSA focus: interview format.
 - [ ] `w12-16` `paper` `+2` Fri · Paper: [MyRocks](https://www.vldb.org/pvldb/vol13/p3217-matsunobu.pdf). Read it after Wednesday's LSM derivation and list every consequence of compaction you did not predict
 - [ ] `w12-17` `maths` `+1` Week · Bonus equation: a Snowflake-style ID and its per-node ceiling
 
-### Week 13 · 18 to 24 Jan · Ready check
+### Week 13 · 25 to 31 Jan · Ready check
 
 - [ ] `w13-01` `dsa` `+10` Week · Morning DSA, interview format
 - [ ] `w13-02` `mock` `+10` Sat · Derive a wallet with a double-entry ledger as a full 45-minute mock with a partner
@@ -993,7 +1004,7 @@ DSA focus: interview format.
 - [ ] `w13-05` `career` `+2` Week · Resume: lead with the UCP story and the capstone
 - [ ] `w13-06` `career` `+2` Week · Ask for referrals at your target companies; research pay bands and know your number
 - [ ] `w13-07` `review` `+0` Sun · Go through the readiness checklist
-- [ ] `w13-08` `career` `+0` Sun · Target applications go out from Mon 25 Jan
+- [ ] `w13-08` `career` `+0` Sun · Target applications go out from Mon 1 Feb
 - [ ] `w13-09` `paper` `+4` Fri · ★ Unseen-paper exam: [Aurora DSQL](https://arxiv.org/abs/2607.13276). Read it once. Then write one page: how it avoids coordination on reads, what it gives up (only write-write conflicts abort), whether your wallet write-skew example gets through, and how it differs from Spanner
 - [ ] `w13-10` `paper` `+2` Sun · After Saturday's ledger mock, read [Jepsen's TigerBeetle analysis](https://jepsen.io/analyses/tigerbeetle-0.16.11). List what you got right, what you missed, and which of its guarantees you would not have thought to test
 - [ ] `w13-11` `maths` `+1` Week · Bonus equation: prove the double-entry invariant
@@ -1068,7 +1079,7 @@ STAR stories (week 11):
 5. A trade-off or disagreement you handled
 6. Something you learned fast and shipped
 
-Applying: practice companies in week 10 (ask for the AI policy per round). Target list in week 12 from Indian fintech: payments infrastructure such as Razorpay, PhonePe, Juspay and BillDesk, and consumer finance such as Groww, Zerodha, Upstox and CRED. Ask NIT Durgapur batchmates and former colleagues for referrals. Target applications go out from Mon 11 Jan. Research pay bands and know your number before the hiring manager round.
+Applying: practice companies in week 10 (ask for the AI policy per round). Target list in week 12 from Indian fintech: payments infrastructure such as Razorpay, PhonePe, Juspay and BillDesk, and consumer finance such as Groww, Zerodha, Upstox and CRED. Ask NIT Durgapur batchmates and former colleagues for referrals. Target applications go out from Mon 1 Feb. Research pay bands and know your number before the hiring manager round.
 
 ## Readiness checklist
 <!-- surface: progress.readiness -->

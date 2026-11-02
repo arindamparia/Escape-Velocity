@@ -37,15 +37,17 @@ export const PAGES = [
   { name: 'settings', path: '/settings', heading: /Settings/ },
   { name: 'guide', path: '/guide', heading: /How this works/ },
   { name: 'solved', path: '/progress/problems', heading: /Solved problems/ },
+  { name: 'growth', path: '/growth', heading: /^Growth$/ },
+  { name: 'growth-law', path: '/growth/law', heading: /48 Laws of Power/ },
 ] as const
 
 /* ------------------------------------------------------------------ time */
 
-/** A wall-clock time in Asia/Kolkata, e.g. kolkata('2026-10-28T10:00:00'). */
+/** A wall-clock time in Asia/Kolkata, e.g. kolkata('2026-11-04T10:00:00'). */
 export const kolkata = (local: string): Date => new Date(`${local}+05:30`)
 
 /** Wednesday of week 1, 10:00 in Kolkata: a plain day inside the plan, morning block. */
-export const WED = kolkata('2026-10-28T10:00:00')
+export const WED = kolkata('2026-11-04T10:00:00')
 
 /* ------------------------------------------------------------------ the API, for seeding and for asserting what the server holds */
 
@@ -98,8 +100,8 @@ export class Api {
       this.op('setting.set', { key: 'onboarded', value: '1' }),
       this.op('setting.set', { key: 'why_note', value: 'I want to design payment systems that do not lose money, and explain every trade-off out loud.' }),
       ...w1.slice(0, 3).map((t) => this.op('task.set', { taskId: t.id, done: true })),
-      this.op('problem.add', { id: randomUUID(), loggedOn: '2026-10-26', difficulty: 'medium', minutes: 22, noAi: true, title: 'Course Schedule II' }),
-      this.op('problem.add', { id: randomUUID(), loggedOn: '2026-10-27', difficulty: 'medium', minutes: 31, noAi: true, title: 'LRU Cache' }),
+      this.op('problem.add', { id: randomUUID(), loggedOn: '2026-11-02', difficulty: 'medium', minutes: 22, noAi: true, title: 'Course Schedule II' }),
+      this.op('problem.add', { id: randomUUID(), loggedOn: '2026-11-03', difficulty: 'medium', minutes: 31, noAi: true, title: 'LRU Cache' }),
     ])
   }
 }

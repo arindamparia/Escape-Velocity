@@ -106,6 +106,12 @@ export function applyOp(s: AppState, op: Op): AppState {
       const { key, value } = op.payload
       return { ...s, settings: upsert(s.settings, (r) => r.key === key, () => ({ key, value, updatedAt: at })) }
     }
+    case 'growth.set': {
+      const { key, value, on } = op.payload
+      const rows = s.growth ?? []
+      if (value === null) return { ...s, growth: rows.filter((r) => r.key !== key) }
+      return { ...s, growth: upsert(rows, (r) => r.key === key, () => ({ key, value, onDay: on, updatedAt: at })) }
+    }
   }
 }
 

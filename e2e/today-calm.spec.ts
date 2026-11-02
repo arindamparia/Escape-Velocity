@@ -2,11 +2,11 @@
 // This holds the page to a budget, so it cannot grow back into a long page without someone noticing.
 import { expect, kolkata, openApp, test } from './support'
 
-const THU = kolkata('2026-11-12T10:00:00') // week 3, a normal day with two tasks, a folded Waiting list and a bonus equation
+const THU = kolkata('2026-11-19T10:00:00') // week 3, a normal day with two tasks, a folded Waiting list and a bonus equation
 
 test.beforeEach(async ({ api }) => {
   await api.seedTypical()
-  await api.activeOn('2026-11-10'); await api.activeOn('2026-11-11')
+  await api.activeOn('2026-11-17'); await api.activeOn('2026-11-18')
 })
 
 test('the page stays short: a budget for a normal weekday, on a desktop and on a phone', async ({ page }) => {

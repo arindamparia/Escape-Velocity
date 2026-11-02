@@ -1,6 +1,7 @@
 // Applying ops: validate everything first, then apply the whole request in ONE DB.batch.
 // Every statement is prepared and bound. Ops are idempotent through applied_op.
 import planCore from '../src/generated/plan-core.json'
+import growthIndex from '../src/generated/pages/growth.json'
 import type { Op } from '../shared/schemas'
 import type { OpsResult } from '../shared/state'
 import { nextCardState } from '../src/lib/srs'
@@ -9,7 +10,10 @@ import type { Env } from './env'
 const taskIds = new Set<string>([...planCore.tasks.map((t) => t.id), ...planCore.shelfIds])
 // a paper's decision cards live under paper-<task id>, beside the designs'
 const designIds = new Set<string>([...planCore.designs.map((d) => d.id), ...planCore.tasks.filter((t) => t.type === 'paper').map((t) => `paper-${t.id}`)])
-const flashcardIds = new Set<string>(planCore.flashcardIds)
+const ideaIds = new Set<string>(growthIndex.path.map((i) => i.id))
+const scenarioIds = new Set<string>(growthIndex.scenarios.map((s) => s.id))
+// the plan's cards (task ids) and the Growth deck (idea ids) share one table; the ids never overlap
+const flashcardIds = new Set<string>([...planCore.flashcardIds, ...ideaIds])
 
 export class OpError extends Error {
   constructor(public code: string, message: string, public opId?: string, public status = 400) {
@@ -35,6 +39,15 @@ export function checkAgainstPlan(ops: Op[]): void {
         const { kind, refId } = op.payload
         if (kind === 'why' && (!refId || !taskIds.has(refId))) throw new OpError('unknown_id', `A why-note needs a known task ID, got ${refId ?? 'none'}`, op.opId, 422)
         if (kind === 'design' && (!refId || !designIds.has(refId))) throw new OpError('unknown_id', `A design note needs a known design ID, got ${refId ?? 'none'}`, op.opId, 422)
+        break
+      }
+      case 'growth.set': {
+        const [kind, ref] = op.payload.key.split(':')
+        const known = kind === 'scenario' ? scenarioIds.has(ref) : kind === 'kept' ? true : ideaIds.has(ref)
+        if (!known) throw new OpError('unknown_id', `Unknown Growth item in ${op.payload.key}`, op.opId, 422)
+        const v = op.payload.value
+        const fits = v === null || (kind === 'learned' ? /^(had|close|new)$/.test(v) : kind === 'scenario' ? /^[A-E]$/.test(v) : v === '1')
+        if (!fits) throw new OpError('bad_value', `${op.payload.key} cannot be ${v}`, op.opId, 422)
         break
       }
       default:
@@ -168,6 +181,16 @@ function statementFor(db: D1Database, op: Op, now: string, cards: Map<string, { 
            ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at`,
         )
         .bind(key, value, now)
+    }
+    case 'growth.set': {
+      const { key, value, on } = op.payload
+      if (value === null) return db.prepare('DELETE FROM growth WHERE key = ?1').bind(key)
+      return db
+        .prepare(
+          `INSERT INTO growth (key, value, on_day, updated_at) VALUES (?1, ?2, ?3, ?4)
+           ON CONFLICT(key) DO UPDATE SET value = excluded.value, on_day = excluded.on_day, updated_at = excluded.updated_at`,
+        )
+        .bind(key, value, on, now)
     }
   }
 }

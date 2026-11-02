@@ -6,7 +6,7 @@ import { addDays, blockOf, dayNum, DOW_NAMES, kolkataToday, lightDayOn, planDow,
 import { plan } from './plan'
 import { mergeProblems } from './problems'
 import { weekPoints, weekTarget } from './points'
-import { dueCards, redrawsDue } from './srs'
+import { dueCards, planCardRows, redrawsDue } from './srs'
 
 export interface DayInfo {
   phase: PlanPhase
@@ -103,12 +103,17 @@ export function activityDates(s: AppState, solved: readonly SolvedProblem[] = []
   for (const r of s.taskProgress) if (r.done) add(r.doneAt ? toDay(r.doneAt) : null)
   for (const r of mergeProblems(s.problemLog, solved)) out.add(r.loggedOn)
   for (const r of s.sessions) add(toDay(r.startedAt))
-  for (const r of s.flashcards) add(toDay(r.updatedAt))
-  for (const r of s.notes) add(toDay(r.updatedAt))
+  // Growth (its cards and its grow: notes) is a separate track: it never makes a study day active, so it cannot move the
+  // streak, the welcome-back or the rest note
+  for (const r of planCardRows(s.flashcards)) add(toDay(r.updatedAt))
+  for (const r of s.notes) if (!isGrowthNote(r.refId)) add(toDay(r.updatedAt))
   for (const r of s.decisionCards) add(toDay(r.updatedAt))
   for (const r of s.designStatus) add(toDay(r.updatedAt))
   return out
 }
+
+/** A note that belongs to the Growth track (grow:anchor:morning, grow:try:law-03 …). */
+export const isGrowthNote = (refId: string | null | undefined): boolean => !!refId && refId.startsWith('grow:')
 
 /** Consecutive days with no activity ending yesterday, counting only plan days that are not light days. */
 export function missedDays(activity: ReadonlySet<string>, today: string, startDate: string, lightDays: LightDayRange[]): number {
@@ -169,7 +174,7 @@ export { weekEnd }
 
 /** What is waiting in the study tools today: flashcards (a card exists once its why-note has text) and redraws. */
 export function dueSummary(s: AppState, today: string): { cards: number; redraws: number } {
-  const states = new Map(s.flashcards.map((c) => [c.cardId, c]))
+  const states = new Map(planCardRows(s.flashcards).map((c) => [c.cardId, c]))
   const eligible = plan.flashcardIds.filter((id) => (s.notes.find((n) => n.kind === 'why' && n.refId === id)?.body ?? '').trim())
   return { cards: dueCards(eligible, states, today).length, redraws: redrawsDue(s.designStatus, today).length }
 }
