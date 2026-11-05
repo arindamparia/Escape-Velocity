@@ -50,23 +50,19 @@ function SyncDot() {
 function TopBar() {
   const { path } = useLocation()
   return (
-    <>
-      <header class="topbar">
-        <a class="brand" href="/" aria-label="Escape Velocity, Today"><Icon name="orbit" /><span>Escape Velocity</span></a>
-        <nav class="nav" aria-label="Main">
-          {NAV.map((n) => <a key={n.href} href={n.href} aria-current={n.match(path) ? 'page' : undefined}>{n.label}</a>)}
-        </nav>
-        <span class="spacer" />
-        <SyncDot />
-        <TimerChip />
-        <button type="button" class="iconbtn" aria-label="Command palette (⌘K)" title="Command palette (⌘K)" onClick={() => openOverlay({ kind: 'palette' })}>
-          <Icon name="search" /><span class="btn-label">Search</span><kbd class="noprint">⌘K</kbd>
-        </button>
-        <a class="iconbtn" href="/settings" aria-label="Settings" aria-current={path === '/settings' ? 'page' : undefined}><Icon name="sliders" /><span class="btn-label">Settings</span></a>
-      </header>
-      {/* a thin line that fills as you read down a page, with a rocket at its tip (CSS scroll timeline; nothing without support) */}
-      <div class="flight" aria-hidden="true"><span class="flight__line" /><Rocket class="flight__rocket" /></div>
-    </>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Escape Velocity, Today"><Icon name="orbit" /><span>Escape Velocity</span></a>
+      <nav class="nav" aria-label="Main">
+        {NAV.map((n) => <a key={n.href} href={n.href} aria-current={n.match(path) ? 'page' : undefined}>{n.label}</a>)}
+      </nav>
+      <span class="spacer" />
+      <SyncDot />
+      <TimerChip />
+      <button type="button" class="iconbtn" aria-label="Command palette (⌘K)" title="Command palette (⌘K)" onClick={() => openOverlay({ kind: 'palette' })}>
+        <Icon name="search" /><span class="btn-label">Search</span><kbd class="noprint">⌘K</kbd>
+      </button>
+      <a class="iconbtn" href="/settings" aria-label="Settings" aria-current={path === '/settings' ? 'page' : undefined}><Icon name="sliders" /><span class="btn-label">Settings</span></a>
+    </header>
   )
 }
 

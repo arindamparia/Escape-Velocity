@@ -115,7 +115,7 @@ export function TaskCheck({ task }: { task: PlanTask }) {
       onClick={() => toggleTask(task.id)}
     >
       {/* drawn inline (not a <use>) so the pencil stroke can draw itself when you tick */}
-      <svg class="i tick" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5" pathLength="1" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      <svg class="i tick" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.5 12.5 C 6.5 14.5, 8.2 16.5, 9.8 18.2 C 12.6 13.8, 16.2 9.2, 19.8 6.5" pathLength="1" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
     </button>
   )
 }

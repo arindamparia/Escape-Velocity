@@ -389,7 +389,7 @@ math { font-size: 1.08em; }
 
 .bar { height: 0.6rem; border: 1px solid var(--line); border-radius: 99px; overflow: hidden; background: var(--surface-2); }
 .bar > i { display: block; height: 100%; background-color: var(--accent); background-image: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 65%, var(--done))); border-radius: 99px; transition: width 0.4s ease; }
-.weekbar { max-width: 28rem; margin-top: 0.2rem; }
+.weekbar { max-width: 28rem; margin: 0.5rem 0 0.4rem; }
 /* Paper: the fill is solid ink (the accent) against an empty, outlined track: no gradient, and it reads in greyscale */
 
 .evidence { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }

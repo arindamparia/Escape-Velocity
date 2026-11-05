@@ -41,14 +41,14 @@
 [data-theme='dark'] {
   /* Dark: a night sky with amber stars. Green is only ever "done". */
   color-scheme: dark;
-  --bg: #0a0e1a;
-  --surface: #121a33;
-  --surface-2: #19234a;
-  --text: #eaf0ff;
-  --text-muted: #9fabcb;
-  --accent: #ffb224;
-  --accent-ink: #0a0e1a;
-  --line: #232d50;
+  --bg: #101626;
+  --surface: #182344;
+  --surface-2: #212f5a;
+  --text: #f0f4ff;
+  --text-muted: #abb7d6;
+  --accent: #ffb834;
+  --accent-ink: #101626;
+  --line: #2b3863;
   --done: #3ddc97;
   --warn: #ff9d8a;
   --radius: 12px;
@@ -66,7 +66,7 @@
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-settle: cubic-bezier(0.34, 1.45, 0.64, 1);
   /* the highlighter: used only for "you are here" */
-  --hl: rgb(255 178 36 / 0.28);
+  --hl: rgb(255 184 52 / 0.35);
 }
 
 [data-theme='light'] {

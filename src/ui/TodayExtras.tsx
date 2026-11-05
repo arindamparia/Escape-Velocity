@@ -6,6 +6,7 @@ import { coreTasks, tasksOn } from '../lib/today'
 import { Disclosure } from './Disclosure'
 import { Html } from './Html'
 import { Icon } from './Icon'
+import { PencilStar } from './Doodles'
 import { usePage } from './hooks'
 import { EvidenceStrip } from './Evidence'
 import type { WeekChunk } from '../../shared/plan-types'
@@ -104,7 +105,7 @@ export default function TodayAside({ week }: { week: number; chunk?: WeekChunk |
     <>
       <EvidenceStrip />
       <section class="card" aria-label="Constellation">
-        <p class="eyebrow">This week’s constellation</p>
+        <p class="eyebrow"><PencilStar class="noprint" />This week’s constellation</p>
         <div style="aspect-ratio:16/10">{showSky ? <ErrorBoundary onError={(e) => console.error(e)}><Constellation week={week} /></ErrorBoundary> : <div class="sky" />}</div>
         <p class="small muted" style="margin-top:0.6rem">Every task you tick lights a star. <a href={`/weeks/${week}`}>See week {week}</a></p>
       </section>

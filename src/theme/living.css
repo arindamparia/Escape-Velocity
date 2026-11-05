@@ -28,11 +28,20 @@ html:not([data-still])[data-theme='paper'] {
   --shadow: 0 1px 0 rgb(255 252 240 / 0.7) inset, 0 1px 1px rgb(70 50 20 / 0.16), 0 12px 20px -14px rgb(70 50 20 / 0.42);
 }
 html:not([data-still])[data-theme='paper'][data-tone='night'] {
+  --bg: #1e1b15;
+  --surface: #28241c;
+  --surface-2: #332e24;
+  --text: #f3ecdc;
+  --text-muted: #cbc2ad;
+  --accent: #f3ecdc;
+  --accent-ink: #1e1b15;
+  --hero-tint: #28241c;
+  --hl: rgb(244 196 48 / 0.4);
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.93 0 0 0 0 0.87 0 0 0 0 0.72 1.5 0 0 0 -0.55'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%2523n)'/%3E%3C/svg%3E");
   --fibre: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='480'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012 .09' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.93 0 0 0 0 0.87 0 0 0 0 0.72 1.3 0 0 0 -0.55'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%2523n)'/%3E%3C/svg%3E");
-  --line: color-mix(in srgb, var(--text) 26%, transparent);
-  --line-strong: #a39b88;
-  --shadow: 0 1px 0 rgb(255 240 210 / 0.05) inset, 0 1px 1px rgb(0 0 0 / 0.5), 0 14px 24px -14px rgb(0 0 0 / 0.8);
+  --line: color-mix(in srgb, var(--text) 22%, transparent);
+  --line-strong: #b8af9b;
+  --shadow: 0 1px 0 rgb(255 240 210 / 0.08) inset, 0 1px 2px rgb(0 0 0 / 0.35), 0 12px 24px -12px rgb(0 0 0 / 0.65);
 }
 
 /* the grain lies over desk and sheets alike, like the tooth of the paper; it never takes a click */
@@ -41,8 +50,8 @@ html:not([data-still])[data-theme='paper'] body::after {
   background-image: var(--grain), var(--fibre); background-size: 220px 220px, 480px 480px;
   opacity: 0.5;
 }
-html:not([data-still])[data-theme='paper'][data-tone='night'] body::after { opacity: 0.4; }
-@media print { body::after, html::before, .lamp, .flight { display: none !important; } }
+html:not([data-still])[data-theme='paper'][data-tone='night'] body::after { opacity: 0.22; }
+@media print { body::after, html::before, .lamp { display: none !important; } }
 
 /* window light on the desk, by the real hour: peach at dawn, warm at midday, amber at dusk, none at night */
 html:not([data-still])[data-theme='paper']:not([data-tone])::before {
@@ -55,12 +64,196 @@ html[data-daypart='dusk'] { --sun-rgb: 255 183 112; --sun: 0.5; }
 html[data-daypart='night'] { --sun: 0; }
 
 /* controls keep a firm edge; the many hairlines around everything else are soft */
-html:not([data-still])[data-theme='paper'] :is(input, textarea, select, .btn, .iconbtn, .chip, .timerchip) { border-color: var(--line-strong); }
-html:not([data-still])[data-theme='paper'] .hero { box-shadow: var(--shadow); }
-html:not([data-still])[data-theme='paper'] .btn--primary { box-shadow: 0 2px 0 rgb(0 0 0 / 0.5); }
+html:not([data-still])[data-theme='paper'] :is(input:not([type='checkbox']), textarea, select, .btn, .iconbtn, .chip, .timerchip) { border-color: var(--line-strong); }
+html:not([data-still])[data-theme='paper'] .hero { box-shadow: var(--shadow); border-radius: 4px; border: 1.8px solid var(--line-strong); }
+html:not([data-still])[data-theme='paper'] .card { border-radius: 4px; border: 1.2px solid color-mix(in srgb, var(--text) 24%, transparent); }
+html:not([data-still])[data-theme='paper'] .btn {
+  border-radius: 3px 5px 3px 4px / 4px 3px 5px 3px;
+  border: 1.4px solid color-mix(in srgb, var(--text) 32%, transparent);
+  transition: border-color 100ms var(--ease-out), transform 80ms var(--ease-out), background 100ms var(--ease-out);
+}
+html:not([data-still])[data-theme='paper'] .btn:hover { border-color: var(--text); transform: translateY(-1px); }
+html:not([data-still])[data-theme='paper'] .btn:active { transform: translateY(1px); }
+html:not([data-still])[data-theme='paper'] .btn--primary {
+  background: var(--text); color: var(--bg); border-color: var(--text);
+  box-shadow: 0 2px 0 rgb(0 0 0 / 0.35);
+}
 html:not([data-still])[data-theme='paper'] .btn--primary:active { box-shadow: 0 0 0 rgb(0 0 0 / 0); }
 html:not([data-still])[data-theme='paper'] .toast { box-shadow: var(--shadow); }
 html:not([data-still])[data-theme='paper'] .timermenu__panel, html:not([data-still])[data-theme='paper'] .soundmenu__panel { box-shadow: var(--shadow); }
+
+/* pencil-crafted checkboxes: hand-sketched graphite box and organic check */
+html:not([data-still])[data-theme='paper'] .task__check {
+  border-radius: 3px 5px 3px 4px / 4px 3px 5px 3px;
+  border: 1.8px solid var(--line-strong);
+  background: var(--surface);
+  color: transparent;
+  transition: border-color 0.12s ease, transform 0.12s ease, background 0.12s ease;
+}
+html:not([data-still])[data-theme='paper'] .task__check:hover {
+  border-color: var(--text);
+  transform: scale(1.06);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--text) 12%, transparent);
+}
+html:not([data-still])[data-theme='paper'] .task[data-done='true'] .task__check {
+  background: color-mix(in srgb, var(--text) 10%, var(--surface));
+  border-color: var(--text);
+  color: var(--text);
+}
+
+/* native checkboxes styled like pencil sketch boxes across the entire site */
+html:not([data-still])[data-theme='paper'] input[type='checkbox'] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0.12rem 0.5rem 0 0;
+  vertical-align: text-bottom;
+  border: 1.8px solid var(--line-strong);
+  border-radius: 3px 5px 3px 4px / 4px 3px 5px 3px;
+  background: var(--surface);
+  cursor: pointer;
+  position: relative;
+  transition: border-color var(--dur-small) var(--ease-out), background var(--dur-small) var(--ease-out), transform 80ms var(--ease-out);
+}
+html:not([data-still])[data-theme='paper'] input[type='checkbox']:hover {
+  border-color: var(--text);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--text) 12%, transparent);
+  transform: scale(1.05);
+}
+html:not([data-still])[data-theme='paper'] input[type='checkbox']:checked {
+  background-color: color-mix(in srgb, var(--text) 8%, var(--surface));
+  border-color: var(--text);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4.5 12.5 C 6.5 14.5, 8.2 16.5, 9.8 18.2 C 12.6 13.8, 16.2 9.2, 19.8 6.5' fill='none' stroke='%23332a22' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-size: 78% 78%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+html:not([data-still])[data-theme='paper'][data-tone='night'] input[type='checkbox']:checked {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4.5 12.5 C 6.5 14.5, 8.2 16.5, 9.8 18.2 C 12.6 13.8, 16.2 9.2, 19.8 6.5' fill='none' stroke='%23f3ecdc' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* pencil-shaded progress bars: graphite crosshatch shading */
+html:not([data-still])[data-theme='paper'] .bar {
+  border: 1.4px solid var(--line-strong);
+  border-radius: 4px;
+  background: var(--surface);
+  box-shadow: inset 0 1px 2px color-mix(in srgb, var(--text) 8%, transparent);
+}
+html:not([data-still])[data-theme='paper'] .bar > i {
+  background-color: color-mix(in srgb, var(--text) 22%, transparent);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--text),
+    var(--text) 1.5px,
+    transparent 1.5px,
+    transparent 5.5px
+  );
+  border-radius: 2px;
+}
+
+/* lined notebook paper for writing notes, reflections and your why */
+html:not([data-still])[data-theme='paper'] textarea {
+  background-color: var(--surface);
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 1.65rem,
+    color-mix(in srgb, var(--text) 12%, transparent) 1.65rem,
+    color-mix(in srgb, var(--text) 12%, transparent) calc(1.65rem + 1px)
+  );
+  line-height: 1.65rem;
+  padding: 0.6rem 0.8rem;
+  border: 1.2px solid color-mix(in srgb, var(--text) 26%, transparent);
+  border-radius: 4px;
+  font-family: inherit;
+}
+html:not([data-still])[data-theme='paper'] textarea:focus {
+  border-color: var(--text);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--text) 12%, transparent);
+  outline: none;
+}
+
+/* sketched inputs & selects */
+html:not([data-still])[data-theme='paper'] :is(input[type='text'], input[type='number'], input[type='url'], input[type='search'], select) {
+  border-radius: 4px;
+  border: 1.2px solid color-mix(in srgb, var(--text) 28%, transparent);
+  background-color: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  transition: border-color var(--dur-small) var(--ease-out), box-shadow var(--dur-small) var(--ease-out);
+}
+html:not([data-still])[data-theme='paper'] :is(input[type='text'], input[type='number'], input[type='url'], input[type='search'], select):focus {
+  border-color: var(--text);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--text) 12%, transparent);
+  outline: none;
+}
+
+/* hand-drawn wavy graphite pencil strikeout on finished tasks */
+html:not([data-still])[data-theme='paper'] .task[data-done='true'] .task__text {
+  text-decoration: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='12' viewBox='0 0 40 12'%3E%3Cpath d='M0 6.5 Q 10 4.8, 20 6.8 T 40 6.2' fill='none' stroke='%238c826e' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: left center;
+  background-size: 32px 10px;
+}
+html:not([data-still])[data-theme='paper'][data-tone='night'] .task[data-done='true'] .task__text {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='12' viewBox='0 0 40 12'%3E%3Cpath d='M0 6.5 Q 10 4.8, 20 6.8 T 40 6.2' fill='none' stroke='%23a89e87' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+/* sketched tactile chips & marginalia badges */
+html:not([data-still])[data-theme='paper'] .chip {
+  border-radius: 3px 5px 3px 4px / 4px 3px 5px 3px;
+  border: 1.2px solid color-mix(in srgb, var(--text) 30%, transparent);
+  background: transparent;
+}
+html:not([data-still])[data-theme='paper'] .chip--accent {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--hl) 40%, transparent);
+  color: var(--text);
+}
+html:not([data-still])[data-theme='paper'] .task__pts {
+  font-family: 'JBM', monospace;
+  font-size: 0.82rem;
+  color: color-mix(in srgb, var(--text) 68%, transparent);
+}
+
+/* tactile notebook tabs on weeks roadmap and timeline */
+html:not([data-still])[data-theme='paper'] :is(.wtab, .week-tabs a, .timeline a) {
+  border-radius: 3px 5px 3px 4px / 4px 3px 5px 3px;
+  border: 1.2px solid color-mix(in srgb, var(--text) 24%, transparent);
+  transition: transform 120ms var(--ease-out), border-color 120ms var(--ease-out);
+}
+html:not([data-still])[data-theme='paper'] :is(.wtab, .week-tabs a, .timeline a):hover {
+  border-color: var(--text);
+  transform: translateY(-1px);
+}
+
+/* tactile notebook spines & tabs on side rails (Study, Library, Growth, Tracks) */
+html:not([data-still])[data-theme='paper'] .toollist a {
+  border-radius: 3px 6px 6px 3px / 4px 6px 6px 4px;
+  border: 1.2px solid color-mix(in srgb, var(--text) 22%, transparent);
+  border-left: 3.5px solid color-mix(in srgb, var(--text) 32%, transparent);
+  transition: all 120ms var(--ease-out);
+}
+html:not([data-still])[data-theme='paper'] .toollist a:hover {
+  border-color: var(--text);
+  border-left-color: var(--accent);
+  background: var(--surface-2);
+  transform: translateX(2px);
+}
+html:not([data-still])[data-theme='paper'] .toollist a[aria-current='page'] {
+  border-left-color: var(--accent);
+  border-left-width: 4.5px;
+  background: color-mix(in srgb, var(--hl) 42%, var(--surface));
+  font-weight: 700;
+  box-shadow: none;
+}
+html:not([data-still])[data-theme='paper'] .dayhead {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
 /* a printed masthead: two thin rules instead of one heavy one */
 html:not([data-still])[data-theme='paper'] .slot-main > header {
   border-bottom: 0; padding-bottom: 1.15rem;
@@ -101,9 +294,23 @@ html:not([data-still]) .tabbar a[aria-current='page'] { box-shadow: inset 0 3px 
   pointer-events: none; overflow: visible; color: var(--accent);
 }
 .pencil-loop path { stroke-dasharray: 1; stroke-dashoffset: 0; }
+.pencil-underline {
+  display: block; width: 100%; max-width: 14rem; height: 8px; overflow: visible;
+  color: var(--accent); margin-top: 0.1rem; pointer-events: none;
+}
+.pencil-underline path { stroke-dasharray: 1; stroke-dashoffset: 0; }
+.pencil-star {
+  display: inline-block; width: 1.15rem; height: 1.15rem; overflow: visible;
+  vertical-align: -0.15rem; margin-right: 0.35rem; color: var(--accent); pointer-events: none;
+}
+.pencil-star path { stroke-dasharray: 1; stroke-dashoffset: 0; }
+.pencil-arrow {
+  display: inline-block; width: 1.8rem; height: 1rem; overflow: visible;
+  vertical-align: middle; color: var(--text-muted); pointer-events: none;
+}
+.pencil-arrow path { stroke-dasharray: 1; stroke-dashoffset: 0; }
 .rocket { width: 1.6rem; height: auto; flex: none; overflow: visible; }
 .empty__rocket { width: 3rem; display: block; margin: 0 auto 0.5rem; color: var(--text-muted); transform: rotate(-14deg); }
-.flight { display: none; }
 .lamp { display: none; }
 
 /* reading focus: point at a paragraph and the rest of the page steps back a little (not in Still: dimming is poor on e-ink) */
@@ -166,7 +373,7 @@ html:not([data-still]) .tabbar a[aria-current='page'] { box-shadow: inset 0 3px 
     to { transform: scaleY(1); }
   }
 
-  /* pencil loop doodle animation */
+  /* pencil doodles draw animations */
   html:not([data-still]) .pencil-loop path {
     animation: pencil-loop-draw 650ms var(--ease-out) both;
   }
@@ -174,19 +381,18 @@ html:not([data-still]) .tabbar a[aria-current='page'] { box-shadow: inset 0 3px 
     from { stroke-dashoffset: 1; }
     to { stroke-dashoffset: 0; }
   }
+  html:not([data-still]) .pencil-underline path,
+  html:not([data-still]) .pencil-star path,
+  html:not([data-still]) .pencil-arrow path {
+    animation: pencil-loop-draw 550ms var(--ease-out) both;
+  }
 
   /* the stamp lands, with a tiny overshoot (follow-through) */
   html:not([data-still]) .stamp { animation: stamp-in 560ms var(--ease-settle) 120ms both; }
   @keyframes stamp-in { from { opacity: 0; transform: rotate(-9deg) scale(1.9); } 55% { opacity: 0.95; } to { opacity: 0.9; transform: rotate(-9deg) scale(1); } }
 
-  /* the week's bar fills like ink soaking in, with a rocket at its tip */
+  /* the week's bar fills like ink soaking into paper */
   html:not([data-still]) .bar > i { transition: width 900ms var(--ease-out); }
-  html:not([data-still]) .weekbar { overflow: visible; }
-  html:not([data-still]) .weekbar > i { position: relative; }
-  html:not([data-still]) .weekbar > i::after {
-    content: ''; position: absolute; right: -0.55rem; top: 50%; width: 1.5rem; height: 0.95rem; transform: translateY(-50%) rotate(-6deg);
-    background: var(--text); -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 24'%3E%3Cpath d='M6 12C12 4 25 4 36 12 25 20 12 20 6 12ZM13 7 6 3l3.5 7ZM13 17 6 21l3.5-7Z'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 24'%3E%3Cpath d='M6 12C12 4 25 4 36 12 25 20 12 20 6 12ZM13 7 6 3l3.5 7ZM13 17 6 21l3.5-7Z'/%3E%3C/svg%3E") center / contain no-repeat;
-  }
 
   /* the highlighter sweeps in when a nav item becomes current */
   html:not([data-still]) .nav a[aria-current='page'] { animation: marker var(--dur-large) var(--ease-out) both; }
@@ -221,26 +427,17 @@ html:not([data-still]) .tabbar a[aria-current='page'] { box-shadow: inset 0 3px 
   html:not([data-still])[data-tone='night'] .lamp {
     display: block; position: fixed; left: 0; top: 0; width: 64vmax; height: 64vmax; margin: -32vmax 0 0 -32vmax; border-radius: 50%;
     pointer-events: none; z-index: 85; will-change: transform; opacity: 0; transition: opacity var(--dur-large) var(--ease-out);
-    background: radial-gradient(closest-side, rgb(255 205 130 / 0.1), transparent);
+    background: radial-gradient(closest-side, rgb(255 220 160 / 0.16), transparent);
   }
   html:not([data-still])[data-tone='night'] .lamp[data-on='1'] { opacity: 1; }
 
   /* the rocket's flame flickers; the 404 rocket drifts */
   .rocket__flame { transform-box: fill-box; transform-origin: right center; }
-  html:not([data-still]) .flight__rocket .rocket__flame, html:not([data-still]) .empty__rocket .rocket__flame { animation: flicker 180ms steps(2) infinite alternate; }
+  html:not([data-still]) .empty__rocket .rocket__flame { animation: flicker 180ms steps(2) infinite alternate; }
   @keyframes flicker { to { transform: scaleX(0.55); } }
   html:not([data-still]) .empty__rocket { animation: drift 5s var(--ease-in-out) infinite alternate; }
   @keyframes drift { from { transform: rotate(-14deg) translateY(0); } to { transform: rotate(-9deg) translateY(-6px); } }
 
-  /* where the browser can tie an animation to scroll: a line and a rocket that travel as you read down the page,
-     and cards that settle onto the desk as they come into view. Without that support, none of it shows. */
-  @supports (animation-timeline: scroll()) {
-    html:not([data-still]) .flight { display: block; position: absolute; left: 0; right: 0; bottom: -1px; height: 0; pointer-events: none; }
-    .flight__line { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--accent); transform-origin: left; transform: scaleX(0); animation: flight-line linear both; animation-timeline: scroll(root); }
-    .flight__rocket { position: absolute; left: 0; bottom: -7px; width: 1.5rem; color: var(--text); animation: flight-go linear both; animation-timeline: scroll(root); }
-    @keyframes flight-line { to { transform: scaleX(1); } }
-    @keyframes flight-go { to { transform: translateX(calc(100vw - 2.4rem)); } }
-  }
   @supports (animation-timeline: view()) {
     html:not([data-still]) :is(.slot-main, .slot-aside) > :not(header, .page) {
       animation: settle linear both; animation-timeline: view(); animation-range: entry 0% entry 160px;

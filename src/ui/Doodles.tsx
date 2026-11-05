@@ -40,3 +40,54 @@ export function PencilLoop({ class: cls = '' }: { class?: string }) {
     </svg>
   )
 }
+
+/** Hand-drawn wavy pencil underline */
+export function PencilUnderline({ class: cls = '' }: { class?: string }) {
+  return (
+    <svg class={`pencil-underline ${cls}`} viewBox="0 0 160 12" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+      <path
+        d="M2 7 C 24 3, 50 10, 80 5 C 110 1, 136 9, 158 4"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        pathLength="1"
+      />
+    </svg>
+  )
+}
+
+/** Hand-sketched 5-point star doodle */
+export function PencilStar({ class: cls = '' }: { class?: string }) {
+  return (
+    <svg class={`pencil-star ${cls}`} viewBox="0 0 28 28" aria-hidden="true" focusable="false">
+      <path
+        d="M14 2.5 L17.6 10.8 L26.5 11.6 L19.8 17.5 L21.8 26.2 L14 21.6 L6.2 26.2 L8.2 17.5 L1.5 11.6 L10.4 10.8 Z"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        pathLength="1"
+      />
+    </svg>
+  )
+}
+
+/** Hand-drawn sketch arrow */
+export function PencilArrow({ class: cls = '' }: { class?: string }) {
+  return (
+    <svg class={`pencil-arrow ${cls}`} viewBox="0 0 48 24" aria-hidden="true" focusable="false">
+      <path
+        d="M4 14 C 16 7, 32 8, 44 12 M36 6 C 39 9, 43 11, 44 12 C 41 15, 37 18, 34 20"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        pathLength="1"
+      />
+    </svg>
+  )
+}

@@ -14,7 +14,7 @@ import { PRESETS, startTimer, timer } from '../tools/timer'
 import { lazyPage } from '../ui/lazyPage'
 import { useNow, useTitle, useWeekChunk } from '../ui/hooks'
 import { Html } from '../ui/Html'
-import { Stamp } from '../ui/Doodles'
+import { PencilLoop, Stamp } from '../ui/Doodles'
 import { Icon } from '../ui/Icon'
 import { CapstoneLinks } from '../ui/CapstoneLinks'
 import { HourBox, PlanLine, RestNote, StatusLine, WeekStart } from '../ui/Rhythm'
@@ -214,7 +214,10 @@ export default function Today() {
     const blockLabel = info.block === 'morning' ? 'Morning · next up' : info.block === 'night' ? 'Night · next up' : 'Next up'
     hero = (
       <section class="card hero" aria-label="Next up">
-        <p class="eyebrow">{blockLabel} · {TYPE_LABEL[next.type]}{next.company ? ` · asked at ${next.company}` : ''}</p>
+        <p class="eyebrow" style="position:relative;display:inline-flex;align-items:center">
+          <span>{blockLabel} · {TYPE_LABEL[next.type]}{next.company ? ` · asked at ${next.company}` : ''}</span>
+          <PencilLoop class="noprint" />
+        </p>
         {entry ? <Html html={entry.html} class="hero__text" /> : <Skeleton h="4rem" />}
         {next.type === 'dsa' && chunk ? (
           <p class="small muted">This week’s focus: <strong>{chunk.dsaFocus}</strong>{suggestion ? <> · try one reported problem: <strong>{suggestion}</strong></> : null}</p>
