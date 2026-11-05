@@ -1,8 +1,8 @@
 // Scores the REAL AI path on the golden questions: the box's candidates, the Worker's retrieval, the model, the checks and
-// the source ordering (worker/ask.ts: converse). It calls OpenAI, so it only runs when asked and when a key is given:
+// the source ordering (worker/ask.ts: converse). It calls Google AI Studio, so it only runs when asked and when a key is given:
 //
-//   OPENAI_API_KEY=sk-... OPENAI_MODEL=gpt-6-luna npm run eval:ask         (about 7 cents for 180 questions)
-//   OPENAI_API_KEY=sk-... OPENAI_MODEL=gpt-4.1-mini npm run eval:ask       (compare models on the same questions)
+//   GEMINI_API_KEY=AQ.... GEMINI_MODEL=gemini-3.5-flash-lite npm run eval:ask         (about 12 cents for 180 questions)
+//   GEMINI_API_KEY=AQ.... GEMINI_MODEL=gemini-3.1-flash-lite npm run eval:ask         (compare models on the same questions)
 //
 // The key is read from the environment and never written anywhere. EVAL_ASK_DRY=1 runs the same code against a canned
 // reply, to check the harness itself without spending anything. What it reports, per model:
@@ -12,7 +12,7 @@
 //   cost                 tokens used and the price at the model's list rate
 import 'fake-indexeddb/auto'
 import { describe, expect, it, vi } from 'vitest'
-import { converse, effortFor } from '../../worker/converse'
+import { converse, thinkingFor } from '../../worker/converse'
 import { inScope } from '../../worker/retrieve'
 import { ASK_LIMITS } from '../../shared/ask'
 import { HELDOUT } from '../golden/heldout'
@@ -21,10 +21,10 @@ import { IN_SCOPE, OFF_TOPIC } from '../golden/scope'
 
 const ON = process.env.EVAL_ASK === '1'
 const DRY = process.env.EVAL_ASK_DRY === '1'
-const KEY = process.env.OPENAI_API_KEY ?? ''
-const MODEL = process.env.OPENAI_MODEL?.trim() || 'gpt-6-luna'
+const KEY = process.env.GEMINI_API_KEY ?? ''
+const MODEL = process.env.GEMINI_MODEL?.trim() || 'gemini-3.5-flash-lite'
 // list prices in dollars per million tokens (input, output); an unknown model is reported in tokens only
-const PRICE: Record<string, [number, number]> = { 'gpt-6-luna': [0.1, 0.5], 'gpt-4.1-mini': [0.4, 1.6], 'gpt-4.1-nano': [0.1, 0.4], 'gpt-5-mini': [0.25, 2], 'gpt-5-nano': [0.05, 0.4] }
+const PRICE: Record<string, [number, number]> = { 'gemini-3.5-flash-lite': [0.3, 2.5], 'gemini-3.1-flash-lite': [0.25, 1.5], 'gemini-2.5-flash-lite': [0.1, 0.4], 'gemini-2.5-flash': [0.3, 2.5] }
 
 describe.runIf(ON && (KEY || DRY))(`the real AI path (${DRY ? 'dry run' : MODEL})`, () => {
   it('scores the first source, scope and cost', async () => {
@@ -32,12 +32,12 @@ describe.runIf(ON && (KEY || DRY))(`the real AI path (${DRY ? 'dry run' : MODEL}
     const actions = ENTRIES.filter((e) => e.kind === 'action').map((e) => ({ id: e.id, title: e.title }))
     if (DRY) {
       vi.stubGlobal('fetch', vi.fn(async (_u: string, init: { body: string }) => {
-        const body = JSON.parse(init.body) as { messages: { content: string }[] }
-        const ctx = (JSON.parse(body.messages[1].content) as { CONTEXT: { id: string }[] }).CONTEXT
-        return new Response(JSON.stringify({ choices: [{ message: { content: JSON.stringify({ in_scope: true, answer: 'ok', results: ctx.slice(0, 3).map((c) => ({ id: c.id, why: 'w' })), actions: [] }) } }], usage: { prompt_tokens: 1500, completion_tokens: 120 } }))
+        const body = JSON.parse(init.body) as { contents: { parts: { text: string }[] }[] }
+        const ctx = (JSON.parse(body.contents[0].parts[0].text) as { CONTEXT: { id: string }[] }).CONTEXT
+        return new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: JSON.stringify({ in_scope: true, answer: 'ok', results: ctx.slice(0, 3).map((c) => ({ id: c.id, why: 'w' })), actions: [] }) }] } }], usageMetadata: { promptTokenCount: 1500, candidatesTokenCount: 120 } }))
       }))
     }
-    const env = { OPENAI_API_KEY: DRY ? 'dry' : KEY, OPENAI_MODEL: MODEL }
+    const env = { GEMINI_API_KEY: DRY ? 'dry' : KEY, GEMINI_MODEL: MODEL }
     const ask = async (q: string) => {
       if (!inScope(q).ok) return { declined: 'gate' as const }
       const req = { q, candidates: ranked(q).slice(0, ASK_LIMITS.candidates), actions }
@@ -81,7 +81,7 @@ describe.runIf(ON && (KEY || DRY))(`the real AI path (${DRY ? 'dry run' : MODEL}
     const [pin, pout] = PRICE[MODEL] ?? [NaN, NaN]
     const cost = (tokensIn / 1e6) * pin + (tokensOut / 1e6) * pout
     console.log(`Cost: ${calls} calls, ${Math.round(tokensIn / calls)} tokens in and ${Math.round(tokensOut / calls)} out per call (${cached} cached) → ${Number.isNaN(cost) ? 'price unknown for this model' : `$${cost.toFixed(3)} in all, $${(cost / calls).toFixed(5)} a question`}`)
-    console.log(`Thinking: reasoning_effort ${effortFor(MODEL) ?? 'not sent'}`)
+    console.log(`Thinking: thinkingConfig ${JSON.stringify(thinkingFor(MODEL)) ?? 'not sent'}`)
     expect(calls).toBeGreaterThan(0)
   }, 600_000)
 })

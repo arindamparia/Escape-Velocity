@@ -1,4 +1,4 @@
-// The palette's "Ask" call to the Worker (worker/ask.ts). The OpenAI key lives there; this only sends the question,
+// The palette's "Ask" call to the Worker (worker/ask.ts). The Google AI Studio key lives there; this only sends the question,
 // the box's own best matches and the list of things the app can do.
 import type { AskErrorCode, AskRequest, AskResponse } from '../../shared/ask'
 

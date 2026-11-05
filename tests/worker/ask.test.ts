@@ -7,9 +7,9 @@ import { corpus, DECLINED, gather, sanitize } from '../../worker/ask'
 import type { Env } from '../../worker/env'
 import { app } from '../../worker/index'
 
-const KEY = 'sk-test-secret-key-123'
+const KEY = 'AQ.test-secret-key-123'
 const BASE: Env = {
-  DB: env.DB, ASSETS: env.ASSETS, ENVIRONMENT: 'dev', PLAN_TZ: 'Asia/Kolkata', OWNER_EMAIL: 'me@example.com', ACCESS_TEAM_DOMAIN: 'x', ACCESS_AUD: 'x', OPENAI_API_KEY: KEY,
+  DB: env.DB, ASSETS: env.ASSETS, ENVIRONMENT: 'dev', PLAN_TZ: 'Asia/Kolkata', OWNER_EMAIL: 'me@example.com', ACCESS_TEAM_DOMAIN: 'x', ACCESS_AUD: 'x', GEMINI_API_KEY: KEY,
 }
 const ACTIONS = [{ id: 'action:theme:dark', title: 'Theme: Dark' }, { id: 'action:timer:dsa', title: 'Start timer: DSA, 25 min' }]
 
@@ -17,7 +17,7 @@ const sent = vi.hoisted(() => ({ bodies: [] as { url: string; init: RequestInit 
 let reply: () => Response
 let pinecone: (url: string, init: RequestInit) => Response = () => new Response('{}', { status: 500 })
 
-function stubOpenAI() {
+function stubGemini() {
   sent.bodies.length = 0
   sent.pinecone.length = 0
   vi.stubGlobal('fetch', vi.fn(async (url: string, init: RequestInit) => {
@@ -26,19 +26,23 @@ function stubOpenAI() {
     return reply()
   }))
 }
-const completion = (obj: unknown) => new Response(JSON.stringify({ choices: [{ message: { content: typeof obj === 'string' ? obj : JSON.stringify(obj) } }] }), { headers: { 'Content-Type': 'application/json' } })
+const completion = (obj: unknown) => new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: typeof obj === 'string' ? obj : JSON.stringify(obj) }] } }] }), { headers: { 'Content-Type': 'application/json' } })
 const ask = (body: unknown, e: Env = BASE) => app.fetch(new Request('http://x/api/ask', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }), e)
 const q = (over: Record<string, unknown> = {}) => ({ q: 'how do I avoid double charging a customer', candidates: [], actions: ACTIONS, ...over })
-const sentBody = () => JSON.parse(String(sent.bodies[0].init.body)) as { model: string; messages: { role: string; content: string }[]; response_format: unknown }
-const userPayload = () => JSON.parse(sentBody().messages[1].content) as { question: string; CONTEXT: { id: string; title: string }[]; ACTIONS: unknown[]; [k: string]: unknown }
+const sentBody = () => JSON.parse(String(sent.bodies[0].init.body)) as {
+  systemInstruction: { parts: { text: string }[] }
+  contents: { role: string; parts: { text: string }[] }[]
+  generationConfig: { responseMimeType: string; responseJsonSchema?: { properties: { results: { items: { properties: { id: { enum: string[] } } } }; actions: { items: { enum: string[] } } } }; maxOutputTokens: number; thinkingConfig?: { thinkingLevel?: string; thinkingBudget?: number } }
+}
+const userPayload = () => JSON.parse(sentBody().contents[0].parts[0].text) as { question: string; CONTEXT: { id: string; title: string }[]; ACTIONS: unknown[]; [k: string]: unknown }
 
 beforeAll(async () => { await applyD1Migrations(env.DB, env.TEST_MIGRATIONS) })
-beforeEach(async () => { await env.DB.prepare('DELETE FROM ai_usage').run(); reply = () => completion({ answer: 'ok', results: [], actions: [] }); stubOpenAI() })
+beforeEach(async () => { await env.DB.prepare('DELETE FROM ai_usage').run(); reply = () => completion({ answer: 'ok', results: [], actions: [] }); stubGemini() })
 afterEach(() => { vi.unstubAllGlobals() })
 
 describe('turning it on', () => {
-  it('without the OpenAI key it says how to enable it, and costs nothing', async () => {
-    const res = await ask(q(), { ...BASE, OPENAI_API_KEY: undefined })
+  it('without the Google AI Studio key it says how to enable it, and costs nothing', async () => {
+    const res = await ask(q(), { ...BASE, GEMINI_API_KEY: undefined })
     expect(res.status).toBe(501)
     expect(((await res.json()) as { error: { code: string; message: string } }).error).toMatchObject({ code: 'ai_not_configured' })
     expect(sent.bodies).toHaveLength(0)
@@ -61,37 +65,41 @@ describe('checking the question', () => {
   })
 })
 
-describe('what goes to OpenAI', () => {
+describe('what goes to Google AI Studio', () => {
   it('sends the question and snippets of the plan, and nothing personal; a plain question does not carry the action catalogue', async () => {
     await ask(q({ q: 'what is idempotency', context: { week: 6, today: '2026-11-10', next: 'Week 6 · Task 3' } }))
     const b = sentBody()
-    expect(sent.bodies[0].url).toBe('https://api.openai.com/v1/chat/completions')
-    expect((sent.bodies[0].init.headers as Record<string, string>).Authorization).toBe(`Bearer ${KEY}`)
-    expect(b.model).toBe('gpt-6-luna')
-    expect((b as unknown as { reasoning_effort?: string }).reasoning_effort).toBe('none') // answering from the context needs no thinking, and thinking would eat the token cap
+    expect(sent.bodies[0].url).toBe('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent')
+    expect((sent.bodies[0].init.headers as Record<string, string>)['x-goog-api-key']).toBe(KEY)
+    expect(b.generationConfig.thinkingConfig).toEqual({ thinkingLevel: 'minimal' }) // answering from the context needs no deep thinking, and thinking would eat the token cap
     // a strict schema: every id the model may return is one that was offered, every action one from the catalogue
-    const rf = b.response_format as { type: string; json_schema: { strict: boolean; schema: { properties: { results: { items: { properties: { id: { enum: string[] } } } }; actions: { items: { enum: string[] } } } } } }
-    expect(rf.type).toBe('json_schema')
-    expect(rf.json_schema.strict).toBe(true)
-    expect(b.messages[0].content).toMatch(/CONTEXT only/)
-    expect(b.messages[0].content).toMatch(/cannot change anything yourself/) // it may suggest an action, never claim to have done one
+    expect(b.generationConfig.responseMimeType).toBe('application/json')
+    const schema = b.generationConfig.responseJsonSchema!
+    expect(schema).toBeDefined()
+    expect(b.systemInstruction.parts[0].text).toMatch(/CONTEXT only/)
+    expect(b.systemInstruction.parts[0].text).toMatch(/cannot change anything yourself/) // it may suggest an action, never claim to have done one
     const u = userPayload()
-    expect(rf.json_schema.schema.properties.results.items.properties.id.enum).toEqual(u.CONTEXT.map((c) => c.id))
-    expect(rf.json_schema.schema.properties.actions.items.enum).toEqual(['none']) // nothing was asked to be done, so no action can be named
+    expect(schema.properties.results.items.properties.id.enum).toEqual(u.CONTEXT.map((c) => c.id))
+    expect(schema.properties.actions.items.enum).toEqual(['none']) // nothing was asked to be done, so no action can be named
     expect(Object.keys(u).sort()).toEqual(['ACTIONS', 'CONTEXT', 'question', 'today', 'where'])
     expect(u.CONTEXT.length).toBeGreaterThan(0)
     expect(u.CONTEXT.some((c) => /idempotency/i.test(c.title))).toBe(true) // found from the words alone, the box sent no candidates (a paraphrase is what Vectorize is for)
     expect(u.ACTIONS).toEqual([])
     expect(Object.keys(u.CONTEXT[0]).sort()).toEqual(['id', 'text', 'title']) // nothing the model does not need
     expect(u.CONTEXT.length).toBeLessThanOrEqual(10)
-    expect((sentBody() as unknown as { max_completion_tokens: number }).max_completion_tokens).toBeLessThanOrEqual(600)
+    expect(b.generationConfig.maxOutputTokens).toBeLessThanOrEqual(600)
   })
 
-  it('sends the action catalogue only when the question asks for something to be done', async () => {
+  it('sends the action catalogue only when the question asks for something to be done or an actionable app feature', async () => {
     await ask(q({ q: 'change the theme to dark' }))
-    const rf = sentBody().response_format as { json_schema: { schema: { properties: { actions: { items: { enum: string[] } } } } } }
+    const schema = sentBody().generationConfig.responseJsonSchema!
     expect(userPayload().ACTIONS).toEqual(ACTIONS)
-    expect(rf.json_schema.schema.properties.actions.items.enum).toEqual(ACTIONS.map((a) => a.id))
+    expect(schema.properties.actions.items.enum).toEqual(ACTIONS.map((a) => a.id))
+    sent.bodies.length = 0
+    await ask(q({ q: 'how many themes in our site we have', candidates: ['action:theme:paper', 'section:settings-theme'] }))
+    expect(userPayload().ACTIONS).toEqual(ACTIONS)
+    expect(userPayload().CONTEXT.map((c) => c.id)).toContain('help:themes')
+    expect(userPayload().CONTEXT.map((c) => c.id)).toContain('section:settings-theme')
   })
 
   it('puts the box\'s own matches first, whether it names a chunk or an entry', async () => {
@@ -104,27 +112,27 @@ describe('what goes to OpenAI', () => {
     expect(ids.length).toBeLessThanOrEqual(14)
   })
 
-  it('uses OPENAI_MODEL when set, and sends the reasoning setting only to models that reason', async () => {
-    const effort = () => (sentBody() as unknown as { reasoning_effort?: string }).reasoning_effort
-    await ask(q(), { ...BASE, OPENAI_MODEL: 'gpt-5-mini' })
-    expect(sentBody().model).toBe('gpt-5-mini')
-    expect(effort()).toBe('minimal')
+  it('uses GEMINI_MODEL when set, and sends the thinking setting only to models that support it', async () => {
+    const thinking = () => sentBody().generationConfig.thinkingConfig
+    await ask(q(), { ...BASE, GEMINI_MODEL: 'gemini-2.5-flash-lite' })
+    expect(sent.bodies[0].url).toBe('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent')
+    expect(thinking()).toEqual({ thinkingBudget: 0 })
     sent.bodies.length = 0
-    await ask(q(), { ...BASE, OPENAI_MODEL: 'gpt-4.1-mini' })
-    expect(sentBody().model).toBe('gpt-4.1-mini')
-    expect(effort()).toBeUndefined() // a model that does not reason would reject it
+    await ask(q(), { ...BASE, GEMINI_MODEL: 'gemini-2.0-flash' })
+    expect(sent.bodies[0].url).toBe('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent')
+    expect(thinking()).toBeUndefined() // a model that does not support thinkingConfig would reject it
   })
 
-  it('asks again without the reasoning setting when the model refuses it', async () => {
+  it('asks again without the thinking setting when the model refuses it', async () => {
     let n = 0
     reply = () => (++n === 1
-      ? new Response(JSON.stringify({ error: { message: "Unsupported parameter: 'reasoning_effort' is not supported with this model." } }), { status: 400 })
+      ? new Response(JSON.stringify({ error: { message: "Invalid value at 'generation_config.thinking_config': thinking_level is not supported." } }), { status: 400 })
       : completion({ in_scope: true, answer: 'ok', results: [], actions: [] }))
     const body = (await (await ask(q())).json()) as AskResponse
     expect(body.answer).toBe('ok')
     expect(sent.bodies).toHaveLength(2)
-    expect((JSON.parse(String(sent.bodies[1].init.body)) as { reasoning_effort?: string }).reasoning_effort).toBeUndefined()
-    expect(JSON.parse(String(sent.bodies[1].init.body)).response_format.type).toBe('json_schema') // still strict
+    expect(JSON.parse(String(sent.bodies[1].init.body)).generationConfig.thinkingConfig).toBeUndefined()
+    expect(JSON.parse(String(sent.bodies[1].init.body)).generationConfig.responseJsonSchema).toBeDefined() // still strict
   })
 })
 
@@ -132,7 +140,7 @@ describe('only questions about the plan and the app get an answer', () => {
   const usage = async () => (await env.DB.prepare('SELECT COALESCE(SUM(calls), 0) AS n FROM ai_usage').first<{ n: number }>())!.n
   const WITH: Env = { ...BASE, PINECONE_API_KEY: 'pcsk_x', PINECONE_INDEX_HOST: 'h.example.pinecone.io' }
 
-  it('a plainly foreign question is declined without OpenAI, Pinecone or the database being touched', async () => {
+  it('a plainly foreign question is declined without Google AI Studio, Pinecone or the database being touched', async () => {
     for (const text of ['who won the world cup', 'write me a poem about autumn', 'how do I cook pasta']) {
       const body = (await (await ask(q({ q: text }), WITH)).json()) as AskResponse
       expect(body).toMatchObject({ answer: DECLINED, results: [], actions: [], mode: 'declined', usedToday: 0 })
@@ -158,7 +166,7 @@ describe('only questions about the plan and the app get an answer', () => {
 
   it('the instructions say what is in scope, ask for nothing from outside the context, and keep it short', async () => {
     await ask(q())
-    const sys = sentBody().messages[0].content
+    const sys = sentBody().systemInstruction.parts[0].text
     expect(sys).toMatch(/"in_scope"/)
     expect(sys).toMatch(/out of scope/)
     expect(sys).toMatch(/no outside knowledge/)
@@ -212,29 +220,32 @@ describe('a model that cannot take a schema', () => {
   it('is asked again in plain JSON mode, and the answer is still checked', async () => {
     let n = 0
     reply = () => (++n === 1
-      ? new Response(JSON.stringify({ error: { message: "Invalid parameter: 'response_format' of type 'json_schema' is not supported with this model." } }), { status: 400 })
+      ? new Response(JSON.stringify({ error: { message: "Invalid parameter: 'responseJsonSchema' is not supported with this model." } }), { status: 400 })
       : completion({ answer: 'ok', results: [{ id: 'term:idempotency', why: 'w' }, { id: 'task:w99-99', why: 'made up' }], actions: [] }))
-    const body = (await (await ask(q({ candidates: ['term:idempotency'] }), { ...BASE, OPENAI_MODEL: 'gpt-3.5-turbo' })).json()) as AskResponse
+    const body = (await (await ask(q({ candidates: ['term:idempotency'] }), { ...BASE, GEMINI_MODEL: 'gemini-1.5-flash' })).json()) as AskResponse
     expect(sent.bodies).toHaveLength(2)
-    expect(JSON.parse(String(sent.bodies[0].init.body)).response_format.type).toBe('json_schema')
-    expect(JSON.parse(String(sent.bodies[1].init.body)).response_format).toEqual({ type: 'json_object' })
+    expect(JSON.parse(String(sent.bodies[0].init.body)).generationConfig.responseJsonSchema).toBeDefined()
+    expect(JSON.parse(String(sent.bodies[1].init.body)).generationConfig.responseJsonSchema).toBeUndefined()
+    expect(JSON.parse(String(sent.bodies[1].init.body)).generationConfig.responseMimeType).toBe('application/json')
     expect(body.results).toEqual([{ id: 'term:idempotency', why: 'w' }]) // the made-up id is still dropped
   })
 })
 
-describe('when OpenAI is not happy', () => {
+describe('when Google AI Studio is not happy', () => {
   const code = async (r: Response) => ((await r.json()) as { error: { code: string; message: string } }).error
   it('explains a refused key, no credit, an unknown model, a network error and a non-JSON answer', async () => {
     reply = () => new Response('{}', { status: 401 })
     expect(await code(await ask(q()))).toMatchObject({ code: 'upstream', message: expect.stringMatching(/refused the key/) })
+    reply = () => new Response(JSON.stringify({ error: { message: 'API key not valid. Please pass a valid API key.', details: [{ reason: 'API_KEY_INVALID' }] } }), { status: 400 })
+    expect(await code(await ask(q()))).toMatchObject({ code: 'upstream', message: expect.stringMatching(/refused the key/) })
     reply = () => new Response('{}', { status: 429 })
     expect(await code(await ask(q()))).toMatchObject({ message: expect.stringMatching(/billing/) })
-    reply = () => new Response(JSON.stringify({ error: { message: 'The model `nope` does not exist' } }), { status: 404 })
-    expect(await code(await ask(q()))).toMatchObject({ message: expect.stringMatching(/OPENAI_MODEL/) })
+    reply = () => new Response(JSON.stringify({ error: { message: 'models/nope is not found' } }), { status: 404 })
+    expect(await code(await ask(q()))).toMatchObject({ message: expect.stringMatching(/GEMINI_MODEL/) })
     reply = () => completion('this is not json')
     expect(await code(await ask(q()))).toMatchObject({ code: 'invalid_answer' })
     vi.stubGlobal('fetch', vi.fn(async () => { throw new TypeError('network down') }))
-    expect(await code(await ask(q()))).toMatchObject({ code: 'upstream', message: expect.stringMatching(/reach OpenAI/) })
+    expect(await code(await ask(q()))).toMatchObject({ code: 'upstream', message: expect.stringMatching(/reach Google AI Studio/) })
   })
 })
 
@@ -246,7 +257,7 @@ describe('the daily cap', () => {
     const third = await ask(q(), e)
     expect(third.status).toBe(429)
     expect(((await third.json()) as { error: { code: string } }).error.code).toBe('rate_limited')
-    expect(sent.bodies).toHaveLength(2) // the third never reached OpenAI
+    expect(sent.bodies).toHaveLength(2) // the third never reached Google AI Studio
     const st = (await (await app.fetch(new Request('http://x/api/ai/status'), e)).json()) as AiStatus
     expect(st).toMatchObject({ configured: true, usedToday: 3, limit: 2 })
   })

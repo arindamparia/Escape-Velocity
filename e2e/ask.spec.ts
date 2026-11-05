@@ -111,14 +111,14 @@ test('against the real Worker with no key set, it says how to switch the AI on',
   await p.getByRole('combobox').fill('? what is the capstone')
   await page.keyboard.press('Enter')
   await expect(p.getByRole('alert')).toContainText('not switched on')
-  await expect(p.getByRole('alert')).toContainText('OPENAI_API_KEY')
+  await expect(p.getByRole('alert')).toContainText('GEMINI_API_KEY')
 })
 
 test('Settings shows whether the AI search is on, and offers a rebuild only when the semantic index is out of date', async ({ page, api }) => {
   await api.onboard()
   await openApp(page, '/settings')
   await expect(page.getByRole('heading', { name: 'AI search' })).toBeVisible()
-  await expect(page.getByText('Off: add the OPENAI_API_KEY secret')).toBeVisible() // the e2e server has no keys
+  await expect(page.getByText('Off: add the GEMINI_API_KEY secret')).toBeVisible() // the e2e server has no keys
   await expect(page.getByText('keywords only')).toBeVisible()
   await expect(page.getByRole('button', { name: 'Rebuild the index' })).toHaveCount(0)
 })

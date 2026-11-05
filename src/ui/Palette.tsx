@@ -116,12 +116,16 @@ export function Palette() {
     const out: Block[] = []
     if (ask) {
       // the answer's rows: ids the model named, kept only if the palette knows them
-      const rows = (ask.data?.results ?? []).flatMap((r) => { const entry = byId.get(r.id); return entry ? [{ entry, marks: [] as [number, number][], note: r.why }] : [] })
       const acts = (ask.data?.actions ?? []).flatMap((id) => { const entry = byId.get(id); return entry ? [{ entry, marks: [] as [number, number][] }] : [] })
+      const actIds = new Set(acts.map((a) => a.entry.id))
+      const allRows = (ask.data?.results ?? []).flatMap((r) => { const entry = byId.get(r.id); return entry ? [{ entry, marks: [] as [number, number][], note: r.why }] : [] })
+      const dedupedRows = allRows.filter((r) => !actIds.has(r.entry.id))
+      const rows = dedupedRows.length ? dedupedRows : allRows
       if (rows.length) out.push({ key: 'from', label: 'From your plan', rows, more: 0 })
       if (acts.length) out.push({ key: 'do', label: 'Suggested: press Enter to confirm', rows: acts, more: 0 })
-      // what the box found itself stays below the answer
-      for (const s of sections(hits, 3) as Section<Entry>[]) out.push({ key: `also-${s.key}`, label: `Also found: ${s.label}`, rows: s.hits.map((h) => ({ entry: h.item, marks: h.marks })), more: 0 })
+      // what the box found itself stays below the answer, without repeating rows already shown above
+      const shownIds = new Set([...rows.map((r) => r.entry.id), ...actIds])
+      for (const s of sections(hits.filter((h) => !shownIds.has(h.item.id)), 3) as Section<Entry>[]) out.push({ key: `also-${s.key}`, label: `Also found: ${s.label}`, rows: s.hits.map((h) => ({ entry: h.item, marks: h.marks })), more: 0 })
       return out
     }
     if (searching) {

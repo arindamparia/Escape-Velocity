@@ -987,8 +987,15 @@ export function compilePlan(source: string): CompileOutput {
 
   // ---------------------------------------------------------------- search index
   const search: SearchEntry[] = []
-  for (const w of weeks) search.push({ k: 'w', id: String(w.n), t: `Week ${w.n} · ${w.title}`, x: `${w.theme} ${w.saturdayDesign} ${w.dates}` })
-  for (const d of designs) search.push({ k: 'd', id: d.id, t: d.name, x: `${d.teaches} ${d.group}` })
+  const alsoKnownAs = new Map<string, string[]>()
+  for (const c of coverage) {
+    for (const r of c.rows) {
+      for (const m of r.planHtml.matchAll(/<code>([a-z0-9-]+)<\/code>/g)) if (designIdSet.has(m[1])) alsoKnownAs.set(m[1], [...(alsoKnownAs.get(m[1]) ?? []), r.topic])
+      if (designIdSet.has(r.goTo)) alsoKnownAs.set(r.goTo, [...(alsoKnownAs.get(r.goTo) ?? []), r.topic])
+    }
+  }
+  for (const w of weeks) search.push({ k: 'w', id: String(w.n), t: `Week ${w.n} · ${w.title}`, x: `${w.theme} ${w.saturdayDesign} ${w.dates}${w.n === 1 ? ' first week' : w.n === weeks.length ? ' last week final week' : ''}` })
+  for (const d of designs) search.push({ k: 'd', id: d.id, t: d.name, x: `${d.teaches} ${d.group}${alsoKnownAs.get(d.id)?.length ? ` ${alsoKnownAs.get(d.id)!.join(' ')}` : ''}` })
   for (const t of tasks) {
     const text = plain(t.text)
     search.push({ k: 't', id: t.id, t: text.length > 96 ? `${text.slice(0, 95)}…` : text, x: `${t.type} ${t.day}` })

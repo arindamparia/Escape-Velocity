@@ -50,6 +50,12 @@ export const IN_SCOPE = [
   'how are the weeks organised',
   'when do I start applying',
   'what is the plan for the last week',
+  'how many themes in our site we have',
+  'what themes are available in this app',
+  'what focus sounds are in our site',
+  'what features does this site have',
+  'how do I restore my backup',
+  'how do I export the plan to my calendar',
 ] as const
 
 export const OFF_TOPIC = [

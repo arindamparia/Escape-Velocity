@@ -31,7 +31,8 @@ try {
   const numbered = (id: string, book: string) => ({ law: 'Law', hf: 'Principle', inf: 'Principle' } as Record<string, string>)[book] ? `${({ law: 'Law', hf: 'Principle', inf: 'Principle' } as Record<string, string>)[book]} ${Number(id.slice(-2))}` : ''
   const growthSearch = growth.index.path.map((i) => {
     const n = numbered(i.id, i.book)
-    return { k: 'g' as const, id: i.id, t: n ? `${n} · ${i.title}` : i.title, x: `${growth.books[i.book].book.title} · ${i.group}${n ? ` · ${n.toLowerCase()} ${n.toLowerCase().replace(' ', '')}` : ''}` }
+    const idea = growth.books[i.book].ideas.find((x) => x.id === i.id)
+    return { k: 'g' as const, id: i.id, t: n ? `${n} · ${i.title}` : i.title, x: `${growth.books[i.book].book.title} · ${i.group}${n ? ` · ${n.toLowerCase()} ${n.toLowerCase().replace(' ', '')}` : ''}${idea ? ` · ${idea.card.front} ${idea.card.back}` : ''}` }
   })
   for (const sc of growth.deck.scenarios) growthSearch.push({ k: 'g' as const, id: sc.id, t: `Scenario: ${sc.title}`, x: `growth scenario practice situation ${sc.kind === 'spot' ? 'spot the tactic manipulation' : 'what would you do'}` })
   write('search.json', [...result.search, ...growthSearch])

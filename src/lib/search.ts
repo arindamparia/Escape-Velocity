@@ -74,7 +74,7 @@ interface Field { text: string; words: Word[]; weight: number }
 interface Match { score: number; range?: [number, number]; /** initials or scattered letters: good enough to list a row, not to call it a full match */ weak?: true }
 
 /** A crude stem: enough to see that "designing", "designs" and "design" are one word, or "videos" and "video". */
-function stemOf(w: string): string {
+export function stemOf(w: string): string {
   if (w.length <= 3) return w
   if (w.length >= 6 && w.endsWith('ing')) return w.slice(0, -3)
   if (w.length >= 5 && w.endsWith('ed')) return w.slice(0, -2)
@@ -145,16 +145,28 @@ export function tokenize(query: string): string[] {
   return wordsOf(fold(query)).map((w) => w.text)
 }
 
-// Words that carry no topic when someone types a sentence ("where do I change the theme"). Left in, every one of them has
-// to match something, and the loose matching (scattered letters, typos) then pairs them with random titles. They are
-// dropped only when at least two other words remain, so a title made of them ("How this works") is still found by name.
-const FILLER = new Set(['a', 'an', 'the', 'i', 'me', 'my', 'we', 'you', 'am', 'is', 'are', 'was', 'do', 'does', 'did', 'how', 'what', 'where', 'when', 'why', 'which', 'who', 'can', 'could', 'should', 'would', 'will', 'to', 'of', 'in', 'on', 'at', 'for', 'and', 'or', 'with', 'about', 'from', 'this', 'that', 'it', 'there', 'show', 'tell', 'explain', 'find', 'want', 'need', 'get', 'like', 'please'])
+// Words that carry no topic when someone types a sentence ("where do I change the theme", "how many themes in our site we have").
+// Left in, every one of them has to match something, and the loose matching (scattered letters, typos) then pairs them with
+// random titles. Self-referential words ("site", "app", "website") are included too: inside this app, every search is already
+// about this site. They are dropped only when at least two other words remain (or one when the only other words are filler),
+// so a title made of them ("How this works") is still found by name.
+const FILLER = new Set([
+  'a', 'an', 'the', 'i', 'me', 'my', 'mine', 'we', 'us', 'our', 'ours', 'you', 'your', 'yours', 'they', 'them', 'their',
+  'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'do', 'does', 'did', 'have', 'has', 'had', 'having',
+  'how', 'what', 'where', 'when', 'why', 'which', 'who', 'whom', 'whose',
+  'can', 'could', 'should', 'would', 'will', 'shall', 'may', 'might', 'must',
+  'to', 'of', 'in', 'on', 'at', 'for', 'by', 'with', 'about', 'from', 'into', 'onto', 'upon', 'as', 'than', 'through', 'between', 'under', 'over', 'after', 'before', 'while', 'during', 'without', 'within',
+  'and', 'or', 'but', 'if', 'so', 'then', 'also', 'too', 'very', 'just', 'only',
+  'this', 'that', 'these', 'those', 'it', 'its', 'there', 'here',
+  'show', 'tell', 'explain', 'find', 'want', 'need', 'get', 'got', 'give', 'let', 'make', 'know', 'see', 'looking', 'think', 'say', 'like', 'please', 'help',
+  'many', 'much', 'site', 'website', 'webpage',
+])
 
-/** The words of a query that say what it is about (see FILLER). */
+/** The words of a query that say what it is about (see FILLER). "why" at the end ("edit my why", "where do I write my why") or before "note(s)" is a noun in this app, not the question word. */
 export function topicWords(query: string): string[] {
   const all = tokenize(query)
-  const topic = all.filter((t) => !FILLER.has(t))
-  return topic.length >= 2 ? topic : all
+  const topic = all.filter((t, i) => !FILLER.has(t) || (t === 'why' && ((i === all.length - 1 && all.length > 1) || /^notes?$/.test(all[i + 1] ?? ''))))
+  return topic.length >= 2 || (topic.length === 1 && all.length >= 4) ? topic : all
 }
 
 /** A row prepared once: its folded fields and the words in them, so typing does not redo that for every row on every key. */

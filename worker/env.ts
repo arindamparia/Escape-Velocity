@@ -13,10 +13,10 @@ export interface Env {
   ALGOTRACKER_DATABASE_URL?: string
   /** whose AlgoTracker progress to read; defaults to OWNER_EMAIL */
   ALGOTRACKER_EMAIL?: string
-  /** OpenAI key for the AI search (a secret). Without it the "Ask" row says how to turn it on. */
-  OPENAI_API_KEY?: string
-  /** which OpenAI chat model answers; defaults in worker/ask.ts */
-  OPENAI_MODEL?: string
+  /** Google AI Studio key for the AI search (a secret). Without it the "Ask" row says how to turn it on. */
+  GEMINI_API_KEY?: string
+  /** which Gemini model answers; defaults in worker/converse.ts */
+  GEMINI_MODEL?: string
   /** questions per day, a cost guard (default 100) */
   AI_DAILY_LIMIT?: string
   /** Pinecone key for the semantic layer (a secret). Optional: without it the AI search still works from the box's own matches. */

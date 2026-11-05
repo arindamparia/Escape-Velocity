@@ -84,7 +84,7 @@ function AiSearch() {
       {st === null ? <p class="muted small m0">Checking…</p> : st === 'off' ? <p class="muted small m0">Could not read the status (offline or signed out).</p> : (
         <>
           <dl class="kv m0">
-            <dt>Answers</dt><dd>{st.configured ? `On (${st.model})` : 'Off: add the OPENAI_API_KEY secret'}</dd>
+            <dt>Answers</dt><dd>{st.configured ? `On (${st.model})` : 'Off: add the GEMINI_API_KEY secret'}</dd>
             <dt>Today</dt><dd>{st.usedToday} of {st.limit} questions</dd>
             <dt>Search by meaning</dt><dd>{!st.semantic ? 'Off (keywords only): add PINECONE_API_KEY and PINECONE_INDEX_HOST' : st.fresh ? `Up to date (${st.indexed} chunks)` : st.indexed === null ? 'Could not reach Pinecone' : `Out of date (${st.indexed} of ${st.chunks} chunks): rebuild`}</dd>
           </dl>

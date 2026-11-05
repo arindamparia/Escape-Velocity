@@ -20,7 +20,7 @@ export const CONTEXT_CHUNKS = 10
 /** What gather() needs from a request: the question and the box's own matches (entry ids or chunk ids). */
 export interface GatherRequest { q: string; candidates: readonly string[] }
 
-const STOP = new Set(['the', 'and', 'for', 'how', 'what', 'why', 'does', 'with', 'this', 'that', 'can', 'you', 'are', 'was', 'about', 'when', 'where', 'which', 'my', 'me', 'do', 'is', 'in', 'to', 'of', 'a', 'an', 'it', 'on', 'i'])
+const STOP = new Set(['the', 'and', 'for', 'how', 'what', 'why', 'does', 'with', 'this', 'that', 'can', 'you', 'are', 'was', 'about', 'when', 'where', 'which', 'my', 'me', 'do', 'is', 'in', 'to', 'of', 'a', 'an', 'it', 'on', 'i', 'we', 'our', 'have', 'has', 'many', 'much', 'site', 'website', 'app', 'application'])
 
 /** A plain keyword search over the bundled plan: the floor when the box sent nothing and Vectorize is off. */
 function lexical(q: string, limit: number): string[] {
@@ -47,12 +47,28 @@ const RRF_K = 60
  * always takes part: the box's matching is strict about every word, so on a question phrased as a sentence it can send
  * junk, and the keywords are what rescue the right page.
  */
+/** Action candidates from the search box map to the help and page chunks that explain those features. */
+const ACTION_CHUNKS: readonly [string, readonly string[]][] = [
+  ['action:theme:', ['help:themes', 'section:settings-theme']],
+  ['action:sound:', ['help:focus-sound', 'section:settings-focus-sound']],
+  ['action:timer:', ['help:timer', 'page:/study/timer']],
+  ['action:log:', ['help:log', 'page:/progress/problems']],
+  ['action:refresh', ['help:solved', 'page:/progress/problems']],
+  ['action:minimum', ['help:minimum', 'term:minimum-day']],
+  ['action:why', ['section:why', 'page:/mindset']],
+  ['action:shortcuts', ['help:shortcuts', 'section:settings-keyboard']],
+  ['action:chime', ['section:settings-sound', 'help:timer']],
+  ['action:print', ['page:/study/cheatsheet', 'help:study-tools']],
+  ['action:next', ['page:/', 'help:today-calm']],
+]
+
 export function gather(req: Pick<GatherRequest, 'q' | 'candidates'>, semanticIds: readonly string[], limit: number = CONTEXT_CHUNKS): Chunk[] {
   const fromBox: string[] = []
   for (const id of req.candidates) {
     // a candidate is an entry id or a chunk id; an entry can have its own chunk (a page's description) and richer ones about it
     if (byId.has(id)) fromBox.push(id)
     for (const c of byEntry.get(id) ?? []) fromBox.push(c.id)
+    for (const [prefix, mapped] of ACTION_CHUNKS) if (id.startsWith(prefix)) for (const cid of mapped) if (byId.has(cid)) fromBox.push(cid)
   }
   const score = new Map<string, number>()
   const order: string[] = [] // first appearance, to break ties the way the box would
@@ -70,12 +86,21 @@ export function gather(req: Pick<GatherRequest, 'q' | 'candidates'>, semanticIds
 }
 
 // ── Scope: is this question about the plan and the app at all? ───────────────────────────────────────────────────────────
-// Decided here, before OpenAI, Pinecone or the database is touched, from the plan's own vocabulary: a question about the
+// Decided here, before Google AI Studio, Pinecone or the database is touched, from the plan's own vocabulary: a question about the
 // world cup or a poem has words the plan never uses. The gate is deliberately generous (it only has to catch the plainly
 // foreign); the model's own in_scope flag catches the rest. Pure, so tests/golden measures it on labelled questions.
 
 /** Words that ask for something without naming a topic: neither evidence for nor against. */
-const NEUTRAL = new Set(['write', 'make', 'give', 'list', 'best', 'good', 'great', 'new', 'use', 'using', 'used', 'please', 'thing', 'things', 'way', 'ways', 'example', 'examples', 'tips', 'tip', 'help', 'one', 'two', 'some', 'any', 'more', 'most', 'very', 'just', 'also', 'know', 'think', 'look', 'take', 'work', 'works', 'name', 'names', 'tell', 'summarise', 'summarize', 'recommend', 'suggest', 'many', 'much', 'long', 'time', 'times', 'long', 'start', 'plan'])
+const NEUTRAL = new Set([
+  'write', 'make', 'give', 'list', 'best', 'good', 'great', 'new', 'use', 'using', 'used', 'please', 'thing', 'things',
+  'way', 'ways', 'example', 'examples', 'tips', 'tip', 'help', 'one', 'two', 'some', 'any', 'more', 'most', 'very',
+  'just', 'also', 'know', 'think', 'look', 'take', 'work', 'works', 'name', 'names', 'tell', 'summarise', 'summarize',
+  'recommend', 'suggest', 'many', 'much', 'long', 'time', 'times', 'start', 'plan',
+  'site', 'website', 'webpage', 'app', 'application', 'platform', 'our', 'ours', 'your', 'yours', 'their', 'have', 'has', 'had',
+  'organise', 'organised', 'organize', 'organized', 'available', 'exist', 'exists', 'offer', 'offers', 'offered',
+  'include', 'includes', 'included', 'support', 'supports', 'supported', 'feature', 'features', 'option', 'options',
+  'total', 'count', 'number', 'different', 'kind', 'kinds', 'type', 'types', 'current', 'currently',
+])
 
 let vocab: { set: Set<string>; list: string[] } | null = null
 /** Every word the plan uses. Built on the first question, not at start-up, so a Worker that never gets asked pays nothing. */
@@ -127,11 +152,13 @@ export function inScope(q: string): Scope {
 }
 
 /**
- * Does the question ask for something to be DONE (start, log, switch, print...)? Only then is the catalogue of actions
- * sent to the model: it is about a third of the prompt, and a plain question can never use it. The box lists the actions
- * it matches on its own either way.
+ * Does the question ask for something to be DONE (start, log, switch, print...) or ask about an actionable app feature
+ * (themes, Cabin sounds, timers, shortcuts, AlgoTracker, minimum day) where offering a one-keystroke action saves steps?
+ * Only then is the catalogue of actions sent to the model: it is about a third of the prompt, and a plain concept question
+ * can never use it. The box lists the actions it matches on its own either way.
  */
-export const wantsAction = (q: string): boolean => /\b(start|stop|begin|log|record|add|switch|change|set|use|turn|toggle|mute|unmute|enable|disable|refresh|reload|sync|print|open|edit|write|run|show|go)\b/i.test(q)
+export const wantsAction = (q: string): boolean =>
+  /\b(start|stop|begin|log|record|add|switch|change|set|use|turn|toggle|mute|unmute|enable|disable|refresh|reload|sync|print|open|edit|write|run|show|go|pick|choose|apply|activate|play|pause|themes?|dark mode|light mode|paper|sounds?|cabin|timers?|pomodoro|stopwatch|chime|shortcuts?|hotkeys?|algotracker|minimum day|bad day|tired|sick|next task|my why)\b/i.test(q)
 
 /**
  * The order of the sources under an answer. The model lists them "best first", but a model is easily pulled by the last

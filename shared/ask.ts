@@ -50,7 +50,7 @@ export interface AskResponse {
 export type AskErrorCode = 'ai_not_configured' | 'rate_limited' | 'bad_request' | 'upstream' | 'invalid_answer'
 
 export interface AiStatus {
-  /** an OpenAI key is set */
+  /** a Google AI Studio key is set */
   configured: boolean
   model: string
   /** Pinecone is set up (key and host) */

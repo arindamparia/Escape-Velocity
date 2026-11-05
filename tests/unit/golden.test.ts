@@ -65,7 +65,7 @@ describe('the scope gate (what the AI will not even be asked)', () => {
   const refusedIn = [...GOLDEN.map((g) => g.q), ...IN_SCOPE].filter((q) => !inScope(q).ok)
   const caught = OFF_TOPIC.filter((q) => !inScope(q).ok)
   // a vocabulary check cannot be perfect: these are the wrong refusals we know of (the refusal says to rephrase, and the box still searches)
-  const KNOWN_WRONG = ['how are the weeks organised']
+  const KNOWN_WRONG: string[] = []
 
   it('prints the figures when asked', () => {
     if (!SHOW) return

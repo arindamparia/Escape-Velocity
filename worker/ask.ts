@@ -1,9 +1,9 @@
 // The AI search. A question comes in with the palette's own best matches; the Worker adds what it can find itself
-// (the plan's content is bundled here, and Pinecone adds a search by meaning when it is set up), asks OpenAI to answer
-// from that and nothing else, and returns JSON. Every id in the answer is checked against what was offered, so the
-// model can only point at things that exist; actions are suggestions the app shows for you to confirm.
-// The OpenAI key is a Worker secret behind Cloudflare Access: it never reaches the browser. No notes, stats or why
-// are ever sent; only your question and snippets of the plan.
+// (the plan's content is bundled here, and Pinecone adds a search by meaning when it is set up), asks Google AI Studio
+// to answer from that and nothing else, and returns JSON. Every id in the answer is checked against what was offered, so
+// the model can only point at things that exist; actions are suggestions the app shows for you to confirm.
+// The Google AI Studio key is a Worker secret behind Cloudflare Access: it never reaches the browser. No notes, stats or
+// why are ever sent; only your question and snippets of the plan.
 // This file is the part that needs the Worker (the daily allowance in D1, Pinecone, the status); the part that talks to
 // the model is worker/converse.ts.
 import { type AiStatus, type AskResponse } from '../shared/ask'
@@ -45,9 +45,9 @@ async function semantic(env: Env, q: string): Promise<string[]> {
 export async function ask(env: Env, body: unknown): Promise<AskResponse> {
   const parsed = AskSchema.safeParse(body)
   if (!parsed.success) throw new AskError('bad_request', `${parsed.error.issues[0].path.join('.') || 'body'}: ${parsed.error.issues[0].message}`, 400)
-  if (!env.OPENAI_API_KEY) throw new AskError('ai_not_configured', 'The AI search needs an OpenAI key: run  npx wrangler secret put OPENAI_API_KEY  and redeploy.', 501)
+  if (!env.GEMINI_API_KEY) throw new AskError('ai_not_configured', 'The AI search needs a Google AI Studio key: run  npx wrangler secret put GEMINI_API_KEY  and redeploy.', 501)
   const req = parsed.data
-  // Not about the plan or the app: say so without spending anything (no OpenAI call, no Pinecone call, no database write)
+  // Not about the plan or the app: say so without spending anything (no Google AI Studio call, no Pinecone call, no database write)
   if (!inScope(req.q).ok) return declined(env, 0)
   const used = await spend(env)
   const sem = await semantic(env, req.q)
@@ -66,7 +66,7 @@ export async function aiStatus(env: Env): Promise<AiStatus> {
   let indexed: number | null = null
   if (cfg) indexed = await namespaceCounts(cfg).then((c) => c[namespaceFor(HASH)] ?? 0).catch(() => null)
   return {
-    configured: !!env.OPENAI_API_KEY, model: modelOf(env), semantic: !!cfg,
+    configured: !!env.GEMINI_API_KEY, model: modelOf(env), semantic: !!cfg,
     usedToday: await usedToday(env), limit: limitOf(env), chunks: CHUNKS.length, indexed, fresh: indexed === CHUNKS.length,
   }
 }
