@@ -7,6 +7,7 @@ import { Icon } from '../ui/Icon'
 import { NoteEditor } from '../ui/NoteEditor'
 import { Peek } from '../ui/Peek'
 import { ResourceList } from '../ui/Resources'
+import { Disclosure } from '../ui/Disclosure'
 
 type Lib = PageChunks['library']
 
@@ -29,13 +30,12 @@ function PaperCard({ p, lib }: { p: PaperRow; lib: Lib }) {
         <Html html={p.findHtml} class="prose" />
       </Peek>
       {p.taskId ? (
-        <details>
-          <summary>Your decision card and notes{hasCard ? ' · 1 card written' : ''}</summary>
-          <div class="stack" style="margin-top:0.7rem">
+        <Disclosure title="Your decision card and notes" hint={hasCard ? '1 card written' : undefined}>
+          <div class="stack">
             <div><p class="eyebrow" style="margin:0 0 0.3rem">Your decision card</p><DecisionCards designId={`paper-${p.taskId}`} min={1} /></div>
             <label class="small">In your own words, one paragraph<NoteEditor kind="free" refId={`paper:${p.taskId}`} rows={4} placeholder="What the team chose, what forced it, what it cost." /></label>
           </div>
-        </details>
+        </Disclosure>
       ) : null}
     </section>
   )
@@ -47,10 +47,9 @@ export function PapersTab({ lib }: { lib: Lib }) {
   return (
     <div class="stack">
       <Html html={p.introHtml} class="prose" />
-      <details class="card" open>
-        <summary>How to read one in 45 minutes</summary>
+      <Disclosure class="card" open title="How to read one in 45 minutes">
         <Html html={p.methodHtml} class="prose small" />
-      </details>
+      </Disclosure>
       <section class="stack" aria-label="The schedule" id="schedule">
         <h2 class="m0">The schedule</h2>
         {p.schedule.map((x) => <PaperCard key={x.taskId} p={x} lib={lib} />)}

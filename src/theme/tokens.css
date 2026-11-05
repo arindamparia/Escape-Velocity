@@ -14,6 +14,21 @@
   font-style: italic;
   font-display: swap;
 }
+/* Fraunces: a soft, slightly wonky old-style display serif with an optical size axis. Headings in Paper only (SIL Open Font Licence). */
+@font-face {
+  font-family: 'Fraunces';
+  src: url('./fraunces.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: optional; /* preloaded; never swapped in late, so nothing shifts */
+}
+@font-face {
+  font-family: 'Fraunces';
+  src: url('./fraunces-italic.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
 @font-face {
   font-family: 'JBM';
   src: url('./jbm.woff2') format('woff2');
@@ -41,6 +56,17 @@
   --hero-tint: color-mix(in srgb, var(--accent) 13%, var(--surface));
   --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI', Roboto, sans-serif;
   --lh: 1.55;
+  /* motion: short for feedback, longer for things that arrive; entering decelerates, leaving accelerates */
+  --dur-micro: 140ms;
+  --dur-small: 220ms;
+  --dur-large: 340ms;
+  --dur-exit: 170ms;
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-settle: cubic-bezier(0.34, 1.45, 0.64, 1);
+  /* the highlighter: used only for "you are here" */
+  --hl: rgb(255 178 36 / 0.28);
 }
 
 [data-theme='light'] {
@@ -58,6 +84,7 @@
   --warn: #a12a16;
   --shadow: 0 1px 2px rgb(26 21 35 / 0.06), 0 12px 28px -16px rgb(26 21 35 / 0.2);
   --hero-tint: color-mix(in srgb, var(--accent) 9%, var(--surface));
+  --hl: rgb(246 190 60 / 0.5);
 }
 
 [data-theme='paper'] {
@@ -79,7 +106,9 @@
   --shadow: none;
   --hero-tint: #f6efdc;
   --font-body: 'Literata', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+  --font-display: 'Fraunces', 'Literata', 'Iowan Old Style', Georgia, serif;
   --lh: 1.68;
+  --hl: rgb(244 196 48 / 0.55);
 }
 
 /* Paper night: Paper in a dark tone (data-theme stays "paper", so every Paper rule below and in app.css still applies).
@@ -99,12 +128,21 @@
   --warn: #e6decb;
   --hero-tint: #1b1913;
   --lh: 1.76;
+  --hl: rgb(244 196 48 / 0.3);
 }
 
-/* Paper: no motion, no shadows, no gradients, no blur. */
-[data-theme='paper'] *,
-[data-theme='paper'] *::before,
-[data-theme='paper'] *::after {
+/* Still mode (Settings: for e-ink and greyscale screens): no motion anywhere, and on Paper no shadows, gradients, texture or blur.
+   Without it Paper is "living": texture, depth and gentle motion (theme/living.css), all of it off under reduced motion. */
+[data-still] *,
+[data-still] *::before,
+[data-still] *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+[data-theme='paper'][data-still] *,
+[data-theme='paper'][data-still] *::before,
+[data-theme='paper'][data-still] *::after {
   animation: none !important;
   transition: none !important;
   box-shadow: none !important;

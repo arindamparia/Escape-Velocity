@@ -1,0 +1,250 @@
+/* Living paper: the texture, depth, light and motion that Paper and the other themes get unless Still mode is on.
+   The plan behind it: docs/design-principles.md. Everything that moves is wrapped in prefers-reduced-motion: no-preference
+   and in html:not([data-still]); the texture is a static tile and never moves. */
+
+/* ================================================================ 1. Paper's type (still or living) */
+[data-theme='paper'] :is(h1, h2, h3, h4), [data-theme='paper'] .brand span {
+  font-family: var(--font-display);
+  font-variation-settings: 'SOFT' 100, 'WONK' 1;
+  font-weight: 560;
+  letter-spacing: -0.012em;
+}
+[data-theme='paper'][data-tone='night'] :is(h1, h2, h3, h4) { font-weight: 520; }
+/* your own words, set like a quotation */
+[data-theme='paper'] :is(.why__text, .grow-identity__text) {
+  font-family: var(--font-display); font-style: italic; font-variation-settings: 'SOFT' 100, 'WONK' 1; font-size: 1.06em;
+}
+
+/* ================================================================ 2. The material */
+@property --sun { syntax: '<number>'; inherits: true; initial-value: 0; }
+
+html:not([data-still])[data-theme='paper'] {
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.33 0 0 0 0 0.24 0 0 0 0 0.12 1.5 0 0 0 -0.5'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%2523n)'/%3E%3C/svg%3E");
+  --fibre: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='480'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012 .09' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.33 0 0 0 0 0.17 1.3 0 0 0 -0.5'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%2523n)'/%3E%3C/svg%3E");
+  --radius: 4px;
+  --line: color-mix(in srgb, var(--text) 38%, transparent);
+  --line-strong: var(--text);
+  /* a sheet resting on a desk: a lit top edge, a close shadow and a soft long one */
+  --shadow: 0 1px 0 rgb(255 252 240 / 0.7) inset, 0 1px 1px rgb(70 50 20 / 0.16), 0 12px 20px -14px rgb(70 50 20 / 0.42);
+}
+html:not([data-still])[data-theme='paper'][data-tone='night'] {
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.93 0 0 0 0 0.87 0 0 0 0 0.72 1.5 0 0 0 -0.55'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%2523n)'/%3E%3C/svg%3E");
+  --fibre: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='480'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012 .09' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.93 0 0 0 0 0.87 0 0 0 0 0.72 1.3 0 0 0 -0.55'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%2523n)'/%3E%3C/svg%3E");
+  --line: color-mix(in srgb, var(--text) 26%, transparent);
+  --line-strong: #a39b88;
+  --shadow: 0 1px 0 rgb(255 240 210 / 0.05) inset, 0 1px 1px rgb(0 0 0 / 0.5), 0 14px 24px -14px rgb(0 0 0 / 0.8);
+}
+
+/* the grain lies over desk and sheets alike, like the tooth of the paper; it never takes a click */
+html:not([data-still])[data-theme='paper'] body::after {
+  content: ''; position: fixed; inset: 0; z-index: 90; pointer-events: none;
+  background-image: var(--grain), var(--fibre); background-size: 220px 220px, 480px 480px;
+  opacity: 0.5;
+}
+html:not([data-still])[data-theme='paper'][data-tone='night'] body::after { opacity: 0.4; }
+@media print { body::after, html::before, .lamp, .flight { display: none !important; } }
+
+/* window light on the desk, by the real hour: peach at dawn, warm at midday, amber at dusk, none at night */
+html:not([data-still])[data-theme='paper']:not([data-tone])::before {
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(120% 90% at 0% 0%, rgb(var(--sun-rgb, 255 240 200) / var(--sun)) 0%, transparent 62%);
+}
+html[data-daypart='dawn'] { --sun-rgb: 255 205 160; --sun: 0.5; }
+html[data-daypart='day'] { --sun-rgb: 255 241 196; --sun: 0.55; }
+html[data-daypart='dusk'] { --sun-rgb: 255 183 112; --sun: 0.5; }
+html[data-daypart='night'] { --sun: 0; }
+
+/* controls keep a firm edge; the many hairlines around everything else are soft */
+html:not([data-still])[data-theme='paper'] :is(input, textarea, select, .btn, .iconbtn, .chip, .timerchip) { border-color: var(--line-strong); }
+html:not([data-still])[data-theme='paper'] .hero { box-shadow: var(--shadow); }
+html:not([data-still])[data-theme='paper'] .btn--primary { box-shadow: 0 2px 0 rgb(0 0 0 / 0.5); }
+html:not([data-still])[data-theme='paper'] .btn--primary:active { box-shadow: 0 0 0 rgb(0 0 0 / 0); }
+html:not([data-still])[data-theme='paper'] .toast { box-shadow: var(--shadow); }
+html:not([data-still])[data-theme='paper'] .timermenu__panel, html:not([data-still])[data-theme='paper'] .soundmenu__panel { box-shadow: var(--shadow); }
+/* a printed masthead: two thin rules instead of one heavy one */
+html:not([data-still])[data-theme='paper'] .slot-main > header {
+  border-bottom: 0; padding-bottom: 1.15rem;
+  background: linear-gradient(var(--line-strong), var(--line-strong)) left bottom / 100% 2px no-repeat, linear-gradient(var(--line-strong), var(--line-strong)) left calc(100% - 5px) / 100% 1px no-repeat;
+}
+
+/* ================================================================ 3. Lists are one sheet, not a stack of boxes (all themes but Still) */
+html:not([data-still]) :is(.tasks, .plist, .library-list) {
+  gap: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
+}
+html:not([data-still]) :is(.tasks > .task, .plist > li > .prow, .library-list .library-item) {
+  border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent;
+}
+html:not([data-still]) :is(.tasks > .task:last-child, .plist > li:last-child > .prow, .library-list > li:last-child .library-item) { border-bottom: 0; }
+html:not([data-still]) .tasks > .task[data-done='true'] { background: color-mix(in srgb, var(--text) 4%, transparent); }
+html:not([data-still]) .library-item:hover { background: var(--surface-2); }
+html:not([data-still]) .tasks > .task[data-focus='true'] { box-shadow: inset 4px 0 0 var(--accent); }
+
+/* ================================================================ 4. You are here: a highlighter stroke */
+html:not([data-still]) .nav a[aria-current='page'] {
+  box-shadow: none; border-color: transparent; border-radius: 3px;
+  background: linear-gradient(transparent 56%, var(--hl) 56%, var(--hl) 94%, transparent 94%) no-repeat left / 100% 100%;
+}
+html:not([data-still]) .tabbar a[aria-current='page'] { box-shadow: inset 0 3px 0 var(--accent); }
+
+/* ================================================================ 5. Cute and useful marks */
+.hero { position: relative; }
+.stamp {
+  position: absolute; top: 1.1rem; right: 1.3rem; transform: rotate(-9deg); transform-origin: center;
+  border: 3px solid var(--accent); outline: 1px solid var(--accent); outline-offset: -7px; border-radius: 4px; padding: 0.35rem 0.8rem;
+  color: var(--accent); text-align: center; text-transform: uppercase; letter-spacing: 0.16em; font-weight: 800; font-size: 0.78rem; line-height: 1.2;
+  opacity: 0.9; pointer-events: none;
+}
+.stamp b { display: block; font-size: 1.25rem; letter-spacing: 0.2em; }
+.hero:has(.stamp) h2 { padding-right: 7rem; }
+.pencil-loop {
+  position: absolute; inset: -4px -8px; width: calc(100% + 16px); height: calc(100% + 8px);
+  pointer-events: none; overflow: visible; color: var(--accent);
+}
+.pencil-loop path { stroke-dasharray: 1; stroke-dashoffset: 0; }
+.rocket { width: 1.6rem; height: auto; flex: none; overflow: visible; }
+.empty__rocket { width: 3rem; display: block; margin: 0 auto 0.5rem; color: var(--text-muted); transform: rotate(-14deg); }
+.flight { display: none; }
+.lamp { display: none; }
+
+/* reading focus: point at a paragraph and the rest of the page steps back a little (not in Still: dimming is poor on e-ink) */
+@media (hover: hover) {
+  html:not([data-still]):not([data-readfocus='off']) .prose:is(:has(> :hover), :has(> :focus-within)) > :not(:hover, :focus-within) { opacity: 0.55; }
+}
+
+/* ================================================================ 6. Motion (all of it opt-in: no-preference, and not in Still mode) */
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-still]) {
+    transition: --sun 4s var(--ease-in-out);
+  }
+
+  /* the page arrives: it settles into place, a little slower than it leaves (a new route builds a new page) */
+  html:not([data-still]) .page { animation: page-in var(--dur-large) var(--ease-out) both; }
+  @keyframes page-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* ticking a task: the pencil check draws itself, the row takes a highlighter wash, the line is struck in */
+  .task__check .tick path { stroke-dasharray: 1; stroke-dashoffset: 0; }
+  .task__check--pop .tick path { animation: tick-draw var(--dur-large) var(--ease-out) both; }
+  @keyframes tick-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+  html:not([data-still]) .task:has(.task__check--pop) { animation: row-mark 900ms var(--ease-out); }
+  @keyframes row-mark { from { background-color: var(--hl); } }
+  html:not([data-still]) .task:has(.task__check--pop) .task__text { animation: strike-in var(--dur-large) var(--ease-out); }
+  @keyframes strike-in { from { text-decoration-color: transparent; } }
+
+  /* hand-drawn wavy pencil underline on editorial link hovers */
+  html:not([data-still]) .prose a:not(.btn):hover,
+  html:not([data-still]) .why a:not(.btn):hover,
+  html:not([data-still]) .task__meta a:hover {
+    text-decoration: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='4' viewBox='0 0 20 4'%3E%3Cpath d='M0 2.5 Q 5 0.5, 10 2.5 T 20 2.5' fill='none' stroke='%239e4a3b' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: repeat-x;
+    background-position: left bottom;
+    background-size: 18px 4px;
+    animation: pencil-sketch 250ms var(--ease-out) both;
+  }
+  [data-tone='night'] html:not([data-still]) .prose a:not(.btn):hover,
+  [data-tone='night'] html:not([data-still]) .why a:not(.btn):hover,
+  [data-tone='night'] html:not([data-still]) .task__meta a:hover {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='4' viewBox='0 0 20 4'%3E%3Cpath d='M0 2.5 Q 5 0.5, 10 2.5 T 20 2.5' fill='none' stroke='%23d9caa8' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E");
+  }
+  @keyframes pencil-sketch {
+    from { background-size: 0 4px; }
+    to { background-size: 18px 4px; }
+  }
+
+  /* hand-drawn graphite pencil margin bracket on your why and identity statements */
+  html:not([data-still])[data-theme='paper'] :is(.why, .grow-identity) {
+    position: relative;
+  }
+  html:not([data-still])[data-theme='paper'] :is(.why, .grow-identity)::before {
+    content: ''; position: absolute; left: -0.65rem; top: 0.15rem; bottom: 0.15rem; width: 3px;
+    background: currentColor; opacity: 0.3; border-radius: 2px;
+    transform-origin: top;
+    animation: pencil-draw-down var(--dur-large) var(--ease-out) both;
+  }
+  @keyframes pencil-draw-down {
+    from { transform: scaleY(0); }
+    to { transform: scaleY(1); }
+  }
+
+  /* pencil loop doodle animation */
+  html:not([data-still]) .pencil-loop path {
+    animation: pencil-loop-draw 650ms var(--ease-out) both;
+  }
+  @keyframes pencil-loop-draw {
+    from { stroke-dashoffset: 1; }
+    to { stroke-dashoffset: 0; }
+  }
+
+  /* the stamp lands, with a tiny overshoot (follow-through) */
+  html:not([data-still]) .stamp { animation: stamp-in 560ms var(--ease-settle) 120ms both; }
+  @keyframes stamp-in { from { opacity: 0; transform: rotate(-9deg) scale(1.9); } 55% { opacity: 0.95; } to { opacity: 0.9; transform: rotate(-9deg) scale(1); } }
+
+  /* the week's bar fills like ink soaking in, with a rocket at its tip */
+  html:not([data-still]) .bar > i { transition: width 900ms var(--ease-out); }
+  html:not([data-still]) .weekbar { overflow: visible; }
+  html:not([data-still]) .weekbar > i { position: relative; }
+  html:not([data-still]) .weekbar > i::after {
+    content: ''; position: absolute; right: -0.55rem; top: 50%; width: 1.5rem; height: 0.95rem; transform: translateY(-50%) rotate(-6deg);
+    background: var(--text); -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 24'%3E%3Cpath d='M6 12C12 4 25 4 36 12 25 20 12 20 6 12ZM13 7 6 3l3.5 7ZM13 17 6 21l3.5-7Z'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 24'%3E%3Cpath d='M6 12C12 4 25 4 36 12 25 20 12 20 6 12ZM13 7 6 3l3.5 7ZM13 17 6 21l3.5-7Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+
+  /* the highlighter sweeps in when a nav item becomes current */
+  html:not([data-still]) .nav a[aria-current='page'] { animation: marker var(--dur-large) var(--ease-out) both; }
+  @keyframes marker { from { background-size: 0 100%; } to { background-size: 100% 100%; } }
+
+  /* the brand star turns when you point at it */
+  html:not([data-still]) .brand:hover .i { animation: star-turn 700ms var(--ease-settle); }
+  @keyframes star-turn { to { transform: rotate(360deg); } }
+
+  /* buttons press like keys */
+  html:not([data-still]) .btn:active { transform: translateY(2px); }
+
+  /* reading focus eases */
+  html:not([data-still]) .prose > * { transition: opacity var(--dur-small) var(--ease-out); }
+
+  /* dialogs and sheets slide in like paper across a desk, and leave a little faster */
+  html:not([data-still]) dialog {
+    opacity: 1; transform: none;
+    transition: opacity var(--dur-small) var(--ease-out), transform var(--dur-small) var(--ease-out), overlay var(--dur-exit) allow-discrete, display var(--dur-exit) allow-discrete;
+  }
+  html:not([data-still]) dialog:not([open]) { opacity: 0; transform: translateY(10px); }
+  html:not([data-still]) dialog.sheet:not([open]) { transform: translateX(28px); }
+  @starting-style {
+    html:not([data-still]) dialog[open] { opacity: 0; transform: translateY(14px); }
+    html:not([data-still]) dialog.sheet[open] { transform: translateX(34px); }
+  }
+  html:not([data-still]) dialog::backdrop { transition: opacity var(--dur-small) var(--ease-out), overlay var(--dur-exit) allow-discrete, display var(--dur-exit) allow-discrete; opacity: 1; }
+  html:not([data-still]) dialog:not([open])::backdrop { opacity: 0; }
+  @starting-style { html:not([data-still]) dialog[open]::backdrop { opacity: 0; } }
+
+  /* a soft lamp follows the pointer in Paper night (one element, moved with transform only) */
+  html:not([data-still])[data-tone='night'] .lamp {
+    display: block; position: fixed; left: 0; top: 0; width: 64vmax; height: 64vmax; margin: -32vmax 0 0 -32vmax; border-radius: 50%;
+    pointer-events: none; z-index: 85; will-change: transform; opacity: 0; transition: opacity var(--dur-large) var(--ease-out);
+    background: radial-gradient(closest-side, rgb(255 205 130 / 0.1), transparent);
+  }
+  html:not([data-still])[data-tone='night'] .lamp[data-on='1'] { opacity: 1; }
+
+  /* the rocket's flame flickers; the 404 rocket drifts */
+  .rocket__flame { transform-box: fill-box; transform-origin: right center; }
+  html:not([data-still]) .flight__rocket .rocket__flame, html:not([data-still]) .empty__rocket .rocket__flame { animation: flicker 180ms steps(2) infinite alternate; }
+  @keyframes flicker { to { transform: scaleX(0.55); } }
+  html:not([data-still]) .empty__rocket { animation: drift 5s var(--ease-in-out) infinite alternate; }
+  @keyframes drift { from { transform: rotate(-14deg) translateY(0); } to { transform: rotate(-9deg) translateY(-6px); } }
+
+  /* where the browser can tie an animation to scroll: a line and a rocket that travel as you read down the page,
+     and cards that settle onto the desk as they come into view. Without that support, none of it shows. */
+  @supports (animation-timeline: scroll()) {
+    html:not([data-still]) .flight { display: block; position: absolute; left: 0; right: 0; bottom: -1px; height: 0; pointer-events: none; }
+    .flight__line { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--accent); transform-origin: left; transform: scaleX(0); animation: flight-line linear both; animation-timeline: scroll(root); }
+    .flight__rocket { position: absolute; left: 0; bottom: -7px; width: 1.5rem; color: var(--text); animation: flight-go linear both; animation-timeline: scroll(root); }
+    @keyframes flight-line { to { transform: scaleX(1); } }
+    @keyframes flight-go { to { transform: translateX(calc(100vw - 2.4rem)); } }
+  }
+  @supports (animation-timeline: view()) {
+    html:not([data-still]) :is(.slot-main, .slot-aside) > :not(header, .page) {
+      animation: settle linear both; animation-timeline: view(); animation-range: entry 0% entry 160px;
+    }
+    @keyframes settle { from { opacity: 0.001; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  }
+}

@@ -118,7 +118,7 @@ test.describe('Growth', () => {
   test('a whole day is done from the session page: ideas, a card, a scenario, a thing to try, a habit', async ({ page, api }) => {
     await api.onboard()
     // the first five ideas were learned last week, so the habit loop is known and their cards are due
-    await api.send(['ah-01', 'ah-02', 'ah-03', 'ah-04', 'ah-05', 'ah-06', 'ah-07', 'ah-08'].map((id) => api.op('growth.set', { key: `learned:${id}`, value: 'new', on: '2026-11-02' })))
+    await api.send(['ah-01', 'ah-02', 'ah-03', 'ah-04', 'ah-05', 'ah-06', 'ah-07', 'ah-08', 'ah-16'].map((id) => api.op('growth.set', { key: `learned:${id}`, value: 'new', on: '2026-11-02' })))
     await openApp(page, '/growth', { at: TUE })
     // 1. two new ideas
     for (const id of ['ah-09', 'hf-01']) {
@@ -138,7 +138,7 @@ test.describe('Growth', () => {
     // 4. the thing to try, with how it went
     const t = page.locator('#try')
     await t.locator('textarea').fill('Moved the phone out of the room. Did two problems.')
-    await t.getByRole('checkbox', { name: 'I tried it' }).check()
+    await t.getByRole('checkbox', { name: 'I tried it' }).click()
     // 5. the first habit, built in place
     const h = page.locator('#habits-today')
     await h.getByLabel('The habit').fill('Morning medium')

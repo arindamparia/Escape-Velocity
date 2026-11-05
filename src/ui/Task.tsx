@@ -8,6 +8,7 @@ import { onLightDay } from '../lib/today'
 import { Html } from './Html'
 import { Icon } from './Icon'
 import { BossHow } from './BossHow'
+import { Disclosure } from './Disclosure'
 import { CapstoneLinks } from './CapstoneLinks'
 import { StudyPanel } from './Resources'
 import { PRESETS, startTimer } from '../tools/timer'
@@ -99,7 +100,7 @@ export function TaskCheck({ task }: { task: PlanTask }) {
   const was = useRef(done)
   const [pop, setPop] = useState(false)
   useEffect(() => {
-    if (done && !was.current) { setPop(true); const t = setTimeout(() => setPop(false), 450); was.current = done; return () => clearTimeout(t) }
+    if (done && !was.current) { setPop(true); const t = setTimeout(() => setPop(false), 700); was.current = done; return () => clearTimeout(t) }
     was.current = done
   }, [done])
   return (
@@ -113,7 +114,8 @@ export function TaskCheck({ task }: { task: PlanTask }) {
       aria-label={locked ? `${taskLabel(task.id)}: done by your solved problems` : `${done ? 'Untick' : 'Tick'} ${taskLabel(task.id)}`}
       onClick={() => toggleTask(task.id)}
     >
-      <Icon name="check" />
+      {/* drawn inline (not a <use>) so the pencil stroke can draw itself when you tick */}
+      <svg class="i tick" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5" pathLength="1" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
     </button>
   )
 }
@@ -130,7 +132,7 @@ function Related({ task }: { task: PlanTask }) {
   const links: [string, string][] = []
   if (task.gap) links.push([`Gap check ${task.gap}`, `/library?tab=gaps#${task.gap}`])
   if (task.type === 'lld') links.push(['Machine-coding list', '/library?tab=machine'])
-  if (task.type === 'boss') links.push(['Solved problems', '/progress/problems'])
+  if (task.type === 'boss') links.push(['How a boss problem works', '/weeks/dsa#boss'], ['Solved problems', '/progress/problems'])
   if (task.type === 'maths') links.push(['Formula sheet', '/study/formulas'])
   if (task.type === 'paper') links.push(['All papers', '/library?tab=papers'])
   if (task.type === 'mock') links.push(['Interview prep', '/weeks/interview'])
@@ -141,23 +143,22 @@ function Related({ task }: { task: PlanTask }) {
 }
 
 /**
- * One task. On Today it is `compact`: the tick, what it is, two lines of its text, ONE small action, and "Details" for everything
- * else (links, study material, the other actions). The next-up card above already has the full version of the task to do now.
- * On the week page it is the full row. `plain` shows the full text even when the task was planned for a light day (a task
- * that is waiting from a festival day is no longer being done on one).
+ * One task: the tick, what it is, its full text, what connects to it, its study links, and ONE button for what to do.
+ * Other actions are quiet text buttons beside it. Nothing about the task is hidden behind a click.
+ * `compact` is the dense row for a list of tasks that are only waiting: the tick, the label and the text, nothing more.
+ * `plain` shows the full text even when the task was planned for a light day (a task that is waiting from a festival day
+ * is no longer being done on one).
  */
 export function TaskRow({ task, chunk, focused = false, actions = true, inWeek = false, compact = false, plain = false }: { task: PlanTask; chunk: WeekChunk | null; focused?: boolean; actions?: boolean; /** link the label to the task in its week (on Today; the week page is already there) */ inWeek?: boolean; compact?: boolean; plain?: boolean }) {
-  const [open, setOpen] = useState(false)
   const done = engine.doneSet.value.has(task.id)
   const entry = chunk?.tasks[task.id]
   const list = actions && !done ? actionsFor(task, chunk) : []
   const primary = list.find((a) => a.primary) ?? list[0]
+  const others = list.filter((a) => a !== primary)
   const pick = task.type === 'design2' ? pickedDesign(task.id) : undefined
   const lightHere = !plain && !!task.hasLight && onLightDay(task)
-  const folded = compact && !open
-  const detailsId = `d-${task.id}`
   return (
-    <li class={`task${task.type === 'rest' ? ' task--rest' : ''}${folded ? ' task--compact' : ''}`} data-done={done} data-focus={focused} data-task={task.id}>
+    <li class={`task${task.type === 'rest' ? ' task--rest' : ''}${compact ? ' task--compact' : ''}`} data-done={done} data-focus={focused} data-task={task.id}>
       <TaskCheck task={task} />
       <div>
         <div class="task__meta">
@@ -168,41 +169,29 @@ export function TaskRow({ task, chunk, focused = false, actions = true, inWeek =
           <span class="task__pts" title="points">+{task.points}</span>
         </div>
         {entry && lightHere && entry.light ? (
-          folded ? (
+          <>
             <div class="task__light"><span class="chip chip--accent"><Icon name="moon" /> Light version</span> <Html class="task__text" html={entry.light} inline /></div>
-          ) : (
-            <>
-              <div class="task__light"><span class="chip chip--accent"><Icon name="moon" /> Light version</span> <Html class="task__text" html={entry.light} inline /></div>
-              <details class="task__full"><summary class="small">Full version</summary><Html class="task__text small" html={entry.html} inline /></details>
-            </>
-          )
+            {compact ? null : <Disclosure class="task__full" title="The full version"><Html class="task__text small" html={entry.html} inline /></Disclosure>}
+          </>
         ) : entry ? <Html class="task__text" html={entry.html} inline /> : <span class="task__text muted">…</span>}
         <DsaProgress task={task} locked={engine.autoDoneSet.value.has(task.id)} />
-        {!folded ? (
-          <div id={detailsId}>
+        {compact ? null : (
+          <>
             {task.type === 'boss' ? <BossHow /> : null}
             <Related task={task} />
             {task.type === 'capstone' && entry ? <CapstoneLinks taskId={task.id} text={entry.text} /> : null}
             <StudyPanel items={chunk?.resources?.[task.id]} design={task.type === 'design' || task.type === 'design2'} />
             {pick ? <div class="small muted">Your pick: <strong>{chunk?.designs[pick]?.name ?? pick}</strong></div> : null}
-            {list.length ? (
+            {primary ? (
               <div class="task__actions">
-                {list.map((a) => (
-                  <button type="button" key={a.label} class={`btn btn--small${a.primary ? ' btn--primary' : ''}`} onClick={a.run}>
-                    {a.label}
-                  </button>
+                <button type="button" class={`btn btn--small${primary.primary ? ' btn--primary' : ''}`} onClick={primary.run}>{primary.label}</button>
+                {others.map((a) => (
+                  <button type="button" key={a.label} class={task.type === 'design2' ? `btn btn--small${a.primary ? ' btn--primary' : ''}` : 'btn btn--link small'} onClick={a.run}>{a.label}</button>
                 ))}
               </div>
             ) : null}
-          </div>
-        ) : null}
-        {compact ? (
-          <div class="task__actions task__actions--compact">
-            {folded && primary && task.type !== 'design2' ? <button type="button" class={`btn btn--small${primary.primary ? ' btn--primary' : ''}`} onClick={primary.run}>{primary.label}</button> : null}
-            <button type="button" class="task__more" aria-expanded={open} aria-controls={detailsId} onClick={() => setOpen(!open)}>{open ? 'Less' : 'Details'}</button>
-          </div>
-        ) : null}
-        {pick && folded ? <div class="small muted">Your pick: <strong>{chunk?.designs[pick]?.name ?? pick}</strong></div> : null}
+          </>
+        )}
       </div>
     </li>
   )

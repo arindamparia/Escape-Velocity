@@ -35,7 +35,10 @@ test.describe('Only have a little time?', () => {
     await api.activeOn('2026-11-13') // so it is not the welcome-back screen
     await openApp(page, '/', { at: kolkata('2026-11-14T10:00:00') }) // Saturday of week 2: the design, the LLD and more are open
     const box = page.getByTestId('hour-box')
-    await box.locator('summary').click()
+    const summary = box.locator('summary')
+    if ((await summary.count()) > 0) {
+      await summary.click()
+    }
     await box.getByRole('button', { name: '1 h', exact: true }).click()
     const items = box.locator('ul li')
     expect(await items.count()).toBeGreaterThan(0)

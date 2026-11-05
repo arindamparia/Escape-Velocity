@@ -14,14 +14,13 @@ import { PRESETS, startTimer, timer } from '../tools/timer'
 import { lazyPage } from '../ui/lazyPage'
 import { useNow, useTitle, useWeekChunk } from '../ui/hooks'
 import { Html } from '../ui/Html'
+import { Stamp } from '../ui/Doodles'
 import { Icon } from '../ui/Icon'
-import { BossHow } from '../ui/BossHow'
 import { CapstoneLinks } from '../ui/CapstoneLinks'
 import { HourBox, PlanLine, RestNote, StatusLine, WeekStart } from '../ui/Rhythm'
 import { SoundLine } from '../ui/SoundLine'
 import { CloseDay, CueLines, GrowthFold } from '../ui/GrowthToday'
 import { OptionalBox } from '../ui/Optional'
-import { setShowAll, showAll } from '../lib/todayView'
 import { momentum } from '../lib/rhythm'
 import { StudyPanel } from '../ui/Resources'
 import { actionsFor, labelOf, TaskRow, TYPE_LABEL } from '../ui/Task'
@@ -81,20 +80,18 @@ function Tomorrow({ info }: { info: ReturnType<typeof dayInfo> }) {
 }
 
 /** Tasks from earlier days that are still open. Quiet by design: one line until you open it, then a few, most valuable first. */
-function Waiting({ week, dow, done, open }: { week: number; dow: number; done: ReadonlySet<string>; open: boolean }) {
+function Waiting({ week, dow, done }: { week: number; dow: number; done: ReadonlySet<string> }) {
   const list = waitingFor(week, dow, done)
   const current = useWeekChunk(week)
   const previous = useWeekChunk(Math.max(1, week - 1))
   if (!list.length) return null
   const shown = list.slice(0, 3)
   return (
-    <section class="card waiting" aria-label="Waiting for you">
-      <details open={open}>
-        <summary>Waiting for you ({list.length}) <span class="small muted">· from earlier days. Nothing is lost.</span></summary>
-        <p class="small muted" style="margin:0.6rem 0 0.7rem">Take one when there is room, never all of it.</p>
-        <ul class="tasks">{shown.map((t) => <TaskRow key={t.id} task={t} chunk={t.week === week ? current : previous} inWeek compact plain actions={false} />)}</ul>
-        {list.length > shown.length ? <p class="small" style="margin:0.6rem 0 0"><a href={`/weeks/${week}`}>{list.length - shown.length} more, in the weeks</a></p> : null}
-      </details>
+    <section class="secblock waiting" aria-label="Waiting for you">
+      <h2 class="secblock__title">Waiting for you <span class="muted small">{list.length} from earlier days</span></h2>
+      <p class="small muted">Take one when there is room, never all of it. Nothing is lost.</p>
+      <ul class="tasks">{shown.map((t) => <TaskRow key={t.id} task={t} chunk={t.week === week ? current : previous} inWeek compact plain actions={false} />)}</ul>
+      {list.length > shown.length ? <p class="small m0"><a href={`/weeks/${week}`}>{list.length - shown.length} more, in the weeks</a></p> : null}
     </section>
   )
 }
@@ -222,7 +219,7 @@ export default function Today() {
         {next.type === 'dsa' && chunk ? (
           <p class="small muted">This week’s focus: <strong>{chunk.dsaFocus}</strong>{suggestion ? <> · try one reported problem: <strong>{suggestion}</strong></> : null}</p>
         ) : null}
-        {next.type === 'boss' ? <><p class="small muted">The first hour has no hints.</p><BossHow /></> : null}
+        {next.type === 'boss' ? <p class="small muted">The first hour has no hints. <a href="/weeks/dsa#boss">How a boss problem works</a></p> : null}
         {design && next.type === 'design' ? <p class="small"><strong>Derive it first:</strong> {design.derive}</p> : null}
         {next.type === 'capstone' && entry ? <CapstoneLinks taskId={next.id} text={entry.text} /> : null}
         <StudyPanel items={chunk?.resources?.[next.id]} design={next.type === 'design' || next.type === 'design2'} />
@@ -248,6 +245,7 @@ export default function Today() {
     hero = (
       <section class="card hero">
         <p class="eyebrow">{info.block === 'morning' ? 'Morning' : info.block === 'night' ? 'Night' : 'Today'}</p>
+        <Stamp top="Today" bottom="done" />
         <h2>That’s today.</h2>
         <p class="hero__text">Rest is training. {waitingNow.length ? 'If you still have energy, one thing is waiting below.' : 'Nothing is waiting.'}</p>
         <div class="hero__actions"><a class="btn btn--big" href={`/weeks/${info.week}`}>See week {info.week}</a></div>
@@ -255,13 +253,10 @@ export default function Today() {
     )
   }
 
-  const full = showAll.value
   const dayList = todays.filter((t) => t.type !== 'rest' || !light)
   // the extras (a Friday paper, the bonus equation) have a folded section of their own; the list is the work of the day
   const mainList = dayList.filter((t) => !t.optional)
   const weeklyCore = weekly.filter((t) => !t.optional)
-  // the any-day list stays open while something in it is still undone (the weekly DSA is already the morning's next action)
-  const weeklyOpen = coreTasks(weekly).some((t) => !done.has(t.id) && t.type !== 'dsa')
   // a look ahead, so a Friday paper, a Saturday cold attempt or a Sunday mock never arrives as a surprise
   const tomorrow = info.phase === 'during' ? dayInfo(addDays(date, 1)) : null
   // the next-up card already offers this task's buttons, so its row below is only the tick and the text
@@ -296,27 +291,26 @@ export default function Today() {
               <button type="button" class="btn btn--link" onClick={() => navigate(`/weeks/${info.week}`)}>See this week’s plan</button>
             ) : mainList.length ? (
               <ul class="tasks">
-                {mainList.map((t) => <TaskRow key={t.id} task={t} chunk={chunk} focused={focusId.value === t.id} actions={!(heroOffersTask && t.id === next?.id)} inWeek compact={!full} />)}
+                {mainList.map((t) => <TaskRow key={t.id} task={t} chunk={chunk} focused={focusId.value === t.id} actions={!(heroOffersTask && t.id === next?.id)} inWeek />)}
               </ul>
             ) : (
               <div class="empty">{dayList.length ? 'Nothing else is planned for today.' : `Nothing is scheduled for ${info.dayName}.`} {weeklyCore.length ? 'This week’s open tasks are below.' : ''}</div>
             )}
             {!welcomeBack && weeklyCore.length ? (
-              <details style="margin-top:1rem" open={full || weeklyOpen}>
-                <summary>This week, any day ({coreTasks(weekly).filter((t) => done.has(t.id)).length} of {coreTasks(weekly).length} done)</summary>
-                <ul class="tasks" style="margin-top:0.6rem">
-                  {weeklyCore.map((t) => <TaskRow key={t.id} task={t} chunk={chunk} focused={focusId.value === t.id} inWeek compact={!full} />)}
+              <div class="secblock">
+                <h3 class="secblock__title">This week, any day <span class="muted small">{coreTasks(weekly).filter((t) => done.has(t.id)).length} of {coreTasks(weekly).length} done</span></h3>
+                <ul class="tasks">
+                  {weeklyCore.map((t) => <TaskRow key={t.id} task={t} chunk={chunk} focused={focusId.value === t.id} inWeek />)}
                 </ul>
-              </details>
+              </div>
             ) : null}
           </section>
         ) : null}
-        {info.phase === 'during' && !welcomeBack ? <OptionalBox week={info.week} dow={info.dow} chunk={chunk} open={full} /> : null}
-        {info.phase === 'during' && !light && !welcomeBack ? <Waiting week={info.week} dow={info.dow} done={done} open={full || (!mainList.some((t) => !done.has(t.id)) && !(next && heroOffersTask))} /> : null}
-        {info.phase === 'during' && !welcomeBack ? <GrowthFold small={!!light} open={full} /> : null}
-        {info.phase === 'during' && !welcomeBack && (info.block === 'night' || (mainList.length > 0 && mainList.every((t) => done.has(t.id)))) ? <CloseDay open={full} /> : null}
+        {info.phase === 'during' && !welcomeBack ? <OptionalBox week={info.week} dow={info.dow} chunk={chunk} /> : null}
+        {info.phase === 'during' && !light && !welcomeBack ? <Waiting week={info.week} dow={info.dow} done={done} /> : null}
+        {info.phase === 'during' && !welcomeBack ? <GrowthFold small={!!light} /> : null}
+        {info.phase === 'during' && !welcomeBack && (info.block === 'night' || (mainList.length > 0 && mainList.every((t) => done.has(t.id)))) ? <CloseDay /> : null}
         {tomorrow && tomorrow.phase === 'during' ? <Tomorrow info={tomorrow} /> : null}
-        {info.phase === 'during' ? <p class="small muted m0"><button type="button" class="btn btn--link small" aria-pressed={full} onClick={() => setShowAll(!full)}>{full ? 'Back to the calm view' : 'Show everything'}</button> <span>{full ? 'Every task is open, as before.' : 'Tasks are short lines; extras and what is waiting are folded.'}</span></p> : null}
       </div>
 
       <div class="slot-aside">

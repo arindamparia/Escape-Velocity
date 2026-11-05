@@ -6,6 +6,7 @@ import { today } from '../lib/clock'
 import { dayInfo } from '../lib/today'
 import { navigate } from '../lib/nav'
 import { TIER_LABEL, tierOf, type Tier } from '../lib/priority'
+import { Disclosure } from '../ui/Disclosure'
 import { Html } from '../ui/Html'
 import { usePage, useTitle } from '../ui/hooks'
 import { StudyLinks } from '../ui/StudyLinks'
@@ -35,16 +36,15 @@ function FilterPanel({ groups, f, set }: { groups: { title: string; designs: Des
   // open beside the list on a wide screen; closed on a phone, where it would fill the first screen and push the list away
   const [open] = useState(() => matchMedia('(min-width: 900px)').matches || Object.values(f).some(Boolean))
   return (
-    <details class="card" open={open}>
-      <summary>Filters</summary>
-      <div class="filters" style="margin-top:0.8rem">
+    <Disclosure class="card" open={open} title="Filters" hint={Object.values(f).some(Boolean) ? 'on' : undefined}>
+      <div class="filters">
         <label>Search<input type="search" value={f.q} placeholder="idempotency, geo, fan-out…" onInput={(e) => set({ q: (e.target as HTMLInputElement).value })} /></label>
         <Chips label="Lesson" options={groups.map((g) => [g.title, g.title.split(':')[0]] as [string, string])} value={f.group} onChange={(v) => set({ group: v })} />
         <Chips label="Priority" options={(Object.keys(TIER_LABEL) as Tier[]).map((t) => [t, TIER_LABEL[t]] as [Tier, string])} value={f.tier as Tier | ''} onChange={(v) => set({ tier: v })} />
         <Chips label="Access" options={[['free', 'Free'], ['premium', 'Premium'], ['derive', 'Derive yourself']]} value={f.access} onChange={(v) => set({ access: v })} />
         <Chips label="Status" options={Object.entries(STATUS_LABEL) as [string, string][]} value={f.st} onChange={(v) => set({ st: v })} />
       </div>
-    </details>
+    </Disclosure>
   )
 }
 

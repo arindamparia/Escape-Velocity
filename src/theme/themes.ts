@@ -41,3 +41,25 @@ export function applyTheme(pref: ThemePref): void {
 export function initThemes(): void {
   media?.addEventListener('change', () => { if (themePref.peek() === 'system') applyTheme('system') })
 }
+
+/**
+ * Still mode: no motion, no texture, no shadow (Paper's strict e-ink rules). A device's own choice, like the theme:
+ * localStorage only, applied before first paint by theme-init.js. Reduced motion also stills the motion on its own.
+ */
+export const stillPref = signal<boolean>((() => { try { return localStorage.getItem('ev:still') === '1' } catch { return false } })())
+
+export function setStill(on: boolean): void {
+  document.documentElement.toggleAttribute('data-still', on)
+  try { localStorage.setItem('ev:still', on ? '1' : '0') } catch { /* storage blocked */ }
+  stillPref.value = on
+}
+
+/** Reading focus: while you point at a paragraph, the others on the page dim a little. On unless you turn it off. */
+export const readFocusPref = signal<boolean>((() => { try { return localStorage.getItem('ev:readfocus') !== '0' } catch { return true } })())
+
+export function setReadFocus(on: boolean): void {
+  if (on) document.documentElement.removeAttribute('data-readfocus')
+  else document.documentElement.setAttribute('data-readfocus', 'off')
+  try { localStorage.setItem('ev:readfocus', on ? '1' : '0') } catch { /* storage blocked */ }
+  readFocusPref.value = on
+}

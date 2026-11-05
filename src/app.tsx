@@ -12,6 +12,7 @@ import { actionsFor } from './ui/Task'
 import { Boundary } from './ui/Boundary'
 import { lazyPage } from './ui/lazyPage'
 import { Icon } from './ui/Icon'
+import { Rocket } from './ui/Doodles'
 import { TimerChip } from './tools/TimerChip'
 
 const Overlays = lazy(() => import('./ui/Overlays'))
@@ -49,19 +50,23 @@ function SyncDot() {
 function TopBar() {
   const { path } = useLocation()
   return (
-    <header class="topbar">
-      <a class="brand" href="/" aria-label="Escape Velocity, Today"><Icon name="orbit" /><span>Escape Velocity</span></a>
-      <nav class="nav" aria-label="Main">
-        {NAV.map((n) => <a key={n.href} href={n.href} aria-current={n.match(path) ? 'page' : undefined}>{n.label}</a>)}
-      </nav>
-      <span class="spacer" />
-      <SyncDot />
-      <TimerChip />
-      <button type="button" class="iconbtn" aria-label="Command palette (⌘K)" title="Command palette (⌘K)" onClick={() => openOverlay({ kind: 'palette' })}>
-        <Icon name="search" /><span class="btn-label">Search</span><kbd class="noprint">⌘K</kbd>
-      </button>
-      <a class="iconbtn" href="/settings" aria-label="Settings" aria-current={path === '/settings' ? 'page' : undefined}><Icon name="sliders" /><span class="btn-label">Settings</span></a>
-    </header>
+    <>
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="Escape Velocity, Today"><Icon name="orbit" /><span>Escape Velocity</span></a>
+        <nav class="nav" aria-label="Main">
+          {NAV.map((n) => <a key={n.href} href={n.href} aria-current={n.match(path) ? 'page' : undefined}>{n.label}</a>)}
+        </nav>
+        <span class="spacer" />
+        <SyncDot />
+        <TimerChip />
+        <button type="button" class="iconbtn" aria-label="Command palette (⌘K)" title="Command palette (⌘K)" onClick={() => openOverlay({ kind: 'palette' })}>
+          <Icon name="search" /><span class="btn-label">Search</span><kbd class="noprint">⌘K</kbd>
+        </button>
+        <a class="iconbtn" href="/settings" aria-label="Settings" aria-current={path === '/settings' ? 'page' : undefined}><Icon name="sliders" /><span class="btn-label">Settings</span></a>
+      </header>
+      {/* a thin line that fills as you read down a page, with a rocket at its tip (CSS scroll timeline; nothing without support) */}
+      <div class="flight" aria-hidden="true"><span class="flight__line" /><Rocket class="flight__rocket" /></div>
+    </>
   )
 }
 
@@ -187,6 +192,7 @@ function Shell() {
       <footer class="sitefoot noprint">
         <a href="/progress/problems">Solved problems</a><a href="/guide">How this works</a><a href="/library?tab=resources">Resources and sources</a><a href="/settings">Settings</a>
         <button type="button" class="btn btn--link" onClick={() => openOverlay({ kind: 'shortcuts' })}>Keyboard shortcuts</button>
+        <span class="sitefoot__colophon muted small">Set in Fraunces & Literata · Made for one person.</span>
       </footer>
       <TabBar />
       {overlay.value || needsOnboarding.value ? <ErrorBoundary onError={(e) => console.error(e)}><Overlays /></ErrorBoundary> : null}
@@ -197,7 +203,7 @@ function Shell() {
 
 function NotFound() {
   return (
-    <div class="page"><div class="slot-main stack"><h1>Page not found</h1><div class="empty">That page doesn’t exist. <a href="/">Back to Today</a></div></div></div>
+    <div class="page"><div class="slot-main stack"><h1>Page not found</h1><div class="empty"><Rocket class="empty__rocket" /><p>That page doesn’t exist. <a href="/">Back to Today</a></p></div></div></div>
   )
 }
 

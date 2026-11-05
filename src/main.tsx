@@ -1,12 +1,14 @@
 import { render } from 'preact'
 import { App } from './app'
 import { engine, sync, whyNote } from './lib/app'
+import { initAmbient } from './lib/ambient'
 import { startClock } from './lib/clock'
 import { kolkataToday } from './lib/dates'
 import { preloadToday } from './pages/Today'
 import { prefetchFor } from './lib/plan'
 import './theme/tokens.css'
 import './theme/app.css'
+import './theme/living.css'
 import { initThemes } from './theme/themes'
 import { setChimeSource } from './tools/timer'
 import { chimeOn } from './lib/app'
@@ -43,6 +45,7 @@ async function boot() {
   render(<App />, document.getElementById('app')!)
   performance.mark('ev:first-render')
   startClock()
+  initAmbient()
   const idle = (cb: () => void) => ('requestIdleCallback' in window ? window.requestIdleCallback(cb) : setTimeout(cb, 200))
   idle(() => void engine.recheckOutbox())
   removeOldServiceWorker()

@@ -25,8 +25,8 @@ test.describe('Today leaves nothing to chance', () => {
     await api.onboard()
     await api.activeOn('2026-12-08'); await api.activeOn('2026-12-09')
     await openApp(page, '/', { at: kolkata('2026-12-09T10:00:00') }) // week 6, a Wednesday: the AI-fluency rep is an any-day task
-    const anyDay = page.locator('details', { hasText: 'This week, any day' })
-    await expect(anyDay).toHaveAttribute('open', '')
+    const anyDay = page.locator('.secblock', { hasText: 'This week, any day' })
+    await expect(anyDay).toBeVisible()
     const tomorrow = page.getByTestId('tomorrow')
     await expect(tomorrow).toContainText('Tomorrow, Thursday')
     await expect(tomorrow).toContainText('Second design')
@@ -114,7 +114,7 @@ test.describe('light days keep going, and a missed day waits for you', () => {
     const w = page.getByRole('region', { name: 'Waiting for you' })
     await expect(w).toBeVisible()
     await expect(w).toContainText('Nothing is lost') // one line until you open it
-    await w.locator('summary').click()
+    if (await w.locator('summary').count()) await w.locator('summary').click()
     await expect(w.locator('[data-task]')).toHaveCount(3) // a few, never the whole list
     await expect(w.locator('[data-task="w01-05"]')).toBeVisible() // Tuesday's Numbers to Know
     await w.locator('[data-task="w01-05"] .task__check').click()

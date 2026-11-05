@@ -28,7 +28,7 @@ export default function Mindset() {
         )}
       </div>
       <div class="slot-aside">
-        {page ? <section class="card"><details id="why-plan"><summary>Why this plan</summary><div style="margin-top:0.8rem"><Html html={page.whyPlanHtml} class="prose small" /></div></details></section> : null}
+        {page ? <section class="card" id="why-plan" aria-label="Why this plan"><h2>Why this plan</h2><Html html={page.whyPlanHtml} class="prose small" /></section> : null}
       </div>
     </div>
   )

@@ -12,6 +12,7 @@ import { Html } from './Html'
 import { NoteEditor } from './NoteEditor'
 import { SketchPeek } from './SketchView'
 import { ThemePicker } from './ThemePicker'
+import { Disclosure } from './Disclosure'
 
 const DesignSheet = lazy(() => import('../pages/DesignSheet'))
 
@@ -167,10 +168,7 @@ function Onboarding() {
         {step === 0 ? (
           <>
             <p>Thirteen weeks, about 15 hours a week, ending with you sitting SDE-2 backend interviews at Indian fintech companies. Each day, Today shows one next action; the rest of the app is there when you want it.</p>
-            <details>
-              <summary>Why this plan, and what the interview loops test</summary>
-              <div style="margin-top:0.7rem">{page ? <Html html={page.whyPlanHtml} /> : <div class="skeleton" />}</div>
-            </details>
+            <Disclosure title="Why this plan, and what the interview loops test">{page ? <Html html={page.whyPlanHtml} /> : <div class="skeleton" />}</Disclosure>
           </>
         ) : null}
         {step === 1 ? (

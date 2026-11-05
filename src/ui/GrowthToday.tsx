@@ -8,6 +8,7 @@ import { addDays, type DayBlock } from '../lib/dates'
 import { anchorFor, blockFor, coachWeek, lastNight, sessionFor, tomorrowRef, votesBetween } from '../lib/growth'
 import { plan } from '../lib/plan'
 import { algotracker } from '../lib/solved'
+import { Disclosure } from './Disclosure'
 import { Habits } from './GrowthParts'
 import { NoteEditor } from './NoteEditor'
 import { usePage } from './hooks'
@@ -27,11 +28,10 @@ export function CueLines({ type, block }: { type: TaskType; block: DayBlock }) {
     <div class="small muted hero__cue" data-testid="cue-lines">
       {night ? <p class="m0" data-testid="last-night"><strong>Last night you wrote:</strong> {night}</p> : null}
       {start || anchor.cue ? (
-        <details class="hero__cue-more">
-          <summary>Can’t face it? Start with two minutes</summary>
+        <Disclosure class="hero__cue-more" title="Can’t face it? Start with two minutes">
           {start ? <p class="m0" data-testid="two-minute"><strong>Two-minute start:</strong> {start}</p> : null}
           {anchor.cue ? <p class="m0"><strong>Your cue:</strong> {anchor.cue} <a href="/growth/habits#anchors">{anchor.mine ? 'Edit' : 'Make it yours'}</a></p> : null}
-        </details>
+        </Disclosure>
       ) : null}
     </div>
   )
@@ -51,8 +51,10 @@ export function GrowthFold({ small, open = false }: { small: boolean; open?: boo
   const parts = [fresh.length ? plural(fresh.length, 'idea') : '', s.cards.length ? plural(s.cards.length, 'card') : '', s.scenario && !state.growth?.some((r) => r.key === `scenario:${s.scenario!.id}`) ? '1 scenario' : ''].filter(Boolean)
   return (
     <section class="card waiting" aria-label="Growth today" data-testid="growth-fold">
-      <details open={open}>
-        <summary>Growth today {parts.length ? `(${parts.join(', ')})` : '(done)'} <span class="small muted">· {s.minutes ? `about ${s.minutes} min · ` : ''}{plural(votes, 'vote')} this week</span></summary>
+      <Disclosure
+        open={open}
+        title={<>Growth today {parts.length ? `(${parts.join(', ')})` : '(done)'} <span class="small muted">· {s.minutes ? `about ${s.minutes} min · ` : ''}{plural(votes, 'vote')} this week</span></>}
+      >
         <div class="stack" style="gap:0.6rem;margin-top:0.6rem">
           {fresh.length ? (
             <ul class="plain small m0" style="padding:0;list-style:none;display:grid;gap:0.25rem">
@@ -62,7 +64,7 @@ export function GrowthFold({ small, open = false }: { small: boolean; open?: boo
           <div><a class="btn btn--small" href="/growth">Open today’s session</a></div>
           <Habits compact />
         </div>
-      </details>
+      </Disclosure>
     </section>
   )
 }
@@ -72,15 +74,17 @@ export function CloseDay({ open = false }: { open?: boolean }) {
   const day = today.value
   return (
     <section class="card waiting closeday" aria-label="Close the day" data-testid="close-day">
-      <details open={open}>
-        <summary>Close the day <span class="small muted">· one line for tomorrow, then stop</span></summary>
+      <Disclosure
+        open={open}
+        title={<>Close the day <span class="small muted">· one line for tomorrow, then stop</span></>}
+      >
         <div style="margin-top:0.6rem">
           <label class="small">Tick what you finished above. Then: what is the first thing tomorrow?
             <NoteEditor kind="free" refId={tomorrowRef(day)} rows={2} placeholder="Tomorrow morning I start with…" />
           </label>
           <p class="small muted m0">Then say it: shutdown complete. Tomorrow’s next-up card shows this line.</p>
         </div>
-      </details>
+      </Disclosure>
     </section>
   )
 }

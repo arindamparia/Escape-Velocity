@@ -58,10 +58,10 @@ export function HourBox({ week, dow, done }: { week: number; dow: number; done: 
   const [budget, setBudget] = useState<number>(0)
   const r = budget ? fitInto(budget, week, dow, done) : null
   return (
-    <details class="hour" data-testid="hour-box">
-      <summary>Only have a little time?</summary>
-      <div class="stack" style="margin-top:0.7rem;gap:0.6rem">
+    <section class="hour" data-testid="hour-box" aria-label="Only have a little time?">
+      <div class="stack" style="gap:0.6rem">
         <div role="group" aria-label="How much time you have" class="row">
+          <span class="hour__q">Only have a little time?</span>
           {BUDGETS.map((m) => <button key={m} type="button" class="chip" aria-pressed={budget === m} onClick={() => setBudget(budget === m ? 0 : m)}>{formatMinutes(m)}</button>)}
         </div>
         {r ? (
@@ -83,7 +83,7 @@ export function HourBox({ week, dow, done }: { week: number; dow: number; done: 
           ) : <p class="small muted m0">Nothing open fits {formatMinutes(budget)}. Try a longer slot, or take the rest.</p>
         ) : <p class="small muted m0">Pick the time you have. This lists the open work that fits, most valuable first.</p>}
       </div>
-    </details>
+    </section>
   )
 }
 

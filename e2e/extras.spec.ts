@@ -41,7 +41,7 @@ test.describe('papers', () => {
     await api.activeOn('2026-11-27')
     await openApp(page, '/', { at: kolkata('2026-11-27T21:00:00') })
     await expect(page.getByRole('region', { name: 'Next up' })).toHaveCount(0)
-    await page.getByRole('region', { name: 'Optional extras' }).locator('summary').click() // extras are folded into one line
+    await page.getByRole('region', { name: 'Optional extras' }).locator('summary').first().click() // extras are folded into one line
     const row = taskRow(page, 'w04-14')
     await expect(row).toBeVisible()
     await expect(row).toContainText('optional')
@@ -90,7 +90,7 @@ test.describe('equations', () => {
     await api.activeOn('2026-11-23'); await api.activeOn('2026-11-24') // not a welcome-back day
     await openApp(page, '/', { at: kolkata('2026-11-25T10:00:00') }) // week 4 has a Thursday derivation and a bonus equation
     await expect(page.getByRole('region', { name: 'Equation of the week' })).toHaveCount(0) // not shown a third time in the side column
-    await page.getByRole('region', { name: 'Optional extras' }).locator('summary').click()
+    await page.getByRole('region', { name: 'Optional extras' }).locator('summary').first().click()
     const bonus = page.getByRole('region', { name: 'Bonus equation' })
     await expect(bonus).toContainText('Zipf hit ratio')
     await expect(bonus.locator('math')).toBeVisible() // the formula is in view

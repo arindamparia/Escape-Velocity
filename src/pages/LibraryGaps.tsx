@@ -4,6 +4,7 @@ import { Html } from '../ui/Html'
 import { Icon } from '../ui/Icon'
 import { SketchBlock } from '../ui/SketchView'
 import { taskLabel } from '../lib/plan'
+import { Disclosure } from '../ui/Disclosure'
 
 type Lib = PageChunks['library']
 
@@ -12,10 +13,9 @@ const STATUS_WORD = { covered: 'Covered', partial: 'Partly covered', gap: 'Gap',
 function GapSketch({ id }: { id: Lib['gaps']['gaps'][number]['sketch'] }) {
   const [open, setOpen] = useState(false)
   return (
-    <details onToggle={(e) => setOpen((e.currentTarget as HTMLDetailsElement).open)}>
-      <summary>Sketch</summary>
+    <Disclosure title="Sketch of this gap" onToggle={setOpen}>
       {open ? <SketchBlock id={id} /> : null}
-    </details>
+    </Disclosure>
   )
 }
 
@@ -44,9 +44,8 @@ export function GapsTab({ lib }: { lib: Lib }) {
       <section class="stack" aria-label="Against his syllabi" id="coverage">
         <h2 class="m0">Against his two syllabi</h2>
         {g.coverage.map((c) => (
-          <details class="card" key={c.title}>
-            <summary>{c.title} <span class="muted small">· {c.rows.filter((r) => r.status === 'covered').length} of {c.rows.length} covered</span></summary>
-            <div class="tblwrap" style="margin-top:0.6rem"><table class="tbl">
+          <Disclosure class="card" key={c.title} title={c.title} hint={`${c.rows.filter((r) => r.status === 'covered').length} of ${c.rows.length} covered`}>
+            <div class="tblwrap"><table class="tbl">
               <thead><tr><th>His topic</th><th>Your plan</th><th>Status</th></tr></thead>
               <tbody>{c.rows.map((r) => (
                 <tr key={r.topic}>
@@ -56,17 +55,16 @@ export function GapsTab({ lib }: { lib: Lib }) {
                 </tr>
               ))}</tbody>
             </table></div>
-          </details>
+          </Disclosure>
         ))}
       </section>
       <section class="stack" aria-label="What you are still missing" id="missing">
         <h2 class="m0">What you are still missing</h2>
         <Html html={g.missingHtml} class="prose" />
       </section>
-      <details class="card" id="courses">
-        <summary>Should you buy a course?</summary>
+      <Disclosure class="card" id="courses" title="Should you buy a course?">
         <Html html={g.coursesHtml} class="prose" />
-      </details>
+      </Disclosure>
     </div>
   )
 }

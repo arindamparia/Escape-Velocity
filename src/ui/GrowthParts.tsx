@@ -15,6 +15,7 @@ import { Html } from './Html'
 import { Icon } from './Icon'
 import { NoteEditor } from './NoteEditor'
 import { usePage } from './hooks'
+import { Disclosure } from './Disclosure'
 
 const LEARNED_LABEL: Record<Learned, string> = { had: 'I had it', close: 'Close', new: 'New to me' }
 const VERDICT: Record<'best' | 'ok' | 'poor', { word: string; mark: string }> = {
@@ -53,12 +54,11 @@ const join = <T,>(items: T[], render: (x: T) => preact.ComponentChildren) => ite
 function More({ idea, open = false }: { idea: GrowthIdea; open?: boolean }) {
   if (!idea.more.length) return null
   return (
-    <details class="grow-more" open={open}>
-      <summary>{idea.more.map((m) => m.label).join(' · ')}</summary>
+    <Disclosure class="grow-more" open={open} title={idea.more.map((m) => m.label).join(' · ')}>
       <dl class="grow-fields">
         {idea.more.map((m) => <div key={m.field}><dt>{m.label}</dt><dd><Html html={m.html} /></dd></div>)}
       </dl>
-    </details>
+    </Disclosure>
   )
 }
 

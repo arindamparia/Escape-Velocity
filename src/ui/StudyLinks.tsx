@@ -3,6 +3,7 @@ import type { ResourceRow } from '../../shared/plan-types'
 import { Html } from './Html'
 import { ResourceList } from './Resources'
 import { usePage } from './hooks'
+import { Disclosure } from './Disclosure'
 
 const DAY_ORDER = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', '']
 const groupKey = (w: string) => (w === 'Extra' ? 99 : Number(w.split('–')[0]) + (w.includes('–') ? 0.5 : 0))
@@ -38,8 +39,7 @@ export function StudyLinks() {
               const days = DAY_ORDER.filter((d) => rows.some((r) => r.day === d))
               const n = Number(week)
               return (
-                <details class="resweek" key={week}>
-                  <summary>{week === 'Extra' ? 'Extra designs (not in the 13 weeks)' : /^\d+$/.test(week) ? `Week ${week}` : `Weeks ${week}`} <span class="muted small">· {rows.length} links</span></summary>
+                <Disclosure class="resweek" key={week} title={week === 'Extra' ? 'Extra designs (not in the 13 weeks)' : /^\d+$/.test(week) ? `Week ${week}` : `Weeks ${week}`} hint={`${rows.length} links`}>
                   {days.map((d) => {
                     const topics = [...new Set(rows.filter((r) => r.day === d).map((r) => r.topic))]
                     return topics.map((t) => (
@@ -50,7 +50,7 @@ export function StudyLinks() {
                     ))
                   })}
                   {Number.isInteger(n) && n >= 1 ? <p class="small" style="margin:0.7rem 0 0"><a href={`/weeks/${n}`}>Open week {n}</a></p> : null}
-                </details>
+                </Disclosure>
               )
             })}
           </section>

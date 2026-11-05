@@ -122,16 +122,17 @@ export { expect }
 
 /* ------------------------------------------------------------------ pages */
 
-export interface OpenOptions { /** null leaves the real clock alone: Playwright's fake clock also stubs performance.mark, so timing tests need it */ at?: Date | null; theme?: Theme | 'system'; reducedMotion?: boolean; /** let time run from `at` (and be moved with page.clock) instead of freezing it */ ticking?: boolean }
+export interface OpenOptions { /** the living look (texture, light, motion). Off by default: the suite runs in Still mode so it is deterministic, and e2e/living.spec.ts covers the living look */ living?: boolean; /** null leaves the real clock alone: Playwright's fake clock also stubs performance.mark, so timing tests need it */ at?: Date | null; theme?: Theme | 'system'; reducedMotion?: boolean; /** let time run from `at` (and be moved with page.clock) instead of freezing it */ ticking?: boolean }
 
 /**
  * Opens the app the way a person does and waits until it has real content and has finished its first sync.
  * `at` freezes the clock (Date only: timers keep running), so what Today shows does not depend on the real date.
  */
-export async function openApp(page: Page, path = '/', { at = WED, theme, reducedMotion, ticking }: OpenOptions = {}): Promise<void> {
+export async function openApp(page: Page, path = '/', { at = WED, theme, reducedMotion, ticking, living }: OpenOptions = {}): Promise<void> {
   if (at && ticking) await page.clock.install({ time: at })
   else if (at) await page.clock.setFixedTime(at)
   if (reducedMotion) await page.emulateMedia({ reducedMotion: 'reduce' })
+  if (!living) await page.addInitScript(() => { try { localStorage.setItem('ev:still', '1') } catch { /* storage blocked */ } })
   if (theme) {
     await page.addInitScript((t) => {
       try { localStorage.setItem('ev:theme', t) } catch { /* storage blocked */ }

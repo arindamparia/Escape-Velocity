@@ -12,6 +12,7 @@ import { Html } from '../ui/Html'
 import { Icon } from '../ui/Icon'
 import { NoteEditor } from '../ui/NoteEditor'
 import { startTimer, timer } from './timer'
+import { Disclosure } from '../ui/Disclosure'
 
 const EXCALIDRAW = 'https://excalidraw.com'
 
@@ -67,7 +68,7 @@ function LoopStart({ presetDesign, presetTask, presetShort }: { presetDesign?: s
           <button type="button" class="btn btn--primary btn--big" disabled={!design} onClick={() => { finishedLoop.value = null; startLoop(design, { taskId: presetTask, short }); navigate('/study/loop') }}>Start the loop</button>
         </div>
       </div>
-      {study ? <details><summary>How the loop works</summary><div style="margin-top:0.8rem"><Html html={study.loopGuideHtml} class="prose small" /></div></details> : null}
+      {study ? <Disclosure title="How the loop works"><Html html={study.loopGuideHtml} class="prose small" /></Disclosure> : null}
     </div>
   )
 }
@@ -239,10 +240,10 @@ function Runner({ run }: { run: LoopRun }) {
           {last && cards < cardsNeeded ? <span class="small muted">Write {cardsNeeded - cards} more decision card{cardsNeeded - cards === 1 ? '' : 's'} first (step 3).</span> : null}
         </div>
         {step === 1 && !stepUnlocked(state.sessions, run, 2) ? (
-          <details class="small"><summary>I already did the timed attempt somewhere else</summary>
+          <Disclosure class="small" title="I already did the timed attempt somewhere else">
             <p class="muted">Only if you really did attempt it cold. The breakdown is worth more after you’ve struggled.</p>
             <button type="button" class="btn btn--small" onClick={() => { if (stepTimerDone(state.sessions, run, 1) || confirm('Did you really attempt it cold for the full time?')) patchLoop({ override: [...run.override, 2] }) }}>Unlock step 2</button>
-          </details>
+          </Disclosure>
         ) : null}
       </section>
     </div>

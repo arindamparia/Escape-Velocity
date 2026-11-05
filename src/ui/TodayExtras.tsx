@@ -3,6 +3,7 @@ import { weekHasLightDay } from '../lib/dates'
 import { plan } from '../lib/plan'
 import { weekPoints, weekTarget } from '../lib/points'
 import { coreTasks, tasksOn } from '../lib/today'
+import { Disclosure } from './Disclosure'
 import { Html } from './Html'
 import { Icon } from './Icon'
 import { usePage } from './hooks'
@@ -60,10 +61,9 @@ export function WeekDays({ week, todayName }: { week: number; todayName: string 
 export function Routine() {
   const page = usePage('today')
   return (
-    <details id="routine">
-      <summary>How my day works</summary>
-      <div style="margin-top:0.8rem">{page ? <Html html={page.routineHtml} class="prose small" /> : <Skeleton h="4rem" />}</div>
-    </details>
+    <Disclosure id="routine" title="How my day works">
+      {page ? <Html html={page.routineHtml} class="prose small" /> : <Skeleton h="4rem" />}
+    </Disclosure>
   )
 }
 

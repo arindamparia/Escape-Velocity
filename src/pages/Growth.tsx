@@ -20,6 +20,7 @@ import { Html } from '../ui/Html'
 import { Icon } from '../ui/Icon'
 import { NoteEditor } from '../ui/NoteEditor'
 import { usePage, useTitle } from '../ui/hooks'
+import { Disclosure } from '../ui/Disclosure'
 
 const VIEWS = ['scenarios', 'habits', 'progress'] as const
 type View = '' | BookId | (typeof VIEWS)[number]
@@ -63,8 +64,7 @@ function Crumbs({ trail }: { trail: [string, string?][] }) {
 
 function HowItWorks({ index }: { index: GrowthIndex }) {
   return (
-    <details class="grow-how" id="how">
-      <summary>How Growth works</summary>
+    <Disclosure class="grow-how" id="how" title="How Growth works">
       <div class="prose small">
         <p>Each day this page gives you, in order:</p>
         <ol>
@@ -76,7 +76,7 @@ function HowItWorks({ index }: { index: GrowthIndex }) {
         </ol>
         <p>The {index.path.length} ideas come from {index.books.length - 1} books and a field kit, in an order that starts with habits and mixes the rest. Doing the session each day covers all of them in about ten weeks; the library is there if you want to read ahead or look back. A missed day costs nothing: the next idea simply waits. Growth has its own progress and never changes your study points or streak.</p>
       </div>
-    </details>
+    </Disclosure>
   )
 }
 
@@ -93,10 +93,9 @@ function Identity({ index }: { index: GrowthIndex }) {
       <p class="grow-kicker">Chapter {c.n}, {c.name} · who you are becoming</p>
       <p class="grow-identity__text m0">“{id.text}”</p>
       <p class="small muted m0"><strong>{votes}</strong> vote{votes === 1 ? '' : 's'} for it this week. Each ticked task, solved problem, idea, card and kept habit is one.</p>
-      <details class="grow-inline">
-        <summary>{id.mine ? 'Edit your statement' : 'Write it in your own words'}</summary>
+      <Disclosure class="grow-inline" title={id.mine ? 'Edit your statement' : 'Write it in your own words'}>
         <NoteEditor kind="free" refId={identityRef(c.n)} rows={2} placeholder={identityFor(index, [], c.n).text} />
-      </details>
+      </Disclosure>
     </section>
   )
 }
@@ -177,11 +176,10 @@ function Session() {
             </>
           ) : <p class="small muted m0">Your habits appear here once you have learned the habit loop (Atomic Habits, the fifth idea).</p>}
           {learned.has('ah-07') ? (
-            <details class="grow-inline">
-              <summary>{anchor.mine ? 'Your cue' : 'Write your cue'} for {BLOCK_LABEL[block].toLowerCase()}</summary>
+            <Disclosure class="grow-inline" title={<>{anchor.mine ? 'Your cue' : 'Write your cue'} for {BLOCK_LABEL[block].toLowerCase()}</>}>
               <p class="small muted m0">{anchor.mine ? '' : `Suggested: ${anchor.cue}`}</p>
               <NoteEditor kind="free" refId={anchorRef(block)} rows={2} placeholder={index.programme.anchors.find((a) => a.block === block)?.cue} />
-            </details>
+            </Disclosure>
           ) : null}
           <a class="small" href="/growth/habits">All habits and anchors</a>
         </section>
