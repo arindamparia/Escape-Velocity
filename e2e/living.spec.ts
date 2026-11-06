@@ -124,6 +124,18 @@ test.describe('Living Paper theme and motion', () => {
     await expect(textarea).toBeVisible()
     const bgImage = await textarea.evaluate((el) => getComputedStyle(el).backgroundImage)
     expect(bgImage).toContain('repeating-linear-gradient')
+
+    // Brand and Nav links have clean non-underlined typography
+    const brandDec = await page.locator('.brand').evaluate((el) => getComputedStyle(el).textDecorationLine)
+    expect(brandDec).toBe('none')
+
+    // Active nav item has the hand-painted watercolor highlighter pseudo-element
+    await openApp(page, '/study/loop', { at: THU, theme: 'paper', living: true })
+    const hasNavHighlighter = await page.locator('.nav a[aria-current="page"]').evaluate((el) => {
+      const beforeBg = getComputedStyle(el, '::before').backgroundImage
+      return beforeBg.includes('svg')
+    })
+    expect(hasNavHighlighter).toBe(true)
   })
 })
 

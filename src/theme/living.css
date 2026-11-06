@@ -244,9 +244,33 @@ html:not([data-still])[data-theme='paper'] .toollist a:hover {
 html:not([data-still])[data-theme='paper'] .toollist a[aria-current='page'] {
   border-left-color: var(--accent);
   border-left-width: 4.5px;
-  background: color-mix(in srgb, var(--hl) 42%, var(--surface));
+  background: var(--surface-2);
   font-weight: 700;
-  box-shadow: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* tactile hand-cut notebook index cards */
+html:not([data-still])[data-theme='paper'] .card {
+  border: 1.5px solid var(--line);
+  border-radius: 5px 7px 4px 6px / 6px 4px 7px 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03), 0 3px 10px rgba(0, 0, 0, 0.02);
+}
+
+/* hand-crafted tactile controls in Living Paper */
+html:not([data-still])[data-theme='paper'] :is(a.iconbtn, button.iconbtn, .timerchip) {
+  border: 1.5px solid color-mix(in srgb, var(--text) 22%, transparent);
+  border-radius: 4px 6px 3px 5px / 5px 3px 6px 4px;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: all 120ms var(--ease-out);
+}
+html:not([data-still])[data-theme='paper'] :is(a.iconbtn, button.iconbtn, .timerchip):hover {
+  border-color: var(--text);
+  background: var(--surface-2);
+  transform: translateY(-1px);
+}
+html:not([data-still])[data-theme='paper'] :is(a.iconbtn, button.iconbtn, .timerchip):active {
+  transform: translateY(1px);
 }
 html:not([data-still])[data-theme='paper'] .dayhead {
   font-family: var(--font-display);
@@ -273,11 +297,58 @@ html:not([data-still]) .library-item:hover { background: var(--surface-2); }
 html:not([data-still]) .tasks > .task[data-focus='true'] { box-shadow: inset 4px 0 0 var(--accent); }
 
 /* ================================================================ 4. You are here: a highlighter stroke */
-html:not([data-still]) .nav a[aria-current='page'] {
+html:not([data-still]):not([data-theme='paper']) .nav a[aria-current='page'] {
   box-shadow: none; border-color: transparent; border-radius: 3px;
   background: linear-gradient(transparent 56%, var(--hl) 56%, var(--hl) 94%, transparent 94%) no-repeat left / 100% 100%;
 }
+html:not([data-still])[data-theme='paper'] .nav a[aria-current='page'] {
+  position: relative;
+  background: none;
+  box-shadow: none;
+  border-color: transparent;
+  color: var(--text);
+  font-weight: 700;
+  z-index: 1;
+}
+html:not([data-still])[data-theme='paper'] .nav a[aria-current='page']::before {
+  content: '';
+  position: absolute;
+  left: 0.15rem;
+  right: 0.15rem;
+  bottom: 10%;
+  height: 62%;
+  z-index: -1;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: center;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 24' preserveAspectRatio='none'%3E%3Cpath d='M 2 18 C 0.8 13, 1.2 7, 3.8 3.5 C 16 2.2, 48 3.8, 86 2 C 94 1.5, 98 2.2, 99 4.8 C 100.5 7.8, 99.2 14.5, 97.8 17.5 C 95 21, 88 20.8, 76 20 C 50 19, 24 20.8, 6.5 20.2 C 3.5 19.8, 2.2 19, 2 18 Z' fill='%23fef08a' fill-opacity='0.85'/%3E%3Cpath d='M 3 16 C 2 12, 2.2 7, 4.5 4 C 18 3, 50 4.2, 85 2.8 C 93 2.5, 96.5 3, 97.5 5 C 98.8 7.5, 97.5 13, 96.5 16 C 94 19, 88 18.8, 77 18 C 52 17.2, 26 18.8, 7.5 18.2 C 4.5 17.8, 3.2 17, 3 16 Z' fill='%23facc15' fill-opacity='0.55'/%3E%3Cpath d='M 3.8 3.5 C 24 2.2, 60 3.8, 98 2' stroke='%23eab308' stroke-opacity='0.45' stroke-width='0.75' fill='none'/%3E%3Cpath d='M 3 19 C 30 20.5, 68 19.5, 96 19' stroke='%23ca8a04' stroke-opacity='0.35' stroke-width='0.9' fill='none'/%3E%3C/svg%3E");
+  transform: rotate(-0.5deg);
+}
+html:not([data-still])[data-theme='paper'][data-tone='night'] .nav a[aria-current='page']::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 24' preserveAspectRatio='none'%3E%3Cpath d='M 2 18 C 0.8 13, 1.2 7, 3.8 3.5 C 16 2.2, 48 3.8, 86 2 C 94 1.5, 98 2.2, 99 4.8 C 100.5 7.8, 99.2 14.5, 97.8 17.5 C 95 21, 88 20.8, 76 20 C 50 19, 24 20.8, 6.5 20.2 C 3.5 19.8, 2.2 19, 2 18 Z' fill='%23fbbf24' fill-opacity='0.28'/%3E%3Cpath d='M 3 16 C 2 12, 2.2 7, 4.5 4 C 18 3, 50 4.2, 85 2.8 C 93 2.5, 96.5 3, 97.5 5 C 98.8 7.5, 97.5 13, 96.5 16 C 94 19, 88 18.8, 77 18 C 52 17.2, 26 18.8, 7.5 18.2 C 4.5 17.8, 3.2 17, 3 16 Z' fill='%23f59e0b' fill-opacity='0.22'/%3E%3Cpath d='M 3.8 3.5 C 24 2.2, 60 3.8, 98 2' stroke='%23fef08a' stroke-opacity='0.35' stroke-width='0.75' fill='none'/%3E%3Cpath d='M 3 19 C 30 20.5, 68 19.5, 96 19' stroke='%23fbbf24' stroke-opacity='0.3' stroke-width='0.9' fill='none'/%3E%3C/svg%3E");
+}
+
+/* subtle pencil underline on hover for inactive nav links */
+html:not([data-still])[data-theme='paper'] .nav a:not([aria-current='page']):hover::after {
+  content: '';
+  position: absolute;
+  left: 0.35rem;
+  right: 0.35rem;
+  bottom: 4px;
+  height: 2px;
+  background: var(--line-strong);
+  border-radius: 2px;
+  opacity: 0.55;
+  pointer-events: none;
+}
 html:not([data-still]) .tabbar a[aria-current='page'] { box-shadow: inset 0 3px 0 var(--accent); }
+html:not([data-still])[data-theme='paper'] .tabbar a[aria-current='page'] {
+  box-shadow: inset 0 3px 0 var(--accent);
+  color: var(--text);
+  font-weight: 700;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
 
 /* ================================================================ 5. Cute and useful marks */
 .hero { position: relative; }
@@ -395,8 +466,15 @@ html:not([data-still]) .tabbar a[aria-current='page'] { box-shadow: inset 0 3px 
   html:not([data-still]) .bar > i { transition: width 900ms var(--ease-out); }
 
   /* the highlighter sweeps in when a nav item becomes current */
-  html:not([data-still]) .nav a[aria-current='page'] { animation: marker var(--dur-large) var(--ease-out) both; }
+  html:not([data-still]):not([data-theme='paper']) .nav a[aria-current='page'] { animation: marker var(--dur-large) var(--ease-out) both; }
   @keyframes marker { from { background-size: 0 100%; } to { background-size: 100% 100%; } }
+  html:not([data-still])[data-theme='paper'] .nav a[aria-current='page']::before {
+    animation: marker-fade 240ms var(--ease-out) both;
+  }
+  @keyframes marker-fade {
+    from { opacity: 0; transform: scaleX(0.8) rotate(-0.5deg); }
+    to { opacity: 1; transform: scaleX(1) rotate(-0.5deg); }
+  }
 
   /* the brand star turns when you point at it */
   html:not([data-still]) .brand:hover .i { animation: star-turn 700ms var(--ease-settle); }

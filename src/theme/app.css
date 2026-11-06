@@ -32,6 +32,7 @@ h3 { font-size: 1.08rem; }
 p { margin: 0 0 0.9em; }
 a { color: var(--accent); text-underline-offset: 0.18em; }
 [data-theme='paper'] a { text-decoration: underline; }
+[data-theme='paper'] :is(.brand, .nav a, .tabbar a, .iconbtn, .chip, .btn, .timeline a, .toollist a, .wtab, .dayrail a) { text-decoration: none; }
 small, .small { font-size: 0.85rem; }
 .muted { color: var(--text-muted); }
 .mono, .num { font-family: 'JBM', ui-monospace, SFMono-Regular, Menlo, monospace; font-variant-numeric: tabular-nums; }
